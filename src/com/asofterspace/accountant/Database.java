@@ -2,7 +2,7 @@
  * Unlicensed code created by A Softer Space, 2020
  * www.asofterspace.com/licenses/unlicense.txt
  */
-package com.asofterspace.metaPlayer;
+package com.asofterspace.accountant;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.JSON;
@@ -13,16 +13,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class SongCtrl {
+public class Database {
 
 	private ConfigFile songConfig;
 
-	private List<Song> songs;
+	private List<Entry> entries;
 
 
-	public SongCtrl() throws JsonParseException {
+	public Database() throws JsonParseException {
 
-		songConfig = new ConfigFile("songs", true);
+		songConfig = new ConfigFile("database", true);
 
 		// create a default config file, if necessary
 		if (songConfig.getAllContents().isEmpty()) {

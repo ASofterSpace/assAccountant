@@ -2,7 +2,7 @@
  * Unlicensed code created by A Softer Space, 2020
  * www.asofterspace.com/licenses/unlicense.txt
  */
-package com.asofterspace.metaPlayer;
+package com.asofterspace.accountant;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.JSON;
@@ -61,7 +61,7 @@ public class Main {
 
 			// create a default config file, if necessary
 			if (config.getAllContents().isEmpty()) {
-				config.setAllContents(new JSON("{\"" + PlayerCtrl.EXT_PLAYER_ASSOC_KEY + "\":[],\"playlists\":[]}"));
+				config.setAllContents(new JSON("{}"));
 			}
 		} catch (JsonParseException e) {
 			System.err.println("Loading the settings failed:");
@@ -69,23 +69,21 @@ public class Main {
 			System.exit(1);
 		}
 
-		// load player associations
-		playerCtrl = new PlayerCtrl(config.getAllContents());
-
 		try {
-			// load songs
-			songCtrl = new SongCtrl();
+			// load database
+			database = new Database();
 		} catch (JsonParseException e) {
-			System.err.println("Loading the songs failed:");
+			System.err.println("Loading the database failed:");
 			System.err.println(e);
 			System.exit(1);
 		}
 
-		System.out.println("All songs have been loaded; MetaPlayer ready!");
+		System.out.println("Hi there! :)");
+		System.out.println("Database has been loaded; I am ready!");
 
-		SwingUtilities.invokeLater(new GUI(playerCtrl, songCtrl, config));
+		SwingUtilities.invokeLater(new GUI(database, config));
 
-		System.out.println("MetaPlayer out. Have a fun day! :)");
+		System.out.println("Accountant out. Have a fun day! :)");
 	}
 
 }
