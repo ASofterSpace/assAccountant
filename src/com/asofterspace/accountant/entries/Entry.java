@@ -12,12 +12,15 @@ public abstract class Entry {
 
 	private static final String AMOUNT_KEY = "amount";
 	private static final String CURRENCY_KEY = "currency";
+	private static final String TAXATION_PERCENT = "taxationPercent";
 	private static final String DATE_KEY = "date";
 	private static final String TITLE_KEY = "title";
 
 	private Integer amount;
 
 	private Currency currency;
+
+	private Integer taxationPercent;
 
 	private Date date;
 
@@ -33,6 +36,8 @@ public abstract class Entry {
 
 		this.currency = Currency.fromString(entryRecord.getString(CURRENCY_KEY));
 
+		this.taxationPercent = entryRecord.getInteger(TAXATION_PERCENT);
+
 		this.date = DateUtils.parseDate(entryRecord.getString(DATE_KEY));
 
 		this.title = entryRecord.getString(TITLE_KEY);
@@ -45,6 +50,8 @@ public abstract class Entry {
 		result.set(AMOUNT_KEY, amount);
 
 		result.set(CURRENCY_KEY, currency);
+
+		result.set(TAXATION_PERCENT, taxationPercent);
 
 		result.set(DATE_KEY, DateUtils.serializeDate(date));
 

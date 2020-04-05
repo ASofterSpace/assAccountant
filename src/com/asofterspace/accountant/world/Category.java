@@ -7,9 +7,30 @@ package com.asofterspace.accountant.world;
 
 public enum Category {
 
-	OTHER,
+	// salaries for a softer space employees
+	INTERNAL_SALARY,
+
+	// money paid to external contractors
+	EXTERNAL_SALARY,
+
+	// travel expenses
 	TRAVEL,
-	DONATION;
+
+	// costs for cars, bikes, spacecraft, ...
+	VEHICLE,
+
+	// entertainment expenses include things like restaurant visits for business purposes
+	ENTERTAINMENT,
+
+	// expenses for office rooms, buildings, planets?
+	LOCATIONS,
+
+	// donations by a softer space
+	DONATION,
+
+	// anything else
+	OTHER;
+
 
 	public static Category fromString(String val) {
 
