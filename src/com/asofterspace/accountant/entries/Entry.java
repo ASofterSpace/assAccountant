@@ -4,7 +4,53 @@
  */
 package com.asofterspace.accountant.entries;
 
+import com.asofterspace.accountant.world.Currency;
+import com.asofterspace.toolbox.utils.DateUtils;
+
 
 public abstract class Entry {
+
+	private static final String AMOUNT_KEY = "amount";
+	private static final String CURRENCY_KEY = "currency";
+	private static final String DATE_KEY = "date";
+	private static final String TITLE_KEY = "title";
+
+	private Integer amount;
+
+	private Currency currency;
+
+	private Date date;
+
+	private String title;
+
+
+	/**
+	 * Load an entry from a generic record
+	 */
+	public Entry(Record entryRecord) {
+
+		this.amount = entryRecord.getInteger(AMOUNT_KEY);
+
+		this.currency = Currency.fromString(entryRecord.getString(CURRENCY_KEY));
+
+		this.date = DateUtils.parseDate(entryRecord.getString(DATE_KEY));
+
+		this.title = entryRecord.getString(TITLE_KEY);
+	}
+
+	public Record toRecord() {
+
+		Record result = new Record();
+
+		result.set(AMOUNT_KEY, amount);
+
+		result.set(CURRENCY_KEY, currency);
+
+		result.set(DATE_KEY, DateUtils.serializeDate(date));
+
+		result.set(TITLE_KEY, title);
+
+		return result;
+	}
 
 }

@@ -53,8 +53,7 @@ public class GUI extends MainWindow {
 	private final static String CONFIG_KEY_LEFT = "mainFrameLeft";
 	private final static String CONFIG_KEY_TOP = "mainFrameTop";
 
-	private PlayerCtrl playerCtrl;
-	private SongCtrl songCtrl;
+	private Database database;
 
 	private Song currentlyPlayedSong;
 
@@ -72,11 +71,9 @@ public class GUI extends MainWindow {
 	private JScrollPane songListScroller;
 
 
-	public GUI(PlayerCtrl playerCtrl, SongCtrl songCtrl, ConfigFile config) {
+	public GUI(Database database, ConfigFile config) {
 
-		this.playerCtrl = playerCtrl;
-
-		this.songCtrl = songCtrl;
+		this.database = database;
 
 		this.configuration = config;
 	}
@@ -134,7 +131,7 @@ public class GUI extends MainWindow {
 			}
 		});
 
-		regenerateSongList();
+		regenerateTimeList();
 	}
 
 	private JMenuBar createMenu(JFrame parent) {
@@ -341,14 +338,11 @@ public class GUI extends MainWindow {
 		searchField.requestFocus();
 	}
 
-
-
 	/**
-	 * Regenerate the file list on the left hand side based on the songCtrl.getSongs() list,
-	 * and (if at least one file exists), select and open the current tab or, if it
-	 * is null, the lastly added one
+	 * Regenerate the list on the left hand side based on the years and their months coming
+	 * from the database
 	 */
-	public void regenerateSongList() {
+	public void regenerateTimeList() {
 
 		// if there is no last shown tab...
 		if (currentlyPlayedSong == null) {

@@ -10,4 +10,17 @@ package com.asofterspace.accountant.entries;
  */
 public class Outgoing extends Entry {
 
+	/**
+	 * Load an outgoing invoice from a generic record
+	 */
+	public Outgoing(Record entryRecord) {
+		super(entryRecord);
+	}
+
+	public Record toRecord() {
+
+		Record result = super.toRecord();
+
+		return result;
+	}
 }
