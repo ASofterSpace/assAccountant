@@ -4,6 +4,7 @@
  */
 package com.asofterspace.accountant;
 
+import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonParseException;
@@ -15,48 +16,41 @@ import java.util.List;
 
 public class Database {
 
-	private ConfigFile songConfig;
+	private static final String YEARS_KEY = "years";
 
-	private List<Entry> entries;
+	private ConfigFile dbFile;
+
+	private List<Year> years;
 
 
 	public Database() throws JsonParseException {
 
-		songConfig = new ConfigFile("database", true);
+		dbFile = new ConfigFile("database", true);
+		years = new ArrayList<>();
 
-		// create a default config file, if necessary
-		if (songConfig.getAllContents().isEmpty()) {
-			songConfig.setAllContents(new JSON("[]"));
+		// create a default database file, if necessary
+		if (dbFile.getAllContents().isEmpty()) {
+			dbFile.setAllContents(new JSON("{\"" + YEARS_KEY + "\":[]}"));
 		}
 
-		JSON songRecordContainer = songConfig.getAllContents();
-		List<Record> songRecords = songRecordContainer.getValues();
-
-		songs = new ArrayList<>();
-
-		for (Record record : songRecords) {
-			Song song = new Song(record);
-			songs.add(song);
+		Record root = dbFile.getAllContents();
+		List<Record> yearRecs = root.getArray(YEARS_KEY);
+		for (Record yearRec : yearRecs) {
+			Year curYear = new Year(yearRec);
+			years.add(curYear);
 		}
-	}
-
-	public List<Song> getSongs() {
-		return songs;
-	}
-
-	public Record getSongData() {
-
-		JSON result = new JSON();
-		result.makeArray();
-
-		for (Song song : songs) {
-			result.append(song.toRecord());
-		}
-
-		return result;
 	}
 
 	public void save() {
-		songConfig.setAllContents(getSongData());
+
+		Record root = Record.emptyObject();
+		Record yearRec = Record.emptyArray();
+		root.set(YEARS_KEY, yearRec);
+
+		for (Year year : years) {
+			yearRec.append(year.toRecord());
+		}
+
+		dbFile.setAllContents(root);
 	}
 }
