@@ -20,8 +20,8 @@ public class Main {
 
 	private static ConfigFile config;
 
-	private static PlayerCtrl playerCtrl;
-	private static SongCtrl songCtrl;
+	private static Database database;
+	private static TabCtrl tabCtrl;
 
 
 	/**
@@ -81,7 +81,9 @@ public class Main {
 		System.out.println("Hi there! :)");
 		System.out.println("Database has been loaded; I am ready!");
 
-		SwingUtilities.invokeLater(new GUI(database, config));
+		tabCtrl = new TabCtrl(database);
+
+		SwingUtilities.invokeLater(new GUI(database, tabCtrl, config));
 
 		System.out.println("Accountant out. Have a fun day! :)");
 	}

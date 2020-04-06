@@ -44,7 +44,7 @@ public class Year {
 		this.months = new ArrayList();
 
 		for (Record monthRec : yearRecord.getArray(MONTHS_KEY)) {
-			months.add(new Month(monthRec));
+			months.add(new Month(monthRec, this));
 		}
 	}
 
@@ -64,4 +64,29 @@ public class Year {
 		return result;
 	}
 
+	public int getNum() {
+		return yearNum;
+	}
+
+	@Override
+	public String toString() {
+		return "" + yearNum;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other == null) {
+			return false;
+		}
+		if (other instanceof Year) {
+			Year otherYear = (Year) other;
+			return yearNum == otherYear.yearNum;
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return yearNum;
+	}
 }

@@ -41,6 +41,10 @@ public class Database {
 		}
 	}
 
+	public List<Year> getYears() {
+		return years;
+	}
+
 	public void save() {
 
 		Record root = Record.emptyObject();

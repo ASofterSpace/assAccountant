@@ -17,6 +17,22 @@ public class Month {
 	private final static String MONTH_NUM_KEY = "monthNum";
 	private final static String OUTGOING_KEY = "outgoings";
 	private final static String INCOMING_KEY = "incomings";
+	private final static String[] MONTH_NUM_TO_NAME = {
+		"January",
+		"February",
+		"March",
+		"April",
+		"May",
+		"June",
+		"July",
+		"August",
+		"September",
+		"October",
+		"November",
+		"December"
+	};
+
+	private Year year;
 
 	private int monthNum;
 
@@ -28,7 +44,9 @@ public class Month {
 	/**
 	 * Create a new month
 	 */
-	public Month(int monthNum) {
+	public Month(int monthNum, Year year) {
+
+		this.year = year;
 
 		this.monthNum = 0;
 
@@ -39,7 +57,9 @@ public class Month {
 	/**
 	 * Load a month from a generic record
 	 */
-	public Month(Record monthRecord) {
+	public Month(Record monthRecord, Year year) {
+
+		this.year = year;
 
 		this.monthNum = monthRecord.getInteger(MONTH_NUM_KEY);
 
@@ -75,4 +95,36 @@ public class Month {
 		return result;
 	}
 
+	public Year getYear() {
+		return year;
+	}
+
+	public int getNum() {
+		return monthNum;
+	}
+
+	@Override
+	public String toString() {
+		return year.toString() + ": " + MONTH_NUM_TO_NAME[monthNum];
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other == null) {
+			return false;
+		}
+		if (other instanceof Month) {
+			// months are equal if they represent the same month - in the same year!
+			Month otherMonth = (Month) other;
+			if (monthNum == otherMonth.monthNum) {
+				return year.getNum() == otherMonth.getYear().getNum());
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return monthNum;
+	}
 }

@@ -4,6 +4,7 @@
  */
 package com.asofterspace.accountant;
 
+import com.asofterspace.accountant.tabs.TimeSpanTab;
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.GuiUtils;
@@ -25,8 +26,6 @@ import java.awt.event.MouseListener;
 import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -54,8 +53,9 @@ public class GUI extends MainWindow {
 	private final static String CONFIG_KEY_TOP = "mainFrameTop";
 
 	private Database database;
+	private TabCtrl tabCtrl;
 
-	private Song currentlyPlayedSong;
+	private TimeSpanTab currentlyOpenedTab;
 
 	private JPanel mainPanelRight;
 
@@ -65,15 +65,18 @@ public class GUI extends MainWindow {
 	private JMenuItem close;
 
 	private ConfigFile configuration;
-	private JList<String> songListComponent;
-	private JPopupMenu songListPopup;
-	private String[] strSongs;
-	private JScrollPane songListScroller;
+	private JList<String> tabListComponent;
+	private JPopupMenu tabListPopup;
+	private List<TimeSpanTab> tabs;
+	private String[] strTabs;
+	private JScrollPane tabListScroller;
 
 
-	public GUI(Database database, ConfigFile config) {
+	public GUI(Database database, TabCtrl tabCtrl, ConfigFile config) {
 
 		this.database = database;
+
+		this.tabCtrl = tabCtrl;
 
 		this.configuration = config;
 	}
@@ -131,7 +134,7 @@ public class GUI extends MainWindow {
 			}
 		});
 
-		regenerateTimeList();
+		regenerateTabList();
 	}
 
 	private JMenuBar createMenu(JFrame parent) {
@@ -216,11 +219,11 @@ public class GUI extends MainWindow {
 		JPanel gapPanel = new JPanel();
 		gapPanel.setPreferredSize(new Dimension(8, 8));
 
-		String[] songList = new String[0];
-		songListComponent = new JList<String>(songList);
+		String[] tabList = new String[0];
+		tabListComponent = new JList<String>(tabList);
 
 		/*
-		songListComponent.addMouseListener(new MouseListener() {
+		tabListComponent.addMouseListener(new MouseListener() {
 
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -247,15 +250,15 @@ public class GUI extends MainWindow {
 
 			private void showPopupAndSelectedTab(MouseEvent e) {
 				if (e.isPopupTrigger()) {
-					songListComponent.setSelectedIndex(songListComponent.locationToIndex(e.getPoint()));
-					songListPopup.show(songListComponent, e.getX(), e.getY());
+					tabListComponent.setSelectedIndex(tabListComponent.locationToIndex(e.getPoint()));
+					tabListPopup.show(tabListComponent, e.getX(), e.getY());
 				}
 
 				showSelectedTab();
 			}
 		});
 
-		songListComponent.addKeyListener(new KeyListener() {
+		tabListComponent.addKeyListener(new KeyListener() {
 
 			@Override
 			public void keyTyped(KeyEvent e) {
@@ -277,9 +280,9 @@ public class GUI extends MainWindow {
 		});
 		*/
 
-		songListScroller = new JScrollPane(songListComponent);
-		songListScroller.setPreferredSize(new Dimension(8, 8));
-		songListScroller.setBorder(BorderFactory.createEmptyBorder());
+		tabListScroller = new JScrollPane(tabListComponent);
+		tabListScroller.setPreferredSize(new Dimension(8, 8));
+		tabListScroller.setBorder(BorderFactory.createEmptyBorder());
 
 		searchPanel = new JPanel();
 		searchPanel.setLayout(new GridBagLayout());
@@ -301,7 +304,7 @@ public class GUI extends MainWindow {
 			private void search() {
 				String searchFor = searchField.getText();
 
-				// TODO :: actually search for the song ;)
+				// TODO :: actually search for the year ;)
 			}
 		});
 
@@ -310,7 +313,7 @@ public class GUI extends MainWindow {
 			public void actionPerformed(ActionEvent e) {
 				String searchFor = searchField.getText();
 
-				// TODO :: actually search for the song ;)
+				// TODO :: actually search for the year ;)
 			}
 		});
 
@@ -320,7 +323,7 @@ public class GUI extends MainWindow {
 
 		mainPanelRightOuter.add(searchPanel, new Arrangement(0, 1, 1.0, 0.0));
 
-		mainPanel.add(songListScroller, new Arrangement(0, 0, 0.2, 1.0));
+		mainPanel.add(tabListScroller, new Arrangement(0, 0, 0.2, 1.0));
 
 		mainPanel.add(gapPanel, new Arrangement(2, 0, 0.0, 0.0));
 
@@ -342,61 +345,53 @@ public class GUI extends MainWindow {
 	 * Regenerate the list on the left hand side based on the years and their months coming
 	 * from the database
 	 */
-	public void regenerateTimeList() {
+	public void regenerateTabList() {
+
+		tabs = TabCtrl.getTabs();
 
 		// if there is no last shown tab...
-		if (currentlyPlayedSong == null) {
+		if (currentlyOpenedTab == null) {
 			// ... show some random tab explicitly - this is fun, and the tabbed layout otherwise shows it anyway, so may as well...
-			if (songCtrl.getSongs().size() > 0) {
-				setCurrentlyPlayedSong(songCtrl.getSongs().get(0));
+			if (tabs.size() > 0) {
+				setCurrentlyOpenedTab(tabs.get(0));
 			}
 		}
 
-		/*
-		Collections.sort(songCtrl.getSongs(), new Comparator<Song>() {
-			public int compare(Song a, Song b) {
-				return a.getFilePath().toLowerCase().compareTo(b.getFilePath().toLowerCase());
-			}
-		});
-		*/
-
-		strSongs = new String[songCtrl.getSongs().size()];
+		strTabs = new String[tabs.size()];
 
 		int i = 0;
 
-		for (Song song : songCtrl.getSongs()) {
-			strSongs[i] = song.toString();
-			if (song.equals(currentlyPlayedSong)) {
-				strSongs[i] = ">> " + strSongs[i] + " <<";
+		for (Tab tab : tabs) {
+			strTabs[i] = tab.toString();
+			if (tab.equals(currentlyOpenedTab)) {
+				strTabs[i] = ">> " + strTabs[i] + " <<";
 			}
 			i++;
 		}
 
-		songListComponent.setListData(strSongs);
+		tabListComponent.setListData(strTabs);
 
 		// if there still is no last shown tab (e.g. we just deleted the very last one)...
-		if (currentlyPlayedSong == null) {
+		if (currentlyOpenedTab == null) {
 			// ... then we do not need to show or highlight any ;)
 			return;
 		}
 
-		/*
 		// show the last shown tab
-		showTab(currentlyPlayedSong);
-		*/
+		showTab(currentlyOpenedTab);
 
-		highlightTabInLeftListOrTree(currentlyPlayedSong);
+		highlightTabInLeftListOrTree(currentlyOpenedTab);
 	}
 
-	public void highlightTabInLeftListOrTree(final Song song) {
+	public void highlightTabInLeftListOrTree(final TimeSpanTab tab) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				// highlight tab the list
 				int i = 0;
-				for (Song cur : songCtrl.getSongs()) {
-					if (song.equals(cur)) {
-						songListComponent.setSelectedIndex(i);
+				for (Tab cur : tabs) {
+					if (tab.equals(cur)) {
+						tabListComponent.setSelectedIndex(i);
 						break;
 					}
 					i++;
@@ -409,8 +404,12 @@ public class GUI extends MainWindow {
 		mainFrame.setTitle(Main.PROGRAM_TITLE);
 	}
 
-	private void setCurrentlyPlayedSong(Song song) {
-		currentlyPlayedSong = song;
+	private void setCurrentlyOpenedTab(TimeSpanTab tab) {
+		currentlyOpenedTab = tab;
+	}
+
+	private void showTab(TimeSpanTab tab) {
+		// TODO
 	}
 
 }
