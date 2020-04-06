@@ -5,10 +5,12 @@
 package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.tabs.TimeSpanTab;
+import com.asofterspace.accountant.tabs.YearTab;
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.gui.MainWindow;
+import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 
 import java.awt.BorderLayout;
@@ -26,6 +28,7 @@ import java.awt.event.MouseListener;
 import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -239,7 +242,6 @@ public class GUI extends MainWindow {
 		String[] tabList = new String[0];
 		tabListComponent = new JList<String>(tabList);
 
-		/*
 		tabListComponent.addMouseListener(new MouseListener() {
 
 			@Override
@@ -249,7 +251,7 @@ public class GUI extends MainWindow {
 
 			@Override
 			public void mousePressed(MouseEvent e) {
-				showPopupAndSelectedTab(e);
+				showSelectedTab();
 			}
 
 			@Override
@@ -262,15 +264,6 @@ public class GUI extends MainWindow {
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
-				showPopupAndSelectedTab(e);
-			}
-
-			private void showPopupAndSelectedTab(MouseEvent e) {
-				if (e.isPopupTrigger()) {
-					tabListComponent.setSelectedIndex(tabListComponent.locationToIndex(e.getPoint()));
-					tabListPopup.show(tabListComponent, e.getX(), e.getY());
-				}
-
 				showSelectedTab();
 			}
 		});
@@ -295,7 +288,6 @@ public class GUI extends MainWindow {
 				}
 			}
 		});
-		*/
 
 		tabListScroller = new JScrollPane(tabListComponent);
 		tabListScroller.setPreferredSize(new Dimension(8, 8));
@@ -374,17 +366,20 @@ public class GUI extends MainWindow {
 			}
 		}
 
-		strTabs = new String[tabs.size()];
-
-		int i = 0;
+		ArrayList<String> strTabList = new ArrayList<>();
 
 		for (TimeSpanTab tab : tabs) {
-			strTabs[i] = tab.toString();
-			if (tab.equals(currentlyOpenedTab)) {
-				strTabs[i] = ">> " + strTabs[i] + " <<";
+			if ((tab instanceof YearTab) && (strTabList.size() > 0)) {
+				strTabList.add(" ");
 			}
-			i++;
+			if (tab.equals(currentlyOpenedTab)) {
+				strTabList.add(">> " + tab.toString() + " <<");
+			} else {
+				strTabList.add(tab.toString());
+			}
 		}
+
+		strTabs = StrUtils.strListToArray(strTabList);
 
 		tabListComponent.setListData(strTabs);
 
@@ -406,8 +401,8 @@ public class GUI extends MainWindow {
 			public void run() {
 				// highlight tab the list
 				int i = 0;
-				for (TimeSpanTab cur : tabs) {
-					if (tab.equals(cur)) {
+				for (String strTab : strTabs) {
+					if (strTab.equals(tab.toString()) || strTab.equals(">> " + tab.toString() + " <<")) {
 						tabListComponent.setSelectedIndex(i);
 						break;
 					}
@@ -427,6 +422,17 @@ public class GUI extends MainWindow {
 
 	private void showTab(TimeSpanTab tab) {
 		// TODO
+	}
+
+	private void showSelectedTab() {
+		String strTab = strTabs[tabListComponent.getSelectedIndex()];
+		for (TimeSpanTab tab : tabs) {
+			if (strTab.equals(tab.toString()) || strTab.equals(">> " + tab.toString() + " <<")) {
+				showTab(tab);
+				return;
+			}
+		}
+		showTab(null);
 	}
 
 }

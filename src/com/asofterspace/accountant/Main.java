@@ -15,8 +15,8 @@ import javax.swing.SwingUtilities;
 public class Main {
 
 	public final static String PROGRAM_TITLE = "assAccountant";
-	public final static String VERSION_NUMBER = "0.0.0.1(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "5. April 2020";
+	public final static String VERSION_NUMBER = "0.0.0.2(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "6. April 2020";
 
 	private static ConfigFile config;
 
@@ -42,6 +42,9 @@ public class Main {
 	 *   the accountant, as much as possible being automated, and it having been done can
 	 *   be logged, such that upon next startup it can be shown which next finance day is
 	 *   now outstanding, if any, and which might come up over the coming weeks etc.)
+	 * generate outgoing invoices with just a few clicks, and have them logged immediately
+	 *   etc.
+	 * automatically read incoming emails and scan for incoming invoices
 	 */
 	public static void main(String[] args) {
 
