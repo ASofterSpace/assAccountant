@@ -45,6 +45,16 @@ public class Database {
 		return years;
 	}
 
+	public boolean addYear(int yearNum) {
+		for (Year cur : years) {
+			if (cur.getNum() == yearNum) {
+				return false;
+			}
+		}
+		years.add(new Year(yearNum));
+		return true;
+	}
+
 	public void save() {
 
 		Record root = Record.emptyObject();

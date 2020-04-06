@@ -13,19 +13,28 @@ public class MonthTab extends TimeSpanTab {
 	private Month month;
 
 
+	public MonthTab(Month month) {
+		this.month = month;
+	}
+
 	@Override
 	public int compareTo(TimeSpanTab tab) {
 		if (tab == null) {
 			return 1;
 		}
 		if (tab instanceof MonthTab) {
-			return month.getNum() - ((MonthTab) tab).getMonth().getNum();
+			int result = tab.getYear().getNum() - getYear().getNum();
+			if (result == 0) {
+				return ((MonthTab) tab).getMonth().getNum() - month.getNum();
+			}
+			return result;
 		}
 		if (tab instanceof YearTab) {
-			int result = getYear().getNum() - ((YearTab) tab).getYear().getNum();
+			int result = tab.getYear().getNum() - getYear().getNum();
 			if (result == 0) {
 				return 1;
 			}
+			return result;
 		}
 		return 1;
 	}
@@ -37,6 +46,11 @@ public class MonthTab extends TimeSpanTab {
 	@Override
 	public Year getYear() {
 		return month.getYear();
+	}
+
+	@Override
+	public String toString() {
+		return month.toString();
 	}
 
 }

@@ -32,6 +32,10 @@ public class Year {
 		this.yearNum = yearNum;
 
 		this.months = new ArrayList<>();
+
+		for (int i = 0; i < 12; i++) {
+			this.months.add(new Month(i, this));
+		}
 	}
 
 	/**
@@ -66,6 +70,10 @@ public class Year {
 
 	public int getNum() {
 		return yearNum;
+	}
+
+	public List<Month> getMonths() {
+		return months;
 	}
 
 	@Override

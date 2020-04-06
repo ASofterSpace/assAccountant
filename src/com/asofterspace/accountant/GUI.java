@@ -71,6 +71,8 @@ public class GUI extends MainWindow {
 	private String[] strTabs;
 	private JScrollPane tabListScroller;
 
+	private NewYearGUI newYearGUI;
+
 
 	public GUI(Database database, TabCtrl tabCtrl, ConfigFile config) {
 
@@ -144,25 +146,40 @@ public class GUI extends MainWindow {
 		JMenu file = new JMenu("File");
 		menu.add(file);
 
-		/*
-		JMenuItem newFile = new JMenuItem("New File");
-		newFile.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
-		newFile.addActionListener(new ActionListener() {
+		JMenuItem addYear = new JMenuItem("Add Year");
+		addYear.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
+		addYear.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				newFile();
+				// show the new year GUI
+				if (newYearGUI == null) {
+					newYearGUI = new NewYearGUI(GUI.this, database);
+				}
+				newYearGUI.show();
 			}
 		});
-		file.add(newFile);
-		*/
+		file.add(addYear);
 
-		// file.addSeparator();
+		file.addSeparator();
+
+		close = new JMenuItem("Save");
+		close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+		close.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				database.save();
+			}
+		});
+		file.add(close);
+
+		file.addSeparator();
 
 		close = new JMenuItem("Exit");
 		close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, ActionEvent.ALT_MASK));
 		close.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				System.out.println("Accountant out. Have a fun day! :)");
 				System.exit(0);
 			}
 		});

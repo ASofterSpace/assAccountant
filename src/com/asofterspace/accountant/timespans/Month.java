@@ -51,7 +51,7 @@ public class Month {
 
 		this.year = year;
 
-		this.monthNum = 0;
+		this.monthNum = monthNum;
 
 		this.outgoings = new ArrayList<>();
 		this.incomings = new ArrayList<>();

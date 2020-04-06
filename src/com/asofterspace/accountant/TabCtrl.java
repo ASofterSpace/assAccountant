@@ -4,7 +4,11 @@
  */
 package com.asofterspace.accountant;
 
+import com.asofterspace.accountant.tabs.MonthTab;
 import com.asofterspace.accountant.tabs.TimeSpanTab;
+import com.asofterspace.accountant.tabs.YearTab;
+import com.asofterspace.accountant.timespans.Month;
+import com.asofterspace.accountant.timespans.Year;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -25,7 +29,13 @@ public class TabCtrl {
 
 		List<TimeSpanTab> result = new ArrayList<>();
 
-		// TODO :: actually get tabs from the database
+		List<Year> years = database.getYears();
+		for (Year year : years) {
+			result.add(new YearTab(year));
+			for (Month month : year.getMonths()) {
+				result.add(new MonthTab(month));
+			}
+		}
 
 		Collections.sort(result, new Comparator<TimeSpanTab>() {
 			public int compare(TimeSpanTab a, TimeSpanTab b) {

@@ -12,17 +12,26 @@ public class YearTab extends TimeSpanTab {
 	private Year year;
 
 
+	public YearTab(Year year) {
+		this.year = year;
+	}
+
 	@Override
 	public int compareTo(TimeSpanTab tab) {
 		if (tab == null) {
 			return 1;
 		}
-		return year.getNum() - tab.getYear().getNum();
+		return tab.getYear().getNum() - year.getNum();
 	}
 
 	@Override
 	public Year getYear() {
 		return year;
+	}
+
+	@Override
+	public String toString() {
+		return year.toString();
 	}
 
 }
