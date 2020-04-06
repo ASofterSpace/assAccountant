@@ -107,6 +107,7 @@ public class MonthTab extends TimeSpanTab {
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
+
 		JPanel footer = new JPanel();
 		tab.add(footer, new Arrangement(0, i, 1.0, 1.0));
 

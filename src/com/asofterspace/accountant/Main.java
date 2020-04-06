@@ -27,6 +27,10 @@ public class Main {
 	/**
 	 * TODO:
 	 * Export (as menu item), with Export as German CSV and Export as English CSV as sub-items
+	 * Check Consistency (as menu item), maybe also automatically done on startup, checks e.g. for
+	 *   all entries if their dates actually belong to the month and year that they say they belong to
+	 * add input method for entries (independent of years and months, according to the date they are
+	 *   automatically added where they need to go!)
 	 * also handle timesheets (and automatically base invoices on timesheets)
 	 * add outgoing invoices with different tax amounts
 	 * add incoming invoices with different tax amounts and having different kinds

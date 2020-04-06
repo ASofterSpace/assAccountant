@@ -4,6 +4,8 @@
  */
 package com.asofterspace.accountant.timespans;
 
+import com.asofterspace.accountant.entries.Incoming;
+import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.toolbox.utils.Record;
 
 import java.util.ArrayList;
@@ -74,6 +76,22 @@ public class Year {
 
 	public List<Month> getMonths() {
 		return months;
+	}
+
+	public List<Outgoing> getOutgoings() {
+		List<Outgoing> result = new ArrayList<>();
+		for (Month month : months) {
+			result.addAll(month.getOutgoings());
+		}
+		return result;
+	}
+
+	public List<Incoming> getIncomings() {
+		List<Incoming> result = new ArrayList<>();
+		for (Month month : months) {
+			result.addAll(month.getIncomings());
+		}
+		return result;
 	}
 
 	@Override
