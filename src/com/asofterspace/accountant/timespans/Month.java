@@ -8,6 +8,9 @@ import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.toolbox.utils.Record;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * This represents a month of accounting data
@@ -50,8 +53,8 @@ public class Month {
 
 		this.monthNum = 0;
 
-		this.outgoings = new ArrayList();
-		this.incomings = new ArrayList();
+		this.outgoings = new ArrayList<>();
+		this.incomings = new ArrayList<>();
 	}
 
 	/**
@@ -63,8 +66,8 @@ public class Month {
 
 		this.monthNum = monthRecord.getInteger(MONTH_NUM_KEY);
 
-		this.outgoings = new ArrayList();
-		this.incomings = new ArrayList();
+		this.outgoings = new ArrayList<>();
+		this.incomings = new ArrayList<>();
 
 		for (Record rec : monthRecord.getArray(OUTGOING_KEY)) {
 			outgoings.add(new Outgoing(rec));
@@ -85,10 +88,10 @@ public class Month {
 		Record incomingRec = Record.emptyArray();
 		result.set(INCOMING_KEY, incomingRec);
 
-		for (Month entry : outgoings) {
+		for (Outgoing entry : outgoings) {
 			outgoingRec.append(entry.toRecord());
 		}
-		for (Month entry : incomings) {
+		for (Incoming entry : incomings) {
 			incomingRec.append(entry.toRecord());
 		}
 
@@ -117,7 +120,7 @@ public class Month {
 			// months are equal if they represent the same month - in the same year!
 			Month otherMonth = (Month) other;
 			if (monthNum == otherMonth.monthNum) {
-				return year.getNum() == otherMonth.getYear().getNum());
+				return year.getNum() == otherMonth.getYear().getNum();
 			}
 		}
 		return false;

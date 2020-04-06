@@ -6,6 +6,9 @@ package com.asofterspace.accountant.entries;
 
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.utils.DateUtils;
+import com.asofterspace.toolbox.utils.Record;
+
+import java.util.Date;
 
 
 public abstract class Entry {
@@ -34,7 +37,7 @@ public abstract class Entry {
 
 		this.amount = entryRecord.getInteger(AMOUNT_KEY);
 
-		this.currency = Currency.fromString(entryRecord.getString(CURRENCY_KEY));
+		this.currency = Currency.valueOf(entryRecord.getString(CURRENCY_KEY));
 
 		this.taxationPercent = entryRecord.getInteger(TAXATION_PERCENT);
 

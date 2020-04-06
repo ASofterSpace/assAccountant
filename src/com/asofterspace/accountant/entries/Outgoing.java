@@ -4,6 +4,8 @@
  */
 package com.asofterspace.accountant.entries;
 
+import com.asofterspace.toolbox.utils.Record;
+
 
 /**
  * This represents an outgoing invoice (so one that we get paid for, yay! ^^)

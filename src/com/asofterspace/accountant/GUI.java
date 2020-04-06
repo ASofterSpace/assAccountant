@@ -347,7 +347,7 @@ public class GUI extends MainWindow {
 	 */
 	public void regenerateTabList() {
 
-		tabs = TabCtrl.getTabs();
+		tabs = tabCtrl.getTabs();
 
 		// if there is no last shown tab...
 		if (currentlyOpenedTab == null) {
@@ -361,7 +361,7 @@ public class GUI extends MainWindow {
 
 		int i = 0;
 
-		for (Tab tab : tabs) {
+		for (TimeSpanTab tab : tabs) {
 			strTabs[i] = tab.toString();
 			if (tab.equals(currentlyOpenedTab)) {
 				strTabs[i] = ">> " + strTabs[i] + " <<";
@@ -389,7 +389,7 @@ public class GUI extends MainWindow {
 			public void run() {
 				// highlight tab the list
 				int i = 0;
-				for (Tab cur : tabs) {
+				for (TimeSpanTab cur : tabs) {
 					if (tab.equals(cur)) {
 						tabListComponent.setSelectedIndex(i);
 						break;

@@ -31,22 +31,4 @@ public enum Category {
 	// anything else
 	OTHER;
 
-
-	public static Category fromString(String val) {
-
-		if (val == null) {
-			return null;
-		}
-
-		switch (val) {
-			case "OTHER":
-				return Category.OTHER;
-			case "TRAVEL":
-				return Category.TRAVEL;
-			case "DONATION":
-				return Category.DONATION;
-		}
-
-		return null;
-	}
 }

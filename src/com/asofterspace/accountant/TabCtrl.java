@@ -4,7 +4,12 @@
  */
 package com.asofterspace.accountant;
 
+import com.asofterspace.accountant.tabs.TimeSpanTab;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 
 public class TabCtrl {
@@ -22,7 +27,7 @@ public class TabCtrl {
 
 		// TODO :: actually get tabs from the database
 
-		Collections.sort(result, new Comparator<Year>() {
+		Collections.sort(result, new Comparator<TimeSpanTab>() {
 			public int compare(TimeSpanTab a, TimeSpanTab b) {
 				return a.compareTo(b);
 			}

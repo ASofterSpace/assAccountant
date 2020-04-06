@@ -2,16 +2,17 @@
  * Unlicensed code created by A Softer Space, 2020
  * www.asofterspace.com/licenses/unlicense.txt
  */
-package com.asofterspace.accountant;
+package com.asofterspace.accountant.tabs;
 
 import com.asofterspace.accountant.timespans.Year;
 
 
-public YearTab extends TimeSpanTab {
+public class YearTab extends TimeSpanTab {
 
 	private Year year;
 
 
+	@Override
 	public int compareTo(TimeSpanTab tab) {
 		if (tab == null) {
 			return 1;

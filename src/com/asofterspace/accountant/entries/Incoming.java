@@ -5,6 +5,7 @@
 package com.asofterspace.accountant.entries;
 
 import com.asofterspace.accountant.world.Category;
+import com.asofterspace.toolbox.utils.Record;
 
 
 /**
@@ -12,7 +13,7 @@ import com.asofterspace.accountant.world.Category;
  */
 public class Incoming extends Entry {
 
-	private static final CATEGORY_KEY = "category";
+	private static final String CATEGORY_KEY = "category";
 
 	private Category category;
 
@@ -22,6 +23,8 @@ public class Incoming extends Entry {
 	 */
 	public Incoming(Record entryRecord) {
 		super(entryRecord);
+
+		category = Category.valueOf(entryRecord.getString(CATEGORY_KEY));
 	}
 
 	public Record toRecord() {

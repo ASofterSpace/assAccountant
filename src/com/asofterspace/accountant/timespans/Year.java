@@ -31,7 +31,7 @@ public class Year {
 
 		this.yearNum = yearNum;
 
-		this.months = new ArrayList();
+		this.months = new ArrayList<>();
 	}
 
 	/**
@@ -41,7 +41,7 @@ public class Year {
 
 		this.yearNum = yearRecord.getInteger(YEAR_NUM_KEY);
 
-		this.months = new ArrayList();
+		this.months = new ArrayList<>();
 
 		for (Record monthRec : yearRecord.getArray(MONTHS_KEY)) {
 			months.add(new Month(monthRec, this));
