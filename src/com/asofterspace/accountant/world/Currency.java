@@ -7,6 +7,5 @@ package com.asofterspace.accountant.world;
 
 public enum Currency {
 
-	EUR,
-	USD;
+	EUR;
 }

@@ -4,8 +4,10 @@
  */
 package com.asofterspace.accountant.tabs;
 
+import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
+import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.toolbox.gui.Arrangement;
@@ -59,12 +61,26 @@ public class MonthTab extends TimeSpanTab {
 
 		int i = 2;
 
+		JPanel curPanel;
+		int totalBeforeTax = 0;
+		int totalTax = 0;
+		int totalAfterTax = 0;
+
 		List<Outgoing> outgoings = month.getOutgoings();
 		for (Outgoing cur : outgoings) {
-			JPanel curPanel = cur.createPanelOnGUI();
+			curPanel = cur.createPanelOnGUI();
 			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
+
+			totalBeforeTax += cur.getAmount();
+			totalTax += cur.getPostTaxAmount() - cur.getAmount();
+			totalAfterTax += cur.getPostTaxAmount();
 		}
+
+		curPanel = AccountingUtils.createTotalPanelOnGUI(totalBeforeTax, totalTax, totalAfterTax);
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
 
 		JLabel incomingLabel = new JLabel("Incoming Invoices - that is, we have to pay:");
 		incomingLabel.setPreferredSize(new Dimension(0, incomingLabel.getPreferredSize().height*2));
@@ -72,12 +88,24 @@ public class MonthTab extends TimeSpanTab {
 		tab.add(incomingLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
+		totalBeforeTax = 0;
+		totalTax = 0;
+		totalAfterTax = 0;
+
 		List<Incoming> incomings = month.getIncomings();
 		for (Incoming cur : incomings) {
-			JPanel curPanel = cur.createPanelOnGUI();
+			curPanel = cur.createPanelOnGUI();
 			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
+
+			totalBeforeTax += cur.getAmount();
+			totalTax += cur.getPostTaxAmount() - cur.getAmount();
+			totalAfterTax += cur.getPostTaxAmount();
 		}
+
+		curPanel = AccountingUtils.createTotalPanelOnGUI(totalBeforeTax, totalTax, totalAfterTax);
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
 
 		JPanel footer = new JPanel();
 		tab.add(footer, new Arrangement(0, i, 1.0, 1.0));

@@ -5,6 +5,13 @@
 package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.world.Currency;
+import com.asofterspace.toolbox.gui.Arrangement;
+
+import java.awt.Dimension;
+import java.awt.GridBagLayout;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 
 public class AccountingUtils {
@@ -34,4 +41,43 @@ public class AccountingUtils {
 		return result + " " + currency;
 	}
 
+	public static JPanel createTotalPanelOnGUI(int totalBeforeTax, int totalTax, int totalAfterTax) {
+
+		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
+
+		JPanel curPanel = new JPanel();
+		curPanel.setLayout(new GridBagLayout());
+
+		JLabel curLabel = new JLabel("");
+		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(0, 0, 0.1, 1.0));
+
+		curLabel = new JLabel("");
+		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(1, 0, 0.1, 1.0));
+
+		curLabel = new JLabel("Total: ");
+		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(2, 0, 0.5, 1.0));
+
+		curLabel = new JLabel(AccountingUtils.formatMoney(totalBeforeTax, Currency.EUR));
+		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(3, 0, 0.1, 1.0));
+
+		curLabel = new JLabel(AccountingUtils.formatMoney(totalTax, Currency.EUR));
+		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(4, 0, 0.1, 1.0));
+
+		curLabel = new JLabel(AccountingUtils.formatMoney(totalAfterTax, Currency.EUR));
+		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(5, 0, 0.1, 1.0));
+
+		return curPanel;
+	}
 }
