@@ -27,6 +27,7 @@ public class Incoming extends Entry {
 		category = Category.valueOf(entryRecord.getString(CATEGORY_KEY));
 	}
 
+	@Override
 	public Record toRecord() {
 
 		Record result = super.toRecord();
@@ -46,6 +47,11 @@ public class Incoming extends Entry {
 
 	public void setCategory(Category category) {
 		this.category = category;
+	}
+
+	@Override
+	public String getCategoryOrCustomer() {
+		return getCategoryAsText();
 	}
 
 }

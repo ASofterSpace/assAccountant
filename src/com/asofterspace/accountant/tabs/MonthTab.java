@@ -59,42 +59,9 @@ public class MonthTab extends TimeSpanTab {
 
 		int i = 2;
 
-		int defaultSize = 16;
-		Dimension defaultDimension = new Dimension(defaultSize, defaultSize);
-
 		List<Outgoing> outgoings = month.getOutgoings();
 		for (Outgoing cur : outgoings) {
-			JPanel curPanel = new JPanel();
-			curPanel.setLayout(new GridBagLayout());
-
-			JLabel curLabel = new JLabel(cur.getDateAsText());
-			curLabel.setHorizontalAlignment(JLabel.CENTER);
-			curLabel.setPreferredSize(defaultDimension);
-			curPanel.add(curLabel, new Arrangement(0, 0, 0.1, 1.0));
-
-			curLabel = new JLabel(cur.getTitle());
-			curLabel.setPreferredSize(defaultDimension);
-			curPanel.add(curLabel, new Arrangement(1, 0, 0.4, 1.0));
-
-			curLabel = new JLabel("[" + cur.getCustomer() + "]");
-			curLabel.setPreferredSize(defaultDimension);
-			curPanel.add(curLabel, new Arrangement(2, 0, 0.2, 1.0));
-
-			curLabel = new JLabel(cur.getAmountAsText());
-			curLabel.setHorizontalAlignment(JLabel.RIGHT);
-			curLabel.setPreferredSize(defaultDimension);
-			curPanel.add(curLabel, new Arrangement(3, 0, 0.1, 1.0));
-
-			curLabel = new JLabel(cur.getTaxPercentAsText());
-			curLabel.setHorizontalAlignment(JLabel.RIGHT);
-			curLabel.setPreferredSize(defaultDimension);
-			curPanel.add(curLabel, new Arrangement(4, 0, 0.1, 1.0));
-
-			curLabel = new JLabel(cur.getPostTaxAmountAsText());
-			curLabel.setHorizontalAlignment(JLabel.RIGHT);
-			curLabel.setPreferredSize(defaultDimension);
-			curPanel.add(curLabel, new Arrangement(5, 0, 0.1, 1.0));
-
+			JPanel curPanel = cur.createPanelOnGUI();
 			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
 		}
@@ -107,37 +74,7 @@ public class MonthTab extends TimeSpanTab {
 
 		List<Incoming> incomings = month.getIncomings();
 		for (Incoming cur : incomings) {
-			JPanel curPanel = new JPanel();
-			curPanel.setLayout(new GridBagLayout());
-
-			JLabel curLabel = new JLabel(cur.getDateAsText());
-			curLabel.setHorizontalAlignment(JLabel.CENTER);
-			curLabel.setPreferredSize(defaultDimension);
-			curPanel.add(curLabel, new Arrangement(0, 0, 0.1, 1.0));
-
-			curLabel = new JLabel(cur.getTitle());
-			curLabel.setPreferredSize(defaultDimension);
-			curPanel.add(curLabel, new Arrangement(1, 0, 0.4, 1.0));
-
-			curLabel = new JLabel("[" + cur.getCategoryAsText() + "]");
-			curLabel.setPreferredSize(defaultDimension);
-			curPanel.add(curLabel, new Arrangement(2, 0, 0.2, 1.0));
-
-			curLabel = new JLabel(cur.getAmountAsText());
-			curLabel.setHorizontalAlignment(JLabel.RIGHT);
-			curLabel.setPreferredSize(defaultDimension);
-			curPanel.add(curLabel, new Arrangement(3, 0, 0.1, 1.0));
-
-			curLabel = new JLabel(cur.getTaxPercentAsText());
-			curLabel.setHorizontalAlignment(JLabel.RIGHT);
-			curLabel.setPreferredSize(defaultDimension);
-			curPanel.add(curLabel, new Arrangement(4, 0, 0.1, 1.0));
-
-			curLabel = new JLabel(cur.getPostTaxAmountAsText());
-			curLabel.setHorizontalAlignment(JLabel.RIGHT);
-			curLabel.setPreferredSize(defaultDimension);
-			curPanel.add(curLabel, new Arrangement(5, 0, 0.1, 1.0));
-
+			JPanel curPanel = cur.createPanelOnGUI();
 			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
 		}

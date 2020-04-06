@@ -456,4 +456,9 @@ public class GUI extends MainWindow {
 		showTab(null);
 	}
 
+	public static Dimension getDefaultDimensionForInvoiceLine() {
+		int defaultSize = 16;
+		return new Dimension(defaultSize, defaultSize);
+	}
+
 }

@@ -5,11 +5,18 @@
 package com.asofterspace.accountant.entries;
 
 import com.asofterspace.accountant.AccountingUtils;
+import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.world.Currency;
+import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
 
+import java.awt.Dimension;
+import java.awt.GridBagLayout;
 import java.util.Date;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 
 public abstract class Entry {
@@ -123,6 +130,46 @@ public abstract class Entry {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public abstract String getCategoryOrCustomer();
+
+	public JPanel createPanelOnGUI() {
+
+		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
+
+		JPanel curPanel = new JPanel();
+		curPanel.setLayout(new GridBagLayout());
+
+		JLabel curLabel = new JLabel(getDateAsText());
+		curLabel.setHorizontalAlignment(JLabel.CENTER);
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(0, 0, 0.1, 1.0));
+
+		curLabel = new JLabel(getTitle());
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(1, 0, 0.4, 1.0));
+
+		curLabel = new JLabel("[" + getCategoryOrCustomer() + "]");
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(2, 0, 0.2, 1.0));
+
+		curLabel = new JLabel(getAmountAsText());
+		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(3, 0, 0.1, 1.0));
+
+		curLabel = new JLabel(getTaxPercentAsText());
+		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(4, 0, 0.1, 1.0));
+
+		curLabel = new JLabel(getPostTaxAmountAsText());
+		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(5, 0, 0.1, 1.0));
+
+		return curPanel;
 	}
 
 }

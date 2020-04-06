@@ -26,6 +26,7 @@ public class Outgoing extends Entry {
 		customer = entryRecord.getString(CUSTOMER_KEY);
 	}
 
+	@Override
 	public Record toRecord() {
 
 		Record result = super.toRecord();
@@ -41,6 +42,11 @@ public class Outgoing extends Entry {
 
 	public void setCustomer(String customer) {
 		this.customer = customer;
+	}
+
+	@Override
+	public String getCategoryOrCustomer() {
+		return getCustomer();
 	}
 
 }
