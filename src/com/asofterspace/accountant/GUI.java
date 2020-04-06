@@ -61,6 +61,7 @@ public class GUI extends MainWindow {
 	private TimeSpanTab currentlyOpenedTab;
 
 	private JPanel mainPanelRight;
+	private JPanel emptyTab;
 
 	private JPanel searchPanel;
 	private JTextField searchField;
@@ -358,14 +359,6 @@ public class GUI extends MainWindow {
 
 		tabs = tabCtrl.getTabs();
 
-		// if there is no last shown tab...
-		if (currentlyOpenedTab == null) {
-			// ... show some random tab explicitly - this is fun, and the tabbed layout otherwise shows it anyway, so may as well...
-			if (tabs.size() > 0) {
-				setCurrentlyOpenedTab(tabs.get(0));
-			}
-		}
-
 		ArrayList<String> strTabList = new ArrayList<>();
 
 		for (TimeSpanTab tab : tabs) {
@@ -388,9 +381,6 @@ public class GUI extends MainWindow {
 			// ... then we do not need to show or highlight any ;)
 			return;
 		}
-
-		// show the last shown tab
-		showTab(currentlyOpenedTab);
 
 		highlightTabInLeftListOrTree(currentlyOpenedTab);
 	}
@@ -416,12 +406,43 @@ public class GUI extends MainWindow {
 		mainFrame.setTitle(Main.PROGRAM_TITLE);
 	}
 
-	private void setCurrentlyOpenedTab(TimeSpanTab tab) {
-		currentlyOpenedTab = tab;
-	}
-
+	/**
+	 * To show a tab, or to set the currentlyOpenedTab, ALWAYS call this function,
+	 * NEVER set currentlyOpenedTab directly - as it is handled in here, and this
+	 * here also destroys the previous tabs!
+	 */
 	private void showTab(TimeSpanTab tab) {
-		// TODO
+
+		// if we switch from one tab to itself, ignore the switch :)
+		if (currentlyOpenedTab != null) {
+			if (tab != null) {
+				if (tab.equals(currentlyOpenedTab)) {
+					return;
+				}
+			}
+		}
+
+		// remove previous tab
+		if (currentlyOpenedTab != null) {
+			currentlyOpenedTab.destroyTabOnGUI(mainPanelRight);
+		} else {
+			if (emptyTab != null) {
+				mainPanelRight.remove(emptyTab);
+			}
+		}
+
+		currentlyOpenedTab = tab;
+
+		// open new tab
+		if (currentlyOpenedTab != null) {
+			currentlyOpenedTab.createTabOnGUI(mainPanelRight);
+		} else {
+			emptyTab = new JPanel();
+			mainPanelRight.add(emptyTab);
+		}
+
+		mainPanelRight.revalidate();
+		mainPanelRight.repaint();
 	}
 
 	private void showSelectedTab() {
