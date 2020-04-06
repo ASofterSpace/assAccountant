@@ -26,6 +26,8 @@ public class Main {
 
 	/**
 	 * TODO:
+	 * Export (as menu item), with Export as German CSV and Export as English CSV as sub-items
+	 * also handle timesheets (and automatically base invoices on timesheets)
 	 * add outgoing invoices with different tax amounts
 	 * add incoming invoices with different tax amounts and having different kinds
 	 * add outgoing donations

@@ -106,6 +106,14 @@ public class Month {
 		return monthNum;
 	}
 
+	public List<Outgoing> getOutgoings() {
+		return outgoings;
+	}
+
+	public List<Incoming> getIncomings() {
+		return incomings;
+	}
+
 	@Override
 	public String toString() {
 		return year.toString() + ": " + MONTH_NUM_TO_NAME[monthNum];

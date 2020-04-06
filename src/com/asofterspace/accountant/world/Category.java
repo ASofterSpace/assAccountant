@@ -8,27 +8,39 @@ package com.asofterspace.accountant.world;
 public enum Category {
 
 	// salaries for a softer space employees
-	INTERNAL_SALARY,
+	INTERNAL_SALARY("Internal Salary"),
 
 	// money paid to external contractors
-	EXTERNAL_SALARY,
+	EXTERNAL_SALARY("External Salary"),
 
 	// travel expenses
-	TRAVEL,
+	TRAVEL("Travel Expenses"),
 
 	// costs for cars, bikes, spacecraft, ...
-	VEHICLE,
+	VEHICLE("Vehicles"),
 
 	// entertainment expenses include things like restaurant visits for business purposes
-	ENTERTAINMENT,
+	ENTERTAINMENT("Entertainment Costs"),
 
 	// expenses for office rooms, buildings, planets?
-	LOCATIONS,
+	LOCATIONS("Locations"),
 
 	// donations by a softer space
-	DONATION,
+	DONATION("Donations"),
 
 	// anything else
-	OTHER;
+	OTHER("Other");
+
+
+	private String text;
+
+
+	private Category(String text) {
+		this.text = text;
+	}
+
+	public String getText() {
+		return text;
+	}
 
 }

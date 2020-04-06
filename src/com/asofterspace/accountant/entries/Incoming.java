@@ -35,4 +35,17 @@ public class Incoming extends Entry {
 
 		return result;
 	}
+
+	public Category getCategory() {
+		return category;
+	}
+
+	public String getCategoryAsText() {
+		return category.getText();
+	}
+
+	public void setCategory(Category category) {
+		this.category = category;
+	}
+
 }

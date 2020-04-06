@@ -12,17 +12,35 @@ import com.asofterspace.toolbox.utils.Record;
  */
 public class Outgoing extends Entry {
 
+	private static final String CUSTOMER_KEY = "customer";
+
+	private String customer;
+
+
 	/**
 	 * Load an outgoing invoice from a generic record
 	 */
 	public Outgoing(Record entryRecord) {
 		super(entryRecord);
+
+		customer = entryRecord.getString(CUSTOMER_KEY);
 	}
 
 	public Record toRecord() {
 
 		Record result = super.toRecord();
 
+		result.set(CUSTOMER_KEY, customer);
+
 		return result;
 	}
+
+	public String getCustomer() {
+		return customer;
+	}
+
+	public void setCustomer(String customer) {
+		this.customer = customer;
+	}
+
 }

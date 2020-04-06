@@ -8,6 +8,7 @@ import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.toolbox.gui.Arrangement;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagLayout;
 
 import javax.swing.JLabel;
@@ -39,11 +40,17 @@ public class YearTab extends TimeSpanTab {
 		topHUD.setLayout(new GridBagLayout());
 
 		JLabel nameLabel = new JLabel(year.toString() + " (yearly overview)");
+		nameLabel.setFont(new Font("Calibri", Font.PLAIN, 24));
 		nameLabel.setPreferredSize(new Dimension(0, nameLabel.getPreferredSize().height*2));
 		nameLabel.setHorizontalAlignment(JLabel.CENTER);
 		topHUD.add(nameLabel, new Arrangement(0, 0, 1.0, 1.0));
 
-		tab.add(topHUD, new Arrangement(0, 0, 1.0, 1.0));
+		tab.add(topHUD, new Arrangement(0, 0, 1.0, 0.0));
+
+
+
+		JPanel footer = new JPanel();
+		tab.add(footer, new Arrangement(0, 100, 1.0, 1.0));
 
 		parentPanel.add(tab);
 	}
