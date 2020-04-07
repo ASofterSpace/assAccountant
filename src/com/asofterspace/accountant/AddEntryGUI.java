@@ -4,12 +4,17 @@
  */
 package com.asofterspace.accountant;
 
+import com.asofterspace.accountant.Database;
+import com.asofterspace.accountant.GUI;
+import com.asofterspace.accountant.timespans.Year;
+import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.Utils;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.util.List;
 import java.util.Set;
@@ -44,19 +49,41 @@ public class AddEntryGUI {
 	private JDialog createGUI() {
 
 		// Create the window
-		final JDialog dialog = new JDialog(mainGUI.getMainFrame(), "Add Year", true);
-		GridLayout dialogLayout = new GridLayout(3, 1);
+		final JDialog dialog = new JDialog(mainGUI.getMainFrame(), "Add Entry", true);
+		GridLayout dialogLayout = new GridLayout(4, 1);
 		dialogLayout.setVgap(8);
 		dialog.setLayout(dialogLayout);
 		dialog.getRootPane().setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
 		// Populate the window
 		JLabel explanationLabel = new JLabel();
-		explanationLabel.setText("Enter a new year here to add it:");
+		explanationLabel.setText("Enter a new entry here to add it:");
 		dialog.add(explanationLabel);
 
-		final JTextField newYearNum = new JTextField();
-		dialog.add(newYearNum);
+		JPanel curPanel;
+		JLabel curLabel;
+
+		curPanel = new JPanel();
+		curPanel.setLayout(new GridBagLayout());
+		curLabel = new JLabel("Date in YYYY-MM-DD or DD. MM. YYYY: ");
+		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
+		final JTextField dateText = new JTextField();
+		curPanel.add(dateText, new Arrangement(1, 0, 1.0, 1.0));
+		dialog.add(curPanel);
+
+		curPanel = new JPanel();
+		curPanel.setLayout(new GridBagLayout());
+		curLabel = new JLabel("Title: ");
+		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
+		final JTextField titleText = new JTextField();
+		curPanel.add(titleText, new Arrangement(1, 0, 1.0, 1.0));
+		dialog.add(curPanel);
+
+		// TODO: category or customer!
+		// TODO: amount
+		// TODO: currency
+		// TODO: taxationpercent
+		// TODO: show final amount after tax also whenever anything is changed
 
 		JPanel buttonRow = new JPanel();
 		GridLayout buttonRowLayout = new GridLayout(1, 3);
@@ -64,20 +91,20 @@ public class AddEntryGUI {
 		buttonRow.setLayout(buttonRowLayout);
 		dialog.add(buttonRow);
 
-		JButton addButton = new JButton("Add This Year");
+		JButton addButton = new JButton("Add This Entry");
 		addButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				addYear(newYearNum.getText());
+				addEntry(dateText.getText(), titleText.getText());
 			}
 		});
 		buttonRow.add(addButton);
 
-		JButton addAndExitButton = new JButton("Add This Year and Exit");
+		JButton addAndExitButton = new JButton("Add This Entry and Exit");
 		addAndExitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				if (addYear(newYearNum.getText())) {
+				if (addEntry(dateText.getText(), titleText.getText())) {
 					dialog.dispose();
 				}
 			}
@@ -94,7 +121,7 @@ public class AddEntryGUI {
 
 		// Set the preferred size of the dialog
 		int width = 700;
-		int height = 200;
+		int height = 500;
 		dialog.setSize(width, height);
 		dialog.setPreferredSize(new Dimension(width, height));
 
@@ -105,7 +132,9 @@ public class AddEntryGUI {
 		GuiUtils.centerAndShowWindow(dialog);
 	}
 
-	private boolean addYear(String newYearNum) {
+	private boolean addEntry(String dateStr, String text) {
+/*
+TODO
 
 		try {
 
@@ -136,7 +165,7 @@ public class AddEntryGUI {
 				JOptionPane.ERROR_MESSAGE
 			);
 		}
-
+*/
 		return false;
 	}
 }
