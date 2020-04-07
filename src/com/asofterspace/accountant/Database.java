@@ -4,14 +4,22 @@
  */
 package com.asofterspace.accountant;
 
+import com.asofterspace.accountant.Database;
+import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Year;
+import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonParseException;
+import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
+import com.asofterspace.toolbox.Utils;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import javax.swing.JOptionPane;
 
 
 public class Database {
@@ -114,6 +122,50 @@ public class Database {
 		} catch (JsonParseException e) {
 			System.err.println("JSON parsing failed for " + BACKUP_FILE_NAME + currentBackup + ": " + e);
 		}
+	}
+
+	public boolean addEntry(String dateStr, String text, String catOrCustomer, String amount,
+		Currency currency, String taxationPercent, boolean isIncoming) {
+
+		Date date = DateUtils.parseDate(dateStr);
+
+		// TODO:
+		// parse the date, find the correct year + month object, adding a year if none exists so far,
+		// then parse all the other data and generate an Entry object, appending that one to the
+		// Month, and then save the database... :)
+
+/*
+		try {
+
+			int newYearNumInt = Integer.parseInt(newYearNum.trim());
+
+			if (database.addYear(newYearNumInt)) {
+
+				mainGUI.regenerateTabList();
+
+				return true;
+
+			} else {
+
+				JOptionPane.showMessageDialog(
+					null,
+					"The year " + newYearNum + " already exists!",
+					Utils.getProgramTitle(),
+					JOptionPane.ERROR_MESSAGE
+				);
+			}
+
+		} catch (NumberFormatException e) {
+
+			JOptionPane.showMessageDialog(
+				null,
+				"The input " + newYearNum + " could not be parsed as a number!",
+				Utils.getProgramTitle(),
+				JOptionPane.ERROR_MESSAGE
+			);
+		}
+*/
+		return false;
 	}
 
 	public void save() {

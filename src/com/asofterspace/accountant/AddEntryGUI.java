@@ -6,7 +6,7 @@ package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
-import com.asofterspace.accountant.timespans.Year;
+import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.Utils;
@@ -23,8 +23,8 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 
@@ -65,6 +65,18 @@ public class AddEntryGUI {
 
 		curPanel = new JPanel();
 		curPanel.setLayout(new GridBagLayout());
+		curLabel = new JLabel("Kind: ");
+		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
+		final JRadioButton isIncoming = new JRadioButton();
+		isIncoming.setSelected(true);
+		curPanel.add(isIncoming, new Arrangement(1, 0, 1.0, 1.0));
+		final JRadioButton isOutgoing = new JRadioButton();
+		isOutgoing.setSelected(false);
+		curPanel.add(isOutgoing, new Arrangement(2, 0, 1.0, 1.0));
+		dialog.add(curPanel);
+
+		curPanel = new JPanel();
+		curPanel.setLayout(new GridBagLayout());
 		curLabel = new JLabel("Date in YYYY-MM-DD or DD. MM. YYYY: ");
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
 		final JTextField dateText = new JTextField();
@@ -79,11 +91,34 @@ public class AddEntryGUI {
 		curPanel.add(titleText, new Arrangement(1, 0, 1.0, 1.0));
 		dialog.add(curPanel);
 
-		// TODO: category or customer!
-		// TODO: amount
-		// TODO: currency
-		// TODO: taxationpercent
-		// TODO: show final amount after tax also whenever anything is changed
+		// TODO: instead, have a dropdown with the different categories and with the previously entered customers
+		curPanel = new JPanel();
+		curPanel.setLayout(new GridBagLayout());
+		curLabel = new JLabel("Category or Customer: ");
+		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
+		final JTextField catOrCustomer = new JTextField();
+		curPanel.add(catOrCustomer, new Arrangement(1, 0, 1.0, 1.0));
+		dialog.add(curPanel);
+
+		curPanel = new JPanel();
+		curPanel.setLayout(new GridBagLayout());
+		curLabel = new JLabel("Amount (both . and , taken as decimal separator): ");
+		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
+		final JTextField amount = new JTextField();
+		curPanel.add(amount, new Arrangement(1, 0, 1.0, 1.0));
+		curLabel = new JLabel(" €");
+		curPanel.add(curLabel, new Arrangement(2, 0, 0.0, 1.0));
+		dialog.add(curPanel);
+
+		curPanel = new JPanel();
+		curPanel.setLayout(new GridBagLayout());
+		curLabel = new JLabel("Tax percentage: ");
+		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
+		final JTextField taxPerc = new JTextField();
+		curPanel.add(taxPerc, new Arrangement(1, 0, 1.0, 1.0));
+		curLabel = new JLabel(" %");
+		curPanel.add(curLabel, new Arrangement(2, 0, 0.0, 1.0));
+		dialog.add(curPanel);
 
 		JPanel buttonRow = new JPanel();
 		GridLayout buttonRowLayout = new GridLayout(1, 3);
@@ -95,7 +130,8 @@ public class AddEntryGUI {
 		addButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				addEntry(dateText.getText(), titleText.getText());
+				database.addEntry(dateText.getText(), titleText.getText(), catOrCustomer.getText(),
+					amount.getText(), Currency.EUR, taxPerc.getText(), isIncoming.isSelected());
 			}
 		});
 		buttonRow.add(addButton);
@@ -104,7 +140,9 @@ public class AddEntryGUI {
 		addAndExitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				if (addEntry(dateText.getText(), titleText.getText())) {
+				if (database.addEntry(dateText.getText(), titleText.getText(), catOrCustomer.getText(),
+					amount.getText(), Currency.EUR, taxPerc.getText(), isIncoming.isSelected())) {
+
 					dialog.dispose();
 				}
 			}
@@ -132,40 +170,4 @@ public class AddEntryGUI {
 		GuiUtils.centerAndShowWindow(dialog);
 	}
 
-	private boolean addEntry(String dateStr, String text) {
-/*
-TODO
-
-		try {
-
-			int newYearNumInt = Integer.parseInt(newYearNum.trim());
-
-			if (database.addYear(newYearNumInt)) {
-
-				mainGUI.regenerateTabList();
-
-				return true;
-
-			} else {
-
-				JOptionPane.showMessageDialog(
-					null,
-					"The year " + newYearNum + " already exists!",
-					Utils.getProgramTitle(),
-					JOptionPane.ERROR_MESSAGE
-				);
-			}
-
-		} catch (NumberFormatException e) {
-
-			JOptionPane.showMessageDialog(
-				null,
-				"The input " + newYearNum + " could not be parsed as a number!",
-				Utils.getProgramTitle(),
-				JOptionPane.ERROR_MESSAGE
-			);
-		}
-*/
-		return false;
-	}
 }
