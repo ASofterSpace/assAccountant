@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -50,7 +51,7 @@ public class AddEntryGUI {
 
 		// Create the window
 		final JDialog dialog = new JDialog(mainGUI.getMainFrame(), "Add Entry", true);
-		GridLayout dialogLayout = new GridLayout(4, 1);
+		GridLayout dialogLayout = new GridLayout(8, 1);
 		dialogLayout.setVgap(8);
 		dialog.setLayout(dialogLayout);
 		dialog.getRootPane().setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
@@ -66,11 +67,14 @@ public class AddEntryGUI {
 		curPanel = new JPanel();
 		curPanel.setLayout(new GridBagLayout());
 		curLabel = new JLabel("Kind: ");
+		ButtonGroup inOutGroup = new ButtonGroup();
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
-		final JRadioButton isIncoming = new JRadioButton();
+		final JRadioButton isIncoming = new JRadioButton("Incoming (we have to pay)");
+		inOutGroup.add(isIncoming);
 		isIncoming.setSelected(true);
 		curPanel.add(isIncoming, new Arrangement(1, 0, 1.0, 1.0));
-		final JRadioButton isOutgoing = new JRadioButton();
+		final JRadioButton isOutgoing = new JRadioButton("Outgoing (we get paid)");
+		inOutGroup.add(isOutgoing);
 		isOutgoing.setSelected(false);
 		curPanel.add(isOutgoing, new Arrangement(2, 0, 1.0, 1.0));
 		dialog.add(curPanel);
@@ -158,8 +162,8 @@ public class AddEntryGUI {
 		buttonRow.add(doneButton);
 
 		// Set the preferred size of the dialog
-		int width = 700;
-		int height = 500;
+		int width = 500;
+		int height = 400;
 		dialog.setSize(width, height);
 		dialog.setPreferredSize(new Dimension(width, height));
 
