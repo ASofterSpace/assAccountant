@@ -7,6 +7,7 @@ package com.asofterspace.accountant.timespans;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.toolbox.utils.Record;
+import com.asofterspace.toolbox.utils.StrUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -132,6 +133,28 @@ public class Month {
 
 	public void removeIncoming(Incoming remEntry) {
 		incomings.remove(remEntry);
+	}
+
+	public boolean addEntry(Date date, String text, String catOrCustomer, String amountStr,
+		Currency currency, String taxationPercent, boolean isIncoming) {
+
+		Integer amountObj = StrUtils.parseMoney(amountStr);
+
+		if (amountObj == null) {
+			JOptionPane.showMessageDialog(
+				null,
+				"The text " + amountStr + " could not be parsed as amount of money!",
+				Utils.getProgramTitle(),
+				JOptionPane.ERROR_MESSAGE
+			);
+			return false;
+		}
+
+		int amount = amountObj;
+
+		TODO
+
+		return true;
 	}
 
 	@Override

@@ -16,6 +16,7 @@ import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.Utils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -129,42 +130,55 @@ public class Database {
 
 		Date date = DateUtils.parseDate(dateStr);
 
-		// TODO:
-		// parse the date, find the correct year + month object, adding a year if none exists so far,
-		// then parse all the other data and generate an Entry object, appending that one to the
-		// Month, and then save the database... :)
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		int yearNum = calendar.get(Calendar.YEAR);
+		int monthNum = calendar.get(Calendar.MONTH);
 
-/*
-		try {
-
-			int newYearNumInt = Integer.parseInt(newYearNum.trim());
-
-			if (database.addYear(newYearNumInt)) {
-
-				mainGUI.regenerateTabList();
-
-				return true;
-
-			} else {
-
-				JOptionPane.showMessageDialog(
-					null,
-					"The year " + newYearNum + " already exists!",
-					Utils.getProgramTitle(),
-					JOptionPane.ERROR_MESSAGE
-				);
+		addYear(yearNum);
+		Year curYear = null;
+		for (Year year : years) {
+			if (year.getNum() == yearNum) {
+				curYear = year;
+				break;
 			}
-
-		} catch (NumberFormatException e) {
-
+		}
+		if (curYear == null) {
 			JOptionPane.showMessageDialog(
 				null,
-				"The input " + newYearNum + " could not be parsed as a number!",
+				"The entry could not be added as the year " + yearNum +
+					" - which we just added! - went missing again...",
 				Utils.getProgramTitle(),
 				JOptionPane.ERROR_MESSAGE
 			);
+			return false;
 		}
-*/
+
+		Month curMonth = null;
+		for (Month month : year.getMonths()) {
+			if (month.getNum() == monthNum) {
+				curMonth = month;
+				break;
+			}
+		}
+		if (curMonth == null) {
+			JOptionPane.showMessageDialog(
+				null,
+				"The entry could not be added as the month " + monthNum +
+					" is missing from year " + yearNum + "...",
+				Utils.getProgramTitle(),
+				JOptionPane.ERROR_MESSAGE
+			);
+			return false;
+		}
+
+		if (curMonth.addEntry(date, text, catOrCustomer, amount, currency, taxationPercent, isIncoming)) {
+
+			save();
+
+			return true;
+		}
+
 		return false;
 	}
 
