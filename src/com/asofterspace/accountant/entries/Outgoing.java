@@ -4,6 +4,8 @@
  */
 package com.asofterspace.accountant.entries;
 
+import com.asofterspace.accountant.Database;
+import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.toolbox.utils.Record;
 
 
@@ -20,8 +22,8 @@ public class Outgoing extends Entry {
 	/**
 	 * Load an outgoing invoice from a generic record
 	 */
-	public Outgoing(Record entryRecord) {
-		super(entryRecord);
+	public Outgoing(Record entryRecord, Month parent) {
+		super(entryRecord, parent);
 
 		customer = entryRecord.getString(CUSTOMER_KEY);
 	}
@@ -42,6 +44,12 @@ public class Outgoing extends Entry {
 
 	public void setCustomer(String customer) {
 		this.customer = customer;
+	}
+
+	@Override
+	public void deleteFrom(Database database) {
+		parent.removeOutgoing(this);
+		database.save();
 	}
 
 	@Override

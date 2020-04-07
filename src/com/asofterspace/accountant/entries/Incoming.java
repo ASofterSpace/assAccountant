@@ -4,6 +4,8 @@
  */
 package com.asofterspace.accountant.entries;
 
+import com.asofterspace.accountant.Database;
+import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.world.Category;
 import com.asofterspace.toolbox.utils.Record;
 
@@ -21,8 +23,8 @@ public class Incoming extends Entry {
 	/**
 	 * Load an incoming invoice from a generic record
 	 */
-	public Incoming(Record entryRecord) {
-		super(entryRecord);
+	public Incoming(Record entryRecord, Month parent) {
+		super(entryRecord, parent);
 
 		category = Category.valueOf(entryRecord.getString(CATEGORY_KEY));
 	}
@@ -47,6 +49,12 @@ public class Incoming extends Entry {
 
 	public void setCategory(Category category) {
 		this.category = category;
+	}
+
+	@Override
+	public void deleteFrom(Database database) {
+		parent.removeIncoming(this);
+		database.save();
 	}
 
 	@Override

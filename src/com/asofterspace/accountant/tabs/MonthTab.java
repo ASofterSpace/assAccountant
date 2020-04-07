@@ -5,6 +5,7 @@
 package com.asofterspace.accountant.tabs;
 
 import com.asofterspace.accountant.AccountingUtils;
+import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.GUI;
@@ -33,7 +34,7 @@ public class MonthTab extends TimeSpanTab {
 	}
 
 	@Override
-	public void createTabOnGUI(JPanel parentPanel) {
+	public void createTabOnGUI(JPanel parentPanel, Database database) {
 
 		if (tab != null) {
 			destroyTabOnGUI(parentPanel);
@@ -68,7 +69,7 @@ public class MonthTab extends TimeSpanTab {
 
 		List<Outgoing> outgoings = month.getOutgoings();
 		for (Outgoing cur : outgoings) {
-			curPanel = cur.createPanelOnGUI();
+			curPanel = cur.createPanelOnGUI(database);
 			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
 
@@ -94,7 +95,7 @@ public class MonthTab extends TimeSpanTab {
 
 		List<Incoming> incomings = month.getIncomings();
 		for (Incoming cur : incomings) {
-			curPanel = cur.createPanelOnGUI();
+			curPanel = cur.createPanelOnGUI(database);
 			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
 

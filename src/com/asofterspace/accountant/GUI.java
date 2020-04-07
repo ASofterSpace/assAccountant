@@ -10,6 +10,7 @@ import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.gui.MainWindow;
+import com.asofterspace.toolbox.gui.MenuItemForMainMenu;
 import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -76,6 +78,7 @@ public class GUI extends MainWindow {
 	private JScrollPane tabListScroller;
 
 	private NewYearGUI newYearGUI;
+	private AddEntryGUI addEntryGUI;
 
 
 	public GUI(Database database, TabCtrl tabCtrl, ConfigFile config) {
@@ -212,6 +215,19 @@ public class GUI extends MainWindow {
 			}
 		});
 		edit.add(redo);
+
+		AbstractButton addEntry = new MenuItemForMainMenu("Add Entry");
+		addEntry.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// show the add entry GUI
+				if (addEntryGUI == null) {
+					addEntryGUI = new AddEntryGUI(GUI.this, database);
+				}
+				addEntryGUI.show();
+			}
+		});
+		menu.add(addEntry);
 
 		JMenu huh = new JMenu("?");
 
@@ -459,7 +475,7 @@ public class GUI extends MainWindow {
 
 		// open new tab
 		if (currentlyOpenedTab != null) {
-			currentlyOpenedTab.createTabOnGUI(mainPanelRight);
+			currentlyOpenedTab.createTabOnGUI(mainPanelRight, database);
 		} else {
 			emptyTab = new JPanel();
 			mainPanelRight.add(emptyTab);
@@ -478,6 +494,18 @@ public class GUI extends MainWindow {
 			}
 		}
 		showTab(null);
+	}
+
+	/**
+	 * Refreshes the content of the currently open tab
+	 */
+	public void refreshOpenTab() {
+		if (currentlyOpenedTab != null) {
+			currentlyOpenedTab.destroyTabOnGUI(mainPanelRight);
+			currentlyOpenedTab.createTabOnGUI(mainPanelRight, database);
+			mainPanelRight.revalidate();
+			mainPanelRight.repaint();
+		}
 	}
 
 	public static Dimension getDefaultDimensionForInvoiceLine() {

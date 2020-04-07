@@ -5,15 +5,21 @@
 package com.asofterspace.accountant.entries;
 
 import com.asofterspace.accountant.AccountingUtils;
+import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
+import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
+import com.asofterspace.toolbox.Utils;
 
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.GridBagLayout;
 import java.util.Date;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -39,11 +45,13 @@ public abstract class Entry {
 
 	private String title;
 
+	protected Month parent;
+
 
 	/**
 	 * Load an entry from a generic record
 	 */
-	public Entry(Record entryRecord) {
+	public Entry(Record entryRecord, Month parent) {
 
 		this.amount = entryRecord.getInteger(AMOUNT_KEY);
 
@@ -54,6 +62,8 @@ public abstract class Entry {
 		this.date = DateUtils.parseDate(entryRecord.getString(DATE_KEY));
 
 		this.title = entryRecord.getString(TITLE_KEY);
+
+		this.parent = parent;
 	}
 
 	public Record toRecord() {
@@ -135,7 +145,12 @@ public abstract class Entry {
 
 	public abstract String getCategoryOrCustomer();
 
-	public JPanel createPanelOnGUI() {
+	/**
+	 * Request our parent to drop us
+	 */
+	public abstract void deleteFrom(Database database);
+
+	public JPanel createPanelOnGUI(Database database) {
 
 		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
 
@@ -177,6 +192,13 @@ public abstract class Entry {
 		JButton curButton = new JButton("Edit");
 		curButton.setPreferredSize(defaultDimension);
 		curPanel.add(curButton, new Arrangement(7, 0, 0.08, 1.0));
+		curButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO
+				System.err.println("Whoops, this button is not yet working!");
+			}
+		});
 
 		curLabel = new JLabel("");
 		curLabel.setPreferredSize(defaultDimension);
@@ -185,6 +207,12 @@ public abstract class Entry {
 		curButton = new JButton("Delete");
 		curButton.setPreferredSize(defaultDimension);
 		curPanel.add(curButton, new Arrangement(9, 0, 0.08, 1.0));
+		curButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Entry.this.deleteFrom(database);
+			}
+		});
 
 		curLabel = new JLabel("");
 		curLabel.setPreferredSize(defaultDimension);

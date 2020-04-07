@@ -72,10 +72,10 @@ public class Month {
 		this.incomings = new ArrayList<>();
 
 		for (Record rec : monthRecord.getArray(OUTGOING_KEY)) {
-			outgoings.add(new Outgoing(rec));
+			outgoings.add(new Outgoing(rec, this));
 		}
 		for (Record rec : monthRecord.getArray(INCOMING_KEY)) {
-			incomings.add(new Incoming(rec));
+			incomings.add(new Incoming(rec, this));
 		}
 	}
 
@@ -124,6 +124,14 @@ public class Month {
 			}
 		});
 		return incomings;
+	}
+
+	public void removeOutgoing(Outgoing remEntry) {
+		outgoings.remove(remEntry);
+	}
+
+	public void removeIncoming(Incoming remEntry) {
+		incomings.remove(remEntry);
 	}
 
 	@Override

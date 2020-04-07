@@ -131,6 +131,8 @@ public class Database {
 		currentBackup++;
 		overflowCheckBackups();
 		new ConfigFile(BACKUP_FILE_NAME + currentBackup, true, root);
+
+		gui.refreshOpenTab();
 	}
 
 	private void overflowCheckBackups() {
