@@ -6,13 +6,21 @@ package com.asofterspace.accountant.timespans;
 
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
+import com.asofterspace.accountant.timespans.Month;
+import com.asofterspace.accountant.timespans.Year;
+import com.asofterspace.accountant.world.Category;
+import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.utils.StrUtils;
+import com.asofterspace.toolbox.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+
+import javax.swing.JOptionPane;
 
 
 /**
@@ -135,26 +143,65 @@ public class Month {
 		incomings.remove(remEntry);
 	}
 
-	public boolean addEntry(Date date, String text, String catOrCustomer, String amountStr,
-		Currency currency, String taxationPercent, boolean isIncoming) {
+	public boolean addEntry(Date date, String title, String catOrCustomer, String amountStr,
+		Currency currency, String taxationPercentStr, boolean isIncoming) {
 
 		Integer amountObj = StrUtils.parseMoney(amountStr);
 
 		if (amountObj == null) {
-			JOptionPane.showMessageDialog(
-				null,
-				"The text " + amountStr + " could not be parsed as amount of money!",
-				Utils.getProgramTitle(),
-				JOptionPane.ERROR_MESSAGE
-			);
-			return false;
+			return complain("The text " + amountStr + " could not be parsed as amount of money!");
 		}
 
 		int amount = amountObj;
 
-		TODO
+		int taxationPercent = 0;
+		if (!"".equals(taxationPercentStr)) {
+			taxationPercentStr = taxationPercentStr.replaceAll(" ", "");
+			taxationPercentStr = taxationPercentStr.replaceAll("%", "");
+			try {
+				taxationPercent = Integer.parseInt(taxationPercentStr);
+			} catch (NullPointerException | NumberFormatException e) {
+				return complain("The text " + taxationPercentStr + " could not be parsed as integer!");
+			}
+		}
+
+		if (isIncoming) {
+
+			Category category = Category.fromString(catOrCustomer);
+
+			if (category == null) {
+				return complain("The text " + catOrCustomer + " could not be parsed as category!");
+			}
+
+			Incoming newIn = new Incoming(amount, currency, taxationPercent, date, title, category, this);
+			incomings.add(newIn);
+
+		} else {
+
+			String customer = catOrCustomer;
+
+			if ((customer == null) || "".equals(customer)) {
+				return complain("The text " + catOrCustomer + " should contain a customer!");
+			}
+
+			Outgoing newOut = new Outgoing(amount, currency, taxationPercent, date, title, customer, this);
+			outgoings.add(newOut);
+		}
 
 		return true;
+	}
+
+	private boolean complain(String complainAbout) {
+
+		JOptionPane.showMessageDialog(
+			null,
+			complainAbout,
+			Utils.getProgramTitle(),
+			JOptionPane.ERROR_MESSAGE
+		);
+
+		// we return false, which can then immediately be returned by the caller
+		return false;
 	}
 
 	@Override

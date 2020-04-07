@@ -32,15 +32,52 @@ public enum Category {
 	OTHER("Other");
 
 
+	// the textual representation of each category
 	private String text;
+
+	// the simplified representation of each category, that is,
+	// internal, external, travel, vehicle, entertainment, location, donation, other
+	private String startText;
 
 
 	private Category(String text) {
+
 		this.text = text;
+
+		this.startText = getStart(text);
+	}
+
+	public static Category fromString(String from) {
+
+		String startFrom = getStart(from);
+
+		for (Category cat : Category.values()) {
+			if (cat.startText.equals(startFrom)) {
+				return cat;
+			}
+		}
+		return null;
 	}
 
 	public String getText() {
 		return text;
+	}
+
+	private static String getStart(String val) {
+
+		val = val.trim();
+
+		if (val.contains(" ")) {
+			 val = val.substring(0, val.indexOf(" "));
+		 }
+
+		 val = val.toLowerCase();
+
+		 if (val.endsWith("s")) {
+			 val = val.substring(0, val.length() - 1);
+		 }
+
+		return val;
 	}
 
 }

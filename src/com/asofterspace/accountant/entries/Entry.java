@@ -49,6 +49,25 @@ public abstract class Entry {
 
 
 	/**
+	 * Create an entry at runtime
+	 */
+	public Entry(Integer amount, Currency currency, Integer taxationPercent, Date date,
+		String title, Month parent) {
+
+		this.amount = amount;
+
+		this.currency = currency;
+
+		this.taxationPercent = taxationPercent;
+
+		this.date = date;
+
+		this.title = title;
+
+		this.parent = parent;
+	}
+
+	/**
 	 * Load an entry from a generic record
 	 */
 	public Entry(Record entryRecord, Month parent) {

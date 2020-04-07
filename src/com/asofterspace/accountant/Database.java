@@ -6,6 +6,7 @@ package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
+import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.configuration.ConfigFile;
@@ -125,7 +126,7 @@ public class Database {
 		}
 	}
 
-	public boolean addEntry(String dateStr, String text, String catOrCustomer, String amount,
+	public boolean addEntry(String dateStr, String title, String catOrCustomer, String amount,
 		Currency currency, String taxationPercent, boolean isIncoming) {
 
 		Date date = DateUtils.parseDate(dateStr);
@@ -155,7 +156,7 @@ public class Database {
 		}
 
 		Month curMonth = null;
-		for (Month month : year.getMonths()) {
+		for (Month month : curYear.getMonths()) {
 			if (month.getNum() == monthNum) {
 				curMonth = month;
 				break;
@@ -172,7 +173,7 @@ public class Database {
 			return false;
 		}
 
-		if (curMonth.addEntry(date, text, catOrCustomer, amount, currency, taxationPercent, isIncoming)) {
+		if (curMonth.addEntry(date, title, catOrCustomer, amount, currency, taxationPercent, isIncoming)) {
 
 			save();
 

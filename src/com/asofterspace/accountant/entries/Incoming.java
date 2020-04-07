@@ -7,7 +7,10 @@ package com.asofterspace.accountant.entries;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.world.Category;
+import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.utils.Record;
+
+import java.util.Date;
 
 
 /**
@@ -19,6 +22,17 @@ public class Incoming extends Entry {
 
 	private Category category;
 
+
+	/**
+	 * Create an incoming invoice at runtime
+	 */
+	public Incoming(Integer amount, Currency currency, Integer taxationPercent, Date date,
+		String title, Category category, Month parent) {
+
+		super(amount, currency, taxationPercent, date, title, parent);
+
+		this.category = category;
+	}
 
 	/**
 	 * Load an incoming invoice from a generic record

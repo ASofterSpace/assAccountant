@@ -6,7 +6,10 @@ package com.asofterspace.accountant.entries;
 
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.timespans.Month;
+import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.utils.Record;
+
+import java.util.Date;
 
 
 /**
@@ -18,6 +21,17 @@ public class Outgoing extends Entry {
 
 	private String customer;
 
+
+	/**
+	 * Create an outgoing invoice at runtime
+	 */
+	public Outgoing(Integer amount, Currency currency, Integer taxationPercent, Date date,
+		String title, String customer, Month parent) {
+
+		super(amount, currency, taxationPercent, date, title, parent);
+
+		this.customer = customer;
+	}
 
 	/**
 	 * Load an outgoing invoice from a generic record
