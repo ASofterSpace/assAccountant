@@ -15,6 +15,7 @@ import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.util.Date;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -148,11 +149,11 @@ public abstract class Entry {
 
 		curLabel = new JLabel(getTitle());
 		curLabel.setPreferredSize(defaultDimension);
-		curPanel.add(curLabel, new Arrangement(1, 0, 0.4, 1.0));
+		curPanel.add(curLabel, new Arrangement(1, 0, 0.35, 1.0));
 
 		curLabel = new JLabel("[" + getCategoryOrCustomer() + "]");
 		curLabel.setPreferredSize(defaultDimension);
-		curPanel.add(curLabel, new Arrangement(2, 0, 0.2, 1.0));
+		curPanel.add(curLabel, new Arrangement(2, 0, 0.11, 1.0));
 
 		curLabel = new JLabel(getAmountAsText());
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
@@ -168,6 +169,26 @@ public abstract class Entry {
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(5, 0, 0.1, 1.0));
+
+		curLabel = new JLabel("");
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(6, 0, 0.0, 1.0));
+
+		JButton curButton = new JButton("Edit");
+		curButton.setPreferredSize(defaultDimension);
+		curPanel.add(curButton, new Arrangement(7, 0, 0.08, 1.0));
+
+		curLabel = new JLabel("");
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(8, 0, 0.0, 1.0));
+
+		curButton = new JButton("Delete");
+		curButton.setPreferredSize(defaultDimension);
+		curPanel.add(curButton, new Arrangement(9, 0, 0.08, 1.0));
+
+		curLabel = new JLabel("");
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(10, 0, 0.0, 1.0));
 
 		return curPanel;
 	}

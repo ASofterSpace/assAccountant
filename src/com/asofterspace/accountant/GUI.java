@@ -81,6 +81,7 @@ public class GUI extends MainWindow {
 	public GUI(Database database, TabCtrl tabCtrl, ConfigFile config) {
 
 		this.database = database;
+		database.setGUI(this);
 
 		this.tabCtrl = tabCtrl;
 
@@ -188,6 +189,29 @@ public class GUI extends MainWindow {
 			}
 		});
 		file.add(close);
+
+		JMenu edit = new JMenu("Edit");
+		menu.add(edit);
+
+		JMenuItem undo = new JMenuItem("Undo");
+		undo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK));
+		undo.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				database.undo();
+			}
+		});
+		edit.add(undo);
+
+		JMenuItem redo = new JMenuItem("Redo");
+		redo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.CTRL_MASK));
+		redo.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				database.redo();
+			}
+		});
+		edit.add(redo);
 
 		JMenu huh = new JMenu("?");
 
@@ -411,7 +435,7 @@ public class GUI extends MainWindow {
 	 * NEVER set currentlyOpenedTab directly - as it is handled in here, and this
 	 * here also destroys the previous tabs!
 	 */
-	private void showTab(TimeSpanTab tab) {
+	public void showTab(TimeSpanTab tab) {
 
 		// if we switch from one tab to itself, ignore the switch :)
 		if (currentlyOpenedTab != null) {
@@ -457,7 +481,7 @@ public class GUI extends MainWindow {
 	}
 
 	public static Dimension getDefaultDimensionForInvoiceLine() {
-		int defaultSize = 16;
+		int defaultSize = 20;
 		return new Dimension(defaultSize, defaultSize);
 	}
 

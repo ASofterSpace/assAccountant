@@ -51,12 +51,12 @@ public class AccountingUtils {
 		JLabel curLabel = new JLabel("");
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
-		curPanel.add(curLabel, new Arrangement(0, 0, 0.1, 1.0));
+		curPanel.add(curLabel, new Arrangement(0, 0, 0.03, 1.0));
 
 		curLabel = new JLabel("");
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
-		curPanel.add(curLabel, new Arrangement(1, 0, 0.1, 1.0));
+		curPanel.add(curLabel, new Arrangement(1, 0, 0.03, 1.0));
 
 		curLabel = new JLabel("Total: ");
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
@@ -77,6 +77,26 @@ public class AccountingUtils {
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(5, 0, 0.1, 1.0));
+
+		curLabel = new JLabel("");
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(6, 0, 0.0, 1.0));
+
+		curLabel = new JLabel("");
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(7, 0, 0.08, 1.0));
+
+		curLabel = new JLabel("");
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(8, 0, 0.0, 1.0));
+
+		curLabel = new JLabel("");
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(9, 0, 0.08, 1.0));
+
+		curLabel = new JLabel("");
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(10, 0, 0.0, 1.0));
 
 		return curPanel;
 	}

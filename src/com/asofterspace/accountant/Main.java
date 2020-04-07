@@ -29,6 +29,7 @@ public class Main {
 	 * Export (as menu item), with Export as German CSV and Export as English CSV as sub-items
 	 * Check Consistency (as menu item), maybe also automatically done on startup, checks e.g. for
 	 *   all entries if their dates actually belong to the month and year that they say they belong to
+	 * prevent undoing more than 64 steps, or redoing more steps than have been undone...
 	 * add input method for entries (independent of years and months, according to the date they are
 	 *   automatically added where they need to go!)
 	 * also handle timesheets (and automatically base invoices on timesheets)
@@ -77,7 +78,7 @@ public class Main {
 
 			// create a default config file, if necessary
 			if (config.getAllContents().isEmpty()) {
-				config.setAllContents(new JSON("{}"));
+				config.setAllContents(new JSON("{\"currentBackup\": 0}"));
 			}
 		} catch (JsonParseException e) {
 			System.err.println("Loading the settings failed:");
@@ -87,7 +88,7 @@ public class Main {
 
 		try {
 			// load database
-			database = new Database();
+			database = new Database(config);
 		} catch (JsonParseException e) {
 			System.err.println("Loading the database failed:");
 			System.err.println(e);

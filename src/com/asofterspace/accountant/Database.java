@@ -17,28 +17,58 @@ import java.util.List;
 public class Database {
 
 	private static final String YEARS_KEY = "years";
+	private static final String BACKUP_FILE_NAME = "database_backup_";
+	private static final String CURRENT_BACKUP_KEY = "currentBackup";
+
+	private static int BACKUP_MAX = 64;
+
+	private GUI gui;
+
+	private ConfigFile settingsFile;
+
+	// we take backups in a ring buffer on every save
+	// (which we can use also to undo any action!)
+	private int currentBackup;
 
 	private ConfigFile dbFile;
 
 	private List<Year> years;
 
 
-	public Database() throws JsonParseException {
+	public Database(ConfigFile settings) throws JsonParseException {
 
-		dbFile = new ConfigFile("database", true);
-		years = new ArrayList<>();
+		this.settingsFile = settings;
+		this.currentBackup = settingsFile.getInteger(CURRENT_BACKUP_KEY, 0);
+
+		this.dbFile = new ConfigFile("database", true);
+
+		loadFromFile(dbFile);
+	}
+
+	private Record loadFromFile(ConfigFile fileToLoad) {
+
+		this.years = new ArrayList<>();
 
 		// create a default database file, if necessary
-		if (dbFile.getAllContents().isEmpty()) {
-			dbFile.setAllContents(new JSON("{\"" + YEARS_KEY + "\":[]}"));
+		if (fileToLoad.getAllContents().isEmpty()) {
+			try {
+				fileToLoad.setAllContents(new JSON("{\"" + YEARS_KEY + "\":[]}"));
+			} catch (JsonParseException e) {
+				System.err.println("JSON parsing failed internally: " + e);
+			}
 		}
 
-		Record root = dbFile.getAllContents();
+		Record root = fileToLoad.getAllContents();
 		List<Record> yearRecs = root.getArray(YEARS_KEY);
 		for (Record yearRec : yearRecs) {
 			Year curYear = new Year(yearRec);
 			years.add(curYear);
 		}
+		return root;
+	}
+
+	public void setGUI(GUI gui) {
+		this.gui = gui;
 	}
 
 	public List<Year> getYears() {
@@ -52,7 +82,38 @@ public class Database {
 			}
 		}
 		years.add(new Year(yearNum));
+		save();
 		return true;
+	}
+
+	public void undo() {
+		currentBackup--;
+		applyUndoRedo();
+	}
+
+	public void redo() {
+		currentBackup++;
+		applyUndoRedo();
+	}
+
+	public void applyUndoRedo() {
+
+		overflowCheckBackups();
+
+		try {
+			Record root = loadFromFile(new ConfigFile(BACKUP_FILE_NAME + currentBackup, true));
+
+			// when undoing and redoing, we want to actually save what we did, so that if we
+			// close and re-open the assAccountant, we still have stuff undone, and are not
+			// back to the front of the queue!
+			dbFile.setAllContents(root);
+
+			gui.showTab(null);
+			gui.regenerateTabList();
+
+		} catch (JsonParseException e) {
+			System.err.println("JSON parsing failed for " + BACKUP_FILE_NAME + currentBackup + ": " + e);
+		}
 	}
 
 	public void save() {
@@ -66,5 +127,23 @@ public class Database {
 		}
 
 		dbFile.setAllContents(root);
+
+		currentBackup++;
+		overflowCheckBackups();
+		new ConfigFile(BACKUP_FILE_NAME + currentBackup, true, root);
+	}
+
+	private void overflowCheckBackups() {
+
+		if (currentBackup > BACKUP_MAX) {
+			currentBackup = 0;
+		}
+
+		if (currentBackup < 0) {
+			currentBackup = BACKUP_MAX;
+		}
+
+		// we check for backup overflow when we adjusted currentBackup... so may as well save it now :)
+		settingsFile.set(CURRENT_BACKUP_KEY, currentBackup);
 	}
 }
