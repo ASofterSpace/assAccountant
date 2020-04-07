@@ -6,6 +6,7 @@ package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
+import com.asofterspace.accountant.world.Category;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.GuiUtils;
@@ -14,6 +15,8 @@ import com.asofterspace.toolbox.Utils;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.util.List;
@@ -22,6 +25,7 @@ import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -36,6 +40,9 @@ public class AddEntryGUI {
 	private Database database;
 
 	private JDialog dialog;
+
+	private JComboBox<String> customer;
+	private JComboBox<String> category;
 
 
 	public AddEntryGUI(GUI mainGUI, Database database) {
@@ -72,10 +79,28 @@ public class AddEntryGUI {
 		final JRadioButton isIncoming = new JRadioButton("Incoming (we have to pay)");
 		inOutGroup.add(isIncoming);
 		isIncoming.setSelected(true);
+		isIncoming.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					customer.setVisible(false);
+					category.setVisible(true);
+				}
+			}
+		});
 		curPanel.add(isIncoming, new Arrangement(1, 0, 1.0, 1.0));
 		final JRadioButton isOutgoing = new JRadioButton("Outgoing (we get paid)");
 		inOutGroup.add(isOutgoing);
 		isOutgoing.setSelected(false);
+		isOutgoing.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					customer.setVisible(true);
+					category.setVisible(false);
+				}
+			}
+		});
 		curPanel.add(isOutgoing, new Arrangement(2, 0, 1.0, 1.0));
 		dialog.add(curPanel);
 
@@ -95,13 +120,17 @@ public class AddEntryGUI {
 		curPanel.add(titleText, new Arrangement(1, 0, 1.0, 1.0));
 		dialog.add(curPanel);
 
-		// TODO: instead, have a dropdown with the different categories and with the previously entered customers
 		curPanel = new JPanel();
 		curPanel.setLayout(new GridBagLayout());
 		curLabel = new JLabel("Category or Customer: ");
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
-		final JTextField catOrCustomer = new JTextField();
-		curPanel.add(catOrCustomer, new Arrangement(1, 0, 1.0, 1.0));
+		customer = new JComboBox<>();
+		customer.setEditable(true);
+		curPanel.add(customer, new Arrangement(1, 0, 1.0, 1.0));
+		customer.setVisible(false);
+		category = new JComboBox<>(Category.getTexts());
+		category.setEditable(false);
+		curPanel.add(category, new Arrangement(1, 0, 1.0, 1.0));
 		dialog.add(curPanel);
 
 		curPanel = new JPanel();
@@ -134,8 +163,15 @@ public class AddEntryGUI {
 		addButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				database.addEntry(dateText.getText(), titleText.getText(), catOrCustomer.getText(),
+				Object catOrCustomer = customer.getSelectedItem();
+				if (isIncoming.isSelected()) {
+					catOrCustomer = category.getSelectedItem();
+				}
+
+				database.addEntry(dateText.getText(), titleText.getText(), catOrCustomer,
 					amount.getText(), Currency.EUR, taxPerc.getText(), isIncoming.isSelected());
+
+				refreshCustomers();
 			}
 		});
 		buttonRow.add(addButton);
@@ -144,8 +180,15 @@ public class AddEntryGUI {
 		addAndExitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				if (database.addEntry(dateText.getText(), titleText.getText(), catOrCustomer.getText(),
+				Object catOrCustomer = customer.getSelectedItem();
+				if (isIncoming.isSelected()) {
+					catOrCustomer = category.getSelectedItem();
+				}
+
+				if (database.addEntry(dateText.getText(), titleText.getText(), catOrCustomer,
 					amount.getText(), Currency.EUR, taxPerc.getText(), isIncoming.isSelected())) {
+
+					refreshCustomers();
 
 					dialog.dispose();
 				}
@@ -162,7 +205,7 @@ public class AddEntryGUI {
 		buttonRow.add(doneButton);
 
 		// Set the preferred size of the dialog
-		int width = 500;
+		int width = 700;
 		int height = 400;
 		dialog.setSize(width, height);
 		dialog.setPreferredSize(new Dimension(width, height));
@@ -172,6 +215,28 @@ public class AddEntryGUI {
 
 	public void show() {
 		GuiUtils.centerAndShowWindow(dialog);
+		refreshCustomers();
+	}
+
+	private void refreshCustomers() {
+
+		Object prev = customer.getSelectedItem();
+
+		customer.removeAllItems();
+
+		for (String curCustomer : database.getCustomers()) {
+			customer.addItem(curCustomer);
+		}
+
+		if (prev != null) {
+			String prevStr = prev.toString();
+			for (int i = 0; i < customer.getItemCount(); i++) {
+				String cur = customer.getItemAt(i);
+				if (prev.equals(cur)) {
+					customer.setSelectedIndex(i);
+				}
+			}
+		}
 	}
 
 }

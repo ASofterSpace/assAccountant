@@ -63,6 +63,16 @@ public enum Category {
 		return text;
 	}
 
+	public static String[] getTexts() {
+		String[] result = new String[Category.values().length];
+		int i = 0;
+		for (Category cat : Category.values()) {
+			result[i] = cat.getText();
+			i++;
+		}
+		return result;
+	}
+
 	private static String getStart(String val) {
 
 		val = val.trim();

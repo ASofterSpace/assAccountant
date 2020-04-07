@@ -5,6 +5,7 @@
 package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.Database;
+import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
@@ -19,7 +20,9 @@ import com.asofterspace.toolbox.Utils;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.JOptionPane;
 
@@ -85,6 +88,18 @@ public class Database {
 		return years;
 	}
 
+	public Set<String> getCustomers() {
+		Set<String> result = new HashSet<>();
+		for (Year year : years) {
+			for (Month month : year.getMonths()) {
+				for (Outgoing outgoing : month.getOutgoings()) {
+					result.add(outgoing.getCustomer());
+				}
+			}
+		}
+		return result;
+	}
+
 	public boolean addYear(int yearNum) {
 		for (Year cur : years) {
 			if (cur.getNum() == yearNum) {
@@ -126,7 +141,7 @@ public class Database {
 		}
 	}
 
-	public boolean addEntry(String dateStr, String title, String catOrCustomer, String amount,
+	public boolean addEntry(String dateStr, String title, Object catOrCustomer, String amount,
 		Currency currency, String taxationPercent, boolean isIncoming) {
 
 		Date date = DateUtils.parseDate(dateStr);

@@ -143,7 +143,7 @@ public class Month {
 		incomings.remove(remEntry);
 	}
 
-	public boolean addEntry(Date date, String title, String catOrCustomer, String amountStr,
+	public boolean addEntry(Date date, String title, Object catOrCustomerObj, String amountStr,
 		Currency currency, String taxationPercentStr, boolean isIncoming) {
 
 		Integer amountObj = StrUtils.parseMoney(amountStr);
@@ -164,6 +164,12 @@ public class Month {
 				return complain("The text " + taxationPercentStr + " could not be parsed as integer!");
 			}
 		}
+
+		if (catOrCustomerObj == null) {
+			return complain("The no category or customer entered!");
+		}
+
+		String catOrCustomer = catOrCustomerObj.toString();
 
 		if (isIncoming) {
 
