@@ -12,6 +12,7 @@ import com.asofterspace.toolbox.gui.CopyByClickLabel;
 
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -54,6 +55,26 @@ public class OverviewTab extends Tab {
 		// TODO - display information such as finance days that have last been done (or maybe
 		// even get away from real "finance days", and instead have continuous financing going on,
 		// this here always showing what is now left to do?)
+
+
+		CopyByClickLabel consistencyChecksLabel = AccountingUtils.createSubHeadLabel("Consistency Checks:");
+		tab.add(consistencyChecksLabel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		CopyByClickLabel curLabel;
+
+		List<String> consistencyProblems = database.getConsistencyProblems();
+		for (String curProblem : consistencyProblems) {
+			curLabel = new CopyByClickLabel(curProblem);
+			tab.add(curLabel, new Arrangement(0, i, 1.0, 0.0));
+			i++;
+		}
+		// for-else:
+		if (consistencyProblems.size() < 1) {
+			curLabel = new CopyByClickLabel("No problems have been found!");
+			tab.add(curLabel, new Arrangement(0, i, 1.0, 0.0));
+			i++;
+		}
 
 
 		JPanel footer = new JPanel();

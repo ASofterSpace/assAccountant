@@ -27,11 +27,6 @@ public class Main {
 	/**
 	 * TODO:
 	 * Export (as menu item), with Export as German CSV and Export as English CSV as sub-items
-	 * Check Consistency (as menu item), maybe also automatically done on startup, checks e.g. for
-	 *   all entries if their dates actually belong to the month and year that they say they belong to,
-	 *   also check that tax is one of 0, 7 or 19
-	 * Output consistency check on Overview page, also check that selected category is same as
-	 *   auto-detected one
 	 * make tax a dropdown edit field
 	 * pre-select category based on title
 	 * prevent undoing more than 64 steps, or redoing more steps than have been undone...

@@ -162,6 +162,10 @@ public abstract class Entry {
 		this.title = title;
 	}
 
+	public Month getParent() {
+		return parent;
+	}
+
 	public abstract String getCategoryOrCustomer();
 
 	/**

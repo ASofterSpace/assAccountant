@@ -6,8 +6,6 @@ package com.asofterspace.accountant.tabs;
 
 import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.Database;
-import com.asofterspace.accountant.entries.Incoming;
-import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.toolbox.gui.Arrangement;
@@ -15,7 +13,6 @@ import com.asofterspace.toolbox.gui.CopyByClickLabel;
 
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
-import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -53,38 +50,7 @@ public class YearTab extends TimeSpanTab {
 		i++;
 
 
-		CopyByClickLabel outgoingLabel = AccountingUtils.createSubHeadLabel("Outgoing Invoices - that is, we get paid:");
-		tab.add(outgoingLabel, new Arrangement(0, i, 1.0, 0.0));
-		i++;
-
-		JPanel curPanel;
-
-		List<Outgoing> outgoings = year.getOutgoings();
-		for (Outgoing cur : outgoings) {
-			curPanel = cur.createPanelOnGUI(database);
-			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
-			i++;
-		}
-
-		curPanel = AccountingUtils.createTotalPanelOnGUI(year.getOutTotalBeforeTax(), year.getOutTotalTax(), year.getOutTotalAfterTax());
-		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
-		i++;
-
-
-		CopyByClickLabel incomingLabel = AccountingUtils.createSubHeadLabel("Incoming Invoices - that is, we have to pay:");
-		tab.add(incomingLabel, new Arrangement(0, i, 1.0, 0.0));
-		i++;
-
-		List<Incoming> incomings = year.getIncomings();
-		for (Incoming cur : incomings) {
-			curPanel = cur.createPanelOnGUI(database);
-			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
-			i++;
-		}
-
-		curPanel = AccountingUtils.createTotalPanelOnGUI(year.getInTotalBeforeTax(), year.getInTotalTax(), year.getInTotalAfterTax());
-		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
-		i++;
+		i = AccountingUtils.createTimeSpanTabMainContent(year, tab, i, database);
 
 
 		i = AccountingUtils.createOverviewAndTaxInfo(year, tab, i);

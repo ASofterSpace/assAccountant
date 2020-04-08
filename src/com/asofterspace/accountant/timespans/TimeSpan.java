@@ -24,6 +24,8 @@ public abstract class TimeSpan {
 
 	public abstract List<Incoming> getIncomings();
 
+	public abstract List<Incoming> getDonations();
+
 	public abstract int getOutTotalBeforeTax();
 
 	public int getOutTotalTax() {
@@ -39,5 +41,13 @@ public abstract class TimeSpan {
 	}
 
 	public abstract int getInTotalAfterTax();
+
+	public abstract int getDonTotalBeforeTax();
+
+	public int getDonTotalTax() {
+		return getDonTotalAfterTax() - getDonTotalBeforeTax();
+	}
+
+	public abstract int getDonTotalAfterTax();
 
 }

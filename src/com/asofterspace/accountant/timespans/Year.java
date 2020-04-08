@@ -106,6 +106,15 @@ public class Year extends TimeSpan {
 	}
 
 	@Override
+	public List<Incoming> getDonations() {
+		List<Incoming> result = new ArrayList<>();
+		for (Month month : getMonths()) {
+			result.addAll(month.getDonations());
+		}
+		return result;
+	}
+
+	@Override
 	public int getOutTotalBeforeTax() {
 		int result = 0;
 		for (Month month : months) {
@@ -137,6 +146,24 @@ public class Year extends TimeSpan {
 		int result = 0;
 		for (Month month : months) {
 			result += month.getInTotalAfterTax();
+		}
+		return result;
+	}
+
+	@Override
+	public int getDonTotalBeforeTax() {
+		int result = 0;
+		for (Month month : months) {
+			result += month.getDonTotalBeforeTax();
+		}
+		return result;
+	}
+
+	@Override
+	public int getDonTotalAfterTax() {
+		int result = 0;
+		for (Month month : months) {
+			result += month.getDonTotalAfterTax();
 		}
 		return result;
 	}

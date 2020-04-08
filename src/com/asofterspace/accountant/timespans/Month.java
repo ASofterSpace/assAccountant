@@ -135,7 +135,29 @@ public class Month extends TimeSpan {
 				return b.getDate().compareTo(a.getDate());
 			}
 		});
-		return incomings;
+		List<Incoming> result = new ArrayList<>();
+		for (Incoming incoming : incomings) {
+			if (incoming.getCategory() != Category.DONATION) {
+				result.add(incoming);
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public List<Incoming> getDonations() {
+		Collections.sort(incomings, new Comparator<Incoming>() {
+			public int compare(Incoming a, Incoming b) {
+				return b.getDate().compareTo(a.getDate());
+			}
+		});
+		List<Incoming> result = new ArrayList<>();
+		for (Incoming incoming : incomings) {
+			if (incoming.getCategory() == Category.DONATION) {
+				result.add(incoming);
+			}
+		}
+		return result;
 	}
 
 	public void removeOutgoing(Outgoing remEntry) {
@@ -232,7 +254,7 @@ public class Month extends TimeSpan {
 	@Override
 	public int getInTotalBeforeTax() {
 		int result = 0;
-		for (Incoming cur : incomings) {
+		for (Incoming cur : getIncomings()) {
 			result += cur.getAmount();
 		}
 		return result;
@@ -241,7 +263,25 @@ public class Month extends TimeSpan {
 	@Override
 	public int getInTotalAfterTax() {
 		int result = 0;
-		for (Incoming cur : incomings) {
+		for (Incoming cur : getIncomings()) {
+			result += cur.getPostTaxAmount();
+		}
+		return result;
+	}
+
+	@Override
+	public int getDonTotalBeforeTax() {
+		int result = 0;
+		for (Incoming cur : getDonations()) {
+			result += cur.getAmount();
+		}
+		return result;
+	}
+
+	@Override
+	public int getDonTotalAfterTax() {
+		int result = 0;
+		for (Incoming cur : getDonations()) {
 			result += cur.getPostTaxAmount();
 		}
 		return result;

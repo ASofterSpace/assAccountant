@@ -4,6 +4,9 @@
  */
 package com.asofterspace.accountant;
 
+import com.asofterspace.accountant.entries.Entry;
+import com.asofterspace.accountant.entries.Incoming;
+import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.timespans.TimeSpan;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
@@ -13,6 +16,7 @@ import com.asofterspace.toolbox.Utils;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
+import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -125,6 +129,60 @@ public class AccountingUtils {
 		return curPanel;
 	}
 
+	public static int createTimeSpanTabMainContent(TimeSpan timeSpan, JPanel tab, int i, Database database) {
+
+		CopyByClickLabel outgoingLabel = AccountingUtils.createSubHeadLabel("Outgoing Invoices - that is, we get paid:");
+		tab.add(outgoingLabel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		JPanel curPanel;
+
+		List<Outgoing> outgoings = timeSpan.getOutgoings();
+		for (Outgoing cur : outgoings) {
+			curPanel = cur.createPanelOnGUI(database);
+			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+			i++;
+		}
+
+		curPanel = AccountingUtils.createTotalPanelOnGUI(timeSpan.getOutTotalBeforeTax(), timeSpan.getOutTotalTax(), timeSpan.getOutTotalAfterTax());
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+
+		CopyByClickLabel incomingLabel = AccountingUtils.createSubHeadLabel("Incoming Invoices - that is, we have to pay:");
+		tab.add(incomingLabel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		List<Incoming> incomings = timeSpan.getIncomings();
+		for (Incoming cur : incomings) {
+			curPanel = cur.createPanelOnGUI(database);
+			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+			i++;
+		}
+
+		curPanel = AccountingUtils.createTotalPanelOnGUI(timeSpan.getInTotalBeforeTax(), timeSpan.getInTotalTax(), timeSpan.getInTotalAfterTax());
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+
+		CopyByClickLabel donationLabel = AccountingUtils.createSubHeadLabel("Donations - which we also pay:");
+		tab.add(donationLabel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		List<Incoming> donations = timeSpan.getDonations();
+		for (Incoming cur : donations) {
+			curPanel = cur.createPanelOnGUI(database);
+			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+			i++;
+		}
+
+		curPanel = AccountingUtils.createTotalPanelOnGUI(timeSpan.getDonTotalBeforeTax(), timeSpan.getDonTotalTax(), timeSpan.getDonTotalAfterTax());
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		return i;
+	}
+
 	public static int createOverviewAndTaxInfo(TimeSpan timeSpan, JPanel tab, int i) {
 
 		CopyByClickLabel taxInfoLabel = AccountingUtils.createSubHeadLabel("Overview and Tax Information:");
@@ -139,11 +197,15 @@ public class AccountingUtils {
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total deductible already paid VAT / Gesamte abziehbare Vorsteuerbeträge für USt: ", timeSpan.getInTotalTax());
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount donated without any taxes: ", timeSpan.getDonTotalBeforeTax());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		int remainVATpay = timeSpan.getOutTotalTax() - timeSpan.getInTotalTax();
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total deductible already paid VAT / Gesamte abziehbare Vorsteuerbeträge für USt: ", timeSpan.getInTotalTax() + timeSpan.getDonTotalTax());
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		int remainVATpay = timeSpan.getOutTotalTax() - (timeSpan.getInTotalTax() + timeSpan.getDonTotalTax());
 		if (remainVATpay < 0) {
 			remainVATpay = 0;
 		}
@@ -182,4 +244,17 @@ public class AccountingUtils {
 		// we return false, which can then immediately be returned by the caller
 		return false;
 	}
+
+	public static String getEntryForLog(Entry entry) {
+		String result = "";
+		if (entry instanceof Incoming) {
+			result += "incoming ";
+		}
+		if (entry instanceof Outgoing) {
+			result += "outgoing ";
+		}
+		result += "'" + entry.getTitle() + "' from " + entry.getDateAsText();
+		return result;
+	}
+
 }

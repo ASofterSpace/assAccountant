@@ -4,6 +4,8 @@
  */
 package com.asofterspace.accountant;
 
+import com.asofterspace.accountant.entries.Entry;
+import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
@@ -25,8 +27,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.swing.JOptionPane;
 
 
 public class Database {
@@ -201,6 +201,28 @@ public class Database {
 		Currency currency, String taxationPercent, boolean isIncoming) {
 
 		Date date = DateUtils.parseDate(dateStr);
+		if (date == null) {
+			return AccountingUtils.complain("The text " + dateStr + " could not be parsed as date!\n" +
+				"Please use YYYY-MM-DD or DD. MM. YYYY as date format.");
+		}
+
+		Month curMonth = getMonthFromEntryDate(date);
+
+		if (curMonth == null) {
+			return false;
+		}
+
+		if (curMonth.addEntry(date, title, catOrCustomer, amount, currency, taxationPercent, isIncoming)) {
+
+			save();
+
+			return true;
+		}
+
+		return false;
+	}
+
+	private Month getMonthFromEntryDate(Date date) {
 
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
@@ -216,14 +238,9 @@ public class Database {
 			}
 		}
 		if (curYear == null) {
-			JOptionPane.showMessageDialog(
-				null,
-				"The entry could not be added as the year " + yearNum +
-					" - which we just added! - went missing again...",
-				Utils.getProgramTitle(),
-				JOptionPane.ERROR_MESSAGE
-			);
-			return false;
+			AccountingUtils.complain("The entry could not be added as the year " + yearNum +
+					" - which we just added! - went missing again...");
+			return null;
 		}
 
 		Month curMonth = null;
@@ -234,24 +251,12 @@ public class Database {
 			}
 		}
 		if (curMonth == null) {
-			JOptionPane.showMessageDialog(
-				null,
-				"The entry could not be added as the month " + monthNum +
-					" is missing from year " + yearNum + "...",
-				Utils.getProgramTitle(),
-				JOptionPane.ERROR_MESSAGE
-			);
-			return false;
+			AccountingUtils.complain("The entry could not be added as the month " + monthNum +
+					" is missing from year " + yearNum + "...");
+			return null;
 		}
 
-		if (curMonth.addEntry(date, title, catOrCustomer, amount, currency, taxationPercent, isIncoming)) {
-
-			save();
-
-			return true;
-		}
-
-		return false;
+		return curMonth;
 	}
 
 	public void bulkImportIncomings(SimpleFile bulkFile) {
@@ -343,6 +348,71 @@ public class Database {
 				break;
 			}
 		}
+	}
+
+	public List<Outgoing> getOutgoings() {
+		List<Outgoing> result = new ArrayList<>();
+		for (Year year : getYears()) {
+			result.addAll(year.getOutgoings());
+		}
+		return result;
+	}
+
+	public List<Incoming> getIncomings() {
+		List<Incoming> result = new ArrayList<>();
+		for (Year year : getYears()) {
+			result.addAll(year.getIncomings());
+		}
+		return result;
+	}
+
+	public List<Entry> getEntries() {
+		List<Entry> result = new ArrayList<>();
+		result.addAll(getOutgoings());
+		result.addAll(getIncomings());
+		return result;
+	}
+
+	public List<String> getConsistencyProblems() {
+
+		List<String> result = new ArrayList<>();
+
+		for (Incoming incoming : getIncomings()) {
+			if (incoming.getCategory() != mapTitleToCategory(incoming.getTitle())) {
+				result.add("For " + AccountingUtils.getEntryForLog(incoming) + ", the selected category (" +
+					incoming.getCategory() + ") differs from the automatically detected one (" +
+					mapTitleToCategory(incoming.getTitle()) + ").");
+			}
+		}
+
+		for (Entry entry : getEntries()) {
+
+			if (entry.getDate() == null) {
+				result.add("For " + AccountingUtils.getEntryForLog(entry) + ", no date has been selected.");
+			} else {
+				Month correctMonth = getMonthFromEntryDate(entry.getDate());
+				Month selectedMonth = entry.getParent();
+				if (!correctMonth.equals(selectedMonth)) {
+					result.add(AccountingUtils.getEntryForLog(entry) + " has been filed in " + selectedMonth +
+						" but actually belongs to " + correctMonth + ".");
+				}
+			}
+
+			if (entry.getTaxPercent() == null) {
+				result.add("For " + AccountingUtils.getEntryForLog(entry) + ", no tax amount has been selected.");
+			} else {
+				switch (entry.getTaxPercent()) {
+					case 0:
+					case 7:
+					case 19:
+						continue;
+				}
+				result.add("For " + AccountingUtils.getEntryForLog(entry) + ", an unusual tax of " +
+					entry.getTaxPercent() + "% has been selected.");
+			}
+		}
+
+		return result;
 	}
 
 	public void drop() {

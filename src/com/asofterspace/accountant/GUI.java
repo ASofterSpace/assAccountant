@@ -4,6 +4,7 @@
  */
 package com.asofterspace.accountant;
 
+import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.tabs.MonthTab;
 import com.asofterspace.accountant.tabs.Tab;
@@ -148,12 +149,13 @@ public class GUI extends MainWindow {
 						configuration.set(CONFIG_KEY_TOP, mainFrame.getLocation().y);
 					}
 				});
+
+				highlightTabInLeftListOrTree(tabCtrl.getOverviewTab());
+				showTab(tabCtrl.getOverviewTab());
 			}
 		});
 
 		regenerateTabList();
-		highlightTabInLeftListOrTree(tabCtrl.getOverviewTab());
-		showTab(tabCtrl.getOverviewTab());
 	}
 
 	private JMenuBar createMenu(JFrame parent) {
