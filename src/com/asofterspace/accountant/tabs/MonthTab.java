@@ -130,14 +130,14 @@ public class MonthTab extends TimeSpanTab {
 		curPanel = new JPanel();
 		curPanel.setLayout(new GridBagLayout());
 
-		JLabel curLabel = new JLabel("Gesamte abziehbare Vorsteuerbeträge: ");
+		JLabel curLabel = new JLabel("Total deductible already paid VAT / Gesamte abziehbare Vorsteuerbeträge: ");
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
-		curPanel.add(curLabel, new Arrangement(0, 0, 0.5, 1.0));
+		curPanel.add(curLabel, new Arrangement(0, 0, 0.6, 1.0));
 
 		curLabel = new JLabel(AccountingUtils.formatMoney(sumOfInTaxes, Currency.EUR));
 		curLabel.setPreferredSize(defaultDimension);
-		curPanel.add(curLabel, new Arrangement(1, 0, 0.5, 1.0));
+		curPanel.add(curLabel, new Arrangement(1, 0, 0.4, 1.0));
 
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
@@ -145,14 +145,14 @@ public class MonthTab extends TimeSpanTab {
 		curPanel = new JPanel();
 		curPanel.setLayout(new GridBagLayout());
 
-		curLabel = new JLabel("Verbleibende Umsatzsteuer-Vorauszahlung: ");
+		curLabel = new JLabel("Remaining VAT advance payment / Verbleibende Umsatzsteuer-Vorauszahlung: ");
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
-		curPanel.add(curLabel, new Arrangement(0, 0, 0.5, 1.0));
+		curPanel.add(curLabel, new Arrangement(0, 0, 0.6, 1.0));
 
 		curLabel = new JLabel(AccountingUtils.formatMoney(sumOfOutTaxes - sumOfInTaxes, Currency.EUR));
 		curLabel.setPreferredSize(defaultDimension);
-		curPanel.add(curLabel, new Arrangement(1, 0, 0.5, 1.0));
+		curPanel.add(curLabel, new Arrangement(1, 0, 0.4, 1.0));
 
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
