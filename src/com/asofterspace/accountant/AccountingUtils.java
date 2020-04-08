@@ -6,11 +6,13 @@ package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
+import com.asofterspace.toolbox.Utils;
 
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 
@@ -99,5 +101,18 @@ public class AccountingUtils {
 		curPanel.add(curLabel, new Arrangement(10, 0, 0.0, 1.0));
 
 		return curPanel;
+	}
+
+	public static boolean complain(String complainAbout) {
+
+		JOptionPane.showMessageDialog(
+			null,
+			complainAbout,
+			Utils.getProgramTitle(),
+			JOptionPane.ERROR_MESSAGE
+		);
+
+		// we return false, which can then immediately be returned by the caller
+		return false;
 	}
 }

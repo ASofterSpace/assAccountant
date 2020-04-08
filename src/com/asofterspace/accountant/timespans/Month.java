@@ -4,6 +4,7 @@
  */
 package com.asofterspace.accountant.timespans;
 
+import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.timespans.Month;
@@ -19,8 +20,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-
-import javax.swing.JOptionPane;
 
 
 /**
@@ -149,7 +148,7 @@ public class Month {
 		Integer amountObj = StrUtils.parseMoney(amountStr);
 
 		if (amountObj == null) {
-			return complain("The text " + amountStr + " could not be parsed as amount of money!");
+			return AccountingUtils.complain("The text " + amountStr + " could not be parsed as amount of money!");
 		}
 
 		int amount = amountObj;
@@ -168,12 +167,12 @@ public class Month {
 			try {
 				taxationPercent = Integer.parseInt(taxationPercentStr);
 			} catch (NullPointerException | NumberFormatException e) {
-				return complain("The text " + taxationPercentStr + " could not be parsed as integer!");
+				return AccountingUtils.complain("The text " + taxationPercentStr + " could not be parsed as integer!");
 			}
 		}
 
 		if (catOrCustomerObj == null) {
-			return complain("The no category or customer entered!");
+			return AccountingUtils.complain("The no category or customer entered!");
 		}
 
 		String catOrCustomer = catOrCustomerObj.toString();
@@ -183,7 +182,7 @@ public class Month {
 			Category category = Category.fromString(catOrCustomer);
 
 			if (category == null) {
-				return complain("The text " + catOrCustomer + " could not be parsed as category!");
+				return AccountingUtils.complain("The text " + catOrCustomer + " could not be parsed as category!");
 			}
 
 			Incoming newIn = new Incoming(amount, currency, taxationPercent, date, title, category, this);
@@ -194,7 +193,7 @@ public class Month {
 			String customer = catOrCustomer;
 
 			if ((customer == null) || "".equals(customer)) {
-				return complain("The text " + catOrCustomer + " should contain a customer!");
+				return AccountingUtils.complain("The text " + catOrCustomer + " should contain a customer!");
 			}
 
 			Outgoing newOut = new Outgoing(amount, currency, taxationPercent, date, title, customer, this);
@@ -204,22 +203,13 @@ public class Month {
 		return true;
 	}
 
-	private boolean complain(String complainAbout) {
-
-		JOptionPane.showMessageDialog(
-			null,
-			complainAbout,
-			Utils.getProgramTitle(),
-			JOptionPane.ERROR_MESSAGE
-		);
-
-		// we return false, which can then immediately be returned by the caller
-		return false;
+	public String getMonthName() {
+		return MONTH_NUM_TO_NAME[monthNum];
 	}
 
 	@Override
 	public String toString() {
-		return year.toString() + ": " + MONTH_NUM_TO_NAME[monthNum];
+		return year.toString() + ": " + getMonthName();
 	}
 
 	@Override

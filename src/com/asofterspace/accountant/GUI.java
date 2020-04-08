@@ -5,14 +5,18 @@
 package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.entries.Outgoing;
+import com.asofterspace.accountant.tabs.MonthTab;
 import com.asofterspace.accountant.tabs.Tab;
+import com.asofterspace.accountant.tabs.TimeSpanTab;
 import com.asofterspace.accountant.tabs.YearTab;
+import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.gui.MainWindow;
 import com.asofterspace.toolbox.gui.MenuItemForMainMenu;
+import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.SimpleFile;
 import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
@@ -59,6 +63,7 @@ public class GUI extends MainWindow {
 	private final static String CONFIG_KEY_HEIGHT = "mainFrameHeight";
 	private final static String CONFIG_KEY_LEFT = "mainFrameLeft";
 	private final static String CONFIG_KEY_TOP = "mainFrameTop";
+	private final static String CONFIG_KEY_INVOICE_LOCATION_ON_DISK = "invoiceLocationOnDisk";
 
 	private Database database;
 	private TabCtrl tabCtrl;
@@ -265,6 +270,41 @@ public class GUI extends MainWindow {
 		});
 		menu.add(addEntry);
 
+		// open the invoice file location on disk
+		AbstractButton openOnDisk = new MenuItemForMainMenu("Open on Disk");
+		openOnDisk.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				String diskLocation = configuration.getValue(CONFIG_KEY_INVOICE_LOCATION_ON_DISK);
+				if (diskLocation == null) {
+					AccountingUtils.complain("Sorry, the key " +
+						CONFIG_KEY_INVOICE_LOCATION_ON_DISK + " in the configuration file " +
+						configuration.getAbsoluteFilename() + " has not been set!");
+					return;
+				}
+				if (currentlyOpenedTab != null) {
+					// go directly to the current year
+					if (currentlyOpenedTab instanceof TimeSpanTab) {
+						diskLocation += "/" + ((TimeSpanTab) currentlyOpenedTab).getYear().getNum();
+					}
+					// go directly to the current month
+					if (currentlyOpenedTab instanceof MonthTab) {
+						Month curMonth = ((MonthTab) currentlyOpenedTab).getMonth();
+						diskLocation += "/" + StrUtils.leftPad0(curMonth.getNum() + 1, 2) + " " +
+							curMonth.getMonthName().toLowerCase();
+					}
+				}
+				Directory diskLocationFile = new Directory(diskLocation);
+				try {
+					Desktop.getDesktop().open(diskLocationFile.getJavaFile());
+				} catch (IOException ex) {
+					AccountingUtils.complain("Sorry, the folder " +
+						diskLocationFile.getAbsoluteDirname() + " could not be opened!");
+				}
+			}
+		});
+		menu.add(openOnDisk);
+
 		JMenu huh = new JMenu("?");
 
 		JMenuItem openConfigPath = new JMenuItem("Open Config Path");
@@ -274,7 +314,8 @@ public class GUI extends MainWindow {
 				try {
 					Desktop.getDesktop().open(configuration.getParentDirectory().getJavaFile());
 				} catch (IOException ex) {
-					// do nothing
+					AccountingUtils.complain("Sorry, the folder " +
+						configuration.getParentDirectory().getAbsoluteDirname() + " could not be opened!");
 				}
 			}
 		});

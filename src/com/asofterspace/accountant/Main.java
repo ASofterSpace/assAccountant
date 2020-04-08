@@ -32,6 +32,9 @@ public class Main {
 	 * prevent undoing more than 64 steps, or redoing more steps than have been undone...
 	 * add input method for entries (independent of years and months, according to the date they are
 	 *   automatically added where they need to go!)
+	 * if someone clicks on "Open on Disk" and the folder for that particular month (or even year)
+	 *   does not yet exist, automatically create it, including all the subfolders (however, only
+	 *   if a base location was actually specified in the config - not if the settings are just null!)
 	 * also handle timesheets (and automatically base invoices on timesheets)
 	 * add outgoing invoices with different tax amounts
 	 * add incoming invoices with different tax amounts and having different kinds
