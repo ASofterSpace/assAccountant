@@ -58,22 +58,15 @@ public class YearTab extends TimeSpanTab {
 		i++;
 
 		JPanel curPanel;
-		int totalBeforeTax = 0;
-		int totalTax = 0;
-		int totalAfterTax = 0;
 
 		List<Outgoing> outgoings = year.getOutgoings();
 		for (Outgoing cur : outgoings) {
 			curPanel = cur.createPanelOnGUI(database);
 			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
-
-			totalBeforeTax += cur.getAmount();
-			totalTax += cur.getPostTaxAmount() - cur.getAmount();
-			totalAfterTax += cur.getPostTaxAmount();
 		}
 
-		curPanel = AccountingUtils.createTotalPanelOnGUI(totalBeforeTax, totalTax, totalAfterTax);
+		curPanel = AccountingUtils.createTotalPanelOnGUI(year.getOutTotalBeforeTax(), year.getOutTotalTax(), year.getOutTotalAfterTax());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
@@ -82,24 +75,19 @@ public class YearTab extends TimeSpanTab {
 		tab.add(incomingLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		totalBeforeTax = 0;
-		totalTax = 0;
-		totalAfterTax = 0;
-
 		List<Incoming> incomings = year.getIncomings();
 		for (Incoming cur : incomings) {
 			curPanel = cur.createPanelOnGUI(database);
 			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
-
-			totalBeforeTax += cur.getAmount();
-			totalTax += cur.getPostTaxAmount() - cur.getAmount();
-			totalAfterTax += cur.getPostTaxAmount();
 		}
 
-		curPanel = AccountingUtils.createTotalPanelOnGUI(totalBeforeTax, totalTax, totalAfterTax);
+		curPanel = AccountingUtils.createTotalPanelOnGUI(year.getInTotalBeforeTax(), year.getInTotalTax(), year.getInTotalAfterTax());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
+
+
+		i = AccountingUtils.createOverviewAndTaxInfo(year, tab, i);
 
 
 		JPanel footer = new JPanel();

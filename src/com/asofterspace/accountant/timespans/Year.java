@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * This represents a whole year of accounting data (whoah!)
  */
-public class Year {
+public class Year extends TimeSpan {
 
 	private static final String YEAR_NUM_KEY = "yearNum";
 
@@ -56,6 +56,7 @@ public class Year {
 		}
 	}
 
+	@Override
 	public Record toRecord() {
 
 		Record result = Record.emptyArray();
@@ -72,6 +73,7 @@ public class Year {
 		return result;
 	}
 
+	@Override
 	public int getNum() {
 		return yearNum;
 	}
@@ -85,6 +87,7 @@ public class Year {
 		return months;
 	}
 
+	@Override
 	public List<Outgoing> getOutgoings() {
 		List<Outgoing> result = new ArrayList<>();
 		for (Month month : getMonths()) {
@@ -93,10 +96,47 @@ public class Year {
 		return result;
 	}
 
+	@Override
 	public List<Incoming> getIncomings() {
 		List<Incoming> result = new ArrayList<>();
 		for (Month month : getMonths()) {
 			result.addAll(month.getIncomings());
+		}
+		return result;
+	}
+
+	@Override
+	public int getOutTotalBeforeTax() {
+		int result = 0;
+		for (Month month : months) {
+			result += month.getOutTotalBeforeTax();
+		}
+		return result;
+	}
+
+	@Override
+	public int getOutTotalAfterTax() {
+		int result = 0;
+		for (Month month : months) {
+			result += month.getOutTotalAfterTax();
+		}
+		return result;
+	}
+
+	@Override
+	public int getInTotalBeforeTax() {
+		int result = 0;
+		for (Month month : months) {
+			result += month.getInTotalBeforeTax();
+		}
+		return result;
+	}
+
+	@Override
+	public int getInTotalAfterTax() {
+		int result = 0;
+		for (Month month : months) {
+			result += month.getInTotalAfterTax();
 		}
 		return result;
 	}

@@ -4,6 +4,7 @@
  */
 package com.asofterspace.accountant;
 
+import com.asofterspace.accountant.timespans.TimeSpan;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
@@ -103,6 +104,54 @@ public class AccountingUtils {
 		curPanel.add(curLabel, new Arrangement(10, 0, 0.0, 1.0));
 
 		return curPanel;
+	}
+
+	public static JPanel createOverviewPanelOnGUI(String text, int amount) {
+
+		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
+
+		JPanel curPanel = new JPanel();
+		curPanel.setLayout(new GridBagLayout());
+
+		CopyByClickLabel curLabel = new CopyByClickLabel(text);
+		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(0, 0, 0.6, 1.0));
+
+		curLabel = new CopyByClickLabel(AccountingUtils.formatMoney(amount, Currency.EUR));
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(1, 0, 0.4, 1.0));
+
+		return curPanel;
+	}
+
+	public static int createOverviewAndTaxInfo(TimeSpan timeSpan, JPanel tab, int i) {
+
+		CopyByClickLabel taxInfoLabel = AccountingUtils.createSubHeadLabel("Overview and Tax Information:");
+		tab.add(taxInfoLabel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		JPanel curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount earned without any taxes: ", timeSpan.getOutTotalBeforeTax());
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount spent without any taxes: ", timeSpan.getInTotalBeforeTax());
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total deductible already paid VAT / Gesamte abziehbare Vorsteuerbeträge für USt: ", timeSpan.getInTotalTax());
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		int remainVATpay = timeSpan.getOutTotalTax() - timeSpan.getInTotalTax();
+		if (remainVATpay < 0) {
+			remainVATpay = 0;
+		}
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Remaining VAT advance payment / Verbleibende Umsatzsteuer-Vorauszahlung: ", remainVATpay);
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		return i;
 	}
 
 	public static CopyByClickLabel createHeadLabel(String text) {

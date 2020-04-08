@@ -11,7 +11,6 @@ import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
-import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 
@@ -62,88 +61,36 @@ public class MonthTab extends TimeSpanTab {
 		i++;
 
 		JPanel curPanel;
-		int totalBeforeTax = 0;
-		int totalTax = 0;
-		int totalAfterTax = 0;
 
 		List<Outgoing> outgoings = month.getOutgoings();
 		for (Outgoing cur : outgoings) {
 			curPanel = cur.createPanelOnGUI(database);
 			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
-
-			totalBeforeTax += cur.getAmount();
-			totalTax += cur.getPostTaxAmount() - cur.getAmount();
-			totalAfterTax += cur.getPostTaxAmount();
 		}
 
-		curPanel = AccountingUtils.createTotalPanelOnGUI(totalBeforeTax, totalTax, totalAfterTax);
+		curPanel = AccountingUtils.createTotalPanelOnGUI(month.getOutTotalBeforeTax(), month.getOutTotalTax(), month.getOutTotalAfterTax());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
-
-		int sumOfOutTaxes = totalTax;
 
 
 		CopyByClickLabel incomingLabel = AccountingUtils.createSubHeadLabel("Incoming Invoices - that is, we have to pay:");
 		tab.add(incomingLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		totalBeforeTax = 0;
-		totalTax = 0;
-		totalAfterTax = 0;
-
 		List<Incoming> incomings = month.getIncomings();
 		for (Incoming cur : incomings) {
 			curPanel = cur.createPanelOnGUI(database);
 			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
-
-			totalBeforeTax += cur.getAmount();
-			totalTax += cur.getPostTaxAmount() - cur.getAmount();
-			totalAfterTax += cur.getPostTaxAmount();
 		}
 
-		curPanel = AccountingUtils.createTotalPanelOnGUI(totalBeforeTax, totalTax, totalAfterTax);
+		curPanel = AccountingUtils.createTotalPanelOnGUI(month.getInTotalBeforeTax(), month.getInTotalTax(), month.getInTotalAfterTax());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		int sumOfInTaxes = totalTax;
 
-
-		CopyByClickLabel taxInfoLabel = AccountingUtils.createSubHeadLabel("Tax Information USt:");
-		tab.add(taxInfoLabel, new Arrangement(0, i, 1.0, 0.0));
-		i++;
-
-		curPanel = new JPanel();
-		curPanel.setLayout(new GridBagLayout());
-
-		CopyByClickLabel curLabel = new CopyByClickLabel("Total deductible already paid VAT / Gesamte abziehbare Vorsteuerbeträge: ");
-		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
-		curLabel.setPreferredSize(defaultDimension);
-		curPanel.add(curLabel, new Arrangement(0, 0, 0.6, 1.0));
-
-		curLabel = new CopyByClickLabel(AccountingUtils.formatMoney(sumOfInTaxes, Currency.EUR));
-		curLabel.setPreferredSize(defaultDimension);
-		curPanel.add(curLabel, new Arrangement(1, 0, 0.4, 1.0));
-
-		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
-		i++;
-
-		curPanel = new JPanel();
-		curPanel.setLayout(new GridBagLayout());
-
-		curLabel = new CopyByClickLabel("Remaining VAT advance payment / Verbleibende Umsatzsteuer-Vorauszahlung: ");
-		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
-		curLabel.setPreferredSize(defaultDimension);
-		curPanel.add(curLabel, new Arrangement(0, 0, 0.6, 1.0));
-
-		curLabel = new CopyByClickLabel(AccountingUtils.formatMoney(sumOfOutTaxes - sumOfInTaxes, Currency.EUR));
-		curLabel.setPreferredSize(defaultDimension);
-		curPanel.add(curLabel, new Arrangement(1, 0, 0.4, 1.0));
-
-		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
-		i++;
-
+		i = AccountingUtils.createOverviewAndTaxInfo(month, tab, i);
 
 
 		JPanel footer = new JPanel();

@@ -28,7 +28,8 @@ public class Main {
 	 * TODO:
 	 * Export (as menu item), with Export as German CSV and Export as English CSV as sub-items
 	 * Check Consistency (as menu item), maybe also automatically done on startup, checks e.g. for
-	 *   all entries if their dates actually belong to the month and year that they say they belong to
+	 *   all entries if their dates actually belong to the month and year that they say they belong to,
+	 *   also check that tax is one of 0, 7 or 19
 	 * prevent undoing more than 64 steps, or redoing more steps than have been undone...
 	 * if someone clicks on "Open on Disk" and the folder for that particular month (or even year)
 	 *   does not yet exist, automatically create it, including all the subfolders (however, only
@@ -36,6 +37,7 @@ public class Main {
 	 * also handle timesheets (and automatically base invoices on timesheets)
 	 * add to outgoing invoices a "date paid" which can be null if not yet paid, or a date can be
 	 *   entered for when it was paid
+	 * edit existing entries
 	 * output monthly accounting json that we can save long-term just in case
 	 * output yearly accounting information
 	 * output yearly accounting json

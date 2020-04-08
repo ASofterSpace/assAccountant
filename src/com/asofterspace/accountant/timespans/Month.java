@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * This represents a month of accounting data
  */
-public class Month {
+public class Month extends TimeSpan {
 
 	private final static String MONTH_NUM_KEY = "monthNum";
 	private final static String OUTGOING_KEY = "outgoings";
@@ -87,6 +87,7 @@ public class Month {
 		}
 	}
 
+	@Override
 	public Record toRecord() {
 
 		Record result = Record.emptyArray();
@@ -112,10 +113,12 @@ public class Month {
 		return year;
 	}
 
+	@Override
 	public int getNum() {
 		return monthNum;
 	}
 
+	@Override
 	public List<Outgoing> getOutgoings() {
 		Collections.sort(outgoings, new Comparator<Outgoing>() {
 			public int compare(Outgoing a, Outgoing b) {
@@ -125,6 +128,7 @@ public class Month {
 		return outgoings;
 	}
 
+	@Override
 	public List<Incoming> getIncomings() {
 		Collections.sort(incomings, new Comparator<Incoming>() {
 			public int compare(Incoming a, Incoming b) {
@@ -205,6 +209,42 @@ public class Month {
 
 	public String getMonthName() {
 		return MONTH_NUM_TO_NAME[monthNum];
+	}
+
+	@Override
+	public int getOutTotalBeforeTax() {
+		int result = 0;
+		for (Outgoing cur : outgoings) {
+			result += cur.getAmount();
+		}
+		return result;
+	}
+
+	@Override
+	public int getOutTotalAfterTax() {
+		int result = 0;
+		for (Outgoing cur : outgoings) {
+			result += cur.getPostTaxAmount();
+		}
+		return result;
+	}
+
+	@Override
+	public int getInTotalBeforeTax() {
+		int result = 0;
+		for (Incoming cur : incomings) {
+			result += cur.getAmount();
+		}
+		return result;
+	}
+
+	@Override
+	public int getInTotalAfterTax() {
+		int result = 0;
+		for (Incoming cur : incomings) {
+			result += cur.getPostTaxAmount();
+		}
+		return result;
 	}
 
 	@Override
