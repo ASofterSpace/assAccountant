@@ -51,4 +51,8 @@ public class TabCtrl {
 
 		return result;
 	}
+
+	public OverviewTab getOverviewTab() {
+		return overviewTab;
+	}
 }

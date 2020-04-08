@@ -147,6 +147,8 @@ public class GUI extends MainWindow {
 		});
 
 		regenerateTabList();
+		highlightTabInLeftListOrTree(tabCtrl.getOverviewTab());
+		showTab(tabCtrl.getOverviewTab());
 	}
 
 	private JMenuBar createMenu(JFrame parent) {

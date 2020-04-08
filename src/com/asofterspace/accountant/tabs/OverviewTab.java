@@ -54,6 +54,10 @@ public class OverviewTab extends Tab {
 		// TODO - display information such as outgoing invoices which have been sent out more
 		// than six weeks ago and not yet been set to having come in
 
+		// TODO - display information such as finance days that have last been done (or maybe
+		// even get away from real "finance days", and instead have continuous financing going on,
+		// this here always showing what is now left to do?)
+
 
 		JPanel footer = new JPanel();
 		tab.add(footer, new Arrangement(0, i, 1.0, 1.0));
