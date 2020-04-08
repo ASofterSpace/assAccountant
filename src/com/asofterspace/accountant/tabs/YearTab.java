@@ -11,13 +11,13 @@ import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.toolbox.gui.Arrangement;
+import com.asofterspace.toolbox.gui.CopyByClickLabel;
 
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.util.List;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 
@@ -47,20 +47,20 @@ public class YearTab extends TimeSpanTab {
 		JPanel topHUD = new JPanel();
 		topHUD.setLayout(new GridBagLayout());
 
-		JLabel nameLabel = new JLabel(year.toString() + " (yearly overview)");
+		CopyByClickLabel nameLabel = new CopyByClickLabel(year.toString() + " (yearly overview)");
 		nameLabel.setFont(new Font("Calibri", Font.PLAIN, 24));
 		nameLabel.setPreferredSize(new Dimension(0, nameLabel.getPreferredSize().height*2));
-		nameLabel.setHorizontalAlignment(JLabel.CENTER);
+		nameLabel.setHorizontalAlignment(CopyByClickLabel.CENTER);
 		topHUD.add(nameLabel, new Arrangement(0, 0, 1.0, 1.0));
 
 		tab.add(topHUD, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
 
-		JLabel outgoingLabel = new JLabel("Outgoing Invoices - that is, we get paid:");
+		CopyByClickLabel outgoingLabel = new CopyByClickLabel("Outgoing Invoices - that is, we get paid:");
 		outgoingLabel.setFont(new Font("Calibri", Font.PLAIN, 20));
 		outgoingLabel.setPreferredSize(new Dimension(0, outgoingLabel.getPreferredSize().height*2));
-		outgoingLabel.setHorizontalAlignment(JLabel.CENTER);
+		outgoingLabel.setHorizontalAlignment(CopyByClickLabel.CENTER);
 		tab.add(outgoingLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
@@ -85,10 +85,10 @@ public class YearTab extends TimeSpanTab {
 		i++;
 
 
-		JLabel incomingLabel = new JLabel("Incoming Invoices - that is, we have to pay:");
+		CopyByClickLabel incomingLabel = new CopyByClickLabel("Incoming Invoices - that is, we have to pay:");
 		incomingLabel.setFont(new Font("Calibri", Font.PLAIN, 20));
 		incomingLabel.setPreferredSize(new Dimension(0, incomingLabel.getPreferredSize().height*2));
-		incomingLabel.setHorizontalAlignment(JLabel.CENTER);
+		incomingLabel.setHorizontalAlignment(CopyByClickLabel.CENTER);
 		tab.add(incomingLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 

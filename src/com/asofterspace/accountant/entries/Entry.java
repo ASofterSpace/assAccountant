@@ -10,6 +10,7 @@ import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
+import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.Utils;
@@ -22,7 +23,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 
@@ -176,35 +176,35 @@ public abstract class Entry {
 		JPanel curPanel = new JPanel();
 		curPanel.setLayout(new GridBagLayout());
 
-		JLabel curLabel = new JLabel(getDateAsText());
-		curLabel.setHorizontalAlignment(JLabel.CENTER);
+		CopyByClickLabel curLabel = new CopyByClickLabel(getDateAsText());
+		curLabel.setHorizontalAlignment(CopyByClickLabel.CENTER);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.1, 1.0));
 
-		curLabel = new JLabel(getTitle());
+		curLabel = new CopyByClickLabel(getTitle());
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(1, 0, 0.35, 1.0));
 
-		curLabel = new JLabel("[" + getCategoryOrCustomer() + "]");
+		curLabel = new CopyByClickLabel("[" + getCategoryOrCustomer() + "]");
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(2, 0, 0.11, 1.0));
 
-		curLabel = new JLabel(getAmountAsText());
-		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		curLabel = new CopyByClickLabel(getAmountAsText());
+		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(3, 0, 0.1, 1.0));
 
-		curLabel = new JLabel(getTaxPercentAsText());
-		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		curLabel = new CopyByClickLabel(getTaxPercentAsText());
+		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(4, 0, 0.1, 1.0));
 
-		curLabel = new JLabel(getPostTaxAmountAsText());
-		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		curLabel = new CopyByClickLabel(getPostTaxAmountAsText());
+		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(5, 0, 0.1, 1.0));
 
-		curLabel = new JLabel("");
+		curLabel = new CopyByClickLabel("");
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(6, 0, 0.0, 1.0));
 
@@ -219,7 +219,7 @@ public abstract class Entry {
 			}
 		});
 
-		curLabel = new JLabel("");
+		curLabel = new CopyByClickLabel("");
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(8, 0, 0.0, 1.0));
 
@@ -233,7 +233,7 @@ public abstract class Entry {
 			}
 		});
 
-		curLabel = new JLabel("");
+		curLabel = new CopyByClickLabel("");
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(10, 0, 0.0, 1.0));
 

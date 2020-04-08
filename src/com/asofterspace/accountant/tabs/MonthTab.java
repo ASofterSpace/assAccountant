@@ -13,13 +13,13 @@ import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
+import com.asofterspace.toolbox.gui.CopyByClickLabel;
 
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.util.List;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 
@@ -51,20 +51,20 @@ public class MonthTab extends TimeSpanTab {
 		JPanel topHUD = new JPanel();
 		topHUD.setLayout(new GridBagLayout());
 
-		JLabel nameLabel = new JLabel(month.toString());
+		CopyByClickLabel nameLabel = new CopyByClickLabel(month.toString());
 		nameLabel.setFont(new Font("Calibri", Font.PLAIN, 24));
 		nameLabel.setPreferredSize(new Dimension(0, nameLabel.getPreferredSize().height*2));
-		nameLabel.setHorizontalAlignment(JLabel.CENTER);
+		nameLabel.setHorizontalAlignment(CopyByClickLabel.CENTER);
 		topHUD.add(nameLabel, new Arrangement(0, 0, 1.0, 1.0));
 
 		tab.add(topHUD, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
 
-		JLabel outgoingLabel = new JLabel("Outgoing Invoices - that is, we get paid:");
+		CopyByClickLabel outgoingLabel = new CopyByClickLabel("Outgoing Invoices - that is, we get paid:");
 		outgoingLabel.setFont(new Font("Calibri", Font.PLAIN, 20));
 		outgoingLabel.setPreferredSize(new Dimension(0, outgoingLabel.getPreferredSize().height*2));
-		outgoingLabel.setHorizontalAlignment(JLabel.CENTER);
+		outgoingLabel.setHorizontalAlignment(CopyByClickLabel.CENTER);
 		tab.add(outgoingLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
@@ -91,10 +91,10 @@ public class MonthTab extends TimeSpanTab {
 		int sumOfOutTaxes = totalTax;
 
 
-		JLabel incomingLabel = new JLabel("Incoming Invoices - that is, we have to pay:");
+		CopyByClickLabel incomingLabel = new CopyByClickLabel("Incoming Invoices - that is, we have to pay:");
 		incomingLabel.setFont(new Font("Calibri", Font.PLAIN, 20));
 		incomingLabel.setPreferredSize(new Dimension(0, incomingLabel.getPreferredSize().height*2));
-		incomingLabel.setHorizontalAlignment(JLabel.CENTER);
+		incomingLabel.setHorizontalAlignment(CopyByClickLabel.CENTER);
 		tab.add(incomingLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
@@ -120,22 +120,22 @@ public class MonthTab extends TimeSpanTab {
 		int sumOfInTaxes = totalTax;
 
 
-		JLabel taxInfoLabel = new JLabel("Tax Information USt:");
+		CopyByClickLabel taxInfoLabel = new CopyByClickLabel("Tax Information USt:");
 		taxInfoLabel.setFont(new Font("Calibri", Font.PLAIN, 20));
 		taxInfoLabel.setPreferredSize(new Dimension(0, taxInfoLabel.getPreferredSize().height*2));
-		taxInfoLabel.setHorizontalAlignment(JLabel.CENTER);
+		taxInfoLabel.setHorizontalAlignment(CopyByClickLabel.CENTER);
 		tab.add(taxInfoLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
 		curPanel = new JPanel();
 		curPanel.setLayout(new GridBagLayout());
 
-		JLabel curLabel = new JLabel("Total deductible already paid VAT / Gesamte abziehbare Vorsteuerbeträge: ");
-		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		CopyByClickLabel curLabel = new CopyByClickLabel("Total deductible already paid VAT / Gesamte abziehbare Vorsteuerbeträge: ");
+		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.6, 1.0));
 
-		curLabel = new JLabel(AccountingUtils.formatMoney(sumOfInTaxes, Currency.EUR));
+		curLabel = new CopyByClickLabel(AccountingUtils.formatMoney(sumOfInTaxes, Currency.EUR));
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(1, 0, 0.4, 1.0));
 
@@ -145,12 +145,12 @@ public class MonthTab extends TimeSpanTab {
 		curPanel = new JPanel();
 		curPanel.setLayout(new GridBagLayout());
 
-		curLabel = new JLabel("Remaining VAT advance payment / Verbleibende Umsatzsteuer-Vorauszahlung: ");
-		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		curLabel = new CopyByClickLabel("Remaining VAT advance payment / Verbleibende Umsatzsteuer-Vorauszahlung: ");
+		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.6, 1.0));
 
-		curLabel = new JLabel(AccountingUtils.formatMoney(sumOfOutTaxes - sumOfInTaxes, Currency.EUR));
+		curLabel = new CopyByClickLabel(AccountingUtils.formatMoney(sumOfOutTaxes - sumOfInTaxes, Currency.EUR));
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(1, 0, 0.4, 1.0));
 
