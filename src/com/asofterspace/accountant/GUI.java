@@ -37,6 +37,7 @@ import java.util.List;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.JFileChooser;
@@ -67,6 +68,7 @@ public class GUI extends MainWindow {
 	private TimeSpanTab currentlyOpenedTab;
 
 	private JPanel mainPanelRight;
+	private JScrollPane mainPanelRightScroller;
 	private JPanel emptyTab;
 
 	private JPanel searchPanel;
@@ -308,8 +310,17 @@ public class GUI extends MainWindow {
 		mainPanelRightOuter.setLayout(mainPanelRightOuterLayout);
 
 		mainPanelRight = new JPanel();
-		mainPanelRight.setLayout(new CardLayout());
-		mainPanelRight.setPreferredSize(new Dimension(8, 8));
+		// mainPanelRight.setLayout(new CardLayout());
+//		mainPanelRight.setLayout(new BoxLayout());
+//		mainPanelRight.setLayout(new BorderLayout());
+		mainPanelRight.setPreferredSize(new Dimension(100, 100));
+
+		mainPanelRightScroller = new JScrollPane(mainPanelRight,
+			JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
+			JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+//		mainPanelRightScroller = new JScrollPane(); // DEBUG
+		mainPanelRightScroller.setPreferredSize(new Dimension(8, 8));
+		mainPanelRightScroller.setBorder(BorderFactory.createEmptyBorder());
 
 		JPanel gapPanel = new JPanel();
 		gapPanel.setPreferredSize(new Dimension(8, 8));
@@ -403,7 +414,7 @@ public class GUI extends MainWindow {
 
 		searchPanel.add(searchField, new Arrangement(0, 0, 1.0, 1.0));
 
-		mainPanelRightOuter.add(mainPanelRight, new Arrangement(0, 0, 1.0, 1.0));
+		mainPanelRightOuter.add(mainPanelRightScroller, new Arrangement(0, 0, 1.0, 1.0));
 
 		mainPanelRightOuter.add(searchPanel, new Arrangement(0, 1, 1.0, 0.0));
 
@@ -517,6 +528,8 @@ public class GUI extends MainWindow {
 
 		mainPanelRight.revalidate();
 		mainPanelRight.repaint();
+		mainPanelRightScroller.revalidate();
+		mainPanelRightScroller.repaint();
 	}
 
 	private void showSelectedTab() {
@@ -539,6 +552,8 @@ public class GUI extends MainWindow {
 			currentlyOpenedTab.createTabOnGUI(mainPanelRight, database);
 			mainPanelRight.revalidate();
 			mainPanelRight.repaint();
+			mainPanelRightScroller.revalidate();
+			mainPanelRightScroller.repaint();
 		}
 	}
 

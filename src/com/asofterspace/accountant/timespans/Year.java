@@ -9,6 +9,8 @@ import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.toolbox.utils.Record;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -75,12 +77,17 @@ public class Year {
 	}
 
 	public List<Month> getMonths() {
+		Collections.sort(months, new Comparator<Month>() {
+			public int compare(Month a, Month b) {
+				return b.getNum() - a.getNum();
+			}
+		});
 		return months;
 	}
 
 	public List<Outgoing> getOutgoings() {
 		List<Outgoing> result = new ArrayList<>();
-		for (Month month : months) {
+		for (Month month : getMonths()) {
 			result.addAll(month.getOutgoings());
 		}
 		return result;
@@ -88,7 +95,7 @@ public class Year {
 
 	public List<Incoming> getIncomings() {
 		List<Incoming> result = new ArrayList<>();
-		for (Month month : months) {
+		for (Month month : getMonths()) {
 			result.addAll(month.getIncomings());
 		}
 		return result;
