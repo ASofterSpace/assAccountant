@@ -11,6 +11,7 @@ import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
+import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
 
 import java.awt.Dimension;
@@ -41,6 +42,8 @@ public class MonthTab extends TimeSpanTab {
 		}
 
 		int i = 0;
+
+		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
 
 		tab = new JPanel();
 		tab.setLayout(new GridBagLayout());
@@ -85,6 +88,8 @@ public class MonthTab extends TimeSpanTab {
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
+		int sumOfOutTaxes = totalTax;
+
 
 		JLabel incomingLabel = new JLabel("Incoming Invoices - that is, we have to pay:");
 		incomingLabel.setFont(new Font("Calibri", Font.PLAIN, 20));
@@ -112,11 +117,52 @@ public class MonthTab extends TimeSpanTab {
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
+		int sumOfInTaxes = totalTax;
+
+
+		JLabel taxInfoLabel = new JLabel("Tax Information USt:");
+		taxInfoLabel.setFont(new Font("Calibri", Font.PLAIN, 20));
+		taxInfoLabel.setPreferredSize(new Dimension(0, taxInfoLabel.getPreferredSize().height*2));
+		taxInfoLabel.setHorizontalAlignment(JLabel.CENTER);
+		tab.add(taxInfoLabel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		curPanel = new JPanel();
+		curPanel.setLayout(new GridBagLayout());
+
+		JLabel curLabel = new JLabel("Gesamte abziehbare Vorsteuerbeträge: ");
+		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(0, 0, 0.5, 1.0));
+
+		curLabel = new JLabel(AccountingUtils.formatMoney(sumOfInTaxes, Currency.EUR));
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(1, 0, 0.5, 1.0));
+
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		curPanel = new JPanel();
+		curPanel.setLayout(new GridBagLayout());
+
+		curLabel = new JLabel("Verbleibende Umsatzsteuer-Vorauszahlung: ");
+		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(0, 0, 0.5, 1.0));
+
+		curLabel = new JLabel(AccountingUtils.formatMoney(sumOfOutTaxes - sumOfInTaxes, Currency.EUR));
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(1, 0, 0.5, 1.0));
+
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+
 
 		JPanel footer = new JPanel();
 		tab.add(footer, new Arrangement(0, i, 1.0, 1.0));
 
-		Dimension newSize = new Dimension(parentPanel.getWidth(), tab.getMinimumSize().height + 100);
+		Dimension newSize = new Dimension(parentPanel.getWidth(), tab.getMinimumSize().height + 200);
 		tab.setPreferredSize(newSize);
 		parentPanel.setPreferredSize(newSize);
 
