@@ -4,13 +4,16 @@
  */
 package com.asofterspace.accountant;
 
+import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.tabs.TimeSpanTab;
 import com.asofterspace.accountant.tabs.YearTab;
+import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.gui.MainWindow;
 import com.asofterspace.toolbox.gui.MenuItemForMainMenu;
+import com.asofterspace.toolbox.io.SimpleFile;
 import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 
@@ -36,6 +39,7 @@ import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JMenu;
@@ -67,8 +71,6 @@ public class GUI extends MainWindow {
 
 	private JPanel searchPanel;
 	private JTextField searchField;
-
-	private JMenuItem close;
 
 	private ConfigFile configuration;
 	private JList<String> tabListComponent;
@@ -170,19 +172,51 @@ public class GUI extends MainWindow {
 
 		file.addSeparator();
 
-		close = new JMenuItem("Save");
-		close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
-		close.addActionListener(new ActionListener() {
+		JMenuItem bulkImportIn = new JMenuItem("Bulk Import Incoming TSV");
+		bulkImportIn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				bulkImportIncomings();
+			}
+		});
+		file.add(bulkImportIn);
+
+		JMenuItem bulkImportOut = new JMenuItem("Bulk Import Outgoing TSV");
+		bulkImportOut.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				bulkImportOutgoings();
+			}
+		});
+		file.add(bulkImportOut);
+
+		file.addSeparator();
+
+		JMenuItem dropEntireDatabase = new JMenuItem("Drop Entire Database");
+		dropEntireDatabase.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO :: guard this with an extra popup!
+				database.drop();
+			}
+		});
+		file.add(dropEntireDatabase);
+
+		file.addSeparator();
+
+		JMenuItem save = new JMenuItem("Save");
+		save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
+		save.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				database.save();
 			}
 		});
-		file.add(close);
+		file.add(save);
 
 		file.addSeparator();
 
-		close = new JMenuItem("Exit");
+		JMenuItem close = new JMenuItem("Exit");
 		close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, ActionEvent.ALT_MASK));
 		close.addActionListener(new ActionListener() {
 			@Override
@@ -505,6 +539,60 @@ public class GUI extends MainWindow {
 			currentlyOpenedTab.createTabOnGUI(mainPanelRight, database);
 			mainPanelRight.revalidate();
 			mainPanelRight.repaint();
+		}
+	}
+
+	private void bulkImportIncomings() {
+
+		// TODO :: actually, write our own file chooser
+		JFileChooser importFilePicker = new JFileChooser(System.getProperty("java.class.path") + "/..");
+
+		importFilePicker.setDialogTitle("Open a File to Bulk Import Incoming Invoices");
+		importFilePicker.setMultiSelectionEnabled(true);
+
+		int result = importFilePicker.showOpenDialog(mainFrame);
+
+		switch (result) {
+
+			case JFileChooser.APPROVE_OPTION:
+
+				// load the files
+				for (java.io.File curFile : importFilePicker.getSelectedFiles()) {
+					database.bulkImportIncomings(new SimpleFile(curFile));
+				}
+
+				break;
+
+			case JFileChooser.CANCEL_OPTION:
+				// cancel was pressed... do nothing!
+				break;
+		}
+	}
+
+	private void bulkImportOutgoings() {
+
+		// TODO :: actually, write our own file chooser
+		JFileChooser importFilePicker = new JFileChooser(System.getProperty("java.class.path") + "/..");
+
+		importFilePicker.setDialogTitle("Open a File to Bulk Import Outgoing Invoices");
+		importFilePicker.setMultiSelectionEnabled(true);
+
+		int result = importFilePicker.showOpenDialog(mainFrame);
+
+		switch (result) {
+
+			case JFileChooser.APPROVE_OPTION:
+
+				// load the files
+				for (java.io.File curFile : importFilePicker.getSelectedFiles()) {
+					database.bulkImportOutgoings(new SimpleFile(curFile));
+				}
+
+				break;
+
+			case JFileChooser.CANCEL_OPTION:
+				// cancel was pressed... do nothing!
+				break;
 		}
 	}
 

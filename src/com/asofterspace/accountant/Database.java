@@ -4,15 +4,15 @@
  */
 package com.asofterspace.accountant;
 
-import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Outgoing;
-import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
+import com.asofterspace.accountant.world.Category;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonParseException;
+import com.asofterspace.toolbox.io.SimpleFile;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.Utils;
@@ -20,8 +20,10 @@ import com.asofterspace.toolbox.Utils;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.JOptionPane;
@@ -47,6 +49,10 @@ public class Database {
 
 	private List<Year> years;
 
+	// the following two fields are used for storing information used during legacy bulk imports only
+	private List<String> potentialCustomers;
+	private Map<String, Category> titleToCategoryMapping;
+
 
 	public Database(ConfigFile settings) throws JsonParseException {
 
@@ -56,6 +62,56 @@ public class Database {
 		this.dbFile = new ConfigFile("database", true);
 
 		loadFromFile(dbFile);
+
+		potentialCustomers = new ArrayList<>();
+		potentialCustomers.add("TPZ-Vega");
+		potentialCustomers.add("Recoded");
+		potentialCustomers.add("Skyhook");
+		potentialCustomers.add("SuperVision Earth");
+
+		titleToCategoryMapping = new HashMap<>();
+
+		titleToCategoryMapping.put("Wikimedia", Category.DONATION);
+		titleToCategoryMapping.put("Patreon", Category.DONATION);
+		titleToCategoryMapping.put("Against Malaria", Category.DONATION);
+		titleToCategoryMapping.put("Projekt Gutenberg", Category.DONATION);
+		titleToCategoryMapping.put("Internet Archive", Category.DONATION);
+		titleToCategoryMapping.put("StrongMinds", Category.DONATION);
+
+		titleToCategoryMapping.put("Fiverr", Category.EXTERNAL_SALARY);
+
+		titleToCategoryMapping.put("Fahrkarte", Category.TRAVEL);
+		titleToCategoryMapping.put("Ticket", Category.TRAVEL);
+		titleToCategoryMapping.put("Bahn", Category.TRAVEL);
+		titleToCategoryMapping.put("Flixbus", Category.TRAVEL);
+		titleToCategoryMapping.put("Travel", Category.TRAVEL);
+		titleToCategoryMapping.put("RMV", Category.TRAVEL);
+		titleToCategoryMapping.put("VBB", Category.TRAVEL);
+		titleToCategoryMapping.put("SNCF", Category.TRAVEL);
+		titleToCategoryMapping.put("inoui", Category.TRAVEL);
+
+		titleToCategoryMapping.put("Google", Category.INFRASTRUCTURE);
+		titleToCategoryMapping.put("Gsuite", Category.INFRASTRUCTURE);
+		titleToCategoryMapping.put("GSuite", Category.INFRASTRUCTURE);
+		titleToCategoryMapping.put("Speicherzentrum", Category.INFRASTRUCTURE);
+		titleToCategoryMapping.put("Speicheranbieter", Category.INFRASTRUCTURE);
+		titleToCategoryMapping.put("Microsoft", Category.INFRASTRUCTURE);
+		titleToCategoryMapping.put("Mobatek", Category.INFRASTRUCTURE);
+		titleToCategoryMapping.put("Oculus", Category.INFRASTRUCTURE);
+		titleToCategoryMapping.put("Computer Game", Category.INFRASTRUCTURE);
+		titleToCategoryMapping.put("Conrad", Category.INFRASTRUCTURE);
+		titleToCategoryMapping.put("Snapmaker", Category.INFRASTRUCTURE);
+		titleToCategoryMapping.put("Proengeno", Category.INFRASTRUCTURE);
+		titleToCategoryMapping.put("Vive", Category.INFRASTRUCTURE);
+		titleToCategoryMapping.put("Vroo", Category.INFRASTRUCTURE);
+
+		titleToCategoryMapping.put("ESAW", Category.EDUCATION);
+		titleToCategoryMapping.put("Expo", Category.EDUCATION);
+
+		titleToCategoryMapping.put("Sixt", Category.VEHICLE);
+
+		titleToCategoryMapping.put("Druckerei", Category.ADVERTISEMENTS);
+		titleToCategoryMapping.put("OnlinePrinters", Category.ADVERTISEMENTS);
 	}
 
 	private Record loadFromFile(ConfigFile fileToLoad) {
@@ -196,6 +252,102 @@ public class Database {
 		}
 
 		return false;
+	}
+
+	public void bulkImportIncomings(SimpleFile bulkFile) {
+
+		List<String> lines = bulkFile.getContents();
+
+		for (String line : lines) {
+
+			line = line.trim();
+
+			if ("".equals(line)) {
+				continue;
+			}
+
+			// we now have a line such as:
+			// 27.03.1998	Fahrkarte von A nach B	9,99 €	5%	10,49 €
+
+			String dateStr = line.substring(0, line.indexOf("\t"));
+			line = line.substring(line.indexOf("\t") + 1);
+
+			String titleStr = line.substring(0, line.indexOf("\t"));
+			line = line.substring(line.indexOf("\t") + 1);
+
+			String amountStr = line.substring(0, line.indexOf("\t"));
+			line = line.substring(line.indexOf("\t") + 1);
+
+			String taxationPercentStr = line;
+			if (line.indexOf("\t") >= 0) {
+				taxationPercentStr = line.substring(0, line.indexOf("\t"));
+			}
+
+			Category category = Category.OTHER;
+			for (Map.Entry<String, Category> entry : titleToCategoryMapping.entrySet()) {
+				if (titleStr.contains(entry.getKey())) {
+					category = entry.getValue();
+					break;
+				}
+			}
+
+			if (!addEntry(dateStr, titleStr, category.getText(), amountStr, Currency.EUR, taxationPercentStr, true)) {
+				// stop upon the first failure instead of showing a million error messages
+				break;
+			}
+		}
+	}
+
+	public void bulkImportOutgoings(SimpleFile bulkFile) {
+
+		List<String> lines = bulkFile.getContents();
+
+		for (String line : lines) {
+
+			line = line.trim();
+
+			if ("".equals(line)) {
+				continue;
+			}
+
+			// we now have a line such as:
+			// 27.03.1998	Fahrkarte von A nach B	9,99 €	5%	10,49 €
+
+			String dateStr = line.substring(0, line.indexOf("\t"));
+			line = line.substring(line.indexOf("\t") + 1);
+
+			String titleStr = line.substring(0, line.indexOf("\t"));
+			line = line.substring(line.indexOf("\t") + 1);
+
+			String amountStr = line.substring(0, line.indexOf("\t"));
+			line = line.substring(line.indexOf("\t") + 1);
+
+			String taxationPercentStr = line;
+			if (line.indexOf("\t") >= 0) {
+				taxationPercentStr = line.substring(0, line.indexOf("\t"));
+			}
+
+			String customer = "";
+			for (String potentialCustomer : potentialCustomers) {
+				if (titleStr.contains(potentialCustomer)) {
+					customer = potentialCustomer;
+				}
+			}
+
+			if (!addEntry(dateStr, titleStr, customer, amountStr, Currency.EUR, taxationPercentStr, false)) {
+				// stop upon the first failure instead of showing a million error messages
+				break;
+			}
+		}
+	}
+
+	public void drop() {
+
+		gui.showTab(null);
+
+		years = new ArrayList<>();
+
+		save();
 	}
 
 	public void save() {

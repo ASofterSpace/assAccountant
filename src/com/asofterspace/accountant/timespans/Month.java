@@ -120,7 +120,7 @@ public class Month {
 	public List<Outgoing> getOutgoings() {
 		Collections.sort(outgoings, new Comparator<Outgoing>() {
 			public int compare(Outgoing a, Outgoing b) {
-				return a.getDate().compareTo(b.getDate());
+				return b.getDate().compareTo(a.getDate());
 			}
 		});
 		return outgoings;
@@ -129,7 +129,7 @@ public class Month {
 	public List<Incoming> getIncomings() {
 		Collections.sort(incomings, new Comparator<Incoming>() {
 			public int compare(Incoming a, Incoming b) {
-				return a.getDate().compareTo(b.getDate());
+				return b.getDate().compareTo(a.getDate());
 			}
 		});
 		return incomings;
@@ -158,6 +158,13 @@ public class Month {
 		if (!"".equals(taxationPercentStr)) {
 			taxationPercentStr = taxationPercentStr.replaceAll(" ", "");
 			taxationPercentStr = taxationPercentStr.replaceAll("%", "");
+			taxationPercentStr = taxationPercentStr.replaceAll("€", "");
+			if (taxationPercentStr.contains(".")) {
+				taxationPercentStr = taxationPercentStr.substring(0, taxationPercentStr.indexOf("."));
+			}
+			if (taxationPercentStr.contains(",")) {
+				taxationPercentStr = taxationPercentStr.substring(0, taxationPercentStr.indexOf(","));
+			}
 			try {
 				taxationPercent = Integer.parseInt(taxationPercentStr);
 			} catch (NullPointerException | NumberFormatException e) {

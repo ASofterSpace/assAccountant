@@ -25,6 +25,15 @@ public enum Category {
 	// expenses for office rooms, buildings, planets?
 	LOCATIONS("Locations"),
 
+	// infrastructure necessary for us to perform our work (e.g. paper, ink, computer programs, ...)
+	INFRASTRUCTURE("Infrastructure of Office Materials, IT Services etc."),
+
+	// education and conference attendance
+	EDUCATION("Education and Conferences"),
+
+	// ads and branded items
+	ADVERTISEMENTS("Advertisements and Branded Items"),
+
 	// donations by a softer space
 	DONATION("Donations"),
 
