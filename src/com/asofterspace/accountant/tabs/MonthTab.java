@@ -40,6 +40,8 @@ public class MonthTab extends TimeSpanTab {
 			destroyTabOnGUI(parentPanel);
 		}
 
+		int i = 0;
+
 		tab = new JPanel();
 		tab.setLayout(new GridBagLayout());
 
@@ -52,16 +54,16 @@ public class MonthTab extends TimeSpanTab {
 		nameLabel.setHorizontalAlignment(JLabel.CENTER);
 		topHUD.add(nameLabel, new Arrangement(0, 0, 1.0, 1.0));
 
-		tab.add(topHUD, new Arrangement(0, 0, 1.0, 0.0));
+		tab.add(topHUD, new Arrangement(0, i, 1.0, 0.0));
+		i++;
 
 
 		JLabel outgoingLabel = new JLabel("Outgoing Invoices - that is, we get paid:");
 		outgoingLabel.setFont(new Font("Calibri", Font.PLAIN, 20));
 		outgoingLabel.setPreferredSize(new Dimension(0, outgoingLabel.getPreferredSize().height*2));
 		outgoingLabel.setHorizontalAlignment(JLabel.CENTER);
-		tab.add(outgoingLabel, new Arrangement(0, 1, 1.0, 0.0));
-
-		int i = 2;
+		tab.add(outgoingLabel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
 
 		JPanel curPanel;
 		int totalBeforeTax = 0;
@@ -129,25 +131,28 @@ public class MonthTab extends TimeSpanTab {
 	}
 
 	@Override
-	public int compareTo(TimeSpanTab tab) {
+	public int compareTo(Tab tab) {
 		if (tab == null) {
+			return -1;
+		}
+		if (tab instanceof OverviewTab) {
 			return 1;
 		}
 		if (tab instanceof MonthTab) {
-			int result = tab.getYear().getNum() - getYear().getNum();
+			int result = ((MonthTab) tab).getYear().getNum() - getYear().getNum();
 			if (result == 0) {
 				return ((MonthTab) tab).getMonth().getNum() - month.getNum();
 			}
 			return result;
 		}
 		if (tab instanceof YearTab) {
-			int result = tab.getYear().getNum() - getYear().getNum();
+			int result = ((YearTab) tab).getYear().getNum() - getYear().getNum();
 			if (result == 0) {
 				return 1;
 			}
 			return result;
 		}
-		return 1;
+		return -1;
 	}
 
 	public Month getMonth() {

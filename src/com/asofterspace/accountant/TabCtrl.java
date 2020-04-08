@@ -5,7 +5,8 @@
 package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.tabs.MonthTab;
-import com.asofterspace.accountant.tabs.TimeSpanTab;
+import com.asofterspace.accountant.tabs.OverviewTab;
+import com.asofterspace.accountant.tabs.Tab;
 import com.asofterspace.accountant.tabs.YearTab;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
@@ -20,14 +21,19 @@ public class TabCtrl {
 
 	private Database database;
 
+	private OverviewTab overviewTab;
+
 
 	public TabCtrl(Database database) {
 		this.database = database;
+		this.overviewTab = new OverviewTab();
 	}
 
-	public List<TimeSpanTab> getTabs() {
+	public List<Tab> getTabs() {
 
-		List<TimeSpanTab> result = new ArrayList<>();
+		List<Tab> result = new ArrayList<>();
+
+		result.add(overviewTab);
 
 		List<Year> years = database.getYears();
 		for (Year year : years) {
@@ -37,8 +43,8 @@ public class TabCtrl {
 			}
 		}
 
-		Collections.sort(result, new Comparator<TimeSpanTab>() {
-			public int compare(TimeSpanTab a, TimeSpanTab b) {
+		Collections.sort(result, new Comparator<Tab>() {
+			public int compare(Tab a, Tab b) {
 				return a.compareTo(b);
 			}
 		});

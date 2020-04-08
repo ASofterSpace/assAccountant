@@ -5,7 +5,7 @@
 package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.entries.Outgoing;
-import com.asofterspace.accountant.tabs.TimeSpanTab;
+import com.asofterspace.accountant.tabs.Tab;
 import com.asofterspace.accountant.tabs.YearTab;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.toolbox.configuration.ConfigFile;
@@ -63,7 +63,7 @@ public class GUI extends MainWindow {
 	private Database database;
 	private TabCtrl tabCtrl;
 
-	private TimeSpanTab currentlyOpenedTab;
+	private Tab currentlyOpenedTab;
 
 	private JPanel mainPanelRight;
 	private JScrollPane mainPanelRightScroller;
@@ -75,7 +75,7 @@ public class GUI extends MainWindow {
 	private ConfigFile configuration;
 	private JList<String> tabListComponent;
 	private JPopupMenu tabListPopup;
-	private List<TimeSpanTab> tabs;
+	private List<Tab> tabs;
 	private String[] strTabs;
 	private JScrollPane tabListScroller;
 
@@ -440,7 +440,7 @@ public class GUI extends MainWindow {
 
 		ArrayList<String> strTabList = new ArrayList<>();
 
-		for (TimeSpanTab tab : tabs) {
+		for (Tab tab : tabs) {
 			if ((tab instanceof YearTab) && (strTabList.size() > 0)) {
 				strTabList.add(" ");
 			}
@@ -464,7 +464,7 @@ public class GUI extends MainWindow {
 		highlightTabInLeftListOrTree(currentlyOpenedTab);
 	}
 
-	public void highlightTabInLeftListOrTree(final TimeSpanTab tab) {
+	public void highlightTabInLeftListOrTree(final Tab tab) {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
@@ -490,7 +490,7 @@ public class GUI extends MainWindow {
 	 * NEVER set currentlyOpenedTab directly - as it is handled in here, and this
 	 * here also destroys the previous tabs!
 	 */
-	public void showTab(TimeSpanTab tab) {
+	public void showTab(Tab tab) {
 
 		// if we switch from one tab to itself, ignore the switch :)
 		if (currentlyOpenedTab != null) {
@@ -528,7 +528,7 @@ public class GUI extends MainWindow {
 
 	private void showSelectedTab() {
 		String strTab = strTabs[tabListComponent.getSelectedIndex()];
-		for (TimeSpanTab tab : tabs) {
+		for (Tab tab : tabs) {
 			if (strTab.equals(tab.toString()) || strTab.equals(">> " + tab.toString() + " <<")) {
 				showTab(tab);
 				return;
