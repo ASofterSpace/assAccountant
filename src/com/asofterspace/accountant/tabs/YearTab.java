@@ -55,6 +55,7 @@ public class YearTab extends TimeSpanTab {
 
 
 		JLabel outgoingLabel = new JLabel("Outgoing Invoices - that is, we get paid:");
+		outgoingLabel.setFont(new Font("Calibri", Font.PLAIN, 20));
 		outgoingLabel.setPreferredSize(new Dimension(0, outgoingLabel.getPreferredSize().height*2));
 		outgoingLabel.setHorizontalAlignment(JLabel.CENTER);
 		tab.add(outgoingLabel, new Arrangement(0, 1, 1.0, 0.0));
@@ -83,6 +84,7 @@ public class YearTab extends TimeSpanTab {
 
 
 		JLabel incomingLabel = new JLabel("Incoming Invoices - that is, we have to pay:");
+		incomingLabel.setFont(new Font("Calibri", Font.PLAIN, 20));
 		incomingLabel.setPreferredSize(new Dimension(0, incomingLabel.getPreferredSize().height*2));
 		incomingLabel.setHorizontalAlignment(JLabel.CENTER);
 		tab.add(incomingLabel, new Arrangement(0, i, 1.0, 0.0));
@@ -109,7 +111,7 @@ public class YearTab extends TimeSpanTab {
 
 
 		JPanel footer = new JPanel();
-		tab.add(footer, new Arrangement(0, 100, 1.0, 1.0));
+		tab.add(footer, new Arrangement(0, i, 1.0, 1.0));
 
 		Dimension newSize = new Dimension(parentPanel.getWidth(), tab.getMinimumSize().height + 100);
 		tab.setPreferredSize(newSize);

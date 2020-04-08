@@ -18,7 +18,6 @@ import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 
 import java.awt.BorderLayout;
-import java.awt.CardLayout;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -37,7 +36,6 @@ import java.util.List;
 
 import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.JFileChooser;
@@ -310,15 +308,11 @@ public class GUI extends MainWindow {
 		mainPanelRightOuter.setLayout(mainPanelRightOuterLayout);
 
 		mainPanelRight = new JPanel();
-		// mainPanelRight.setLayout(new CardLayout());
-//		mainPanelRight.setLayout(new BoxLayout());
-//		mainPanelRight.setLayout(new BorderLayout());
 		mainPanelRight.setPreferredSize(new Dimension(100, 100));
 
 		mainPanelRightScroller = new JScrollPane(mainPanelRight,
 			JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 			JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-//		mainPanelRightScroller = new JScrollPane(); // DEBUG
 		mainPanelRightScroller.setPreferredSize(new Dimension(8, 8));
 		mainPanelRightScroller.setBorder(BorderFactory.createEmptyBorder());
 
