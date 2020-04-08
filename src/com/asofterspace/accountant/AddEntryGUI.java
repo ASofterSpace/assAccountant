@@ -10,6 +10,7 @@ import com.asofterspace.accountant.world.Category;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.GuiUtils;
+import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.Utils;
 
 import java.awt.Dimension;
@@ -24,6 +25,8 @@ import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -108,7 +111,7 @@ public class AddEntryGUI {
 		curPanel.setLayout(new GridBagLayout());
 		curLabel = new JLabel("Date in YYYY-MM-DD or DD. MM. YYYY: ");
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
-		final JTextField dateText = new JTextField();
+		final JTextField dateText = new JTextField(DateUtils.serializeDate(null));
 		curPanel.add(dateText, new Arrangement(1, 0, 1.0, 1.0));
 		dialog.add(curPanel);
 
@@ -119,6 +122,27 @@ public class AddEntryGUI {
 		final JTextField titleText = new JTextField();
 		curPanel.add(titleText, new Arrangement(1, 0, 1.0, 1.0));
 		dialog.add(curPanel);
+		titleText.getDocument().addDocumentListener(new DocumentListener() {
+			public void changedUpdate(DocumentEvent e) {
+				autoselectCategory();
+			}
+			public void removeUpdate(DocumentEvent e) {
+				autoselectCategory();
+			}
+			public void insertUpdate(DocumentEvent e) {
+				autoselectCategory();
+			}
+			public void autoselectCategory() {
+				Category cat = database.mapTitleToCategory(titleText.getText());
+				String catStr = cat.getText();
+				for (int i = 0; i < category.getItemCount(); i++) {
+					String cur = category.getItemAt(i);
+					if (catStr.equals(cur)) {
+						category.setSelectedIndex(i);
+					}
+				}
+			}
+		});
 
 		curPanel = new JPanel();
 		curPanel.setLayout(new GridBagLayout());

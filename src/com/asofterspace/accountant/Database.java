@@ -283,19 +283,23 @@ public class Database {
 				taxationPercentStr = line.substring(0, line.indexOf("\t"));
 			}
 
-			Category category = Category.OTHER;
-			for (Map.Entry<String, Category> entry : titleToCategoryMapping.entrySet()) {
-				if (titleStr.contains(entry.getKey())) {
-					category = entry.getValue();
-					break;
-				}
-			}
+			Category category = mapTitleToCategory(titleStr);
 
 			if (!addEntry(dateStr, titleStr, category.getText(), amountStr, Currency.EUR, taxationPercentStr, true)) {
 				// stop upon the first failure instead of showing a million error messages
 				break;
 			}
 		}
+	}
+
+	public Category mapTitleToCategory(String titleStr) {
+
+		for (Map.Entry<String, Category> entry : titleToCategoryMapping.entrySet()) {
+			if (titleStr.contains(entry.getKey())) {
+				return entry.getValue();
+			}
+		}
+		return Category.OTHER;
 	}
 
 	public void bulkImportOutgoings(SimpleFile bulkFile) {
