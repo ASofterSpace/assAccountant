@@ -4,13 +4,13 @@
  */
 package com.asofterspace.accountant.tabs;
 
+import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagLayout;
 
 import javax.swing.JPanel;
@@ -41,10 +41,7 @@ public class OverviewTab extends Tab {
 		JPanel topHUD = new JPanel();
 		topHUD.setLayout(new GridBagLayout());
 
-		CopyByClickLabel nameLabel = new CopyByClickLabel(TITLE);
-		nameLabel.setFont(new Font("Calibri", Font.PLAIN, 24));
-		nameLabel.setPreferredSize(new Dimension(0, nameLabel.getPreferredSize().height*2));
-		nameLabel.setHorizontalAlignment(CopyByClickLabel.CENTER);
+		CopyByClickLabel nameLabel = AccountingUtils.createHeadLabel(TITLE);
 		topHUD.add(nameLabel, new Arrangement(0, 0, 1.0, 1.0));
 
 		tab.add(topHUD, new Arrangement(0, i, 1.0, 0.0));

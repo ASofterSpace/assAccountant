@@ -211,7 +211,7 @@ public class GUI extends MainWindow {
 
 		file.addSeparator();
 
-		JMenuItem save = new JMenuItem("Save");
+		JMenuItem save = new JMenuItem("Save (done automatically anyway!)");
 		save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
 		save.addActionListener(new ActionListener() {
 			@Override

@@ -6,9 +6,11 @@ package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
+import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.Utils;
 
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagLayout;
 
 import javax.swing.JLabel;
@@ -101,6 +103,22 @@ public class AccountingUtils {
 		curPanel.add(curLabel, new Arrangement(10, 0, 0.0, 1.0));
 
 		return curPanel;
+	}
+
+	public static CopyByClickLabel createHeadLabel(String text) {
+		CopyByClickLabel result = new CopyByClickLabel(text);
+		result.setFont(new Font("Calibri", Font.PLAIN, 24));
+		result.setPreferredSize(new Dimension(0, result.getPreferredSize().height*2));
+		result.setHorizontalAlignment(CopyByClickLabel.CENTER);
+		return result;
+	}
+
+	public static CopyByClickLabel createSubHeadLabel(String text) {
+		CopyByClickLabel result = new CopyByClickLabel(text);
+		result.setFont(new Font("Calibri", Font.PLAIN, 20));
+		result.setPreferredSize(new Dimension(0, result.getPreferredSize().height*2));
+		result.setHorizontalAlignment(CopyByClickLabel.CENTER);
+		return result;
 	}
 
 	public static boolean complain(String complainAbout) {

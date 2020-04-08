@@ -214,8 +214,7 @@ public abstract class Entry {
 		curButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO
-				System.err.println("Whoops, this button is not yet working!");
+				AccountingUtils.complain("Whoops, this button is not yet working!");
 			}
 		});
 

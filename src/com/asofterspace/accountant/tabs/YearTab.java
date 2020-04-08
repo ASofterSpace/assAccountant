@@ -14,7 +14,6 @@ import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.util.List;
 
@@ -47,20 +46,14 @@ public class YearTab extends TimeSpanTab {
 		JPanel topHUD = new JPanel();
 		topHUD.setLayout(new GridBagLayout());
 
-		CopyByClickLabel nameLabel = new CopyByClickLabel(year.toString() + " (yearly overview)");
-		nameLabel.setFont(new Font("Calibri", Font.PLAIN, 24));
-		nameLabel.setPreferredSize(new Dimension(0, nameLabel.getPreferredSize().height*2));
-		nameLabel.setHorizontalAlignment(CopyByClickLabel.CENTER);
+		CopyByClickLabel nameLabel = AccountingUtils.createHeadLabel(year.toString() + " (yearly overview)");
 		topHUD.add(nameLabel, new Arrangement(0, 0, 1.0, 1.0));
 
 		tab.add(topHUD, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
 
-		CopyByClickLabel outgoingLabel = new CopyByClickLabel("Outgoing Invoices - that is, we get paid:");
-		outgoingLabel.setFont(new Font("Calibri", Font.PLAIN, 20));
-		outgoingLabel.setPreferredSize(new Dimension(0, outgoingLabel.getPreferredSize().height*2));
-		outgoingLabel.setHorizontalAlignment(CopyByClickLabel.CENTER);
+		CopyByClickLabel outgoingLabel = AccountingUtils.createSubHeadLabel("Outgoing Invoices - that is, we get paid:");
 		tab.add(outgoingLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
@@ -85,10 +78,7 @@ public class YearTab extends TimeSpanTab {
 		i++;
 
 
-		CopyByClickLabel incomingLabel = new CopyByClickLabel("Incoming Invoices - that is, we have to pay:");
-		incomingLabel.setFont(new Font("Calibri", Font.PLAIN, 20));
-		incomingLabel.setPreferredSize(new Dimension(0, incomingLabel.getPreferredSize().height*2));
-		incomingLabel.setHorizontalAlignment(CopyByClickLabel.CENTER);
+		CopyByClickLabel incomingLabel = AccountingUtils.createSubHeadLabel("Incoming Invoices - that is, we have to pay:");
 		tab.add(incomingLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
