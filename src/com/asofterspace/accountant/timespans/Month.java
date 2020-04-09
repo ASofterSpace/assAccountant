@@ -261,6 +261,17 @@ public class Month extends TimeSpan {
 	}
 
 	@Override
+	public int getInTotalBeforeTax(Category category) {
+		int result = 0;
+		for (Incoming cur : incomings) {
+			if (cur.getCategory() == category) {
+				result += cur.getAmount();
+			}
+		}
+		return result;
+	}
+
+	@Override
 	public int getInTotalAfterTax() {
 		int result = 0;
 		for (Incoming cur : getIncomings()) {

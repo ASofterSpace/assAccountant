@@ -6,6 +6,7 @@ package com.asofterspace.accountant.timespans;
 
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
+import com.asofterspace.accountant.world.Category;
 import com.asofterspace.toolbox.utils.Record;
 
 import java.util.ArrayList;
@@ -142,6 +143,15 @@ public class Year extends TimeSpan {
 	}
 
 	@Override
+	public int getInTotalBeforeTax(Category category) {
+		int result = 0;
+		for (Month month : months) {
+			result += month.getInTotalBeforeTax(category);
+		}
+		return result;
+	}
+
+	@Override
 	public int getInTotalAfterTax() {
 		int result = 0;
 		for (Month month : months) {
@@ -166,6 +176,58 @@ public class Year extends TimeSpan {
 			result += month.getDonTotalAfterTax();
 		}
 		return result;
+	}
+
+	// gets the expected income tax VERY ROUGHLY!
+	public long getExpectedIncomeTax() {
+
+		// we calculate the income tax as good as we can... and then we take 90% of that value to
+		// account for stuff like insurances which are not contained in our numbers at all so far!
+		return (getExpectedIncomeTaxProper() * 9) / 10;
+	}
+
+	private long getExpectedIncomeTaxProper() {
+
+		double result = 0;
+		double taxAmount = getOutTotalBeforeTax() - (getInTotalBeforeTax() + getDonTotalBeforeTax());
+
+		// Freibetrag
+		if (taxAmount <= 916800) {
+			return (long) result;
+		}
+
+		double curTaxAmount = taxAmount;
+		if (curTaxAmount > 1425400) {
+			curTaxAmount = 1425400;
+		}
+		double y = (curTaxAmount - 916800) / 1000000;
+		result = result + ((98014*y + 140000) * y);
+		if (taxAmount <= 1425400) {
+			return (long) result;
+		}
+
+		curTaxAmount = taxAmount;
+		if (curTaxAmount > 5596000) {
+			curTaxAmount = 5596000;
+		}
+		y = (curTaxAmount - 1425400) / 1000000;
+		result = result + ((21616*y + 239700) * y) + 96558;
+		if (taxAmount <= 5596000) {
+			return (long) result;
+		}
+
+		curTaxAmount = taxAmount;
+		if (curTaxAmount > 26532600) {
+			curTaxAmount = 26532600;
+		}
+		result = result + ((42*(curTaxAmount-5596000))/100)+(147223/10);
+		if (taxAmount <= 265326000) {
+			return (long) result;
+		}
+
+		curTaxAmount = taxAmount;
+		result = result + ((45*(curTaxAmount-26532600))/100)+(10265602/100);
+		return (long) result;
 	}
 
 	@Override

@@ -8,6 +8,8 @@ import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.timespans.TimeSpan;
+import com.asofterspace.accountant.timespans.Year;
+import com.asofterspace.accountant.world.Category;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
@@ -120,11 +122,39 @@ public class AccountingUtils {
 		CopyByClickLabel curLabel = new CopyByClickLabel(text);
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
-		curPanel.add(curLabel, new Arrangement(0, 0, 0.6, 1.0));
+		curPanel.add(curLabel, new Arrangement(0, 0, 0.5, 1.0));
 
 		curLabel = new CopyByClickLabel(AccountingUtils.formatMoney(amount, Currency.EUR));
 		curLabel.setPreferredSize(defaultDimension);
-		curPanel.add(curLabel, new Arrangement(1, 0, 0.4, 1.0));
+		curPanel.add(curLabel, new Arrangement(1, 0, 0.5, 1.0));
+
+		return curPanel;
+	}
+
+	public static JPanel createOverviewPanelOnGUI(String text1, int amount1, String text2, int amount2) {
+
+		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
+
+		JPanel curPanel = new JPanel();
+		curPanel.setLayout(new GridBagLayout());
+
+		CopyByClickLabel curLabel = new CopyByClickLabel(text1);
+		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(0, 0, 0.5, 1.0));
+
+		curLabel = new CopyByClickLabel(AccountingUtils.formatMoney(amount1, Currency.EUR));
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(1, 0, 0.1, 1.0));
+
+		curLabel = new CopyByClickLabel(text2);
+		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(2, 0, 0.1, 1.0));
+
+		curLabel = new CopyByClickLabel(AccountingUtils.formatMoney(amount2, Currency.EUR));
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(3, 0, 0.3, 1.0));
 
 		return curPanel;
 	}
@@ -189,19 +219,37 @@ public class AccountingUtils {
 		tab.add(taxInfoLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		JPanel curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount earned without any taxes: ", timeSpan.getOutTotalBeforeTax());
+		JPanel curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount earned: ", timeSpan.getOutTotalAfterTax(), "Of that VAT: ", timeSpan.getOutTotalTax());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount spent without any taxes: ", timeSpan.getInTotalBeforeTax());
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount spent: ", timeSpan.getInTotalAfterTax(), "Of that VAT: ", timeSpan.getInTotalTax());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount donated without any taxes: ", timeSpan.getDonTotalBeforeTax());
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount donated: ", timeSpan.getDonTotalAfterTax(), "Of that VAT: ", timeSpan.getDonTotalTax());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total deductible already paid VAT / Gesamte abziehbare Vorsteuerbeträge für USt: ", timeSpan.getInTotalTax() + timeSpan.getDonTotalTax());
+		if (timeSpan instanceof Year) {
+
+			Year curYear = (Year) timeSpan;
+
+			curPanel = AccountingUtils.createOverviewPanelOnGUI("ROUGHLY expected income tax payment: ", (int) curYear.getExpectedIncomeTax());
+			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+			i++;
+
+			curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount earned in " + curYear.getNum() + ": ", (int) (timeSpan.getOutTotalBeforeTax() - (timeSpan.getInTotalBeforeTax() + timeSpan.getDonTotalBeforeTax() + curYear.getExpectedIncomeTax())));
+			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+			i++;
+		}
+
+		JLabel sep = new JLabel("-------------- VAT / USt --------------");
+		sep.setHorizontalAlignment(JLabel.CENTER);
+		tab.add(sep, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total deductible already paid VAT / Gesamte abziehbare Vorsteuerbeträge: ", timeSpan.getInTotalTax() + timeSpan.getDonTotalTax());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
@@ -210,6 +258,65 @@ public class AccountingUtils {
 			remainVATpay = 0;
 		}
 		curPanel = AccountingUtils.createOverviewPanelOnGUI("Remaining VAT advance payment / Verbleibende Umsatzsteuer-Vorauszahlung: ", remainVATpay);
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		sep = new JLabel("-------------- Income Tax / ESt --------------");
+		sep.setHorizontalAlignment(JLabel.CENTER);
+		tab.add(sep, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		int externalSalary = timeSpan.getInTotalBeforeTax(Category.EXTERNAL_SALARY);
+		int internalSalary = timeSpan.getInTotalBeforeTax(Category.INTERNAL_SALARY);
+		int vehicleCosts = timeSpan.getInTotalBeforeTax(Category.VEHICLE);
+		int travelCosts = timeSpan.getInTotalBeforeTax(Category.TRAVEL);
+		int locationCosts = timeSpan.getInTotalBeforeTax(Category.LOCATIONS);
+		int educationCosts = timeSpan.getInTotalBeforeTax(Category.EDUCATION);
+		int advertisementCosts = timeSpan.getInTotalBeforeTax(Category.ADVERTISEMENTS);
+		int infrastructureCosts = timeSpan.getInTotalBeforeTax(Category.INFRASTRUCTURE);
+		int entertainmentCosts = timeSpan.getInTotalBeforeTax(Category.ENTERTAINMENT);
+
+		// this does NOT include donations, as we will not get donation amounts from timeSpan.getInTotalBeforeTax() anyway, so we do not want to subtract them from it!
+		int categoryTally = externalSalary + internalSalary + vehicleCosts + travelCosts + locationCosts +
+			educationCosts + advertisementCosts + infrastructureCosts + entertainmentCosts;
+
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount spent on items, raw materials etc.: ", timeSpan.getInTotalBeforeTax() - categoryTally);
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total external personnel and subcontractor costs: ", externalSalary);
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total internal personnel costs: ", internalSalary);
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total vehicle costs: ", vehicleCosts);
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total travel costs: ", travelCosts);
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total location / building costs: ", locationCosts);
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total education and conference costs: ", educationCosts);
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total advertisement and branded item costs: ", advertisementCosts);
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount spent on infrastructure of office materials, IT Services etc.: ", infrastructureCosts);
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total entertainment (e.g. restaurant) costs: ", entertainmentCosts);
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
@@ -229,6 +336,7 @@ public class AccountingUtils {
 		result.setFont(new Font("Calibri", Font.PLAIN, 20));
 		result.setPreferredSize(new Dimension(0, result.getPreferredSize().height*2));
 		result.setHorizontalAlignment(CopyByClickLabel.CENTER);
+		result.setVerticalAlignment(CopyByClickLabel.BOTTOM);
 		return result;
 	}
 

@@ -29,6 +29,7 @@ public class Main {
 	 * Export (as menu item), with Export as German CSV and Export as English CSV as sub-items
 	 * make tax a dropdown edit field
 	 * pre-select category based on title
+	 * if we ever have more than 20 Mio € in any field, switch to using long instead of int... :)
 	 * prevent undoing more than 64 steps, or redoing more steps than have been undone...
 	 * if someone clicks on "Open on Disk" and the folder for that particular month (or even year)
 	 *   does not yet exist, automatically create it, including all the subfolders (however, only
