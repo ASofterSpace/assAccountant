@@ -115,7 +115,7 @@ public abstract class Entry {
 	}
 
 	public Integer getPostTaxAmount() {
-		return (amount * (100 + taxationPercent)) / 100;
+		return AccountingUtils.calcPostTax(amount, taxationPercent);
 	}
 
 	public String getPostTaxAmountAsText() {

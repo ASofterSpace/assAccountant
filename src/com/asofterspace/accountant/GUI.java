@@ -11,6 +11,7 @@ import com.asofterspace.accountant.tabs.Tab;
 import com.asofterspace.accountant.tabs.TimeSpanTab;
 import com.asofterspace.accountant.tabs.YearTab;
 import com.asofterspace.accountant.timespans.Month;
+import com.asofterspace.accountant.timespans.TimeSpan;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.gui.Arrangement;
@@ -528,6 +529,25 @@ public class GUI extends MainWindow {
 
 	private void refreshTitleBar() {
 		mainFrame.setTitle(Main.PROGRAM_TITLE);
+	}
+
+	public TimeSpanTab getTabForTimeSpan(TimeSpan timeSpan) {
+		for (Tab tab : tabs) {
+			if (tab instanceof TimeSpanTab) {
+				TimeSpanTab timeSpanTab = (TimeSpanTab) tab;
+				if (timeSpan.equals(timeSpanTab.getTimeSpan())) {
+					return timeSpanTab;
+				}
+			}
+		}
+		return null;
+	}
+
+	public void showTabAndHighlightInTree(Tab tab) {
+
+		showTab(tab);
+
+		highlightTabInLeftListOrTree(tab);
 	}
 
 	/**

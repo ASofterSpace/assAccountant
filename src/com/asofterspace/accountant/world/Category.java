@@ -26,7 +26,7 @@ public enum Category {
 	LOCATIONS("Locations"),
 
 	// infrastructure necessary for us to perform our work (e.g. paper, ink, computer programs, ...)
-	INFRASTRUCTURE("Infrastructure of Office Materials, IT Services etc."),
+	INFRASTRUCTURE("Infrastructure of IT Systems (Hardware, Software, Services etc.)"),
 
 	// education and conference attendance
 	EDUCATION("Education and Conferences"),

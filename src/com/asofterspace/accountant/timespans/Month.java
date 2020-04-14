@@ -179,22 +179,9 @@ public class Month extends TimeSpan {
 
 		int amount = amountObj;
 
-		int taxationPercent = 0;
-		if (!"".equals(taxationPercentStr)) {
-			taxationPercentStr = taxationPercentStr.replaceAll(" ", "");
-			taxationPercentStr = taxationPercentStr.replaceAll("%", "");
-			taxationPercentStr = taxationPercentStr.replaceAll("€", "");
-			if (taxationPercentStr.contains(".")) {
-				taxationPercentStr = taxationPercentStr.substring(0, taxationPercentStr.indexOf("."));
-			}
-			if (taxationPercentStr.contains(",")) {
-				taxationPercentStr = taxationPercentStr.substring(0, taxationPercentStr.indexOf(","));
-			}
-			try {
-				taxationPercent = Integer.parseInt(taxationPercentStr);
-			} catch (NullPointerException | NumberFormatException e) {
-				return AccountingUtils.complain("The text " + taxationPercentStr + " could not be parsed as integer!");
-			}
+		Integer taxationPercent = AccountingUtils.parseTaxes(taxationPercentStr);
+		if (taxationPercent == null) {
+			return AccountingUtils.complain("The text " + taxationPercentStr + " could not be parsed as integer!");
 		}
 
 		if (catOrCustomerObj == null) {

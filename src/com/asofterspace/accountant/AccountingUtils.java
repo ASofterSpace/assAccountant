@@ -308,11 +308,11 @@ public class AccountingUtils {
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total advertisement and branded item costs: ", advertisementCosts);
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount spent on IT infrastructure: ", infrastructureCosts);
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount spent on infrastructure of office materials, IT Services etc.: ", infrastructureCosts);
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total advertisement and branded item costs: ", advertisementCosts);
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
@@ -363,6 +363,35 @@ public class AccountingUtils {
 		}
 		result += "'" + entry.getTitle() + "' from " + entry.getDateAsText();
 		return result;
+	}
+
+	public static Integer parseTaxes(String taxationPercentStr) {
+
+		if (!"".equals(taxationPercentStr)) {
+			taxationPercentStr = taxationPercentStr.replaceAll(" ", "");
+			taxationPercentStr = taxationPercentStr.replaceAll("%", "");
+			taxationPercentStr = taxationPercentStr.replaceAll("€", "");
+			if (taxationPercentStr.contains(".")) {
+				taxationPercentStr = taxationPercentStr.substring(0, taxationPercentStr.indexOf("."));
+			}
+			if (taxationPercentStr.contains(",")) {
+				taxationPercentStr = taxationPercentStr.substring(0, taxationPercentStr.indexOf(","));
+			}
+			try {
+				return Integer.parseInt(taxationPercentStr);
+			} catch (NullPointerException | NumberFormatException e) {
+				// we will just return null and let the caller complain to the user (if necessary)
+			}
+		}
+
+		return null;
+	}
+
+	public static Integer calcPostTax(Integer amount, Integer taxationPercent) {
+		if ((amount == null) || (taxationPercent == null)) {
+			return null;
+		}
+		return (int) Math.round((amount * (100 + taxationPercent)) / 100.0);
 	}
 
 }

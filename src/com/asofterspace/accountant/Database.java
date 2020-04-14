@@ -222,7 +222,7 @@ public class Database {
 		return false;
 	}
 
-	private Month getMonthFromEntryDate(Date date) {
+	public Month getMonthFromEntryDate(Date date) {
 
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);

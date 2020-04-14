@@ -6,11 +6,15 @@ package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
+import com.asofterspace.accountant.tabs.TimeSpanTab;
+import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.world.Category;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
+import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.utils.DateUtils;
+import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 
 import java.awt.Dimension;
@@ -20,6 +24,7 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -30,7 +35,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
@@ -46,6 +50,11 @@ public class AddEntryGUI {
 
 	private JComboBox<String> customer;
 	private JComboBox<String> category;
+	private JRadioButton isIncoming;
+	private JTextField dateText;
+	private JTextField titleText;
+	private JTextField amount;
+	private JTextField taxPerc;
 
 
 	public AddEntryGUI(GUI mainGUI, Database database) {
@@ -61,25 +70,24 @@ public class AddEntryGUI {
 
 		// Create the window
 		final JDialog dialog = new JDialog(mainGUI.getMainFrame(), "Add Entry", true);
-		GridLayout dialogLayout = new GridLayout(8, 1);
+		GridLayout dialogLayout = new GridLayout(9, 1);
 		dialogLayout.setVgap(8);
 		dialog.setLayout(dialogLayout);
 		dialog.getRootPane().setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
 
 		// Populate the window
-		JLabel explanationLabel = new JLabel();
-		explanationLabel.setText("Enter a new entry here to add it:");
+		CopyByClickLabel explanationLabel = new CopyByClickLabel("Enter a new entry here to add it:");
 		dialog.add(explanationLabel);
 
 		JPanel curPanel;
-		JLabel curLabel;
+		CopyByClickLabel curLabel;
 
 		curPanel = new JPanel();
 		curPanel.setLayout(new GridBagLayout());
-		curLabel = new JLabel("Kind: ");
+		curLabel = new CopyByClickLabel("Kind: ");
 		ButtonGroup inOutGroup = new ButtonGroup();
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
-		final JRadioButton isIncoming = new JRadioButton("Incoming (we have to pay)");
+		isIncoming = new JRadioButton("Incoming (we have to pay)");
 		inOutGroup.add(isIncoming);
 		isIncoming.setSelected(true);
 		isIncoming.addItemListener(new ItemListener() {
@@ -109,17 +117,17 @@ public class AddEntryGUI {
 
 		curPanel = new JPanel();
 		curPanel.setLayout(new GridBagLayout());
-		curLabel = new JLabel("Date in YYYY-MM-DD or DD. MM. YYYY: ");
+		curLabel = new CopyByClickLabel("Date in YYYY-MM-DD or DD. MM. YYYY: ");
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
-		final JTextField dateText = new JTextField(DateUtils.serializeDate(null));
+		dateText = new JTextField(DateUtils.serializeDate(null));
 		curPanel.add(dateText, new Arrangement(1, 0, 1.0, 1.0));
 		dialog.add(curPanel);
 
 		curPanel = new JPanel();
 		curPanel.setLayout(new GridBagLayout());
-		curLabel = new JLabel("Title: ");
+		curLabel = new CopyByClickLabel("Title: ");
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
-		final JTextField titleText = new JTextField();
+		titleText = new JTextField();
 		curPanel.add(titleText, new Arrangement(1, 0, 1.0, 1.0));
 		dialog.add(curPanel);
 		titleText.getDocument().addDocumentListener(new DocumentListener() {
@@ -146,7 +154,7 @@ public class AddEntryGUI {
 
 		curPanel = new JPanel();
 		curPanel.setLayout(new GridBagLayout());
-		curLabel = new JLabel("Category or Customer: ");
+		curLabel = new CopyByClickLabel("Category or Customer: ");
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
 		customer = new JComboBox<>();
 		customer.setEditable(true);
@@ -159,23 +167,57 @@ public class AddEntryGUI {
 
 		curPanel = new JPanel();
 		curPanel.setLayout(new GridBagLayout());
-		curLabel = new JLabel("Amount (both . and , taken as decimal separator): ");
+		curLabel = new CopyByClickLabel("Amount before tax (both . and , taken as decimal separator): ");
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
-		final JTextField amount = new JTextField();
+		amount = new JTextField();
 		curPanel.add(amount, new Arrangement(1, 0, 1.0, 1.0));
-		curLabel = new JLabel(" €");
+		curLabel = new CopyByClickLabel(" €");
 		curPanel.add(curLabel, new Arrangement(2, 0, 0.0, 1.0));
 		dialog.add(curPanel);
 
 		curPanel = new JPanel();
 		curPanel.setLayout(new GridBagLayout());
-		curLabel = new JLabel("Tax percentage: ");
+		curLabel = new CopyByClickLabel("Tax percentage: ");
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
-		final JTextField taxPerc = new JTextField();
+		taxPerc = new JTextField();
 		curPanel.add(taxPerc, new Arrangement(1, 0, 1.0, 1.0));
-		curLabel = new JLabel(" %");
+		curLabel = new CopyByClickLabel(" %");
 		curPanel.add(curLabel, new Arrangement(2, 0, 0.0, 1.0));
 		dialog.add(curPanel);
+
+		curPanel = new JPanel();
+		curPanel.setLayout(new GridBagLayout());
+		curLabel = new CopyByClickLabel("Amount after tax: ");
+		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
+		final CopyByClickLabel amountPostTaxLabel = new CopyByClickLabel("");
+		curPanel.add(amountPostTaxLabel, new Arrangement(1, 0, 1.0, 1.0));
+		dialog.add(curPanel);
+
+		DocumentListener afterTaxUpdateListener = new DocumentListener() {
+			public void changedUpdate(DocumentEvent e) {
+				refreshPostTax();
+			}
+			public void removeUpdate(DocumentEvent e) {
+				refreshPostTax();
+			}
+			public void insertUpdate(DocumentEvent e) {
+				refreshPostTax();
+			}
+
+			public void refreshPostTax() {
+				Integer amountPreTax = StrUtils.parseMoney(amount.getText());
+				Integer amountTax = AccountingUtils.parseTaxes(taxPerc.getText());
+				Integer amountPostTax = AccountingUtils.calcPostTax(amountPreTax, amountTax);
+				if (amountPostTax == null) {
+					amountPostTaxLabel.setText("");
+				} else {
+					amountPostTaxLabel.setText(AccountingUtils.formatMoney(amountPostTax, Currency.EUR));
+				}
+			}
+		};
+
+		amount.getDocument().addDocumentListener(afterTaxUpdateListener);
+		taxPerc.getDocument().addDocumentListener(afterTaxUpdateListener);
 
 		JPanel buttonRow = new JPanel();
 		GridLayout buttonRowLayout = new GridLayout(1, 3);
@@ -186,16 +228,7 @@ public class AddEntryGUI {
 		JButton addButton = new JButton("Add This Entry");
 		addButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
-				Object catOrCustomer = customer.getSelectedItem();
-				if (isIncoming.isSelected()) {
-					catOrCustomer = category.getSelectedItem();
-				}
-
-				database.addEntry(dateText.getText(), titleText.getText(), catOrCustomer,
-					amount.getText(), Currency.EUR, taxPerc.getText(), isIncoming.isSelected());
-
-				refreshCustomers();
+				addEntry(false);
 			}
 		});
 		buttonRow.add(addButton);
@@ -203,19 +236,7 @@ public class AddEntryGUI {
 		JButton addAndExitButton = new JButton("Add This Entry and Exit");
 		addAndExitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
-				Object catOrCustomer = customer.getSelectedItem();
-				if (isIncoming.isSelected()) {
-					catOrCustomer = category.getSelectedItem();
-				}
-
-				if (database.addEntry(dateText.getText(), titleText.getText(), catOrCustomer,
-					amount.getText(), Currency.EUR, taxPerc.getText(), isIncoming.isSelected())) {
-
-					refreshCustomers();
-
-					dialog.dispose();
-				}
+				addEntry(true);
 			}
 		});
 		buttonRow.add(addAndExitButton);
@@ -240,6 +261,33 @@ public class AddEntryGUI {
 	public void show() {
 		GuiUtils.centerAndShowWindow(dialog);
 		refreshCustomers();
+	}
+
+	private void addEntry(boolean exitOnSuccess) {
+
+		Object catOrCustomer = customer.getSelectedItem();
+		if (isIncoming.isSelected()) {
+			catOrCustomer = category.getSelectedItem();
+		}
+
+		if (database.addEntry(dateText.getText(), titleText.getText(), catOrCustomer,
+			amount.getText(), Currency.EUR, taxPerc.getText(), isIncoming.isSelected())) {
+
+			Date date = DateUtils.parseDate(dateText.getText());
+			if (date != null) {
+				Month month = database.getMonthFromEntryDate(date);
+				TimeSpanTab curTab = mainGUI.getTabForTimeSpan(month);
+				if (curTab != null) {
+					mainGUI.showTabAndHighlightInTree(curTab);
+				}
+			}
+
+			refreshCustomers();
+
+			if (exitOnSuccess) {
+				dialog.dispose();
+			}
+		}
 	}
 
 	private void refreshCustomers() {

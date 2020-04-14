@@ -8,6 +8,7 @@ import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Month;
+import com.asofterspace.accountant.timespans.TimeSpan;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
@@ -108,6 +109,11 @@ public class MonthTab extends TimeSpanTab {
 	@Override
 	public Year getYear() {
 		return month.getYear();
+	}
+
+	@Override
+	public TimeSpan getTimeSpan() {
+		return month;
 	}
 
 	@Override
