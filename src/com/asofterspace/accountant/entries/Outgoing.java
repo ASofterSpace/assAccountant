@@ -26,9 +26,9 @@ public class Outgoing extends Entry {
 	 * Create an outgoing invoice at runtime
 	 */
 	public Outgoing(Integer amount, Currency currency, Integer taxationPercent, Date date,
-		String title, String customer, Month parent) {
+		String title, String originator, String customer, Month parent) {
 
-		super(amount, currency, taxationPercent, date, title, parent);
+		super(amount, currency, taxationPercent, date, title, originator, parent);
 
 		this.customer = customer;
 	}

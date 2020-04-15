@@ -128,6 +128,10 @@ public class Month extends TimeSpan {
 		return outgoings;
 	}
 
+	public List<Incoming> getIncomingsAndDonations() {
+		return incomings;
+	}
+
 	@Override
 	public List<Incoming> getIncomings() {
 		Collections.sort(incomings, new Comparator<Incoming>() {
@@ -169,7 +173,7 @@ public class Month extends TimeSpan {
 	}
 
 	public boolean addEntry(Date date, String title, Object catOrCustomerObj, String amountStr,
-		Currency currency, String taxationPercentStr, boolean isIncoming) {
+		Currency currency, String taxationPercentStr, String originator, boolean isIncoming) {
 
 		Integer amountObj = StrUtils.parseMoney(amountStr);
 
@@ -198,7 +202,7 @@ public class Month extends TimeSpan {
 				return AccountingUtils.complain("The text " + catOrCustomer + " could not be parsed as category!");
 			}
 
-			Incoming newIn = new Incoming(amount, currency, taxationPercent, date, title, category, this);
+			Incoming newIn = new Incoming(amount, currency, taxationPercent, date, title, originator, category, this);
 			incomings.add(newIn);
 
 		} else {
@@ -209,7 +213,7 @@ public class Month extends TimeSpan {
 				return AccountingUtils.complain("The text " + catOrCustomer + " should contain a customer!");
 			}
 
-			Outgoing newOut = new Outgoing(amount, currency, taxationPercent, date, title, customer, this);
+			Outgoing newOut = new Outgoing(amount, currency, taxationPercent, date, title, originator, customer, this);
 			outgoings.add(newOut);
 		}
 

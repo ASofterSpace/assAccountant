@@ -27,9 +27,9 @@ public class Incoming extends Entry {
 	 * Create an incoming invoice at runtime
 	 */
 	public Incoming(Integer amount, Currency currency, Integer taxationPercent, Date date,
-		String title, Category category, Month parent) {
+		String title, String originator, Category category, Month parent) {
 
-		super(amount, currency, taxationPercent, date, title, parent);
+		super(amount, currency, taxationPercent, date, title, originator, parent);
 
 		this.category = category;
 	}

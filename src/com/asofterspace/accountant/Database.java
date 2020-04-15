@@ -96,6 +96,7 @@ public class Database {
 		titleToCategoryMapping.put("Speicherzentrum", Category.INFRASTRUCTURE);
 		titleToCategoryMapping.put("Speicheranbieter", Category.INFRASTRUCTURE);
 		titleToCategoryMapping.put("Microsoft", Category.INFRASTRUCTURE);
+		titleToCategoryMapping.put("Mindfactory", Category.INFRASTRUCTURE);
 		titleToCategoryMapping.put("Mobatek", Category.INFRASTRUCTURE);
 		titleToCategoryMapping.put("Oculus", Category.INFRASTRUCTURE);
 		titleToCategoryMapping.put("Computer Game", Category.INFRASTRUCTURE);
@@ -156,6 +157,21 @@ public class Database {
 		return result;
 	}
 
+	public Set<String> getOriginators() {
+		Set<String> result = new HashSet<>();
+		for (Year year : years) {
+			for (Month month : year.getMonths()) {
+				for (Outgoing outgoing : month.getOutgoings()) {
+					result.add(outgoing.getOriginator());
+				}
+				for (Incoming incoming : month.getIncomingsAndDonations()) {
+					result.add(incoming.getOriginator());
+				}
+			}
+		}
+		return result;
+	}
+
 	public boolean addYear(int yearNum) {
 		for (Year cur : years) {
 			if (cur.getNum() == yearNum) {
@@ -198,7 +214,7 @@ public class Database {
 	}
 
 	public boolean addEntry(String dateStr, String title, Object catOrCustomer, String amount,
-		Currency currency, String taxationPercent, boolean isIncoming) {
+		Currency currency, String taxationPercent, String originator, boolean isIncoming) {
 
 		Date date = DateUtils.parseDate(dateStr);
 		if (date == null) {
@@ -212,7 +228,7 @@ public class Database {
 			return false;
 		}
 
-		if (curMonth.addEntry(date, title, catOrCustomer, amount, currency, taxationPercent, isIncoming)) {
+		if (curMonth.addEntry(date, title, catOrCustomer, amount, currency, taxationPercent, originator, isIncoming)) {
 
 			save();
 
@@ -290,7 +306,7 @@ public class Database {
 
 			Category category = mapTitleToCategory(titleStr);
 
-			if (!addEntry(dateStr, titleStr, category.getText(), amountStr, Currency.EUR, taxationPercentStr, true)) {
+			if (!addEntry(dateStr, titleStr, category.getText(), amountStr, Currency.EUR, taxationPercentStr, "", true)) {
 				// stop upon the first failure instead of showing a million error messages
 				break;
 			}
@@ -343,7 +359,7 @@ public class Database {
 				}
 			}
 
-			if (!addEntry(dateStr, titleStr, customer, amountStr, Currency.EUR, taxationPercentStr, false)) {
+			if (!addEntry(dateStr, titleStr, customer, amountStr, Currency.EUR, taxationPercentStr, "", false)) {
 				// stop upon the first failure instead of showing a million error messages
 				break;
 			}
@@ -380,8 +396,8 @@ public class Database {
 		for (Incoming incoming : getIncomings()) {
 			if (incoming.getCategory() != mapTitleToCategory(incoming.getTitle())) {
 				result.add("For " + AccountingUtils.getEntryForLog(incoming) + ", the selected category (" +
-					incoming.getCategory() + ") differs from the automatically detected one (" +
-					mapTitleToCategory(incoming.getTitle()) + ").");
+					incoming.getCategory().getText() + ") differs from the automatically detected one (" +
+					mapTitleToCategory(incoming.getTitle()).getText() + ").");
 			}
 		}
 

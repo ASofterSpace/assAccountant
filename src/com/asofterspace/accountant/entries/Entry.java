@@ -33,6 +33,7 @@ public abstract class Entry {
 	private static final String TAXATION_PERCENT = "taxationPercent";
 	private static final String DATE_KEY = "date";
 	private static final String TITLE_KEY = "title";
+	private static final String ORIGINATOR = "originator";
 
 	// this is the amount pre-tax!
 	private Integer amount;
@@ -45,6 +46,8 @@ public abstract class Entry {
 
 	private String title;
 
+	private String originator;
+
 	protected Month parent;
 
 
@@ -52,7 +55,7 @@ public abstract class Entry {
 	 * Create an entry at runtime
 	 */
 	public Entry(Integer amount, Currency currency, Integer taxationPercent, Date date,
-		String title, Month parent) {
+		String title, String originator, Month parent) {
 
 		this.amount = amount;
 
@@ -63,6 +66,8 @@ public abstract class Entry {
 		this.date = date;
 
 		this.title = title;
+
+		this.originator = originator;
 
 		this.parent = parent;
 	}
@@ -82,6 +87,11 @@ public abstract class Entry {
 
 		this.title = entryRecord.getString(TITLE_KEY);
 
+		this.originator = entryRecord.getString(ORIGINATOR);
+		if ((this.originator == null) || this.originator.equals("")) { // DEBUG
+			this.originator = "Moya"; // DEBUG
+		} // DEBUG
+
 		this.parent = parent;
 	}
 
@@ -98,6 +108,8 @@ public abstract class Entry {
 		result.set(DATE_KEY, DateUtils.serializeDate(date));
 
 		result.set(TITLE_KEY, title);
+
+		result.set(ORIGINATOR, originator);
 
 		return result;
 	}
@@ -162,6 +174,10 @@ public abstract class Entry {
 		this.title = title;
 	}
 
+	public String getOriginator() {
+		return originator;
+	}
+
 	public Month getParent() {
 		return parent;
 	}
@@ -187,34 +203,39 @@ public abstract class Entry {
 
 		curLabel = new CopyByClickLabel(getTitle());
 		curLabel.setPreferredSize(defaultDimension);
-		curPanel.add(curLabel, new Arrangement(1, 0, 0.35, 1.0));
+		curPanel.add(curLabel, new Arrangement(1, 0, 0.3, 1.0));
 
 		curLabel = new CopyByClickLabel("[" + getCategoryOrCustomer() + "]");
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(2, 0, 0.11, 1.0));
 
-		curLabel = new CopyByClickLabel(getAmountAsText());
+		curLabel = new CopyByClickLabel(getOriginator());
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
-		curPanel.add(curLabel, new Arrangement(3, 0, 0.1, 1.0));
+		curPanel.add(curLabel, new Arrangement(3, 0, 0.05, 1.0));
 
-		curLabel = new CopyByClickLabel(getTaxPercentAsText());
+		curLabel = new CopyByClickLabel(getAmountAsText());
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(4, 0, 0.1, 1.0));
 
-		curLabel = new CopyByClickLabel(getPostTaxAmountAsText());
+		curLabel = new CopyByClickLabel(getTaxPercentAsText());
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(5, 0, 0.1, 1.0));
 
+		curLabel = new CopyByClickLabel(getPostTaxAmountAsText());
+		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
+		curLabel.setPreferredSize(defaultDimension);
+		curPanel.add(curLabel, new Arrangement(6, 0, 0.1, 1.0));
+
 		curLabel = new CopyByClickLabel("");
 		curLabel.setPreferredSize(defaultDimension);
-		curPanel.add(curLabel, new Arrangement(6, 0, 0.0, 1.0));
+		curPanel.add(curLabel, new Arrangement(7, 0, 0.0, 1.0));
 
 		JButton curButton = new JButton("Edit");
 		curButton.setPreferredSize(defaultDimension);
-		curPanel.add(curButton, new Arrangement(7, 0, 0.08, 1.0));
+		curPanel.add(curButton, new Arrangement(8, 0, 0.08, 1.0));
 		curButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -224,11 +245,11 @@ public abstract class Entry {
 
 		curLabel = new CopyByClickLabel("");
 		curLabel.setPreferredSize(defaultDimension);
-		curPanel.add(curLabel, new Arrangement(8, 0, 0.0, 1.0));
+		curPanel.add(curLabel, new Arrangement(9, 0, 0.0, 1.0));
 
 		curButton = new JButton("Delete");
 		curButton.setPreferredSize(defaultDimension);
-		curPanel.add(curButton, new Arrangement(9, 0, 0.08, 1.0));
+		curPanel.add(curButton, new Arrangement(10, 0, 0.08, 1.0));
 		curButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -238,7 +259,7 @@ public abstract class Entry {
 
 		curLabel = new CopyByClickLabel("");
 		curLabel.setPreferredSize(defaultDimension);
-		curPanel.add(curLabel, new Arrangement(10, 0, 0.0, 1.0));
+		curPanel.add(curLabel, new Arrangement(11, 0, 0.0, 1.0));
 
 		return curPanel;
 	}

@@ -5,6 +5,7 @@
 package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.Database;
+import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.tabs.TimeSpanTab;
 import com.asofterspace.accountant.timespans.Month;
@@ -50,6 +51,7 @@ public class AddEntryGUI {
 
 	private JComboBox<String> customer;
 	private JComboBox<String> category;
+	private JComboBox<String> originator;
 	private JRadioButton isIncoming;
 	private JTextField dateText;
 	private JTextField titleText;
@@ -70,7 +72,7 @@ public class AddEntryGUI {
 
 		// Create the window
 		final JDialog dialog = new JDialog(mainGUI.getMainFrame(), "Add Entry", true);
-		GridLayout dialogLayout = new GridLayout(9, 1);
+		GridLayout dialogLayout = new GridLayout(10, 1);
 		dialogLayout.setVgap(8);
 		dialog.setLayout(dialogLayout);
 		dialog.getRootPane().setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
@@ -163,6 +165,15 @@ public class AddEntryGUI {
 		category = new JComboBox<>(Category.getTexts());
 		category.setEditable(false);
 		curPanel.add(category, new Arrangement(1, 0, 1.0, 1.0));
+		dialog.add(curPanel);
+
+		curPanel = new JPanel();
+		curPanel.setLayout(new GridBagLayout());
+		curLabel = new CopyByClickLabel("Originator: ");
+		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
+		originator = new JComboBox<>(database.getOriginators().toArray(new String[0]));
+		originator.setEditable(true);
+		curPanel.add(originator, new Arrangement(1, 0, 1.0, 1.0));
 		dialog.add(curPanel);
 
 		curPanel = new JPanel();
@@ -271,7 +282,8 @@ public class AddEntryGUI {
 		}
 
 		if (database.addEntry(dateText.getText(), titleText.getText(), catOrCustomer,
-			amount.getText(), Currency.EUR, taxPerc.getText(), isIncoming.isSelected())) {
+			amount.getText(), Currency.EUR, taxPerc.getText(), (String) originator.getSelectedItem(),
+			isIncoming.isSelected())) {
 
 			Date date = DateUtils.parseDate(dateText.getText());
 			if (date != null) {
