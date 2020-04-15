@@ -141,7 +141,7 @@ public class Month extends TimeSpan {
 		});
 		List<Incoming> result = new ArrayList<>();
 		for (Incoming incoming : incomings) {
-			if (incoming.getCategory() != Category.DONATION) {
+			if (!incoming.getCategory().isSpecial()) {
 				result.add(incoming);
 			}
 		}

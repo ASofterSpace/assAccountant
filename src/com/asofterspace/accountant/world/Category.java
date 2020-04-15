@@ -8,37 +8,40 @@ package com.asofterspace.accountant.world;
 public enum Category {
 
 	// salaries for a softer space employees
-	INTERNAL_SALARY("Internal Salary"),
+	INTERNAL_SALARY("Internal Salary", false),
 
 	// money paid to external contractors
-	EXTERNAL_SALARY("External Salary"),
+	EXTERNAL_SALARY("External Salary", false),
 
 	// travel expenses
-	TRAVEL("Travel Expenses"),
+	TRAVEL("Travel Expenses", false),
 
 	// costs for cars, bikes, spacecraft, ...
-	VEHICLE("Vehicles"),
+	VEHICLE("Vehicles", false),
 
 	// entertainment expenses include things like restaurant visits for business purposes
-	ENTERTAINMENT("Entertainment Costs"),
+	ENTERTAINMENT("Entertainment Costs", false),
 
 	// expenses for office rooms, buildings, planets?
-	LOCATIONS("Locations"),
+	LOCATIONS("Locations", false),
 
 	// infrastructure necessary for us to perform our work (e.g. paper, ink, computer programs, ...)
-	INFRASTRUCTURE("Infrastructure of IT Systems (Hardware, Software, Services etc.)"),
+	INFRASTRUCTURE("Infrastructure of IT Systems (Hardware, Software, Services etc.)", false),
 
 	// education and conference attendance
-	EDUCATION("Education and Conferences"),
+	EDUCATION("Education and Conferences", false),
 
 	// ads and branded items
-	ADVERTISEMENTS("Advertisements and Branded Items"),
+	ADVERTISEMENTS("Advertisements and Branded Items", false),
+
+	// personal spendings that are tracked anyway
+	PERSONAL("Personal", true),
 
 	// donations by a softer space
-	DONATION("Donations"),
+	DONATION("Donations", true),
 
 	// anything else
-	OTHER("Other");
+	OTHER("Other", false);
 
 
 	// the textual representation of each category
@@ -48,12 +51,17 @@ public enum Category {
 	// internal, external, travel, vehicle, entertainment, location, donation, other
 	private String startText;
 
+	// is this a special category, or a regular one?
+	private boolean isSpecialCategory;
 
-	private Category(String text) {
+
+	private Category(String text, boolean isSpecial) {
 
 		this.text = text;
 
 		this.startText = getStart(text);
+
+		this.isSpecialCategory = isSpecial;
 	}
 
 	public static Category fromString(String from) {
@@ -97,6 +105,10 @@ public enum Category {
 		 }
 
 		return val;
+	}
+
+	public boolean isSpecial() {
+		return isSpecialCategory;
 	}
 
 }

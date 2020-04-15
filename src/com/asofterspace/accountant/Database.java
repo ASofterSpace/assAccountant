@@ -71,6 +71,8 @@ public class Database {
 
 		titleToCategoryMapping = new HashMap<>();
 
+		titleToCategoryMapping.put("FF43", Category.PERSONAL);
+
 		titleToCategoryMapping.put("Wikimedia", Category.DONATION);
 		titleToCategoryMapping.put("Patreon", Category.DONATION);
 		titleToCategoryMapping.put("Against Malaria", Category.DONATION);
