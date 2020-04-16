@@ -24,11 +24,14 @@ public abstract class TimeSpan {
 	// gets all outgoing invoices
 	public abstract List<Outgoing> getOutgoings();
 
-	// gets on incoming invoices not set to category donation
+	// gets all incoming invoices not set to categories donation or personal
 	public abstract List<Incoming> getIncomings();
 
-	// gets on incoming invoices set to category donation
+	// gets all incoming invoices set to category donation
 	public abstract List<Incoming> getDonations();
+
+	// gets all incoming invoices set to category personal
+	public abstract List<Incoming> getPersonals();
 
 	// before tax means before applying VAT (USt)
 	public abstract int getOutTotalBeforeTax();
@@ -57,5 +60,13 @@ public abstract class TimeSpan {
 	}
 
 	public abstract int getDonTotalAfterTax();
+
+	public abstract int getPersTotalBeforeTax();
+
+	public int getPersTotalTax() {
+		return getPersTotalAfterTax() - getPersTotalBeforeTax();
+	}
+
+	public abstract int getPersTotalAfterTax();
 
 }

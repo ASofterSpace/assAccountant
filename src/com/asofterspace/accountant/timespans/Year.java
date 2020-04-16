@@ -116,6 +116,15 @@ public class Year extends TimeSpan {
 	}
 
 	@Override
+	public List<Incoming> getPersonals() {
+		List<Incoming> result = new ArrayList<>();
+		for (Month month : getMonths()) {
+			result.addAll(month.getPersonals());
+		}
+		return result;
+	}
+
+	@Override
 	public int getOutTotalBeforeTax() {
 		int result = 0;
 		for (Month month : months) {
@@ -178,6 +187,24 @@ public class Year extends TimeSpan {
 		return result;
 	}
 
+	@Override
+	public int getPersTotalBeforeTax() {
+		int result = 0;
+		for (Month month : months) {
+			result += month.getPersTotalBeforeTax();
+		}
+		return result;
+	}
+
+	@Override
+	public int getPersTotalAfterTax() {
+		int result = 0;
+		for (Month month : months) {
+			result += month.getPersTotalAfterTax();
+		}
+		return result;
+	}
+
 	// gets the expected income tax VERY ROUGHLY!
 	public long getExpectedIncomeTax() {
 
@@ -189,7 +216,7 @@ public class Year extends TimeSpan {
 	private long getExpectedIncomeTaxProper() {
 
 		double result = 0;
-		double taxAmount = getOutTotalBeforeTax() - (getInTotalBeforeTax() + getDonTotalBeforeTax());
+		double taxAmount = getOutTotalBeforeTax() - (getInTotalBeforeTax() + getDonTotalBeforeTax() + getPersTotalBeforeTax());
 
 		// Freibetrag
 		if (taxAmount <= 916800) {

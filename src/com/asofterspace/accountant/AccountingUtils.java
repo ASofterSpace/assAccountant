@@ -215,6 +215,22 @@ public class AccountingUtils {
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
+
+		CopyByClickLabel personalLabel = AccountingUtils.createSubHeadLabel("Personal Expenses - which we also pay:");
+		tab.add(personalLabel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		List<Incoming> personals = timeSpan.getPersonals();
+		for (Incoming cur : personals) {
+			curPanel = cur.createPanelOnGUI(database);
+			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+			i++;
+		}
+
+		curPanel = AccountingUtils.createTotalPanelOnGUI(timeSpan.getPersTotalBeforeTax(), timeSpan.getPersTotalTax(), timeSpan.getPersTotalAfterTax());
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
 		return i;
 	}
 
@@ -236,6 +252,10 @@ public class AccountingUtils {
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount of personal expenses: ", timeSpan.getPersTotalAfterTax(), "Of that VAT: ", timeSpan.getPersTotalTax());
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
 		if (timeSpan instanceof Year) {
 
 			Year curYear = (Year) timeSpan;
@@ -244,7 +264,7 @@ public class AccountingUtils {
 			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
 
-			curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount earned in " + curYear.getNum() + ": ", (int) (timeSpan.getOutTotalBeforeTax() - (timeSpan.getInTotalBeforeTax() + timeSpan.getDonTotalBeforeTax() + curYear.getExpectedIncomeTax())));
+			curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount earned in " + curYear.getNum() + ": ", (int) (timeSpan.getOutTotalBeforeTax() - (timeSpan.getInTotalBeforeTax() + timeSpan.getDonTotalBeforeTax() + timeSpan.getPersTotalBeforeTax() + curYear.getExpectedIncomeTax())));
 			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
 		}
@@ -372,21 +392,23 @@ public class AccountingUtils {
 
 	public static Integer parseTaxes(String taxationPercentStr) {
 
-		if (!"".equals(taxationPercentStr)) {
-			taxationPercentStr = taxationPercentStr.replaceAll(" ", "");
-			taxationPercentStr = taxationPercentStr.replaceAll("%", "");
-			taxationPercentStr = taxationPercentStr.replaceAll("€", "");
-			if (taxationPercentStr.contains(".")) {
-				taxationPercentStr = taxationPercentStr.substring(0, taxationPercentStr.indexOf("."));
-			}
-			if (taxationPercentStr.contains(",")) {
-				taxationPercentStr = taxationPercentStr.substring(0, taxationPercentStr.indexOf(","));
-			}
-			try {
-				return Integer.parseInt(taxationPercentStr);
-			} catch (NullPointerException | NumberFormatException e) {
-				// we will just return null and let the caller complain to the user (if necessary)
-			}
+		if ("".equals(taxationPercentStr)) {
+			return 0;
+		}
+
+		taxationPercentStr = taxationPercentStr.replaceAll(" ", "");
+		taxationPercentStr = taxationPercentStr.replaceAll("%", "");
+		taxationPercentStr = taxationPercentStr.replaceAll("€", "");
+		if (taxationPercentStr.contains(".")) {
+			taxationPercentStr = taxationPercentStr.substring(0, taxationPercentStr.indexOf("."));
+		}
+		if (taxationPercentStr.contains(",")) {
+			taxationPercentStr = taxationPercentStr.substring(0, taxationPercentStr.indexOf(","));
+		}
+		try {
+			return Integer.parseInt(taxationPercentStr);
+		} catch (NullPointerException | NumberFormatException e) {
+			// we will just return null and let the caller complain to the user (if necessary)
 		}
 
 		return null;

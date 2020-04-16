@@ -164,6 +164,22 @@ public class Month extends TimeSpan {
 		return result;
 	}
 
+	@Override
+	public List<Incoming> getPersonals() {
+		Collections.sort(incomings, new Comparator<Incoming>() {
+			public int compare(Incoming a, Incoming b) {
+				return b.getDate().compareTo(a.getDate());
+			}
+		});
+		List<Incoming> result = new ArrayList<>();
+		for (Incoming incoming : incomings) {
+			if (incoming.getCategory() == Category.PERSONAL) {
+				result.add(incoming);
+			}
+		}
+		return result;
+	}
+
 	public void removeOutgoing(Outgoing remEntry) {
 		outgoings.remove(remEntry);
 	}
@@ -284,6 +300,24 @@ public class Month extends TimeSpan {
 	public int getDonTotalAfterTax() {
 		int result = 0;
 		for (Incoming cur : getDonations()) {
+			result += cur.getPostTaxAmount();
+		}
+		return result;
+	}
+
+	@Override
+	public int getPersTotalBeforeTax() {
+		int result = 0;
+		for (Incoming cur : getPersonals()) {
+			result += cur.getAmount();
+		}
+		return result;
+	}
+
+	@Override
+	public int getPersTotalAfterTax() {
+		int result = 0;
+		for (Incoming cur : getPersonals()) {
 			result += cur.getPostTaxAmount();
 		}
 		return result;
