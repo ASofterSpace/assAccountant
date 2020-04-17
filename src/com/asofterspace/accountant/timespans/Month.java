@@ -18,8 +18,6 @@ import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -122,11 +120,7 @@ public class Month extends TimeSpan {
 
 	@Override
 	public List<Outgoing> getOutgoings() {
-		Collections.sort(outgoings, new Comparator<Outgoing>() {
-			public int compare(Outgoing a, Outgoing b) {
-				return b.getDate().compareTo(a.getDate());
-			}
-		});
+		AccountingUtils.sortEntries(outgoings);
 		return outgoings;
 	}
 
@@ -139,11 +133,7 @@ public class Month extends TimeSpan {
 
 	@Override
 	public List<Incoming> getIncomings() {
-		Collections.sort(incomings, new Comparator<Incoming>() {
-			public int compare(Incoming a, Incoming b) {
-				return b.getDate().compareTo(a.getDate());
-			}
-		});
+		AccountingUtils.sortEntries(incomings);
 		List<Incoming> result = new ArrayList<>();
 		for (Incoming incoming : incomings) {
 			if (!incoming.getCategory().isSpecial()) {
@@ -155,11 +145,7 @@ public class Month extends TimeSpan {
 
 	@Override
 	public List<Incoming> getDonations() {
-		Collections.sort(incomings, new Comparator<Incoming>() {
-			public int compare(Incoming a, Incoming b) {
-				return b.getDate().compareTo(a.getDate());
-			}
-		});
+		AccountingUtils.sortEntries(incomings);
 		List<Incoming> result = new ArrayList<>();
 		for (Incoming incoming : incomings) {
 			if (incoming.getCategory() == Category.DONATION) {
@@ -171,11 +157,7 @@ public class Month extends TimeSpan {
 
 	@Override
 	public List<Incoming> getPersonals() {
-		Collections.sort(incomings, new Comparator<Incoming>() {
-			public int compare(Incoming a, Incoming b) {
-				return b.getDate().compareTo(a.getDate());
-			}
-		});
+		AccountingUtils.sortEntries(incomings);
 		List<Incoming> result = new ArrayList<>();
 		for (Incoming incoming : incomings) {
 			if (incoming.getCategory() == Category.PERSONAL) {

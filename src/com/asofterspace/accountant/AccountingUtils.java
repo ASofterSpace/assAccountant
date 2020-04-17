@@ -18,6 +18,8 @@ import com.asofterspace.toolbox.Utils;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -419,6 +421,22 @@ public class AccountingUtils {
 			return null;
 		}
 		return (int) Math.round((amount * (100 + taxationPercent)) / 100.0);
+	}
+
+	/**
+	 * Sort entries descending, so latest / highest at the top
+	 */
+	public static void sortEntries(List<? extends Entry> entries) {
+		Collections.sort(entries, new Comparator<Entry>() {
+			public int compare(Entry a, Entry b) {
+				// break ties using the title (such that a higher number in a title gets sorted to the top)
+				if (a.getDate().equals(b.getDate())) {
+					return b.getTitle().compareTo(a.getTitle());
+				}
+				// usually, compare using the date
+				return b.getDate().compareTo(a.getDate());
+			}
+		});
 	}
 
 }

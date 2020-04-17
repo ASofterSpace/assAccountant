@@ -21,8 +21,6 @@ import com.asofterspace.toolbox.Utils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -416,19 +414,7 @@ public class Database {
 		List<Entry> result = new ArrayList<>();
 		result.addAll(getOutgoings());
 		result.addAll(getIncomings());
-		Collections.sort(result, new Comparator<Entry>() {
-			public int compare(Entry a, Entry b) {
-				// break ties using the title (such that a higher number in a title gets sorted to the top)
-				if (a.getDate().equals(b.getDate())) {
-					return b.getTitle().compareTo(a.getTitle());
-				}
-				// usually, compare using the date
-				if (a.getDate().before(b.getDate())) {
-					return 1;
-				}
-				return -1;
-			}
-		});
+		AccountingUtils.sortEntries(result);
 		return result;
 	}
 
