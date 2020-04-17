@@ -6,12 +6,16 @@ package com.asofterspace.accountant.tabs;
 
 import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.Database;
+import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
+import com.asofterspace.toolbox.utils.DateUtils;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -48,9 +52,38 @@ public class OverviewTab extends Tab {
 		tab.add(topHUD, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
+		CopyByClickLabel curLabel;
 
-		// TODO - display information such as outgoing invoices which have been sent out more
-		// than six weeks ago and not yet been set to having come in
+
+		CopyByClickLabel unpaidInvoicesLabel = AccountingUtils.createSubHeadLabel("Unpaid Invoices:");
+		tab.add(unpaidInvoicesLabel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		// display outgoing invoices which have been sent out more than six weeks ago and not yet
+		// been set to having come in
+		List<Outgoing> outgoings = database.getOutgoings();
+		boolean foundProblem = false;
+		Date sixWeeksAgo = DateUtils.daysInTheFuture(-6*7);
+
+		for (Outgoing outgoing : outgoings) {
+			if (!outgoing.getReceived()) {
+				if (outgoing.getDate().before(sixWeeksAgo)) {
+					foundProblem = true;
+					curLabel = new CopyByClickLabel("The " + AccountingUtils.getEntryForLog(outgoing) + " has not yet been paid!");
+					tab.add(curLabel, new Arrangement(0, i, 1.0, 0.0));
+					curLabel.setForeground(new Color(196, 0, 0));
+					i++;
+					// TODO add paid and show buttons
+				}
+			}
+		}
+
+		if (!foundProblem) {
+			curLabel = new CopyByClickLabel("No problems have been found!");
+			tab.add(curLabel, new Arrangement(0, i, 1.0, 0.0));
+			i++;
+		}
+
 
 		// TODO - display information such as finance days that have last been done (or maybe
 		// even get away from real "finance days", and instead have continuous financing going on,
@@ -61,13 +94,12 @@ public class OverviewTab extends Tab {
 		tab.add(consistencyChecksLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		CopyByClickLabel curLabel;
-
 		List<String> consistencyProblems = database.getConsistencyProblems();
 		for (String curProblem : consistencyProblems) {
 			curLabel = new CopyByClickLabel(curProblem);
 			tab.add(curLabel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
+			// TODO add edit and show buttons
 		}
 		// for-else:
 		if (consistencyProblems.size() < 1) {
