@@ -418,9 +418,11 @@ public class Database {
 		result.addAll(getIncomings());
 		Collections.sort(result, new Comparator<Entry>() {
 			public int compare(Entry a, Entry b) {
+				// break ties using the title (such that a higher number in a title gets sorted to the top)
 				if (a.getDate().equals(b.getDate())) {
-					return 0;
+					return b.getTitle().compareTo(a.getTitle());
 				}
+				// usually, compare using the date
 				if (a.getDate().before(b.getDate())) {
 					return 1;
 				}
