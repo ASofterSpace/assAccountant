@@ -266,7 +266,7 @@ public class GUI extends MainWindow {
 			public void actionPerformed(ActionEvent e) {
 				// show the add entry GUI
 				if (addEntryGUI == null) {
-					addEntryGUI = new AddEntryGUI(GUI.this, database);
+					addEntryGUI = new AddEntryGUI(GUI.this, database, null);
 				}
 				addEntryGUI.show();
 			}

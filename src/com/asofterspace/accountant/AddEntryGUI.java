@@ -27,7 +27,6 @@ import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -47,6 +46,8 @@ public class AddEntryGUI {
 
 	private Database database;
 
+	private Entry editingEntry;
+
 	private JDialog dialog;
 
 	private JComboBox<String> customer;
@@ -59,11 +60,13 @@ public class AddEntryGUI {
 	private JTextField taxPerc;
 
 
-	public AddEntryGUI(GUI mainGUI, Database database) {
+	public AddEntryGUI(GUI mainGUI, Database database, Entry editingEntry) {
 
 		this.mainGUI = mainGUI;
 
 		this.database = database;
+
+		this.editingEntry = editingEntry;
 
 		this.dialog = createGUI();
 	}
@@ -231,20 +234,30 @@ public class AddEntryGUI {
 		taxPerc.getDocument().addDocumentListener(afterTaxUpdateListener);
 
 		JPanel buttonRow = new JPanel();
-		GridLayout buttonRowLayout = new GridLayout(1, 3);
+		GridLayout buttonRowLayout = null;
+		if (editingEntry == null) {
+			buttonRowLayout = new GridLayout(1, 3);
+		} else {
+			buttonRowLayout = new GridLayout(1, 2);
+		}
 		buttonRowLayout.setHgap(8);
 		buttonRow.setLayout(buttonRowLayout);
 		dialog.add(buttonRow);
 
-		JButton addButton = new JButton("Add This Entry");
-		addButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				addEntry(false);
-			}
-		});
-		buttonRow.add(addButton);
+		if (editingEntry == null) {
+			JButton addButton = new JButton("Add This Entry");
+			addButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					addEntry(false);
+				}
+			});
+			buttonRow.add(addButton);
+		}
 
 		JButton addAndExitButton = new JButton("Add This Entry and Exit");
+		if (editingEntry != null) {
+			addAndExitButton.setText("Save Changes");
+		}
 		addAndExitButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				addEntry(true);
@@ -253,6 +266,9 @@ public class AddEntryGUI {
 		buttonRow.add(addAndExitButton);
 
 		JButton doneButton = new JButton("Done");
+		if (editingEntry != null) {
+			doneButton.setText("Cancel");
+		}
 		doneButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				dialog.dispose();
@@ -281,9 +297,16 @@ public class AddEntryGUI {
 			catOrCustomer = category.getSelectedItem();
 		}
 
+		// we add the new entry (no matter if we are editing a new one or editing an existing one)...
 		if (database.addEntry(dateText.getText(), titleText.getText(), catOrCustomer,
 			amount.getText(), Currency.EUR, taxPerc.getText(), (String) originator.getSelectedItem(),
 			isIncoming.isSelected())) {
+
+			// ... and if we are editing an existing one, we delete the existing one
+			// (think about this as the scifi transporter approach to editing ^^)
+			if (editingEntry != null) {
+				editingEntry.deleteFrom(database);
+			}
 
 			Date date = DateUtils.parseDate(dateText.getText());
 			if (date != null) {

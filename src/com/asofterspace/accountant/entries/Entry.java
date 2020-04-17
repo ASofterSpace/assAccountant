@@ -5,6 +5,7 @@
 package com.asofterspace.accountant.entries;
 
 import com.asofterspace.accountant.AccountingUtils;
+import com.asofterspace.accountant.AddEntryGUI;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Month;
@@ -239,7 +240,8 @@ public abstract class Entry {
 		curButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				AccountingUtils.complain("Whoops, this button is not yet working!");
+				AddEntryGUI editEntryGUI = new AddEntryGUI(GUI.this, database, Entry.this);
+				editEntryGUI.show();
 			}
 		});
 
