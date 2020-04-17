@@ -6,6 +6,7 @@ package com.asofterspace.accountant.entries;
 
 import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.AddEntryGUI;
+import com.asofterspace.accountant.AddPaidGUI;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Month;
@@ -35,6 +36,9 @@ public abstract class Entry {
 	private static final String DATE_KEY = "date";
 	private static final String TITLE_KEY = "title";
 	private static final String ORIGINATOR = "originator";
+	private static final String RECEIVED_KEY = "received";
+	private static final String RECEIVED_ON_DATE_KEY = "receivedOnDate";
+	private static final String RECEIVED_ON_ACCOUNT_KEY = "receivedOnAccount";
 
 	// this is the amount pre-tax!
 	private Integer amount;
@@ -48,6 +52,12 @@ public abstract class Entry {
 	private String title;
 
 	private String originator;
+
+	private boolean received;
+
+	private Date receivedOnDate;
+
+	private String receivedOnAccount;
 
 	protected Month parent;
 
@@ -71,6 +81,8 @@ public abstract class Entry {
 		this.originator = originator;
 
 		this.parent = parent;
+
+		this.received = false;
 	}
 
 	/**
@@ -89,9 +101,16 @@ public abstract class Entry {
 		this.title = entryRecord.getString(TITLE_KEY);
 
 		this.originator = entryRecord.getString(ORIGINATOR);
-		if ((this.originator == null) || this.originator.equals("")) { // DEBUG
-			this.originator = "Moya"; // DEBUG
-		} // DEBUG
+
+		this.received = entryRecord.getBoolean(RECEIVED_KEY, false);
+
+		this.receivedOnDate = null;
+		String dateStr = entryRecord.getString(RECEIVED_ON_DATE_KEY);
+		if (dateStr != null) {
+			this.receivedOnDate = DateUtils.parseDate(dateStr);
+		}
+
+		this.receivedOnAccount = entryRecord.getString(RECEIVED_ON_ACCOUNT_KEY);
 
 		this.parent = parent;
 	}
@@ -111,6 +130,17 @@ public abstract class Entry {
 		result.set(TITLE_KEY, title);
 
 		result.set(ORIGINATOR, originator);
+
+		result.set(RECEIVED_KEY, received);
+
+		// we actually want to explicitly write null if this is null...
+		String dateStr = null;
+		if (receivedOnDate != null) {
+			dateStr = DateUtils.serializeDate(receivedOnDate);
+		}
+		result.set(RECEIVED_ON_DATE_KEY, dateStr);
+
+		result.set(RECEIVED_ON_ACCOUNT_KEY, receivedOnAccount);
 
 		return result;
 	}
@@ -179,6 +209,44 @@ public abstract class Entry {
 		return originator;
 	}
 
+	public boolean getReceived() {
+		return received;
+	}
+
+	public void setReceived(boolean received) {
+		this.received = received;
+	}
+
+	public Date getReceivedOnDate() {
+		return receivedOnDate;
+	}
+
+	public void setReceivedOnDate(Date receivedOnDate) {
+		this.receivedOnDate = receivedOnDate;
+	}
+
+	public String getReceivedOnAccount() {
+		return receivedOnAccount;
+	}
+
+	public void setReceivedOnAccount(String receivedOnAccount) {
+		this.receivedOnAccount = receivedOnAccount;
+	}
+
+	public boolean setPaidInfo(boolean receivedVal, String dateStr, String accountStr) {
+		if ("".equals(dateStr)) {
+			setReceivedOnDate(null);
+		} else {
+			setReceivedOnDate(DateUtils.parseDate(dateStr));
+		}
+
+		setReceived(receivedVal);
+
+		setReceivedOnAccount(accountStr);
+
+		return true;
+	}
+
 	public Month getParent() {
 		return parent;
 	}
@@ -240,7 +308,8 @@ public abstract class Entry {
 		curButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				AccountingUtils.complain("Sorry, not implemented yet ^^");
+				AddPaidGUI addPaidGUI = new AddPaidGUI(database.getGUI(), database, Entry.this);
+				addPaidGUI.show();
 			}
 		});
 
@@ -270,6 +339,11 @@ public abstract class Entry {
 		curPanel.add(curLabel, new Arrangement(11, 0, 0.0, 1.0));
 
 		return curPanel;
+	}
+
+	@Override
+	public String toString() {
+		return getAmountAsText() + " on " + getDateAsText() + " " + getTitle() + " [" + getCategoryOrCustomer() + "] ";
 	}
 
 }

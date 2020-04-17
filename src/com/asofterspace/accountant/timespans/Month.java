@@ -5,6 +5,7 @@
 package com.asofterspace.accountant.timespans;
 
 import com.asofterspace.accountant.AccountingUtils;
+import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.timespans.Month;
@@ -128,8 +129,11 @@ public class Month extends TimeSpan {
 		return outgoings;
 	}
 
-	public List<Incoming> getIncomingsAndDonations() {
-		return incomings;
+	public List<Entry> getEntries() {
+		List<Entry> result = new ArrayList<>();
+		result.addAll(incomings);
+		result.addAll(outgoings);
+		return result;
 	}
 
 	@Override

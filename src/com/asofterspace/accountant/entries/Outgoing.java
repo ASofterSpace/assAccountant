@@ -7,7 +7,6 @@ package com.asofterspace.accountant.entries;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.world.Currency;
-import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
 
 import java.util.Date;
@@ -20,19 +19,7 @@ public class Outgoing extends Entry {
 
 	private static final String CUSTOMER_KEY = "customer";
 
-	private static final String RECEIVED_KEY = "received";
-
-	private static final String RECEIVED_ON_DATE_KEY = "receivedOnDate";
-
-	private static final String RECEIVED_ON_ACCOUNT_KEY = "receivedOnAccount";
-
 	private String customer;
-
-	private boolean received;
-
-	private Date receivedOnDate;
-
-	private String receivedOnAccount;
 
 
 	/**
@@ -44,8 +31,6 @@ public class Outgoing extends Entry {
 		super(amount, currency, taxationPercent, date, title, originator, parent);
 
 		this.customer = customer;
-
-		this.received = false;
 	}
 
 	/**
@@ -55,16 +40,6 @@ public class Outgoing extends Entry {
 		super(entryRecord, parent);
 
 		customer = entryRecord.getString(CUSTOMER_KEY);
-
-		received = entryRecord.getBoolean(RECEIVED_KEY, false);
-
-		receivedOnDate = null;
-		String dateStr = entryRecord.getString(RECEIVED_ON_DATE_KEY);
-		if (dateStr != null) {
-			receivedOnDate = DateUtils.parseDate(dateStr);
-		}
-
-		receivedOnAccount = entryRecord.getString(RECEIVED_ON_ACCOUNT_KEY);
 	}
 
 	@Override
@@ -73,17 +48,6 @@ public class Outgoing extends Entry {
 		Record result = super.toRecord();
 
 		result.set(CUSTOMER_KEY, customer);
-
-		result.set(RECEIVED_KEY, received);
-
-		// we actually want to explicitly write null if this is null...
-		String dateStr = null;
-		if (receivedOnDate != null) {
-			dateStr = DateUtils.serializeDate(receivedOnDate);
-		}
-		result.set(RECEIVED_ON_DATE_KEY, dateStr);
-
-		result.set(RECEIVED_ON_ACCOUNT_KEY, receivedOnAccount);
 
 		return result;
 	}

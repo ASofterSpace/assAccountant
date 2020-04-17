@@ -167,11 +167,20 @@ public class Database {
 		Set<String> result = new HashSet<>();
 		for (Year year : years) {
 			for (Month month : year.getMonths()) {
-				for (Outgoing outgoing : month.getOutgoings()) {
-					result.add(outgoing.getOriginator());
+				for (Entry entry : month.getEntries()) {
+					result.add(entry.getOriginator());
 				}
-				for (Incoming incoming : month.getIncomingsAndDonations()) {
-					result.add(incoming.getOriginator());
+			}
+		}
+		return result;
+	}
+
+	public Set<String> getAccounts() {
+		Set<String> result = new HashSet<>();
+		for (Year year : years) {
+			for (Month month : year.getMonths()) {
+				for (Entry entry : month.getEntries()) {
+					result.add(entry.getReceivedOnAccount());
 				}
 			}
 		}
