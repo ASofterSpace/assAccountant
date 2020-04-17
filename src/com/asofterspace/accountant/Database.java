@@ -143,6 +143,10 @@ public class Database {
 		this.gui = gui;
 	}
 
+	public GUI getGUI() {
+		return gui;
+	}
+
 	public List<Year> getYears() {
 		return years;
 	}

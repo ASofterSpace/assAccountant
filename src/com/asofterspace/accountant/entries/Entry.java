@@ -240,7 +240,7 @@ public abstract class Entry {
 		curButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				AddEntryGUI editEntryGUI = new AddEntryGUI(GUI.this, database, Entry.this);
+				AddEntryGUI editEntryGUI = new AddEntryGUI(database.getGUI(), database, Entry.this);
 				editEntryGUI.show();
 			}
 		});

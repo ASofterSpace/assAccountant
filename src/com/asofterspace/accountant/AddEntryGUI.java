@@ -6,6 +6,8 @@ package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
+import com.asofterspace.accountant.entries.Incoming;
+import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.tabs.TimeSpanTab;
 import com.asofterspace.accountant.timespans.Month;
@@ -169,6 +171,7 @@ public class AddEntryGUI {
 		category.setEditable(false);
 		curPanel.add(category, new Arrangement(1, 0, 1.0, 1.0));
 		dialog.add(curPanel);
+		refreshCustomers();
 
 		curPanel = new JPanel();
 		curPanel.setLayout(new GridBagLayout());
@@ -281,6 +284,37 @@ public class AddEntryGUI {
 		int height = 400;
 		dialog.setSize(width, height);
 		dialog.setPreferredSize(new Dimension(width, height));
+
+		if (editingEntry != null) {
+			dateText.setText(editingEntry.getDateAsText());
+			titleText.setText(editingEntry.getTitle());
+			if (editingEntry instanceof Incoming) {
+				String searchFor = ((Incoming) editingEntry).getCategoryAsText();
+				for (int i = 0; i < category.getItemCount(); i++) {
+					if (category.getItemAt(i).equals(searchFor)) {
+						category.setSelectedIndex(i);
+					}
+				}
+				isOutgoing.setSelected(false);
+				isIncoming.setSelected(true);
+			} else {
+				String searchFor = ((Outgoing) editingEntry).getCustomer();
+				for (int i = 0; i < customer.getItemCount(); i++) {
+					if (customer.getItemAt(i).equals(searchFor)) {
+						customer.setSelectedIndex(i);
+					}
+				}
+				isIncoming.setSelected(false);
+				isOutgoing.setSelected(true);
+			}
+			amount.setText(editingEntry.getAmountAsText());
+			taxPerc.setText(editingEntry.getTaxPercentAsText());
+			for (int i = 0; i < originator.getItemCount(); i++) {
+				if (originator.getItemAt(i).equals(editingEntry.getOriginator())) {
+					originator.setSelectedIndex(i);
+				}
+			}
+		}
 
 		return dialog;
 	}
