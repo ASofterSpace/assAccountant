@@ -7,8 +7,12 @@ package com.asofterspace.accountant.entries;
 import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.AddEntryGUI;
 import com.asofterspace.accountant.AddPaidGUI;
+import com.asofterspace.accountant.ConsistencyProblem;
+import com.asofterspace.accountant.ConsistencyWarning;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
+import com.asofterspace.accountant.PaymentProblem;
+import com.asofterspace.accountant.Problem;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
@@ -22,6 +26,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.GridBagLayout;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -346,11 +351,87 @@ public abstract class Entry {
 
 		CopyByClickLabel result = new CopyByClickLabel(text);
 
+		result.setForeground(new Color(0, 0, 0));
 		if (received) {
 			result.setForeground(new Color(0, 156, 0));
 		}
 
+		List<Problem> problems = new ArrayList<>();
+
+		reportProblemsTo(problems);
+
+		for (Problem problem : problems) {
+			if (problem.isImportant()) {
+				// set red and break such that we do not overwrite with yellow for warning later!
+				result.setForeground(new Color(196, 0, 0));
+				break;
+			} else {
+				result.setForeground(new Color(148, 148, 0));
+			}
+		}
+
 		return result;
+	}
+
+	public void reportProblemsTo(List<Problem> result) {
+
+		Database database = parent.getDatabase();
+
+		if (this instanceof Incoming) {
+			if (((Incoming) this).getCategory() != database.mapTitleToCategory(getTitle())) {
+				result.add(new ConsistencyProblem(
+					"For " + AccountingUtils.getEntryForLog(this) + ", the selected category (" +
+					((Incoming) this).getCategory().getText() + ") differs from the automatically detected one (" +
+					database.mapTitleToCategory(this.getTitle()).getText() + ").",
+					this));
+			}
+		}
+
+		if (this instanceof Outgoing) {
+			if (!getReceived()) {
+				Date sixWeeksAgo = DateUtils.daysInTheFuture(-6*7);
+				if (getDate().before(sixWeeksAgo)) {
+					result.add(new PaymentProblem(
+						"The " + AccountingUtils.getEntryForLog(this) + " has not yet been paid!",
+						this));
+				}
+			}
+		}
+
+		if (getDate() == null) {
+			result.add(new ConsistencyProblem(
+				"For " + AccountingUtils.getEntryForLog(this) + ", no date has been selected.",
+				this));
+		} else {
+			Month correctMonth = database.getMonthFromEntryDate(getDate());
+			Month selectedMonth = getParent();
+			if (!correctMonth.equals(selectedMonth)) {
+				result.add(new ConsistencyProblem(
+					AccountingUtils.getEntryForLog(this) + " has been filed in " + selectedMonth +
+					" but actually belongs to " + correctMonth + ".",
+					this));
+			}
+		}
+
+		if (getTaxPercent() == null) {
+			result.add(new ConsistencyProblem(
+				"For " + AccountingUtils.getEntryForLog(this) + ", no tax amount has been selected.",
+				this));
+		} else {
+			boolean okay = false;
+			switch (getTaxPercent()) {
+				case 0:
+				case 7:
+				case 19:
+					okay = true;
+			}
+			if (!okay) {
+				result.add(new ConsistencyWarning(
+					"For " + AccountingUtils.getEntryForLog(this) + ", an unusual tax of " +
+					getTaxPercent() + "% has been selected.",
+					this));
+			}
+		}
 	}
 
 	@Override

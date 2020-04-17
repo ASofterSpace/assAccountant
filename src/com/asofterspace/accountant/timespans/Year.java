@@ -4,6 +4,7 @@
  */
 package com.asofterspace.accountant.timespans;
 
+import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.world.Category;
@@ -28,11 +29,13 @@ public class Year extends TimeSpan {
 
 	private List<Month> months;
 
+	private Database database;
+
 
 	/**
 	 * Create a new year
 	 */
-	public Year(int yearNum) {
+	public Year(int yearNum, Database database) {
 
 		this.yearNum = yearNum;
 
@@ -41,12 +44,14 @@ public class Year extends TimeSpan {
 		for (int i = 0; i < 12; i++) {
 			this.months.add(new Month(i, this));
 		}
+
+		this.database = database;
 	}
 
 	/**
 	 * Load a year from a generic record
 	 */
-	public Year(Record yearRecord) {
+	public Year(Record yearRecord, Database database) {
 
 		this.yearNum = yearRecord.getInteger(YEAR_NUM_KEY);
 
@@ -55,6 +60,8 @@ public class Year extends TimeSpan {
 		for (Record monthRec : yearRecord.getArray(MONTHS_KEY)) {
 			months.add(new Month(monthRec, this));
 		}
+
+		this.database = database;
 	}
 
 	@Override
@@ -255,6 +262,10 @@ public class Year extends TimeSpan {
 		curTaxAmount = taxAmount;
 		result = result + ((45*(curTaxAmount-26532600))/100)+(10265602/100);
 		return (long) result;
+	}
+
+	public Database getDatabase() {
+		return database;
 	}
 
 	@Override

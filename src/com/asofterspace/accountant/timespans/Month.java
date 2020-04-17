@@ -5,6 +5,7 @@
 package com.asofterspace.accountant.timespans;
 
 import com.asofterspace.accountant.AccountingUtils;
+import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
@@ -325,6 +326,10 @@ public class Month extends TimeSpan {
 			result += cur.getPostTaxAmount();
 		}
 		return result;
+	}
+
+	public Database getDatabase() {
+		return year.getDatabase();
 	}
 
 	@Override

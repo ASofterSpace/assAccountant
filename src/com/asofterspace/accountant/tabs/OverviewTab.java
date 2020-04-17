@@ -5,19 +5,24 @@
 package com.asofterspace.accountant.tabs;
 
 import com.asofterspace.accountant.AccountingUtils;
+import com.asofterspace.accountant.AddEntryGUI;
+import com.asofterspace.accountant.AddPaidGUI;
+import com.asofterspace.accountant.ConsistencyProblem;
 import com.asofterspace.accountant.Database;
-import com.asofterspace.accountant.entries.Outgoing;
+import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.GUI;
+import com.asofterspace.accountant.PaymentProblem;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
-import com.asofterspace.toolbox.utils.DateUtils;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.GridBagLayout;
-import java.util.Date;
 import java.util.List;
 
+import javax.swing.JButton;
 import javax.swing.JPanel;
 
 
@@ -32,13 +37,15 @@ public class OverviewTab extends Tab {
 	}
 
 	@Override
-	public void createTabOnGUI(JPanel parentPanel, Database database) {
+	public void createTabOnGUI(final JPanel parentPanel, final Database database) {
 
 		if (tab != null) {
 			destroyTabOnGUI(parentPanel);
 		}
 
 		int i = 0;
+
+		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
 
 		tab = new JPanel();
 		tab.setLayout(new GridBagLayout());
@@ -61,24 +68,55 @@ public class OverviewTab extends Tab {
 
 		// display outgoing invoices which have been sent out more than six weeks ago and not yet
 		// been set to having come in
-		List<Outgoing> outgoings = database.getOutgoings();
-		boolean foundProblem = false;
-		Date sixWeeksAgo = DateUtils.daysInTheFuture(-6*7);
+		List<PaymentProblem> paymentProblems = database.getPaymentProblems();
+		for (final PaymentProblem curProblem : paymentProblems) {
 
-		for (Outgoing outgoing : outgoings) {
-			if (!outgoing.getReceived()) {
-				if (outgoing.getDate().before(sixWeeksAgo)) {
-					foundProblem = true;
-					curLabel = new CopyByClickLabel("The " + AccountingUtils.getEntryForLog(outgoing) + " has not yet been paid!");
-					tab.add(curLabel, new Arrangement(0, i, 1.0, 0.0));
-					curLabel.setForeground(new Color(196, 0, 0));
-					i++;
-					// TODO add paid and show buttons
-				}
+			JPanel curPanel = new JPanel();
+			curPanel.setLayout(new GridBagLayout());
+
+			curLabel = new CopyByClickLabel(curProblem.getProblem());
+			if (curProblem.isImportant()) {
+				curLabel.setForeground(new Color(196, 0, 0));
+			} else {
+				curLabel.setForeground(new Color(148, 148, 0));
 			}
-		}
+			curLabel.setPreferredSize(defaultDimension);
+			curPanel.add(curLabel, new Arrangement(0, 0, 0.8, 1.0));
 
-		if (!foundProblem) {
+			JButton curButton = new JButton("Paid");
+			curButton.setPreferredSize(defaultDimension);
+			curPanel.add(curButton, new Arrangement(1, 0, 0.1, 1.0));
+			curButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					AddPaidGUI addPaidGUI = new AddPaidGUI(database.getGUI(), database, curProblem.getEntry());
+					addPaidGUI.show();
+				}
+			});
+
+			curLabel = new CopyByClickLabel("");
+			curLabel.setPreferredSize(defaultDimension);
+			curPanel.add(curLabel, new Arrangement(2, 0, 0.0, 1.0));
+
+			curButton = new JButton("Show");
+			curButton.setPreferredSize(defaultDimension);
+			curPanel.add(curButton, new Arrangement(3, 0, 0.1, 1.0));
+			curButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					database.getGUI().showMonthTabForEntry(curProblem.getEntry());
+				}
+			});
+
+			curLabel = new CopyByClickLabel("");
+			curLabel.setPreferredSize(defaultDimension);
+			curPanel.add(curLabel, new Arrangement(4, 0, 0.0, 1.0));
+
+			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+			i++;
+		}
+		// for-else:
+		if (paymentProblems.size() < 1) {
 			curLabel = new CopyByClickLabel("No problems have been found!");
 			tab.add(curLabel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
@@ -94,12 +132,52 @@ public class OverviewTab extends Tab {
 		tab.add(consistencyChecksLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		List<String> consistencyProblems = database.getConsistencyProblems();
-		for (String curProblem : consistencyProblems) {
-			curLabel = new CopyByClickLabel(curProblem);
-			tab.add(curLabel, new Arrangement(0, i, 1.0, 0.0));
+		List<ConsistencyProblem> consistencyProblems = database.getConsistencyProblems();
+		for (final ConsistencyProblem curProblem : consistencyProblems) {
+
+			JPanel curPanel = new JPanel();
+			curPanel.setLayout(new GridBagLayout());
+
+			curLabel = new CopyByClickLabel(curProblem.getProblem());
+			if (curProblem.isImportant()) {
+				curLabel.setForeground(new Color(196, 0, 0));
+			} else {
+				curLabel.setForeground(new Color(148, 148, 0));
+			}
+			curLabel.setPreferredSize(defaultDimension);
+			curPanel.add(curLabel, new Arrangement(0, 0, 0.8, 1.0));
+
+			JButton curButton = new JButton("Edit");
+			curButton.setPreferredSize(defaultDimension);
+			curPanel.add(curButton, new Arrangement(1, 0, 0.1, 1.0));
+			curButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					AddEntryGUI addEntryGUI = new AddEntryGUI(database.getGUI(), database, curProblem.getEntry());
+					addEntryGUI.show();
+				}
+			});
+
+			curLabel = new CopyByClickLabel("");
+			curLabel.setPreferredSize(defaultDimension);
+			curPanel.add(curLabel, new Arrangement(2, 0, 0.0, 1.0));
+
+			curButton = new JButton("Show");
+			curButton.setPreferredSize(defaultDimension);
+			curPanel.add(curButton, new Arrangement(3, 0, 0.1, 1.0));
+			curButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					database.getGUI().showMonthTabForEntry(curProblem.getEntry());
+				}
+			});
+
+			curLabel = new CopyByClickLabel("");
+			curLabel.setPreferredSize(defaultDimension);
+			curPanel.add(curLabel, new Arrangement(4, 0, 0.0, 1.0));
+
+			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
-			// TODO add edit and show buttons
 		}
 		// for-else:
 		if (consistencyProblems.size() < 1) {

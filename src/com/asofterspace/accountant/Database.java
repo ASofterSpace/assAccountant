@@ -133,7 +133,7 @@ public class Database {
 		Record root = fileToLoad.getAllContents();
 		List<Record> yearRecs = root.getArray(YEARS_KEY);
 		for (Record yearRec : yearRecs) {
-			Year curYear = new Year(yearRec);
+			Year curYear = new Year(yearRec, this);
 			years.add(curYear);
 		}
 		return root;
@@ -199,7 +199,7 @@ public class Database {
 				return false;
 			}
 		}
-		years.add(new Year(yearNum));
+		years.add(new Year(yearNum, this));
 		save();
 		return true;
 	}
@@ -410,42 +410,37 @@ public class Database {
 		return result;
 	}
 
-	public List<String> getConsistencyProblems() {
+	public List<Problem> getProblems() {
 
-		List<String> result = new ArrayList<>();
+		List<Problem> result = new ArrayList<>();
 
-		for (Incoming incoming : getIncomings()) {
-			if (incoming.getCategory() != mapTitleToCategory(incoming.getTitle())) {
-				result.add("For " + AccountingUtils.getEntryForLog(incoming) + ", the selected category (" +
-					incoming.getCategory().getText() + ") differs from the automatically detected one (" +
-					mapTitleToCategory(incoming.getTitle()).getText() + ").");
+		for (Entry entry : getEntries()) {
+			entry.reportProblemsTo(result);
+		}
+
+		return result;
+	}
+
+	public List<PaymentProblem> getPaymentProblems() {
+
+		List<PaymentProblem> result = new ArrayList<>();
+
+		for (Problem problem : getProblems()) {
+			if (problem instanceof PaymentProblem) {
+				result.add((PaymentProblem) problem);
 			}
 		}
 
-		for (Entry entry : getEntries()) {
+		return result;
+	}
 
-			if (entry.getDate() == null) {
-				result.add("For " + AccountingUtils.getEntryForLog(entry) + ", no date has been selected.");
-			} else {
-				Month correctMonth = getMonthFromEntryDate(entry.getDate());
-				Month selectedMonth = entry.getParent();
-				if (!correctMonth.equals(selectedMonth)) {
-					result.add(AccountingUtils.getEntryForLog(entry) + " has been filed in " + selectedMonth +
-						" but actually belongs to " + correctMonth + ".");
-				}
-			}
+	public List<ConsistencyProblem> getConsistencyProblems() {
 
-			if (entry.getTaxPercent() == null) {
-				result.add("For " + AccountingUtils.getEntryForLog(entry) + ", no tax amount has been selected.");
-			} else {
-				switch (entry.getTaxPercent()) {
-					case 0:
-					case 7:
-					case 19:
-						continue;
-				}
-				result.add("For " + AccountingUtils.getEntryForLog(entry) + ", an unusual tax of " +
-					entry.getTaxPercent() + "% has been selected.");
+		List<ConsistencyProblem> result = new ArrayList<>();
+
+		for (Problem problem : getProblems()) {
+			if (problem instanceof ConsistencyProblem) {
+				result.add((ConsistencyProblem) problem);
 			}
 		}
 

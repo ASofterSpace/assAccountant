@@ -7,7 +7,6 @@ package com.asofterspace.accountant;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.GUI;
-import com.asofterspace.accountant.tabs.TimeSpanTab;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
@@ -172,14 +171,7 @@ public class AddPaidGUI {
 
 			database.save();
 
-			Date date = editingEntry.getDate();
-			if (date != null) {
-				Month month = database.getMonthFromEntryDate(date);
-				TimeSpanTab curTab = mainGUI.getTabForTimeSpan(month);
-				if (curTab != null) {
-					mainGUI.showTabAndHighlightInTree(curTab);
-				}
-			}
+			mainGUI.showMonthTabForEntry(editingEntry);
 
 			refreshAccounts();
 

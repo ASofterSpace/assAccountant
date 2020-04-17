@@ -4,6 +4,7 @@
  */
 package com.asofterspace.accountant;
 
+import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.tabs.MonthTab;
@@ -38,6 +39,7 @@ import java.awt.GridBagLayout;
 import java.awt.Point;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.AbstractButton;
@@ -151,8 +153,13 @@ public class GUI extends MainWindow {
 					}
 				});
 
-				highlightTabInLeftListOrTree(tabCtrl.getOverviewTab());
-				showTab(tabCtrl.getOverviewTab());
+				// invoke later AGAIN, such that we can react to the correct sizes being reported
+				SwingUtilities.invokeLater(new Runnable() {
+					public void run() {
+						highlightTabInLeftListOrTree(tabCtrl.getOverviewTab());
+						showTab(tabCtrl.getOverviewTab());
+					}
+				});
 			}
 		});
 
@@ -673,6 +680,17 @@ public class GUI extends MainWindow {
 	public static Dimension getDefaultDimensionForInvoiceLine() {
 		int defaultSize = 20;
 		return new Dimension(defaultSize, defaultSize);
+	}
+
+	public void showMonthTabForEntry(Entry entry) {
+		Date date = entry.getDate();
+		if (date != null) {
+			Month month = database.getMonthFromEntryDate(date);
+			TimeSpanTab curTab = getTabForTimeSpan(month);
+			if (curTab != null) {
+				showTabAndHighlightInTree(curTab);
+			}
+		}
 	}
 
 }
