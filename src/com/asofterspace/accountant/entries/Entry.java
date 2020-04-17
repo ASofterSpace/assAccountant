@@ -234,9 +234,19 @@ public abstract class Entry {
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(7, 0, 0.0, 1.0));
 
-		JButton curButton = new JButton("Edit");
+		JButton curButton = new JButton("Paid");
 		curButton.setPreferredSize(defaultDimension);
-		curPanel.add(curButton, new Arrangement(8, 0, 0.08, 1.0));
+		curPanel.add(curButton, new Arrangement(8, 0, 0.05, 1.0));
+		curButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				AccountingUtils.complain("Sorry, not implemented yet ^^");
+			}
+		});
+
+		curButton = new JButton("Edit");
+		curButton.setPreferredSize(defaultDimension);
+		curPanel.add(curButton, new Arrangement(9, 0, 0.05, 1.0));
 		curButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -245,13 +255,9 @@ public abstract class Entry {
 			}
 		});
 
-		curLabel = new CopyByClickLabel("");
-		curLabel.setPreferredSize(defaultDimension);
-		curPanel.add(curLabel, new Arrangement(9, 0, 0.0, 1.0));
-
 		curButton = new JButton("Delete");
 		curButton.setPreferredSize(defaultDimension);
-		curPanel.add(curButton, new Arrangement(10, 0, 0.08, 1.0));
+		curPanel.add(curButton, new Arrangement(10, 0, 0.06, 1.0));
 		curButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
