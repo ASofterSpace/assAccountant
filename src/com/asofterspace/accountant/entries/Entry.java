@@ -17,6 +17,7 @@ import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.Utils;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -265,35 +266,35 @@ public abstract class Entry {
 		JPanel curPanel = new JPanel();
 		curPanel.setLayout(new GridBagLayout());
 
-		CopyByClickLabel curLabel = new CopyByClickLabel(getDateAsText());
+		CopyByClickLabel curLabel = createLabel(getDateAsText());
 		curLabel.setHorizontalAlignment(CopyByClickLabel.CENTER);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.1, 1.0));
 
-		curLabel = new CopyByClickLabel(getTitle());
+		curLabel = createLabel(getTitle());
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(1, 0, 0.3, 1.0));
 
-		curLabel = new CopyByClickLabel("[" + getCategoryOrCustomer() + "]");
+		curLabel = createLabel("[" + getCategoryOrCustomer() + "]");
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(2, 0, 0.11, 1.0));
 
-		curLabel = new CopyByClickLabel(getOriginator());
+		curLabel = createLabel(getOriginator());
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(3, 0, 0.05, 1.0));
 
-		curLabel = new CopyByClickLabel(getAmountAsText());
+		curLabel = createLabel(getAmountAsText());
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(4, 0, 0.1, 1.0));
 
-		curLabel = new CopyByClickLabel(getTaxPercentAsText());
+		curLabel = createLabel(getTaxPercentAsText());
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(5, 0, 0.1, 1.0));
 
-		curLabel = new CopyByClickLabel(getPostTaxAmountAsText());
+		curLabel = createLabel(getPostTaxAmountAsText());
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(6, 0, 0.1, 1.0));
@@ -339,6 +340,17 @@ public abstract class Entry {
 		curPanel.add(curLabel, new Arrangement(11, 0, 0.0, 1.0));
 
 		return curPanel;
+	}
+
+	private CopyByClickLabel createLabel(String text) {
+
+		CopyByClickLabel result = new CopyByClickLabel(text);
+
+		if (received) {
+			result.setForeground(new Color(0, 156, 0));
+		}
+
+		return result;
 	}
 
 	@Override

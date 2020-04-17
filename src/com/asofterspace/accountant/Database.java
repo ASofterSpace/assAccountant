@@ -156,7 +156,9 @@ public class Database {
 		for (Year year : years) {
 			for (Month month : year.getMonths()) {
 				for (Outgoing outgoing : month.getOutgoings()) {
-					result.add(outgoing.getCustomer());
+					if (outgoing.getCustomer() != null) {
+						result.add(outgoing.getCustomer());
+					}
 				}
 			}
 		}
@@ -168,7 +170,9 @@ public class Database {
 		for (Year year : years) {
 			for (Month month : year.getMonths()) {
 				for (Entry entry : month.getEntries()) {
-					result.add(entry.getOriginator());
+					if (entry.getOriginator() != null) {
+						result.add(entry.getOriginator());
+					}
 				}
 			}
 		}
@@ -180,7 +184,9 @@ public class Database {
 		for (Year year : years) {
 			for (Month month : year.getMonths()) {
 				for (Entry entry : month.getEntries()) {
-					result.add(entry.getReceivedOnAccount());
+					if (entry.getReceivedOnAccount() != null) {
+						result.add(entry.getReceivedOnAccount());
+					}
 				}
 			}
 		}

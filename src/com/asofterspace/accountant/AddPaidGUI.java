@@ -147,7 +147,11 @@ public class AddPaidGUI {
 				}
 			} else {
 				for (int i = 0; i < account.getItemCount(); i++) {
-					if (account.getItemAt(i).equals(searchFor)) {
+					Object obj = account.getItemAt(i);
+					if (obj == null) {
+						continue;
+					}
+					if (obj.equals(searchFor)) {
 						account.setSelectedIndex(i);
 					}
 				}
@@ -165,6 +169,8 @@ public class AddPaidGUI {
 	private void addPaidInfo(boolean exitOnSuccess) {
 
 		if (editingEntry.setPaidInfo(received.isSelected(), dateText.getText(), (String) account.getSelectedItem())) {
+
+			database.save();
 
 			Date date = editingEntry.getDate();
 			if (date != null) {
