@@ -269,6 +269,7 @@ public abstract class Entry {
 		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
 
 		JPanel curPanel = new JPanel();
+		curPanel.setBackground(GUI.getBackgroundColor());
 		curPanel.setLayout(new GridBagLayout());
 
 		CopyByClickLabel curLabel = createLabel(getDateAsText());

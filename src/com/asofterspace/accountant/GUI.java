@@ -25,6 +25,7 @@ import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
@@ -352,24 +353,29 @@ public class GUI extends MainWindow {
 	private JPanel createMainPanel(JFrame parent) {
 
 		JPanel mainPanel = new JPanel();
+		mainPanel.setBackground(GUI.getBackgroundColor());
 		mainPanel.setPreferredSize(new Dimension(800, 500));
 		GridBagLayout mainPanelLayout = new GridBagLayout();
 		mainPanel.setLayout(mainPanelLayout);
 
 		JPanel mainPanelRightOuter = new JPanel();
+		mainPanelRightOuter.setBackground(GUI.getBackgroundColor());
 		GridBagLayout mainPanelRightOuterLayout = new GridBagLayout();
 		mainPanelRightOuter.setLayout(mainPanelRightOuterLayout);
 
 		mainPanelRight = new JPanel();
+		mainPanelRight.setBackground(GUI.getBackgroundColor());
 		mainPanelRight.setPreferredSize(new Dimension(100, 100));
 
 		mainPanelRightScroller = new JScrollPane(mainPanelRight,
 			JScrollPane.VERTICAL_SCROLLBAR_ALWAYS,
 			JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		mainPanelRightScroller.setBackground(GUI.getBackgroundColor());
 		mainPanelRightScroller.setPreferredSize(new Dimension(8, 8));
 		mainPanelRightScroller.setBorder(BorderFactory.createEmptyBorder());
 
 		JPanel gapPanel = new JPanel();
+		gapPanel.setBackground(GUI.getBackgroundColor());
 		gapPanel.setPreferredSize(new Dimension(8, 8));
 
 		String[] tabList = new String[0];
@@ -427,10 +433,12 @@ public class GUI extends MainWindow {
 		tabListScroller.setBorder(BorderFactory.createEmptyBorder());
 
 		searchPanel = new JPanel();
+		searchPanel.setBackground(GUI.getBackgroundColor());
 		searchPanel.setLayout(new GridBagLayout());
 		searchPanel.setVisible(false);
 
 		searchField = new JTextField();
+		searchField.setBackground(GUI.getBackgroundColor());
 
 		// listen to text updates
 		searchField.getDocument().addDocumentListener(new DocumentListener() {
@@ -589,6 +597,7 @@ public class GUI extends MainWindow {
 			currentlyOpenedTab.createTabOnGUI(mainPanelRight, database);
 		} else {
 			emptyTab = new JPanel();
+			emptyTab.setBackground(GUI.getBackgroundColor());
 			mainPanelRight.add(emptyTab);
 		}
 
@@ -691,6 +700,10 @@ public class GUI extends MainWindow {
 				showTabAndHighlightInTree(curTab);
 			}
 		}
+	}
+
+	public static Color getBackgroundColor() {
+		return new Color(255, 255, 255);
 	}
 
 }

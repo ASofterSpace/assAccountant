@@ -59,6 +59,7 @@ public class AccountingUtils {
 		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
 
 		JPanel curPanel = new JPanel();
+		curPanel.setBackground(GUI.getBackgroundColor());
 		curPanel.setLayout(new GridBagLayout());
 
 		JLabel curLabel = new JLabel("");
@@ -124,6 +125,7 @@ public class AccountingUtils {
 		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
 
 		JPanel curPanel = new JPanel();
+		curPanel.setBackground(GUI.getBackgroundColor());
 		curPanel.setLayout(new GridBagLayout());
 
 		CopyByClickLabel curLabel = new CopyByClickLabel(text);
@@ -143,6 +145,7 @@ public class AccountingUtils {
 		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
 
 		JPanel curPanel = new JPanel();
+		curPanel.setBackground(GUI.getBackgroundColor());
 		curPanel.setLayout(new GridBagLayout());
 
 		CopyByClickLabel curLabel = new CopyByClickLabel(text1);

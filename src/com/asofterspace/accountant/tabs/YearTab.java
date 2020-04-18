@@ -39,9 +39,11 @@ public class YearTab extends TimeSpanTab {
 		int i = 0;
 
 		tab = new JPanel();
+		tab.setBackground(GUI.getBackgroundColor());
 		tab.setLayout(new GridBagLayout());
 
 		JPanel topHUD = new JPanel();
+		topHUD.setBackground(GUI.getBackgroundColor());
 		topHUD.setLayout(new GridBagLayout());
 
 		CopyByClickLabel nameLabel = AccountingUtils.createHeadLabel(year.toString() + " (yearly overview)");
@@ -58,6 +60,7 @@ public class YearTab extends TimeSpanTab {
 
 
 		JPanel footer = new JPanel();
+		footer.setBackground(GUI.getBackgroundColor());
 		tab.add(footer, new Arrangement(0, i, 1.0, 1.0));
 
 		Dimension newSize = new Dimension(parentPanel.getWidth(), tab.getMinimumSize().height + 100);

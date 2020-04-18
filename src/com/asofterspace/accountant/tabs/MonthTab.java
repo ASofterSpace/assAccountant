@@ -43,8 +43,10 @@ public class MonthTab extends TimeSpanTab {
 
 		tab = new JPanel();
 		tab.setLayout(new GridBagLayout());
+		tab.setBackground(GUI.getBackgroundColor());
 
 		JPanel topHUD = new JPanel();
+		topHUD.setBackground(GUI.getBackgroundColor());
 		topHUD.setLayout(new GridBagLayout());
 
 		CopyByClickLabel nameLabel = AccountingUtils.createHeadLabel(month.toString());
@@ -61,6 +63,7 @@ public class MonthTab extends TimeSpanTab {
 
 
 		JPanel footer = new JPanel();
+		footer.setBackground(GUI.getBackgroundColor());
 		tab.add(footer, new Arrangement(0, i, 1.0, 1.0));
 
 		Dimension newSize = new Dimension(parentPanel.getWidth(), tab.getMinimumSize().height + 300);

@@ -48,9 +48,11 @@ public class OverviewTab extends Tab {
 		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
 
 		tab = new JPanel();
+		tab.setBackground(GUI.getBackgroundColor());
 		tab.setLayout(new GridBagLayout());
 
 		JPanel topHUD = new JPanel();
+		topHUD.setBackground(GUI.getBackgroundColor());
 		topHUD.setLayout(new GridBagLayout());
 
 		CopyByClickLabel nameLabel = AccountingUtils.createHeadLabel(TITLE);
@@ -72,6 +74,7 @@ public class OverviewTab extends Tab {
 		for (final PaymentProblem curProblem : paymentProblems) {
 
 			JPanel curPanel = new JPanel();
+			curPanel.setBackground(GUI.getBackgroundColor());
 			curPanel.setLayout(new GridBagLayout());
 
 			curLabel = new CopyByClickLabel(curProblem.getProblem());
@@ -136,6 +139,7 @@ public class OverviewTab extends Tab {
 		for (final ConsistencyProblem curProblem : consistencyProblems) {
 
 			JPanel curPanel = new JPanel();
+			curPanel.setBackground(GUI.getBackgroundColor());
 			curPanel.setLayout(new GridBagLayout());
 
 			curLabel = new CopyByClickLabel(curProblem.getProblem());
@@ -188,6 +192,7 @@ public class OverviewTab extends Tab {
 
 
 		JPanel footer = new JPanel();
+		footer.setBackground(GUI.getBackgroundColor());
 		tab.add(footer, new Arrangement(0, i, 1.0, 1.0));
 		i++;
 
