@@ -64,6 +64,15 @@ public class OverviewTab extends Tab {
 		CopyByClickLabel curLabel;
 
 
+		CopyByClickLabel outstandingTasksLabel = AccountingUtils.createSubHeadLabel("Outstanding Tasks:");
+		tab.add(outstandingTasksLabel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		curLabel = new CopyByClickLabel("TODO!");
+		tab.add(curLabel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+
 		CopyByClickLabel unpaidInvoicesLabel = AccountingUtils.createSubHeadLabel("Unpaid Invoices:");
 		tab.add(unpaidInvoicesLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;

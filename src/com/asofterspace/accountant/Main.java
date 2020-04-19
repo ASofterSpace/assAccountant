@@ -22,6 +22,7 @@ public class Main {
 
 	private static Database database;
 	private static TabCtrl tabCtrl;
+	private static TaskCtrl taskCtrl;
 
 
 	/**
@@ -98,6 +99,7 @@ public class Main {
 		System.out.println("Database has been loaded; I am ready!");
 
 		tabCtrl = new TabCtrl(database);
+		taskCtrl = new TaskCtrl(database);
 
 		SwingUtilities.invokeLater(new GUI(database, tabCtrl, config));
 	}

@@ -38,6 +38,7 @@ public class Database {
 	private static int BACKUP_MAX = 64;
 
 	private GUI gui;
+	private TaskCtrl taskCtrl;
 
 	private ConfigFile settingsFile;
 
@@ -47,6 +48,7 @@ public class Database {
 
 	private ConfigFile dbFile;
 
+	private Record loadedRoot;
 	private List<Year> years;
 
 	// the following two fields are used for storing information used during legacy bulk imports only
@@ -61,7 +63,7 @@ public class Database {
 
 		this.dbFile = new ConfigFile("database", true);
 
-		loadFromFile(dbFile);
+		this.loadedRoot = loadFromFile(dbFile);
 
 		potentialCustomers = new ArrayList<>();
 		potentialCustomers.add("TPZ-Vega");
@@ -145,6 +147,10 @@ public class Database {
 
 	public GUI getGUI() {
 		return gui;
+	}
+
+	public void setTaskCtrl(TaskCtrl taskCtrl) {
+		this.taskCtrl = taskCtrl;
 	}
 
 	public List<Year> getYears() {
@@ -455,6 +461,10 @@ public class Database {
 		return result;
 	}
 
+	public Record getLoadedRoot() {
+		return loadedRoot;
+	}
+
 	public void drop() {
 
 		gui.showTab(null);
@@ -473,6 +483,8 @@ public class Database {
 		for (Year year : years) {
 			yearRec.append(year.toRecord());
 		}
+
+		taskCtrl.saveIntoRecord(root);
 
 		dbFile.setAllContents(root);
 
