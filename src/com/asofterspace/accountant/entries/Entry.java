@@ -264,49 +264,86 @@ public abstract class Entry {
 	 */
 	public abstract void deleteFrom(Database database);
 
+	private Color getTextColor() {
+
+		Color result = new Color(0, 0, 0);
+		if (getReceived()) {
+			result = new Color(0, 156, 0);
+		}
+
+		List<Problem> problems = new ArrayList<>();
+
+		reportProblemsTo(problems);
+
+		for (Problem problem : problems) {
+			if (problem.isImportant()) {
+				// set red and break such that we do not overwrite with yellow for warning later!
+				result = new Color(196, 0, 0);
+				break;
+			} else {
+				result = new Color(148, 148, 0);
+			}
+		}
+
+		return result;
+	}
+
 	public JPanel createPanelOnGUI(Database database) {
 
 		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
+		Color textColor = getTextColor();
 
 		JPanel curPanel = new JPanel();
 		curPanel.setBackground(GUI.getBackgroundColor());
 		curPanel.setLayout(new GridBagLayout());
 
-		CopyByClickLabel curLabel = createLabel(getDateAsText());
+		CopyByClickLabel curLabel = createLabel(getDateAsText(), textColor);
 		curLabel.setHorizontalAlignment(CopyByClickLabel.CENTER);
-		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.1, 1.0));
 
-		curLabel = createLabel(getTitle());
-		curLabel.setPreferredSize(defaultDimension);
+		/*
+		// This could be used to generate multi-line text, by default showing the paid on date:
+
+		if (getReceived()) {
+			curLabel = createLabel("<html>" + getTitle() + "<br>" +
+				"&nbsp;&nbsp;&nbsp;Paid on " + DateUtils.serializeDate(getReceivedOnDate()) + " to " + getReceivedOnAccount() + "</html>",
+				textColor);
+			curLabel.setPreferredSize(new Dimension((int) defaultDimension.getWidth(), 32));
+		} else {
+			curLabel = createLabel(getTitle(), textColor);
+		}
+		curPanel.add(curLabel, new Arrangement(1, 0, 0.3, 1.0));
+		*/
+
+		// Buuut actually that gets quite confusing, so instead we just add a tooltip:
+		curLabel = createLabel(getTitle(), textColor);
+		if (getReceived()) {
+			curLabel.setToolTipText("Paid on " + DateUtils.serializeDate(getReceivedOnDate()) + " to " + getReceivedOnAccount());
+		} else {
+			curLabel.setToolTipText("Not yet paid!");
+		}
 		curPanel.add(curLabel, new Arrangement(1, 0, 0.3, 1.0));
 
-		curLabel = createLabel("[" + getCategoryOrCustomer() + "]");
-		curLabel.setPreferredSize(defaultDimension);
+		curLabel = createLabel("[" + getCategoryOrCustomer() + "]", textColor);
 		curPanel.add(curLabel, new Arrangement(2, 0, 0.11, 1.0));
 
-		curLabel = createLabel(getOriginator());
+		curLabel = createLabel(getOriginator(), textColor);
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
-		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(3, 0, 0.05, 1.0));
 
-		curLabel = createLabel(getAmountAsText());
+		curLabel = createLabel(getAmountAsText(), textColor);
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
-		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(4, 0, 0.1, 1.0));
 
-		curLabel = createLabel(getTaxPercentAsText());
+		curLabel = createLabel(getTaxPercentAsText(), textColor);
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
-		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(5, 0, 0.1, 1.0));
 
-		curLabel = createLabel(getPostTaxAmountAsText());
+		curLabel = createLabel(getPostTaxAmountAsText(), textColor);
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
-		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(6, 0, 0.1, 1.0));
 
-		curLabel = new CopyByClickLabel("");
-		curLabel.setPreferredSize(defaultDimension);
+		curLabel = createLabel("", textColor);
 		curPanel.add(curLabel, new Arrangement(7, 0, 0.0, 1.0));
 
 		JButton curButton = new JButton("Paid");
@@ -341,35 +378,20 @@ public abstract class Entry {
 			}
 		});
 
-		curLabel = new CopyByClickLabel("");
-		curLabel.setPreferredSize(defaultDimension);
+		curLabel = createLabel("", textColor);
 		curPanel.add(curLabel, new Arrangement(11, 0, 0.0, 1.0));
 
 		return curPanel;
 	}
 
-	private CopyByClickLabel createLabel(String text) {
+	private CopyByClickLabel createLabel(String text, Color color) {
 
 		CopyByClickLabel result = new CopyByClickLabel(text);
 
-		result.setForeground(new Color(0, 0, 0));
-		if (received) {
-			result.setForeground(new Color(0, 156, 0));
-		}
+		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
+		result.setPreferredSize(defaultDimension);
 
-		List<Problem> problems = new ArrayList<>();
-
-		reportProblemsTo(problems);
-
-		for (Problem problem : problems) {
-			if (problem.isImportant()) {
-				// set red and break such that we do not overwrite with yellow for warning later!
-				result.setForeground(new Color(196, 0, 0));
-				break;
-			} else {
-				result.setForeground(new Color(148, 148, 0));
-			}
-		}
+		result.setForeground(color);
 
 		return result;
 	}
