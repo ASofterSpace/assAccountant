@@ -60,17 +60,21 @@ public class FinanceLogTab extends Tab {
 
 
 		List<FinanceLogEntry> entries = database.getTaskCtrl().getFinanceLogs();
+		boolean foundEntry = false;
 		for (FinanceLogEntry entry : entries) {
-			curPanel = entry.createPanelOnGUI(database);
-			curPanel.setBackground(GUI.getBackgroundColor());
-			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
-			i++;
+			if (entry.getRows().size() > 0) {
+				curPanel = entry.createPanelOnGUI(database);
+				curPanel.setBackground(GUI.getBackgroundColor());
+				tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+				i++;
 
-			Dimension newSize = new Dimension(parentPanel.getWidth(), curPanel.getMinimumSize().height);
-			curPanel.setPreferredSize(newSize);
+				Dimension newSize = new Dimension(parentPanel.getWidth(), curPanel.getMinimumSize().height);
+				curPanel.setPreferredSize(newSize);
+				foundEntry = true;
+			}
 		}
 		// for-else:
-		if (entries.size() < 1) {
+		if (!foundEntry) {
 			curLabel = new CopyByClickLabel("No finance logs have been found!");
 			tab.add(curLabel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
