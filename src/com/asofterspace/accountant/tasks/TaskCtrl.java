@@ -260,6 +260,20 @@ public class TaskCtrl {
 		return financeLogs;
 	}
 
+	public void removeFinanceLogForDate(Date removeForDate) {
+		List<FinanceLogEntry> newLogs = new ArrayList<>();
+		for (FinanceLogEntry log : financeLogs) {
+			if (!DateUtils.isSameDay(log.getDate(), removeForDate)) {
+				newLogs.add(log);
+			}
+		}
+		this.financeLogs = newLogs;
+	}
+
+	public void addFinanceLogEntry(FinanceLogEntry newEntry) {
+		this.financeLogs.add(newEntry);
+	}
+
 	public void deleteTaskInstance(Task task) {
 		for (int i = taskInstances.size() - 1; i >= 0; i--) {
 			if (taskInstances.get(i).equals(task)) {

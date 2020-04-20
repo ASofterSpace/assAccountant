@@ -79,9 +79,7 @@ public class FinanceLogTab extends Tab {
 		tab.add(footer, new Arrangement(0, i, 1.0, 1.0));
 		i++;
 
-		Dimension newSize = new Dimension(parentPanel.getWidth(), tab.getMinimumSize().height + 100);
-		tab.setPreferredSize(newSize);
-		parentPanel.setPreferredSize(newSize);
+		AccountingUtils.resetTabSize(tab, parentPanel);
 
 		parentPanel.add(tab);
 	}

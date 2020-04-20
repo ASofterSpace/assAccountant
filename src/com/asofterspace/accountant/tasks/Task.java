@@ -5,9 +5,11 @@
 package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.entries.Outgoing;
+import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.utils.DateUtils;
+import com.asofterspace.toolbox.utils.StrUtils;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -231,7 +233,7 @@ public class Task {
 		this.doneLog = doneLog;
 	}
 
-	public JPanel createPanelOnGUI(Database database, JPanel parentPanel, JPanel tab) {
+	public JPanel createPanelOnGUI(Database database, JPanel tab, JPanel parentPanel) {
 
 		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
 		Color textColor = new Color(0, 0, 0);
@@ -256,8 +258,12 @@ public class Task {
 		final List<JComponent> addedLines = new ArrayList<>();
 		final JButton detailsButton = new JButton("Show Details");
 		if ((details == null) || (details.size() < 1)) {
-			detailsButton.setText("No Details");
-			detailsButton.setEnabled(false);
+			detailsButton.setText("Add Details");
+			// actually keep the details button enabled in case the user want to add a log
+			// detailsButton.setEnabled(false);
+		}
+		if (done) {
+			detailsButton.setText("Show Details");
 		}
 		detailsButton.setPreferredSize(defaultDimension);
 		curPanel.add(detailsButton, new Arrangement(3, 0, 0.1, 1.0));
@@ -268,10 +274,27 @@ public class Task {
 			taskLog.setText(doneLog);
 		}
 
+		final JTextPane finLog = new JTextPane();
+		finLog.setPreferredSize(new Dimension(128, 128));
+		if (done && (doneDate != null)) {
+			StringBuilder finLogText = new StringBuilder();
+			List<FinanceLogEntry> entries = taskCtrl.getFinanceLogs();
+			for (FinanceLogEntry entry : entries) {
+				if (DateUtils.isSameDay(entry.getDate(), doneDate)) {
+					for (FinanceLogEntryRow row : entry.getRows()) {
+						finLogText.append(row.getAccount());
+						finLogText.append(": ");
+						finLogText.append(AccountingUtils.formatMoney(row.getAmount(), Currency.EUR));
+					}
+				}
+			}
+			finLog.setText(finLogText.toString());
+		}
+
 		detailsButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (detailsButton.getText().startsWith("Show")) {
+				if (!detailsButton.getText().startsWith("Hide")) {
 					detailsButton.setText("Hide Details");
 
 					int i = 1;
@@ -295,6 +318,23 @@ public class Task {
 						}
 					}
 
+					if (Task.this instanceof FinanceOverviewTask) {
+						CopyByClickLabel curLabel = createLabel("", textColor, "");
+						containerPanel.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
+						addedLines.add(curLabel);
+						i++;
+
+						curLabel = createLabel("Finance Log - on each line put an Account: Amount, " +
+							"so e.g. Iron Bank: 3.14 €:", textColor, "");
+						containerPanel.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
+						addedLines.add(curLabel);
+						i++;
+
+						containerPanel.add(finLog, new Arrangement(0, i, 1.0, 1.0));
+						addedLines.add(finLog);
+						i++;
+					}
+
 					CopyByClickLabel curLabel = createLabel("", textColor, "");
 					containerPanel.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
 					addedLines.add(curLabel);
@@ -313,7 +353,14 @@ public class Task {
 					containerPanel.setBorder(BorderFactory.createEtchedBorder());
 
 				} else {
-					detailsButton.setText("Show Details");
+					if ((details == null) || (details.size() < 1)) {
+						detailsButton.setText("Add Details");
+					} else {
+						detailsButton.setText("Show Details");
+					}
+					if (Task.this.done) {
+						detailsButton.setText("Show Details");
+					}
 
 					// hide the detail lines again
 					for (JComponent line : addedLines) {
@@ -326,22 +373,41 @@ public class Task {
 					containerPanel.setBorder(BorderFactory.createEmptyBorder());
 				}
 
-				Dimension newSize = new Dimension(parentPanel.getWidth(), tab.getMinimumSize().height + 100);
-				tab.setPreferredSize(newSize);
-				parentPanel.setPreferredSize(newSize);
+				AccountingUtils.resetTabSize(tab, parentPanel);
 			}
 		});
 
 		JButton curButton = new JButton("Done");
+		if (done) {
+			curButton.setText("Save");
+		}
 		curButton.setPreferredSize(defaultDimension);
 		curPanel.add(curButton, new Arrangement(4, 0, 0.05, 1.0));
 		curButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Task.this.done = true;
-				setDoneDate(new Date());
+				if (Task.this.done) {
+					if (Task.this instanceof FinanceOverviewTask) {
+						taskCtrl.removeFinanceLogForDate(doneDate);
+					}
+				} else {
+					Task.this.done = true;
+					setDoneDate(new Date());
+					setDoneDate(DateUtils.parseDate(getReleasedDateStr())); // DEBUG
+				}
 				setDoneLog(taskLog.getText());
-				// setDoneDate(DateUtils.parseDate(getReleasedDateStr())); // DEBUG
+				if (Task.this instanceof FinanceOverviewTask) {
+					FinanceLogEntry entry = new FinanceLogEntry(doneDate);
+					String[] finLogLines = finLog.getText().split("\n");
+					for (String line : finLogLines) {
+						String[] lineSplit = line.split(":");
+						if (lineSplit.length > 1) {
+							Integer amount = StrUtils.parseMoney(lineSplit[1]);
+							entry.add(new FinanceLogEntryRow(lineSplit[0], amount));
+						}
+					}
+					taskCtrl.addFinanceLogEntry(entry);
+				}
 				taskCtrl.save();
 			}
 		});

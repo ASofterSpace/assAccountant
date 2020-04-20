@@ -442,4 +442,13 @@ public class AccountingUtils {
 		});
 	}
 
+	public static void resetTabSize(JPanel tab, JPanel parentPanel) {
+		int newHeight = parentPanel.getParent().getHeight();
+		if (tab.getMinimumSize().height + 100 > newHeight) {
+			newHeight = tab.getMinimumSize().height + 100;
+		}
+		Dimension newSize = new Dimension(parentPanel.getWidth(), newHeight);
+		tab.setPreferredSize(newSize);
+		parentPanel.setPreferredSize(newSize);
+	}
 }

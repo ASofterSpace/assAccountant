@@ -12,7 +12,6 @@ import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 
-import java.awt.Dimension;
 import java.awt.GridBagLayout;
 
 import javax.swing.JPanel;
@@ -63,9 +62,7 @@ public class YearTab extends TimeSpanTab {
 		footer.setBackground(GUI.getBackgroundColor());
 		tab.add(footer, new Arrangement(0, i, 1.0, 1.0));
 
-		Dimension newSize = new Dimension(parentPanel.getWidth(), tab.getMinimumSize().height + 100);
-		tab.setPreferredSize(newSize);
-		parentPanel.setPreferredSize(newSize);
+		AccountingUtils.resetTabSize(tab, parentPanel);
 
 		parentPanel.add(tab);
 	}

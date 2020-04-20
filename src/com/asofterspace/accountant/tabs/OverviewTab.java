@@ -75,7 +75,7 @@ public class OverviewTab extends Tab {
 		for (Task task : tasks) {
 			if (!task.hasBeenDone()) {
 				tasksShown = true;
-				curPanel = task.createPanelOnGUI(database, parentPanel, tab);
+				curPanel = task.createPanelOnGUI(database, tab, parentPanel);
 				curPanel.setBackground(GUI.getBackgroundColor());
 				tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 				i++;
@@ -221,9 +221,7 @@ public class OverviewTab extends Tab {
 		tab.add(footer, new Arrangement(0, i, 1.0, 1.0));
 		i++;
 
-		Dimension newSize = new Dimension(parentPanel.getWidth(), tab.getMinimumSize().height + 100);
-		tab.setPreferredSize(newSize);
-		parentPanel.setPreferredSize(newSize);
+		AccountingUtils.resetTabSize(tab, parentPanel);
 
 		parentPanel.add(tab);
 	}
