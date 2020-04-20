@@ -243,6 +243,9 @@ public class OverviewTab extends Tab {
 		if (tab instanceof OverviewTab) {
 			return 0;
 		}
+		if (tab instanceof TaskLogTab) {
+			return -1;
+		}
 		return -1;
 	}
 

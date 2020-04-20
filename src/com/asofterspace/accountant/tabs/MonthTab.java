@@ -88,6 +88,9 @@ public class MonthTab extends TimeSpanTab {
 		if (tab instanceof OverviewTab) {
 			return 1;
 		}
+		if (tab instanceof TaskLogTab) {
+			return 1;
+		}
 		if (tab instanceof MonthTab) {
 			int result = ((MonthTab) tab).getYear().getNum() - getYear().getNum();
 			if (result == 0) {
