@@ -65,6 +65,7 @@ public class Database {
 
 		this.loadedRoot = loadFromFile(dbFile);
 
+		// only used during bulk import of legacy data
 		potentialCustomers = new ArrayList<>();
 		potentialCustomers.add("TPZ-Vega");
 		potentialCustomers.add("Recoded");

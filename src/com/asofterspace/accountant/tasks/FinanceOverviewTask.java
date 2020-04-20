@@ -15,4 +15,9 @@ public class FinanceOverviewTask extends Task {
 	public FinanceOverviewTask(String title, Integer scheduledOnDay, Integer scheduledInMonth, List<String> details) {
 		super(title, scheduledOnDay, scheduledInMonth, details);
 	}
+
+	@Override
+	public FinanceOverviewTask getNewInstance() {
+		return new FinanceOverviewTask(title, scheduledOnDay, scheduledInMonth, details);
+	}
 }

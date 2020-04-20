@@ -8,6 +8,7 @@ import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -45,9 +46,21 @@ public class TaskCtrl {
 
 	private List<FinanceLogEntry> financeLogs;
 
+	private Database database;
+
 
 	public TaskCtrl(Database database) {
+
+		this.database = database;
+
 		database.setTaskCtrl(this);
+
+		loadFromDatabase();
+
+		generateNewInstances();
+	}
+
+	private void loadFromDatabase() {
 
 		Record root = database.getLoadedRoot();
 
@@ -81,6 +94,34 @@ public class TaskCtrl {
 		}
 
 		this.lastTaskGeneration = DateUtils.parseDate(root.getString(LAST_TASK_GENERATION));
+	}
+
+	private void generateNewInstances() {
+
+		List<Date> daysToGenerate = DateUtils.listDaysFromTo(lastTaskGeneration, DateUtils.now());
+
+		// we ignore the very first day that is returned,
+		// as we already reported tasks for that one last time!
+		for (int i = 1; i < daysToGenerate.size(); i++) {
+
+			Date day = daysToGenerate.get(i);
+
+			for (Task task : tasks) {
+				if (task.isScheduledOn(day)) {
+					Task taskInstance = task.getNewInstance();
+					taskInstance.setDone(false);
+
+					Calendar cal = Calendar.getInstance();
+					cal.setTime(day);
+					taskInstance.setReleasedOnDay(cal.get(Calendar.DAY_OF_MONTH));
+					taskInstance.setReleasedInMonth(cal.get(Calendar.MONTH));
+					taskInstance.setReleasedInYear(cal.get(Calendar.YEAR));
+					taskInstances.add(taskInstance);
+				}
+			}
+
+			lastTaskGeneration = day;
+		}
 	}
 
 	private Task taskFromRecord(Record recordTask) {

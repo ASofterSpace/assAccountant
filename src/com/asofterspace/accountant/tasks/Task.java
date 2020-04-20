@@ -7,6 +7,8 @@ package com.asofterspace.accountant;
 import com.asofterspace.toolbox.utils.DateUtils;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
@@ -16,27 +18,27 @@ import java.util.List;
  */
 public class Task {
 
-	private String title;
+	protected String title;
 
 	// on which day of the month is this task scheduled?
-	private Integer scheduledOnDay;
+	protected Integer scheduledOnDay;
 
 	// in which month is this task scheduled?
-	private Integer scheduledInMonth;
+	protected Integer scheduledInMonth;
 
-	private List<String> details;
+	protected List<String> details;
 
 	// has this task already been done?
-	private Boolean done;
+	protected Boolean done;
 
 	// on which day of the month was this task actually created?
-	private Integer releasedOnDay;
+	protected Integer releasedOnDay;
 
 	// in which month was this task actually created?
-	private Integer releasedInMonth;
+	protected Integer releasedInMonth;
 
 	// in which year was this task actually released?
-	private Integer releasedInYear;
+	protected Integer releasedInYear;
 
 
 	public Task(String title, Integer scheduledOnDay, Integer scheduledInMonth, List<String> details) {
@@ -44,6 +46,29 @@ public class Task {
 		this.scheduledOnDay = scheduledOnDay;
 		this.scheduledInMonth = scheduledInMonth;
 		this.details = details;
+	}
+
+	public Task getNewInstance() {
+		return new Task(title, scheduledOnDay, scheduledInMonth, details);
+	}
+
+	public boolean isScheduledOn(Date date) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(date);
+
+		if (scheduledOnDay != null) {
+			if (!scheduledOnDay.equals(cal.get(Calendar.DAY_OF_MONTH))) {
+				return false;
+			}
+		}
+
+		if (scheduledInMonth != null) {
+			if (!scheduledInMonth.equals(cal.get(Calendar.MONTH))) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	public String getTitle() {
