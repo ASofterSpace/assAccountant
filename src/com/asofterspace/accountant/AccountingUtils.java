@@ -15,6 +15,7 @@ import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.Utils;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridBagLayout;
@@ -29,7 +30,11 @@ import javax.swing.JPanel;
 
 public class AccountingUtils {
 
-	public static String formatMoney(int amount, Currency currency) {
+	public static String formatMoney(Integer amount, Currency currency) {
+
+		if (amount == null) {
+			return "N/A";
+		}
 
 		String result = "" + amount;
 
@@ -351,6 +356,22 @@ public class AccountingUtils {
 		i++;
 
 		return i;
+	}
+
+	public static CopyByClickLabel createLabel(String text, Color color, String tooltip) {
+
+		CopyByClickLabel result = new CopyByClickLabel(text);
+
+		if (!"".equals(tooltip)) {
+			result.setToolTipText(tooltip);
+		}
+
+		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
+		result.setPreferredSize(defaultDimension);
+
+		result.setForeground(color);
+
+		return result;
 	}
 
 	public static CopyByClickLabel createHeadLabel(String text) {

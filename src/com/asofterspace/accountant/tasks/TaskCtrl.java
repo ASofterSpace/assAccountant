@@ -253,7 +253,7 @@ public class TaskCtrl {
 
 		Collections.sort(financeLogs, new Comparator<FinanceLogEntry>() {
 			public int compare(FinanceLogEntry a, FinanceLogEntry b) {
-				return a.getDate().compareTo(b.getDate());
+				return b.getDate().compareTo(a.getDate());
 			}
 		});
 

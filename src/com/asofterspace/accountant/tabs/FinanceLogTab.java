@@ -65,6 +65,9 @@ public class FinanceLogTab extends Tab {
 			curPanel.setBackground(GUI.getBackgroundColor());
 			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
+
+			Dimension newSize = new Dimension(parentPanel.getWidth(), curPanel.getMinimumSize().height);
+			curPanel.setPreferredSize(newSize);
 		}
 		// for-else:
 		if (entries.size() < 1) {

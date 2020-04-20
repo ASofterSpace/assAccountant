@@ -301,7 +301,7 @@ public abstract class Entry {
 		curPanel.setBackground(GUI.getBackgroundColor());
 		curPanel.setLayout(new GridBagLayout());
 
-		CopyByClickLabel curLabel = createLabel(getDateAsText(), textColor, tooltip);
+		CopyByClickLabel curLabel = AccountingUtils.createLabel(getDateAsText(), textColor, tooltip);
 		curLabel.setHorizontalAlignment(CopyByClickLabel.CENTER);
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.1, 1.0));
 
@@ -309,41 +309,41 @@ public abstract class Entry {
 		// This could be used to generate multi-line text, by default showing the paid on date:
 
 		if (getReceived()) {
-			curLabel = createLabel("<html>" + getTitle() + "<br>" +
+			curLabel = AccountingUtils.createLabel("<html>" + getTitle() + "<br>" +
 				"&nbsp;&nbsp;&nbsp;Paid on " + DateUtils.serializeDate(getReceivedOnDate()) + " to " + getReceivedOnAccount() + "</html>",
 				textColor,
 				tooltip);
 			curLabel.setPreferredSize(new Dimension((int) defaultDimension.getWidth(), 32));
 		} else {
-			curLabel = createLabel(getTitle(), textColor, tooltip);
+			curLabel = AccountingUtils.createLabel(getTitle(), textColor, tooltip);
 		}
 		curPanel.add(curLabel, new Arrangement(1, 0, 0.3, 1.0));
 		*/
 
 		// Buuut actually that gets quite confusing, so instead we just add a tooltip:
-		curLabel = createLabel(getTitle(), textColor, tooltip);
+		curLabel = AccountingUtils.createLabel(getTitle(), textColor, tooltip);
 		curPanel.add(curLabel, new Arrangement(1, 0, 0.3, 1.0));
 
-		curLabel = createLabel("[" + getCategoryOrCustomer() + "]", textColor, tooltip);
+		curLabel = AccountingUtils.createLabel("[" + getCategoryOrCustomer() + "]", textColor, tooltip);
 		curPanel.add(curLabel, new Arrangement(2, 0, 0.11, 1.0));
 
-		curLabel = createLabel(getOriginator(), textColor, tooltip);
+		curLabel = AccountingUtils.createLabel(getOriginator(), textColor, tooltip);
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curPanel.add(curLabel, new Arrangement(3, 0, 0.05, 1.0));
 
-		curLabel = createLabel(getAmountAsText(), textColor, tooltip);
+		curLabel = AccountingUtils.createLabel(getAmountAsText(), textColor, tooltip);
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curPanel.add(curLabel, new Arrangement(4, 0, 0.1, 1.0));
 
-		curLabel = createLabel(getTaxPercentAsText(), textColor, tooltip);
+		curLabel = AccountingUtils.createLabel(getTaxPercentAsText(), textColor, tooltip);
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curPanel.add(curLabel, new Arrangement(5, 0, 0.1, 1.0));
 
-		curLabel = createLabel(getPostTaxAmountAsText(), textColor, tooltip);
+		curLabel = AccountingUtils.createLabel(getPostTaxAmountAsText(), textColor, tooltip);
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curPanel.add(curLabel, new Arrangement(6, 0, 0.1, 1.0));
 
-		curLabel = createLabel("", textColor, tooltip);
+		curLabel = AccountingUtils.createLabel("", textColor, tooltip);
 		curPanel.add(curLabel, new Arrangement(7, 0, 0.0, 1.0));
 
 		JButton curButton = new JButton("Paid");
@@ -378,26 +378,10 @@ public abstract class Entry {
 			}
 		});
 
-		curLabel = createLabel("", textColor, tooltip);
+		curLabel = AccountingUtils.createLabel("", textColor, tooltip);
 		curPanel.add(curLabel, new Arrangement(11, 0, 0.0, 1.0));
 
 		return curPanel;
-	}
-
-	private CopyByClickLabel createLabel(String text, Color color, String tooltip) {
-
-		CopyByClickLabel result = new CopyByClickLabel(text);
-
-		if (!"".equals(tooltip)) {
-			result.setToolTipText(tooltip);
-		}
-
-		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
-		result.setPreferredSize(defaultDimension);
-
-		result.setForeground(color);
-
-		return result;
 	}
 
 	public void reportProblemsTo(List<Problem> result) {

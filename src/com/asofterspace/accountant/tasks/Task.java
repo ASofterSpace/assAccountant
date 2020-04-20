@@ -285,6 +285,7 @@ public class Task {
 						finLogText.append(row.getAccount());
 						finLogText.append(": ");
 						finLogText.append(AccountingUtils.formatMoney(row.getAmount(), Currency.EUR));
+						finLogText.append("\n");
 					}
 				}
 			}
