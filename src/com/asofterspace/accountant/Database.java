@@ -21,6 +21,8 @@ import com.asofterspace.toolbox.Utils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -139,6 +141,7 @@ public class Database {
 			Year curYear = new Year(yearRec, this);
 			years.add(curYear);
 		}
+		sortYears();
 		return root;
 	}
 
@@ -211,8 +214,17 @@ public class Database {
 			}
 		}
 		years.add(new Year(yearNum, this));
+		sortYears();
 		save();
 		return true;
+	}
+
+	private void sortYears() {
+		Collections.sort(years, new Comparator<Year>() {
+			public int compare(Year a, Year b) {
+				return b.getNum() - a.getNum();
+			}
+		});
 	}
 
 	public void undo() {

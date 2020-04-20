@@ -33,6 +33,7 @@ public class TaskCtrl {
 	private final String RELEASED_IN_MONTH = "releasedInMonth";
 	private final String RELEASED_IN_YEAR = "releasedInYear";
 	private final String DONE_DATE = "doneDate";
+	private final String DONE_LOG = "doneLog";
 	private final String DATE = "date";
 	private final String ROWS = "rows";
 	private final String AMOUNT = "amount";
@@ -160,6 +161,7 @@ public class TaskCtrl {
 		result.setReleasedInMonth(recordTask.getInteger(RELEASED_IN_MONTH));
 		result.setReleasedInYear(recordTask.getInteger(RELEASED_IN_YEAR));
 		result.setDoneDate(DateUtils.parseDate(recordTask.getString(DONE_DATE)));
+		result.setDoneLog(recordTask.getString(DONE_LOG));
 		return result;
 	}
 
@@ -221,6 +223,7 @@ public class TaskCtrl {
 			taskRecord.set(RELEASED_IN_MONTH, task.getReleasedInMonth());
 			taskRecord.set(RELEASED_IN_YEAR, task.getReleasedInYear());
 			taskRecord.set(DONE_DATE, DateUtils.serializeDate(task.getDoneDate()));
+			taskRecord.set(DONE_LOG, task.getDoneLog());
 			base.append(taskRecord);
 		}
 		return base;
@@ -244,6 +247,17 @@ public class TaskCtrl {
 		});
 
 		return taskInstances;
+	}
+
+	public List<FinanceLogEntry> getFinanceLogs() {
+
+		Collections.sort(financeLogs, new Comparator<FinanceLogEntry>() {
+			public int compare(FinanceLogEntry a, FinanceLogEntry b) {
+				return a.getDate().compareTo(b.getDate());
+			}
+		});
+
+		return financeLogs;
 	}
 
 	public void deleteTaskInstance(Task task) {

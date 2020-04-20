@@ -4,6 +4,17 @@
  */
 package com.asofterspace.accountant;
 
+import com.asofterspace.accountant.world.Currency;
+import com.asofterspace.toolbox.gui.Arrangement;
+import com.asofterspace.toolbox.gui.CopyByClickLabel;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridBagLayout;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
 
 public class FinanceLogEntryRow {
 
@@ -24,4 +35,40 @@ public class FinanceLogEntryRow {
 	public Integer getAmount() {
 		return amount;
 	}
+
+	public JPanel createPanelOnGUI(Database database) {
+
+		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
+		Color textColor = new Color(0, 0, 0);
+
+		JPanel curPanel = new JPanel();
+		curPanel.setBackground(GUI.getBackgroundColor());
+		curPanel.setLayout(new GridBagLayout());
+
+		CopyByClickLabel curLabel = createLabel(getAccount(), textColor, "");
+		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		curPanel.add(curLabel, new Arrangement(0, 0, 0.5, 1.0));
+
+		curLabel = createLabel(AccountingUtils.formatMoney(getAmount(), Currency.EUR), textColor, "");
+		curPanel.add(curLabel, new Arrangement(1, 0, 0.5, 1.0));
+
+		return curPanel;
+	}
+
+	private CopyByClickLabel createLabel(String text, Color color, String tooltip) {
+
+		CopyByClickLabel result = new CopyByClickLabel(text);
+
+		if (!"".equals(tooltip)) {
+			result.setToolTipText(tooltip);
+		}
+
+		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
+		result.setPreferredSize(defaultDimension);
+
+		result.setForeground(color);
+
+		return result;
+	}
+
 }

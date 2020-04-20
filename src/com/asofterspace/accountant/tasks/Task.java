@@ -4,6 +4,7 @@
  */
 package com.asofterspace.accountant;
 
+import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.utils.DateUtils;
@@ -18,8 +19,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
+import javax.swing.JTextPane;
 
 
 /**
@@ -52,6 +57,9 @@ public class Task {
 
 	// when was this task done?
 	protected Date doneDate;
+
+	// what interesting things did the user encounter while doing this task?
+	protected String doneLog;
 
 	protected TaskCtrl taskCtrl;
 
@@ -112,23 +120,52 @@ public class Task {
 	 * Actually return the instructions as shown to the user, with information replaced with
 	 * actual info
 	 */
-	public List<String> getDetailsToShowToUser() {
-		List<String> results = new ArrayList<>();
+	public List<JPanel> getDetailsToShowToUser(Database database) {
+		List<JPanel> results = new ArrayList<>();
 		if (details != null) {
 			for (String detail : details) {
-				detail = detail.replaceAll("%[DAY]", ""+releasedOnDay);
-				detail = detail.replaceAll("%[MONTH]", ""+releasedInMonth);
-				detail = detail.replaceAll("%[NAME_OF_MONTH]", DateUtils.monthNumToName(releasedInMonth));
-				detail = detail.replaceAll("%[YEAR]", ""+releasedInYear);
-				detail = detail.replaceAll("%[PREV_DAY]", ""+(releasedOnDay-1));
+				detail = detail.replaceAll("%\\[DAY\\]", ""+releasedOnDay);
+				detail = detail.replaceAll("%\\[MONTH\\]", ""+releasedInMonth);
+				detail = detail.replaceAll("%\\[NAME_OF_MONTH\\]", DateUtils.monthNumToName(releasedInMonth));
+				detail = detail.replaceAll("%\\[YEAR\\]", ""+releasedInYear);
+				detail = detail.replaceAll("%\\[PREV_DAY\\]", ""+(releasedOnDay-1));
 				int prevMonth = releasedInMonth - 1;
 				if (prevMonth < 0) {
 					prevMonth = 11;
 				}
-				detail = detail.replaceAll("%[PREV_MONTH]", ""+prevMonth);
-				detail = detail.replaceAll("%[NAME_OF_PREV_MONTH]", DateUtils.monthNumToName(prevMonth));
-				detail = detail.replaceAll("%[PREV_YEAR]", ""+(releasedInYear-1));
-				results.add(detail);
+				detail = detail.replaceAll("%\\[PREV_MONTH\\]", ""+prevMonth);
+				detail = detail.replaceAll("%\\[NAME_OF_PREV_MONTH\\]", DateUtils.monthNumToName(prevMonth));
+				detail = detail.replaceAll("%\\[PREV_YEAR\\]", ""+(releasedInYear-1));
+
+				JPanel curPanel = new JPanel();
+				curPanel.setBackground(GUI.getBackgroundColor());
+				curPanel.setLayout(new GridBagLayout());
+
+				if (detail.contains("%[LIST_OUTGOING_UNPAID]")) {
+					List<Outgoing> outgoings = database.getOutgoings();
+					int i = 0;
+					for (Outgoing outgoing : outgoings) {
+						if (!outgoing.getReceived()) {
+							JPanel curCurPanel = outgoing.createPanelOnGUI(database);
+							curPanel.add(curCurPanel, new Arrangement(0, i, 1.0, 0.0));
+							i++;
+						}
+					}
+				} else {
+					if (detail.trim().startsWith("%[CHECK]")) {
+						JCheckBox checkBox = new JCheckBox();
+						checkBox.setBackground(GUI.getBackgroundColor());
+						curPanel.add(checkBox, new Arrangement(0, 0, 0.0, 1.0));
+						CopyByClickLabel curLabel = createLabel(detail.replaceAll("%\\[CHECK\\]", ""),
+							new Color(0, 0, 0), "");
+						curPanel.add(curLabel, new Arrangement(1, 0, 1.0, 1.0));
+					} else {
+						CopyByClickLabel curLabel = createLabel(detail, new Color(0, 0, 0), "");
+						curPanel.add(curLabel, new Arrangement(0, 0, 1.0, 1.0));
+					}
+				}
+
+				results.add(curPanel);
 			}
 		}
 		return results;
@@ -186,10 +223,22 @@ public class Task {
 		this.doneDate = doneDate;
 	}
 
-	public JPanel createPanelOnGUI(Database database) {
+	public String getDoneLog() {
+		return doneLog;
+	}
+
+	public void setDoneLog(String doneLog) {
+		this.doneLog = doneLog;
+	}
+
+	public JPanel createPanelOnGUI(Database database, JPanel parentPanel, JPanel tab) {
 
 		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
 		Color textColor = new Color(0, 0, 0);
+
+		final JPanel containerPanel = new JPanel();
+		containerPanel.setBackground(GUI.getBackgroundColor());
+		containerPanel.setLayout(new GridBagLayout());
 
 		JPanel curPanel = new JPanel();
 		curPanel.setBackground(GUI.getBackgroundColor());
@@ -204,17 +253,86 @@ public class Task {
 		curLabel = createLabel("", textColor, "");
 		curPanel.add(curLabel, new Arrangement(2, 0, 0.0, 1.0));
 
-		JButton curButton = new JButton("Show Details");
-		curButton.setPreferredSize(defaultDimension);
-		curPanel.add(curButton, new Arrangement(3, 0, 0.1, 1.0));
-		curButton.addActionListener(new ActionListener() {
+		final List<JComponent> addedLines = new ArrayList<>();
+		final JButton detailsButton = new JButton("Show Details");
+		if ((details == null) || (details.size() < 1)) {
+			detailsButton.setText("No Details");
+			detailsButton.setEnabled(false);
+		}
+		detailsButton.setPreferredSize(defaultDimension);
+		curPanel.add(detailsButton, new Arrangement(3, 0, 0.1, 1.0));
+
+		final JTextPane taskLog = new JTextPane();
+		taskLog.setPreferredSize(new Dimension(128, 128));
+		if (doneLog != null) {
+			taskLog.setText(doneLog);
+		}
+
+		detailsButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				AccountingUtils.complain("Not yet implemented!");
+				if (detailsButton.getText().startsWith("Show")) {
+					detailsButton.setText("Hide Details");
+
+					int i = 1;
+
+					if ((details == null) || (details.size() < 1)) {
+						JPanel curPanel = new JPanel();
+						curPanel.setBackground(GUI.getBackgroundColor());
+						curPanel.setLayout(new GridBagLayout());
+
+						CopyByClickLabel curLabel = createLabel("There are no details for this task!", textColor, "");
+						curPanel.add(curLabel, new Arrangement(0, 0, 1.0, 1.0));
+
+						containerPanel.add(curPanel, new Arrangement(0, i, 1.0, 1.0));
+						addedLines.add(curPanel);
+						i++;
+					} else {
+						for (JPanel detail : getDetailsToShowToUser(database)) {
+							containerPanel.add(detail, new Arrangement(0, i, 1.0, 1.0));
+							addedLines.add(detail);
+							i++;
+						}
+					}
+
+					CopyByClickLabel curLabel = createLabel("", textColor, "");
+					containerPanel.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
+					addedLines.add(curLabel);
+					i++;
+
+					curLabel = createLabel("Task Log - for logging anything interesting that happened " +
+						"while doing this task:", textColor, "");
+					containerPanel.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
+					addedLines.add(curLabel);
+					i++;
+
+					containerPanel.add(taskLog, new Arrangement(0, i, 1.0, 1.0));
+					addedLines.add(taskLog);
+					i++;
+
+					containerPanel.setBorder(BorderFactory.createEtchedBorder());
+
+				} else {
+					detailsButton.setText("Show Details");
+
+					// hide the detail lines again
+					for (JComponent line : addedLines) {
+						containerPanel.remove(line);
+					}
+
+					// and clear them (such that we do not attempt to remove them again)
+					addedLines.clear();
+
+					containerPanel.setBorder(BorderFactory.createEmptyBorder());
+				}
+
+				Dimension newSize = new Dimension(parentPanel.getWidth(), tab.getMinimumSize().height + 100);
+				tab.setPreferredSize(newSize);
+				parentPanel.setPreferredSize(newSize);
 			}
 		});
 
-		curButton = new JButton("Done");
+		JButton curButton = new JButton("Done");
 		curButton.setPreferredSize(defaultDimension);
 		curPanel.add(curButton, new Arrangement(4, 0, 0.05, 1.0));
 		curButton.addActionListener(new ActionListener() {
@@ -222,6 +340,7 @@ public class Task {
 			public void actionPerformed(ActionEvent e) {
 				Task.this.done = true;
 				setDoneDate(new Date());
+				setDoneLog(taskLog.getText());
 				// setDoneDate(DateUtils.parseDate(getReleasedDateStr())); // DEBUG
 				taskCtrl.save();
 			}
@@ -241,7 +360,9 @@ public class Task {
 		curLabel = createLabel("", textColor, "");
 		curPanel.add(curLabel, new Arrangement(6, 0, 0.0, 1.0));
 
-		return curPanel;
+		containerPanel.add(curPanel, new Arrangement(0, 0, 1.0, 1.0));
+
+		return containerPanel;
 	}
 
 	private CopyByClickLabel createLabel(String text, Color color, String tooltip) {

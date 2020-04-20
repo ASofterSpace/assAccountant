@@ -4,6 +4,7 @@
  */
 package com.asofterspace.accountant;
 
+import com.asofterspace.accountant.tabs.FinanceLogTab;
 import com.asofterspace.accountant.tabs.MonthTab;
 import com.asofterspace.accountant.tabs.OverviewTab;
 import com.asofterspace.accountant.tabs.Tab;
@@ -24,12 +25,14 @@ public class TabCtrl {
 
 	private OverviewTab overviewTab;
 	private TaskLogTab taskLogTab;
+	private FinanceLogTab financeLogTab;
 
 
 	public TabCtrl(Database database) {
 		this.database = database;
 		this.overviewTab = new OverviewTab();
 		this.taskLogTab = new TaskLogTab();
+		this.financeLogTab = new FinanceLogTab();
 	}
 
 	public List<Tab> getTabs() {
@@ -38,6 +41,7 @@ public class TabCtrl {
 
 		result.add(overviewTab);
 		result.add(taskLogTab);
+		result.add(financeLogTab);
 
 		List<Year> years = database.getYears();
 		for (Year year : years) {

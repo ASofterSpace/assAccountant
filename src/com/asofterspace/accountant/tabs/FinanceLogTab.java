@@ -6,6 +6,7 @@ package com.asofterspace.accountant.tabs;
 
 import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.Database;
+import com.asofterspace.accountant.FinanceLogEntry;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.Task;
 import com.asofterspace.toolbox.gui.Arrangement;
@@ -19,14 +20,14 @@ import java.util.List;
 import javax.swing.JPanel;
 
 
-public class TaskLogTab extends Tab {
+public class FinanceLogTab extends Tab {
 
-	private static final String TITLE = "Task Log";
+	private static final String TITLE = "Finance Log";
 
 	private JPanel tab;
 
 
-	public TaskLogTab() {
+	public FinanceLogTab() {
 	}
 
 	@Override
@@ -58,20 +59,16 @@ public class TaskLogTab extends Tab {
 		JPanel curPanel;
 
 
-		List<Task> tasks = database.getTaskCtrl().getTaskInstances();
-		boolean tasksShown = false;
-		for (Task task : tasks) {
-			if (task.hasBeenDone()) {
-				tasksShown = true;
-				curPanel = task.createPanelOnGUI(database, parentPanel, tab);
-				curPanel.setBackground(GUI.getBackgroundColor());
-				tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
-				i++;
-			}
+		List<FinanceLogEntry> entries = database.getTaskCtrl().getFinanceLogs();
+		for (FinanceLogEntry entry : entries) {
+			curPanel = entry.createPanelOnGUI(database);
+			curPanel.setBackground(GUI.getBackgroundColor());
+			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+			i++;
 		}
 		// for-else:
-		if (!tasksShown) {
-			curLabel = new CopyByClickLabel("No previously performed tasks have been found in the log!");
+		if (entries.size() < 1) {
+			curLabel = new CopyByClickLabel("No finance logs have been found!");
 			tab.add(curLabel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
 		}
@@ -105,6 +102,9 @@ public class TaskLogTab extends Tab {
 			return 1;
 		}
 		if (tab instanceof TaskLogTab) {
+			return 1;
+		}
+		if (tab instanceof FinanceLogTab) {
 			return 0;
 		}
 		return -1;

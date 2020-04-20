@@ -88,6 +88,9 @@ public class YearTab extends TimeSpanTab {
 		if (tab instanceof TaskLogTab) {
 			return 1;
 		}
+		if (tab instanceof FinanceLogTab) {
+			return 1;
+		}
 		if (tab instanceof TimeSpanTab) {
 			return ((TimeSpanTab) tab).getYear().getNum() - year.getNum();
 		}
