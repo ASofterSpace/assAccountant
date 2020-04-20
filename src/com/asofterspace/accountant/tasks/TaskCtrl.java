@@ -32,6 +32,7 @@ public class TaskCtrl {
 	private final String RELEASED_ON_DAY = "releasedOnDay";
 	private final String RELEASED_IN_MONTH = "releasedInMonth";
 	private final String RELEASED_IN_YEAR = "releasedInYear";
+	private final String DONE_DATE = "doneDate";
 	private final String DATE = "date";
 	private final String ROWS = "rows";
 	private final String AMOUNT = "amount";
@@ -117,6 +118,7 @@ public class TaskCtrl {
 					taskInstance.setReleasedOnDay(cal.get(Calendar.DAY_OF_MONTH));
 					taskInstance.setReleasedInMonth(cal.get(Calendar.MONTH));
 					taskInstance.setReleasedInYear(cal.get(Calendar.YEAR));
+					taskInstance.setDoneDate(null);
 					taskInstances.add(taskInstance);
 				}
 			}
@@ -157,6 +159,7 @@ public class TaskCtrl {
 		result.setReleasedOnDay(recordTask.getInteger(RELEASED_ON_DAY));
 		result.setReleasedInMonth(recordTask.getInteger(RELEASED_IN_MONTH));
 		result.setReleasedInYear(recordTask.getInteger(RELEASED_IN_YEAR));
+		result.setDoneDate(DateUtils.parseDate(recordTask.getString(DONE_DATE)));
 		return result;
 	}
 
@@ -217,6 +220,7 @@ public class TaskCtrl {
 			taskRecord.set(RELEASED_ON_DAY, task.getReleasedOnDay());
 			taskRecord.set(RELEASED_IN_MONTH, task.getReleasedInMonth());
 			taskRecord.set(RELEASED_IN_YEAR, task.getReleasedInYear());
+			taskRecord.set(DONE_DATE, DateUtils.serializeDate(task.getDoneDate()));
 			base.append(taskRecord);
 		}
 		return base;

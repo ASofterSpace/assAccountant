@@ -41,14 +41,17 @@ public class Task {
 	// has this task already been done?
 	protected Boolean done;
 
-	// on which day of the month was this task actually created?
+	// for which date was this task instance released for the user to look at?
+	// (this might be before or after the date the user actually first saw it,
+	// e.g. the user have have seen it as a future task, or it may have been
+	// generated days later... this is really the date in the calendar that
+	// triggered the schedule for this task to generate this instance!)
 	protected Integer releasedOnDay;
-
-	// in which month was this task actually created?
 	protected Integer releasedInMonth;
-
-	// in which year was this task actually released?
 	protected Integer releasedInYear;
+
+	// when was this task done?
+	protected Date doneDate;
 
 	protected TaskCtrl taskCtrl;
 
@@ -175,6 +178,14 @@ public class Task {
 		return getReleasedInYear() + "-" + month + "-" + day;
 	}
 
+	public Date getDoneDate() {
+		return doneDate;
+	}
+
+	public void setDoneDate(Date doneDate) {
+		this.doneDate = doneDate;
+	}
+
 	public JPanel createPanelOnGUI(Database database) {
 
 		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
@@ -209,7 +220,10 @@ public class Task {
 		curButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				AccountingUtils.complain("Not yet implemented!");
+				Task.this.done = true;
+				setDoneDate(new Date());
+				// setDoneDate(DateUtils.parseDate(getReleasedDateStr())); // DEBUG
+				taskCtrl.save();
 			}
 		});
 
