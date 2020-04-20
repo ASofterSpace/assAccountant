@@ -12,12 +12,14 @@ import java.util.List;
  */
 public class FinanceOverviewTask extends Task {
 
-	public FinanceOverviewTask(String title, Integer scheduledOnDay, Integer scheduledInMonth, List<String> details) {
-		super(title, scheduledOnDay, scheduledInMonth, details);
+	public FinanceOverviewTask(TaskCtrl taskCtrl, String title, Integer scheduledOnDay,
+		Integer scheduledInMonth, List<String> details) {
+
+		super(taskCtrl, title, scheduledOnDay, scheduledInMonth, details);
 	}
 
 	@Override
 	public FinanceOverviewTask getNewInstance() {
-		return new FinanceOverviewTask(title, scheduledOnDay, scheduledInMonth, details);
+		return new FinanceOverviewTask(taskCtrl, title, scheduledOnDay, scheduledInMonth, details);
 	}
 }

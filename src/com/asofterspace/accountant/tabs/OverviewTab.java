@@ -12,6 +12,7 @@ import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.PaymentProblem;
+import com.asofterspace.accountant.Task;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 
@@ -62,15 +63,30 @@ public class OverviewTab extends Tab {
 		i++;
 
 		CopyByClickLabel curLabel;
+		JPanel curPanel;
 
 
 		CopyByClickLabel outstandingTasksLabel = AccountingUtils.createSubHeadLabel("Outstanding Tasks:");
 		tab.add(outstandingTasksLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		curLabel = new CopyByClickLabel("TODO!");
-		tab.add(curLabel, new Arrangement(0, i, 1.0, 0.0));
-		i++;
+		List<Task> tasks = database.getTaskCtrl().getTaskInstances();
+		boolean tasksShown = false;
+		for (Task task : tasks) {
+			if (!task.hasBeenDone()) {
+				tasksShown = true;
+				curPanel = task.createPanelOnGUI(database);
+				curPanel.setBackground(GUI.getBackgroundColor());
+				tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+				i++;
+			}
+		}
+		// for-else:
+		if (!tasksShown) {
+			curLabel = new CopyByClickLabel("No outstanding tasks have been found!");
+			tab.add(curLabel, new Arrangement(0, i, 1.0, 0.0));
+			i++;
+		}
 
 
 		CopyByClickLabel unpaidInvoicesLabel = AccountingUtils.createSubHeadLabel("Unpaid Invoices:");
@@ -82,7 +98,7 @@ public class OverviewTab extends Tab {
 		List<PaymentProblem> paymentProblems = database.getPaymentProblems();
 		for (final PaymentProblem curProblem : paymentProblems) {
 
-			JPanel curPanel = new JPanel();
+			curPanel = new JPanel();
 			curPanel.setBackground(GUI.getBackgroundColor());
 			curPanel.setLayout(new GridBagLayout());
 
@@ -147,7 +163,7 @@ public class OverviewTab extends Tab {
 		List<ConsistencyProblem> consistencyProblems = database.getConsistencyProblems();
 		for (final ConsistencyProblem curProblem : consistencyProblems) {
 
-			JPanel curPanel = new JPanel();
+			curPanel = new JPanel();
 			curPanel.setBackground(GUI.getBackgroundColor());
 			curPanel.setLayout(new GridBagLayout());
 

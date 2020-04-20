@@ -9,6 +9,8 @@ import com.asofterspace.toolbox.utils.Record;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -109,10 +111,9 @@ public class TaskCtrl {
 			for (Task task : tasks) {
 				if (task.isScheduledOn(day)) {
 					Task taskInstance = task.getNewInstance();
-					taskInstance.setDone(false);
-
 					Calendar cal = Calendar.getInstance();
 					cal.setTime(day);
+					taskInstance.setDone(false);
 					taskInstance.setReleasedOnDay(cal.get(Calendar.DAY_OF_MONTH));
 					taskInstance.setReleasedInMonth(cal.get(Calendar.MONTH));
 					taskInstance.setReleasedInYear(cal.get(Calendar.YEAR));
@@ -127,6 +128,7 @@ public class TaskCtrl {
 	private Task taskFromRecord(Record recordTask) {
 		if (recordTask.getString(KIND).equals(FINANCE_OVERVIEW)) {
 			return new FinanceOverviewTask(
+				this,
 				recordTask.getString(TITLE),
 				recordTask.getInteger(DAY),
 				DateUtils.monthNameToNum(recordTask.getString(MONTH)),
@@ -135,6 +137,7 @@ public class TaskCtrl {
 		}
 		if (recordTask.getString(KIND).equals(GENERIC)) {
 			return new Task(
+				this,
 				recordTask.getString(TITLE),
 				recordTask.getInteger(DAY),
 				DateUtils.monthNameToNum(recordTask.getString(MONTH)),
@@ -210,12 +213,44 @@ public class TaskCtrl {
 		Record base = Record.emptyArray();
 		for (Task task : taskInstances) {
 			Record taskRecord = taskToRecord(task);
-			taskRecord.set(DONE, task.getDone());
+			taskRecord.set(DONE, task.hasBeenDone());
 			taskRecord.set(RELEASED_ON_DAY, task.getReleasedOnDay());
 			taskRecord.set(RELEASED_IN_MONTH, task.getReleasedInMonth());
 			taskRecord.set(RELEASED_IN_YEAR, task.getReleasedInYear());
 			base.append(taskRecord);
 		}
 		return base;
+	}
+
+	public List<Task> getTaskInstances() {
+
+		Collections.sort(taskInstances, new Comparator<Task>() {
+			public int compare(Task a, Task b) {
+				if (a.getReleasedInYear().equals(b.getReleasedInYear())) {
+					if (a.getReleasedInMonth().equals(b.getReleasedInMonth())) {
+						if (a.getReleasedOnDay().equals(b.getReleasedOnDay())) {
+							return a.getTitle().compareTo(b.getTitle());
+						}
+						return b.getReleasedOnDay() - a.getReleasedOnDay();
+					}
+					return b.getReleasedInMonth() - a.getReleasedInMonth();
+				}
+				return b.getReleasedInYear() - a.getReleasedInYear();
+			}
+		});
+
+		return taskInstances;
+	}
+
+	public void deleteTaskInstance(Task task) {
+		for (int i = taskInstances.size() - 1; i >= 0; i--) {
+			if (taskInstances.get(i).equals(task)) {
+				taskInstances.remove(i);
+			}
+		}
+	}
+
+	public void save() {
+		database.save();
 	}
 }

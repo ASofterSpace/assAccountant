@@ -154,6 +154,10 @@ public class Database {
 		this.taskCtrl = taskCtrl;
 	}
 
+	public TaskCtrl getTaskCtrl() {
+		return taskCtrl;
+	}
+
 	public List<Year> getYears() {
 		return years;
 	}

@@ -4,12 +4,22 @@
  */
 package com.asofterspace.accountant;
 
+import com.asofterspace.toolbox.gui.Arrangement;
+import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.utils.DateUtils;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import javax.swing.JButton;
+import javax.swing.JPanel;
 
 
 /**
@@ -40,8 +50,13 @@ public class Task {
 	// in which year was this task actually released?
 	protected Integer releasedInYear;
 
+	protected TaskCtrl taskCtrl;
 
-	public Task(String title, Integer scheduledOnDay, Integer scheduledInMonth, List<String> details) {
+
+	public Task(TaskCtrl taskCtrl, String title, Integer scheduledOnDay, Integer scheduledInMonth,
+		List<String> details) {
+
+		this.taskCtrl = taskCtrl;
 		this.title = title;
 		this.scheduledOnDay = scheduledOnDay;
 		this.scheduledInMonth = scheduledInMonth;
@@ -49,7 +64,7 @@ public class Task {
 	}
 
 	public Task getNewInstance() {
-		return new Task(title, scheduledOnDay, scheduledInMonth, details);
+		return new Task(taskCtrl, title, scheduledOnDay, scheduledInMonth, details);
 	}
 
 	public boolean isScheduledOn(Date date) {
@@ -116,7 +131,7 @@ public class Task {
 		return results;
 	}
 
-	public Boolean getDone() {
+	public Boolean hasBeenDone() {
 		return done;
 	}
 
@@ -147,4 +162,114 @@ public class Task {
 	public void setReleasedInYear(Integer releasedInYear) {
 		this.releasedInYear = releasedInYear;
 	}
+
+	public String getReleasedDateStr() {
+		String day = ""+getReleasedOnDay();
+		if (day.length() < 2) {
+			day = "0" + day;
+		}
+		String month = ""+(getReleasedInMonth()+1);
+		if (month.length() < 2) {
+			month = "0" + month;
+		}
+		return getReleasedInYear() + "-" + month + "-" + day;
+	}
+
+	public JPanel createPanelOnGUI(Database database) {
+
+		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
+		Color textColor = new Color(0, 0, 0);
+
+		JPanel curPanel = new JPanel();
+		curPanel.setBackground(GUI.getBackgroundColor());
+		curPanel.setLayout(new GridBagLayout());
+
+		CopyByClickLabel curLabel = createLabel(getReleasedDateStr(), textColor, "");
+		curPanel.add(curLabel, new Arrangement(0, 0, 0.08, 1.0));
+
+		curLabel = createLabel(title, textColor, "");
+		curPanel.add(curLabel, new Arrangement(1, 0, 0.5, 1.0));
+
+		curLabel = createLabel("", textColor, "");
+		curPanel.add(curLabel, new Arrangement(2, 0, 0.0, 1.0));
+
+		JButton curButton = new JButton("Show Details");
+		curButton.setPreferredSize(defaultDimension);
+		curPanel.add(curButton, new Arrangement(3, 0, 0.1, 1.0));
+		curButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				AccountingUtils.complain("Not yet implemented!");
+			}
+		});
+
+		curButton = new JButton("Done");
+		curButton.setPreferredSize(defaultDimension);
+		curPanel.add(curButton, new Arrangement(4, 0, 0.05, 1.0));
+		curButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				AccountingUtils.complain("Not yet implemented!");
+			}
+		});
+
+		curButton = new JButton("Delete");
+		curButton.setPreferredSize(defaultDimension);
+		curPanel.add(curButton, new Arrangement(5, 0, 0.06, 1.0));
+		curButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				taskCtrl.deleteTaskInstance(Task.this);
+				taskCtrl.save();
+			}
+		});
+
+		curLabel = createLabel("", textColor, "");
+		curPanel.add(curLabel, new Arrangement(6, 0, 0.0, 1.0));
+
+		return curPanel;
+	}
+
+	private CopyByClickLabel createLabel(String text, Color color, String tooltip) {
+
+		CopyByClickLabel result = new CopyByClickLabel(text);
+
+		if (!"".equals(tooltip)) {
+			result.setToolTipText(tooltip);
+		}
+
+		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
+		result.setPreferredSize(defaultDimension);
+
+		result.setForeground(color);
+
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other == null) {
+			return false;
+		}
+		if (other instanceof Task) {
+			Task otherTask = (Task) other;
+			if (this.title.equals(otherTask.title) &&
+				this.done.equals(otherTask.done) &&
+				this.releasedOnDay.equals(otherTask.releasedOnDay) &&
+				this.releasedInMonth.equals(otherTask.releasedInMonth) &&
+				this.releasedInYear.equals(otherTask.releasedInYear)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		if ((done == null) || done.equals(false)) {
+			return -1;
+		}
+		return this.releasedOnDay + 64 * this.releasedInMonth + 1024 * this.releasedInYear;
+	}
+
 }
