@@ -69,4 +69,17 @@ public abstract class TimeSpan {
 
 	public abstract int getPersTotalAfterTax();
 
+	// pre-paid VAT discountable for own VAT payments
+	public int getDiscountablePreTax() {
+		return getInTotalTax() + getDonTotalTax();
+	}
+
+	public int getRemainingVatPayments() {
+		int remainVATpay = getOutTotalTax() - (getInTotalTax() + getDonTotalTax());
+		if (remainVATpay < 0) {
+			remainVATpay = 0;
+		}
+		return remainVATpay;
+	}
+
 }

@@ -5,6 +5,7 @@
 package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.entries.Outgoing;
+import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
@@ -118,11 +119,18 @@ public class Task {
 		return details;
 	}
 
+	public Date getReleaseDate() {
+		return DateUtils.parseDate(getReleasedInYear() + "-" + (getReleasedInMonth() + 1) + "-" + getReleasedOnDay());
+	}
+
 	/**
 	 * Actually return the instructions as shown to the user, with information replaced with
 	 * actual info
 	 */
 	public List<JPanel> getDetailsToShowToUser(Database database) {
+
+		Month curMonth = database.getMonthFromEntryDate(getReleaseDate());
+
 		List<JPanel> results = new ArrayList<>();
 		if (details != null) {
 			for (String detail : details) {
@@ -138,6 +146,19 @@ public class Task {
 				detail = detail.replaceAll("%\\[PREV_MONTH\\]", ""+prevMonth);
 				detail = detail.replaceAll("%\\[NAME_OF_PREV_MONTH\\]", DateUtils.monthNumToName(prevMonth));
 				detail = detail.replaceAll("%\\[PREV_YEAR\\]", ""+(releasedInYear-1));
+				/*
+				if (detail.contains("%[VAT_TOTAL_OUTGOING_MONTH_TAX_19%]")) {
+					detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_MONTH_TAX_19%\\]", TODO);
+				}
+				*/
+				if (detail.contains("%[VAT_TOTAL_DISCOUNTABLE_PRETAX]")) {
+					detail = detail.replaceAll("%\\[VAT_TOTAL_DISCOUNTABLE_PRETAX\\]",
+						AccountingUtils.formatMoney(curMonth.getDiscountablePreTax(), Currency.EUR));
+				}
+				if (detail.contains("%[VAT_TOTAL_REMAINING_TAX]")) {
+					detail = detail.replaceAll("%\\[VAT_TOTAL_REMAINING_TAX\\]",
+						AccountingUtils.formatMoney(curMonth.getRemainingVatPayments(), Currency.EUR));
+				}
 
 				JPanel curPanel = new JPanel();
 				curPanel.setBackground(GUI.getBackgroundColor());

@@ -284,15 +284,11 @@ public class AccountingUtils {
 		tab.add(sep, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total deductible already paid VAT / Gesamte abziehbare Vorsteuerbeträge: ", timeSpan.getInTotalTax() + timeSpan.getDonTotalTax());
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total deductible already paid VAT / Gesamte abziehbare Vorsteuerbeträge: ", timeSpan.getDiscountablePreTax());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		int remainVATpay = timeSpan.getOutTotalTax() - (timeSpan.getInTotalTax() + timeSpan.getDonTotalTax());
-		if (remainVATpay < 0) {
-			remainVATpay = 0;
-		}
-		curPanel = AccountingUtils.createOverviewPanelOnGUI("Remaining VAT advance payment / Verbleibende Umsatzsteuer-Vorauszahlung: ", remainVATpay);
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Remaining VAT advance payment / Verbleibende Umsatzsteuer-Vorauszahlung: ", timeSpan.getRemainingVatPayments());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
