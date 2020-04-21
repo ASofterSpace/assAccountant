@@ -69,7 +69,6 @@ public class FinanceLogEntry {
 		}
 
 		JPanel curCurPanel = new JPanel();
-		curCurPanel.setPreferredSize(defaultDimension);
 		curCurPanel.setBackground(GUI.getBackgroundColor());
 		curCurPanel.setLayout(new GridBagLayout());
 
@@ -80,6 +79,10 @@ public class FinanceLogEntry {
 		curLabel = AccountingUtils.createLabel(AccountingUtils.formatMoney(totalAmount, Currency.EUR), textColor, "");
 		curCurPanel.add(curLabel, new Arrangement(1, 0, 0.5, 1.0));
 		curPanel.add(curCurPanel, new Arrangement(0, i, 1.0, 1.0));
+		i++;
+
+		curLabel = AccountingUtils.createLabel(" ", textColor, "");
+		curPanel.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
 		i++;
 
 		return curPanel;
