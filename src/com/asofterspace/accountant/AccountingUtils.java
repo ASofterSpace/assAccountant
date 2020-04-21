@@ -464,6 +464,7 @@ public class AccountingUtils {
 		if (tab.getMinimumSize().height + 100 > newHeight) {
 			newHeight = tab.getMinimumSize().height + 100;
 		}
+		newHeight += 500;
 		Dimension newSize = new Dimension(parentPanel.getWidth(), newHeight);
 		tab.setPreferredSize(newSize);
 		parentPanel.setPreferredSize(newSize);

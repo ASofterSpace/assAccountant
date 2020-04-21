@@ -39,22 +39,23 @@ public class FinanceLogEntryRow {
 	public JPanel createPanelOnGUI(Database database) {
 
 		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
-		Color textColor = new Color(0, 0, 0);
 
 		JPanel curPanel = new JPanel();
-		curPanel.setPreferredSize(defaultDimension);
 		curPanel.setBackground(GUI.getBackgroundColor());
 		curPanel.setLayout(new GridBagLayout());
 
-		CopyByClickLabel curLabel = AccountingUtils.createLabel(getAccount() + ": ", textColor, "");
-		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		CopyByClickLabel curLabel = new CopyByClickLabel(getAccount() + ": ");
+		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
+		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.5, 1.0));
 
-		curLabel = AccountingUtils.createLabel(AccountingUtils.formatMoney(getAmount(), Currency.EUR), textColor, "");
+		curLabel = new CopyByClickLabel(AccountingUtils.formatMoney(getAmount(), Currency.EUR));
+		curLabel.setPreferredSize(defaultDimension);
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curPanel.add(curLabel, new Arrangement(1, 0, 0.1, 1.0));
 
-		curLabel = AccountingUtils.createLabel("", textColor, "");
+		curLabel = new CopyByClickLabel("");
+		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(2, 0, 0.4, 1.0));
 
 		return curPanel;

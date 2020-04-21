@@ -77,9 +77,16 @@ public class FinanceLogEntry {
 		curCurPanel.add(curLabel, new Arrangement(0, 0, 0.5, 1.0));
 
 		curLabel = AccountingUtils.createLabel(AccountingUtils.formatMoney(totalAmount, Currency.EUR), textColor, "");
-		curCurPanel.add(curLabel, new Arrangement(1, 0, 0.5, 1.0));
+		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		curCurPanel.add(curLabel, new Arrangement(1, 0, 0.1, 1.0));
+
+		curLabel = new CopyByClickLabel("");
+		curLabel.setPreferredSize(defaultDimension);
+		curCurPanel.add(curLabel, new Arrangement(2, 0, 0.4, 1.0));
+
 		curPanel.add(curCurPanel, new Arrangement(0, i, 1.0, 1.0));
 		i++;
+
 
 		curLabel = AccountingUtils.createLabel(" ", textColor, "");
 		curPanel.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
