@@ -133,38 +133,95 @@ public class Task {
 
 		List<JPanel> results = new ArrayList<>();
 		if (details != null) {
-			for (String detail : details) {
-				detail = detail.replaceAll("%\\[DAY\\]", ""+releasedOnDay);
-				detail = detail.replaceAll("%\\[MONTH\\]", ""+releasedInMonth);
-				detail = detail.replaceAll("%\\[NAME_OF_MONTH\\]", DateUtils.monthNumToName(releasedInMonth));
-				detail = detail.replaceAll("%\\[YEAR\\]", ""+releasedInYear);
-				detail = detail.replaceAll("%\\[PREV_DAY\\]", ""+(releasedOnDay-1));
-				int prevMonth = releasedInMonth - 1;
-				if (prevMonth < 0) {
-					prevMonth = 11;
+			// actually join all the individual lines to a big text first, and make all the replacements
+			// just once for which this works (and afterwards split again for the more line-specific
+			// replacements such as %[CHECK])
+			String detail = StrUtils.join("\n", details);
+			detail = detail.replaceAll("%\\[DAY\\]", ""+releasedOnDay);
+			detail = detail.replaceAll("%\\[MONTH\\]", ""+releasedInMonth);
+			detail = detail.replaceAll("%\\[NAME_OF_MONTH\\]", DateUtils.monthNumToName(releasedInMonth));
+			detail = detail.replaceAll("%\\[YEAR\\]", ""+releasedInYear);
+			detail = detail.replaceAll("%\\[PREV_DAY\\]", ""+(releasedOnDay-1));
+			int prevMonth = releasedInMonth - 1;
+			if (prevMonth < 0) {
+				prevMonth = 11;
+			}
+			detail = detail.replaceAll("%\\[PREV_MONTH\\]", ""+prevMonth);
+			detail = detail.replaceAll("%\\[NAME_OF_PREV_MONTH\\]", DateUtils.monthNumToName(prevMonth));
+			detail = detail.replaceAll("%\\[PREV_YEAR\\]", ""+(releasedInYear-1));
+			if (detail.contains("%[VAT_TOTAL_OUTGOING_MONTH_TAX_19%]")) {
+				int cur = 0;
+				for (Outgoing entry : curMonth.getOutgoings()) {
+					if (19 == (int) entry.getTaxPercent()) {
+						cur += entry.getAmount();
+					}
 				}
-				detail = detail.replaceAll("%\\[PREV_MONTH\\]", ""+prevMonth);
-				detail = detail.replaceAll("%\\[NAME_OF_PREV_MONTH\\]", DateUtils.monthNumToName(prevMonth));
-				detail = detail.replaceAll("%\\[PREV_YEAR\\]", ""+(releasedInYear-1));
-				/*
-				if (detail.contains("%[VAT_TOTAL_OUTGOING_MONTH_TAX_19%]")) {
-					detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_MONTH_TAX_19%\\]", TODO);
+				detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_MONTH_TAX_19%\\]",
+					AccountingUtils.formatMoney(cur, Currency.EUR));
+			}
+			if (detail.contains("%[VAT_TOTAL_OUTGOING_MONTH_TAX_0%]")) {
+				int cur = 0;
+				for (Outgoing entry : curMonth.getOutgoings()) {
+					if (0 == (int) entry.getTaxPercent()) {
+						cur += entry.getAmount();
+					}
 				}
-				*/
-				if (detail.contains("%[VAT_TOTAL_DISCOUNTABLE_PRETAX]")) {
-					detail = detail.replaceAll("%\\[VAT_TOTAL_DISCOUNTABLE_PRETAX\\]",
-						AccountingUtils.formatMoney(curMonth.getDiscountablePreTax(), Currency.EUR));
+				detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_MONTH_TAX_0%\\]",
+					AccountingUtils.formatMoney(cur, Currency.EUR));
+			}
+			String vat0complex = "%[VAT_TOTAL_OUTGOING_MONTH_TAX_0%_";
+			String vat0complexBracket = vat0complex + "(";
+			if (detail.contains(vat0complexBracket)) {
+				List<String> included = new ArrayList<>();
+				String findInc = detail.substring(detail.indexOf(vat0complexBracket) + vat0complexBracket.length());
+				if (findInc.contains(")")) {
+					while ((findInc.indexOf(")") > findInc.indexOf(",")) && (findInc.indexOf(",") >= 0)) {
+						included.add(findInc.substring(0, findInc.indexOf(",")).toLowerCase().trim());
+						findInc = findInc.substring(findInc.indexOf(",") + 1);
+					}
+					included.add(findInc.substring(0, findInc.indexOf(")")).toLowerCase().trim());
+					int curInc = 0;
+					int curRest = 0;
+					for (Outgoing entry : curMonth.getOutgoings()) {
+						if (0 == (int) entry.getTaxPercent()) {
+							String curCustomer = entry.getCategoryOrCustomer().toLowerCase().trim();
+							boolean includeThisOne = false;
+							for (String incCustomer : included) {
+								if (curCustomer.equals(incCustomer)) {
+									includeThisOne = true;
+								}
+							}
+							if (includeThisOne) {
+								curInc += entry.getAmount();
+							} else {
+								curRest += entry.getAmount();
+							}
+						}
+					}
+					detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_MONTH_TAX_0%_\\(.*\\)\\]",
+						AccountingUtils.formatMoney(curInc, Currency.EUR));
+					detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_MONTH_TAX_0%_REST\\]",
+						AccountingUtils.formatMoney(curRest, Currency.EUR));
 				}
-				if (detail.contains("%[VAT_TOTAL_REMAINING_TAX]")) {
-					detail = detail.replaceAll("%\\[VAT_TOTAL_REMAINING_TAX\\]",
-						AccountingUtils.formatMoney(curMonth.getRemainingVatPayments(), Currency.EUR));
-				}
+			}
+			if (detail.contains("%[VAT_TOTAL_DISCOUNTABLE_PRETAX]")) {
+				detail = detail.replaceAll("%\\[VAT_TOTAL_DISCOUNTABLE_PRETAX\\]",
+					AccountingUtils.formatMoney(curMonth.getDiscountablePreTax(), Currency.EUR));
+			}
+			if (detail.contains("%[VAT_TOTAL_REMAINING_TAX]")) {
+				detail = detail.replaceAll("%\\[VAT_TOTAL_REMAINING_TAX\\]",
+					AccountingUtils.formatMoney(curMonth.getRemainingVatPayments(), Currency.EUR));
+			}
+
+			String[] detailsAfterReplacement = detail.split("\n");
+
+			for (String detailLine : detailsAfterReplacement) {
 
 				JPanel curPanel = new JPanel();
 				curPanel.setBackground(GUI.getBackgroundColor());
 				curPanel.setLayout(new GridBagLayout());
 
-				if (detail.contains("%[LIST_OUTGOING_UNPAID]")) {
+				if (detailLine.contains("%[LIST_OUTGOING_UNPAID]")) {
 					List<Outgoing> outgoings = database.getOutgoings();
 					int i = 0;
 					for (Outgoing outgoing : outgoings) {
@@ -175,15 +232,15 @@ public class Task {
 						}
 					}
 				} else {
-					if (detail.trim().startsWith("%[CHECK]")) {
+					if (detailLine.trim().startsWith("%[CHECK]")) {
 						JCheckBox checkBox = new JCheckBox();
 						checkBox.setBackground(GUI.getBackgroundColor());
 						curPanel.add(checkBox, new Arrangement(0, 0, 0.0, 1.0));
-						CopyByClickLabel curLabel = AccountingUtils.createLabel(detail.replaceAll("%\\[CHECK\\]", ""),
+						CopyByClickLabel curLabel = AccountingUtils.createLabel(detailLine.replaceAll("%\\[CHECK\\]", ""),
 							new Color(0, 0, 0), "");
 						curPanel.add(curLabel, new Arrangement(1, 0, 1.0, 1.0));
 					} else {
-						CopyByClickLabel curLabel = AccountingUtils.createLabel(detail, new Color(0, 0, 0), "");
+						CopyByClickLabel curLabel = AccountingUtils.createLabel(detailLine, new Color(0, 0, 0), "");
 						curPanel.add(curLabel, new Arrangement(0, 0, 1.0, 1.0));
 					}
 				}
