@@ -158,11 +158,11 @@ public class Task {
 						JCheckBox checkBox = new JCheckBox();
 						checkBox.setBackground(GUI.getBackgroundColor());
 						curPanel.add(checkBox, new Arrangement(0, 0, 0.0, 1.0));
-						CopyByClickLabel curLabel = createLabel(detail.replaceAll("%\\[CHECK\\]", ""),
+						CopyByClickLabel curLabel = AccountingUtils.createLabel(detail.replaceAll("%\\[CHECK\\]", ""),
 							new Color(0, 0, 0), "");
 						curPanel.add(curLabel, new Arrangement(1, 0, 1.0, 1.0));
 					} else {
-						CopyByClickLabel curLabel = createLabel(detail, new Color(0, 0, 0), "");
+						CopyByClickLabel curLabel = AccountingUtils.createLabel(detail, new Color(0, 0, 0), "");
 						curPanel.add(curLabel, new Arrangement(0, 0, 1.0, 1.0));
 					}
 				}
@@ -246,14 +246,27 @@ public class Task {
 		curPanel.setBackground(GUI.getBackgroundColor());
 		curPanel.setLayout(new GridBagLayout());
 
-		CopyByClickLabel curLabel = createLabel(getReleasedDateStr(), textColor, "");
-		curPanel.add(curLabel, new Arrangement(0, 0, 0.08, 1.0));
+		int h = 0;
 
-		curLabel = createLabel(title, textColor, "");
-		curPanel.add(curLabel, new Arrangement(1, 0, 0.5, 1.0));
+		CopyByClickLabel curLabel = AccountingUtils.createLabel(getReleasedDateStr(), textColor, "");
+		curPanel.add(curLabel, new Arrangement(h, 0, 0.08, 1.0));
+		h++;
 
-		curLabel = createLabel("", textColor, "");
-		curPanel.add(curLabel, new Arrangement(2, 0, 0.0, 1.0));
+		double titleWidth = 0.5;
+		if (done && (doneDate != null)) {
+			curLabel = AccountingUtils.createLabel(DateUtils.serializeDate(getDoneDate()), textColor, "");
+			curPanel.add(curLabel, new Arrangement(h, 0, 0.08, 1.0));
+			titleWidth = 0.42;
+			h++;
+		}
+
+		curLabel = AccountingUtils.createLabel(title, textColor, "");
+		curPanel.add(curLabel, new Arrangement(h, 0, titleWidth, 1.0));
+		h++;
+
+		curLabel = AccountingUtils.createLabel("", textColor, "");
+		curPanel.add(curLabel, new Arrangement(h, 0, 0.0, 1.0));
+		h++;
 
 		final List<JComponent> addedLines = new ArrayList<>();
 		final JButton detailsButton = new JButton("Show Details");
@@ -266,7 +279,8 @@ public class Task {
 			detailsButton.setText("Show Details");
 		}
 		detailsButton.setPreferredSize(defaultDimension);
-		curPanel.add(detailsButton, new Arrangement(3, 0, 0.1, 1.0));
+		curPanel.add(detailsButton, new Arrangement(h, 0, 0.1, 1.0));
+		h++;
 
 		final JTextPane taskLog = new JTextPane();
 		taskLog.setPreferredSize(new Dimension(128, 128));
@@ -305,7 +319,7 @@ public class Task {
 						curPanel.setBackground(GUI.getBackgroundColor());
 						curPanel.setLayout(new GridBagLayout());
 
-						CopyByClickLabel curLabel = createLabel("There are no details for this task!", textColor, "");
+						CopyByClickLabel curLabel = AccountingUtils.createLabel("There are no details for this task!", textColor, "");
 						curPanel.add(curLabel, new Arrangement(0, 0, 1.0, 1.0));
 
 						containerPanel.add(curPanel, new Arrangement(0, i, 1.0, 1.0));
@@ -320,12 +334,12 @@ public class Task {
 					}
 
 					if (Task.this instanceof FinanceOverviewTask) {
-						CopyByClickLabel curLabel = createLabel("", textColor, "");
+						CopyByClickLabel curLabel = AccountingUtils.createLabel("", textColor, "");
 						containerPanel.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
 						addedLines.add(curLabel);
 						i++;
 
-						curLabel = createLabel("Finance Log - on each line put an Account: Amount, " +
+						curLabel = AccountingUtils.createLabel("Finance Log - on each line put an Account: Amount, " +
 							"so e.g. Iron Bank: 3.14 €:", textColor, "");
 						containerPanel.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
 						addedLines.add(curLabel);
@@ -336,12 +350,12 @@ public class Task {
 						i++;
 					}
 
-					CopyByClickLabel curLabel = createLabel("", textColor, "");
+					CopyByClickLabel curLabel = AccountingUtils.createLabel("", textColor, "");
 					containerPanel.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
 					addedLines.add(curLabel);
 					i++;
 
-					curLabel = createLabel("Task Log - for logging anything interesting that happened " +
+					curLabel = AccountingUtils.createLabel("Task Log - for logging anything interesting that happened " +
 						"while doing this task:", textColor, "");
 					containerPanel.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
 					addedLines.add(curLabel);
@@ -383,7 +397,8 @@ public class Task {
 			curButton.setText("Save");
 		}
 		curButton.setPreferredSize(defaultDimension);
-		curPanel.add(curButton, new Arrangement(4, 0, 0.05, 1.0));
+		curPanel.add(curButton, new Arrangement(h, 0, 0.05, 1.0));
+		h++;
 		curButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -415,7 +430,8 @@ public class Task {
 
 		curButton = new JButton("Delete");
 		curButton.setPreferredSize(defaultDimension);
-		curPanel.add(curButton, new Arrangement(5, 0, 0.06, 1.0));
+		curPanel.add(curButton, new Arrangement(h, 0, 0.06, 1.0));
+		h++;
 		curButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -424,28 +440,13 @@ public class Task {
 			}
 		});
 
-		curLabel = createLabel("", textColor, "");
-		curPanel.add(curLabel, new Arrangement(6, 0, 0.0, 1.0));
+		curLabel = AccountingUtils.createLabel("", textColor, "");
+		curPanel.add(curLabel, new Arrangement(h, 0, 0.0, 1.0));
+		h++;
 
 		containerPanel.add(curPanel, new Arrangement(0, 0, 1.0, 1.0));
 
 		return containerPanel;
-	}
-
-	private CopyByClickLabel createLabel(String text, Color color, String tooltip) {
-
-		CopyByClickLabel result = new CopyByClickLabel(text);
-
-		if (!"".equals(tooltip)) {
-			result.setToolTipText(tooltip);
-		}
-
-		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
-		result.setPreferredSize(defaultDimension);
-
-		result.setForeground(color);
-
-		return result;
 	}
 
 	@Override

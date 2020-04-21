@@ -64,6 +64,7 @@ public class OverviewTab extends Tab {
 
 		CopyByClickLabel curLabel;
 		JPanel curPanel;
+		Color textColor = new Color(0, 0, 0);
 
 
 		CopyByClickLabel outstandingTasksLabel = AccountingUtils.createSubHeadLabel("Outstanding Tasks:");
@@ -71,10 +72,47 @@ public class OverviewTab extends Tab {
 		i++;
 
 		List<Task> tasks = database.getTaskCtrl().getTaskInstances();
+
 		boolean tasksShown = false;
 		for (Task task : tasks) {
 			if (!task.hasBeenDone()) {
 				tasksShown = true;
+				break;
+			}
+		}
+
+		if (tasksShown) {
+			curPanel = new JPanel();
+			curPanel.setBackground(GUI.getBackgroundColor());
+			curPanel.setLayout(new GridBagLayout());
+
+			curLabel = AccountingUtils.createLabel("Scheduled:", textColor, "");
+			curPanel.add(curLabel, new Arrangement(0, 0, 0.08, 1.0));
+
+			curLabel = AccountingUtils.createLabel("Title:", textColor, "");
+			curPanel.add(curLabel, new Arrangement(1, 0, 0.5, 1.0));
+
+			curLabel = AccountingUtils.createLabel("", textColor, "");
+			curPanel.add(curLabel, new Arrangement(2, 0, 0.0, 1.0));
+
+			curLabel = AccountingUtils.createLabel("", textColor, "");
+			curPanel.add(curLabel, new Arrangement(3, 0, 0.1, 1.0));
+
+			curLabel = AccountingUtils.createLabel("", textColor, "");
+			curPanel.add(curLabel, new Arrangement(4, 0, 0.05, 1.0));
+
+			curLabel = AccountingUtils.createLabel("", textColor, "");
+			curPanel.add(curLabel, new Arrangement(5, 0, 0.06, 1.0));
+
+			curLabel = AccountingUtils.createLabel("", textColor, "");
+			curPanel.add(curLabel, new Arrangement(6, 0, 0.0, 1.0));
+
+			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+			i++;
+		}
+
+		for (Task task : tasks) {
+			if (!task.hasBeenDone()) {
 				curPanel = task.createPanelOnGUI(database, tab, parentPanel);
 				curPanel.setBackground(GUI.getBackgroundColor());
 				tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
