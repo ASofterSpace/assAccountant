@@ -361,28 +361,53 @@ public class Task {
 		h++;
 
 		final JTextPane taskLog = new JTextPane();
-		taskLog.setPreferredSize(new Dimension(128, 128));
 		if (doneLog != null) {
 			taskLog.setText(doneLog);
 		}
+		int newHeight = taskLog.getPreferredSize().height + 48;
+		if (newHeight < 128) {
+			newHeight = 128;
+		}
+		taskLog.setPreferredSize(new Dimension(128, newHeight));
 
 		final JTextPane finLog = new JTextPane();
-		finLog.setPreferredSize(new Dimension(128, 128));
-		if (done && (doneDate != null)) {
-			StringBuilder finLogText = new StringBuilder();
-			List<FinanceLogEntry> entries = taskCtrl.getFinanceLogs();
-			for (FinanceLogEntry entry : entries) {
-				if (DateUtils.isSameDay(entry.getDate(), doneDate)) {
+		if (Task.this instanceof FinanceOverviewTask) {
+			// if this was done before, load the finance log contents as filled in back then
+			if (done && (doneDate != null)) {
+				StringBuilder finLogText = new StringBuilder();
+				List<FinanceLogEntry> entries = taskCtrl.getFinanceLogs();
+				for (FinanceLogEntry entry : entries) {
+					if (DateUtils.isSameDay(entry.getDate(), doneDate)) {
+						for (FinanceLogEntryRow row : entry.getRows()) {
+							finLogText.append(row.getAccount());
+							finLogText.append(": ");
+							finLogText.append(AccountingUtils.formatMoney(row.getAmount(), Currency.EUR));
+							finLogText.append("\n");
+						}
+					}
+				}
+				finLog.setText(finLogText.toString());
+			}
+			// if this has not been done before, load the latest finance log keys, but do not assing values
+			if (!done) {
+				List<FinanceLogEntry> entries = taskCtrl.getFinanceLogs();
+				if (entries.size() > 0) {
+					StringBuilder finLogText = new StringBuilder();
+					FinanceLogEntry entry = entries.get(0);
 					for (FinanceLogEntryRow row : entry.getRows()) {
 						finLogText.append(row.getAccount());
 						finLogText.append(": ");
-						finLogText.append(AccountingUtils.formatMoney(row.getAmount(), Currency.EUR));
 						finLogText.append("\n");
 					}
+					finLog.setText(finLogText.toString());
 				}
 			}
-			finLog.setText(finLogText.toString());
 		}
+		newHeight = finLog.getPreferredSize().height + 48;
+		if (newHeight < 128) {
+			newHeight = 128;
+		}
+		finLog.setPreferredSize(new Dimension(128, newHeight));
 
 		detailsButton.addActionListener(new ActionListener() {
 			@Override
@@ -492,12 +517,31 @@ public class Task {
 				if (Task.this instanceof FinanceOverviewTask) {
 					FinanceLogEntry entry = new FinanceLogEntry(doneDate);
 					String[] finLogLines = finLog.getText().split("\n");
+					boolean wroteARow = false;
 					for (String line : finLogLines) {
+						line = line.trim();
+						if ("".equals(line)) {
+							continue;
+						}
 						String[] lineSplit = line.split(":");
 						if (lineSplit.length > 1) {
 							Integer amount = StrUtils.parseMoney(lineSplit[1]);
 							entry.add(new FinanceLogEntryRow(lineSplit[0], amount));
+							wroteARow = true;
+							if (lineSplit.length > 2) {
+								AccountingUtils.complain("The line '" + line + "' contained more than one : sign!\n" +
+									"It was parsed as " + lineSplit[0] + ": " + AccountingUtils.formatMoney(amount,
+									Currency.EUR));
+							}
 						}
+						if (lineSplit.length < 2) {
+							AccountingUtils.complain("The line '" + line + "' contained no : sign!\n" +
+								"It was ignored.");
+						}
+					}
+					if (!wroteARow) {
+						AccountingUtils.complain("It looks like the Finance Log section was not filled!\n" +
+							"You can edit the Finance Log section in the task's details on the Task Log tab.");
 					}
 					taskCtrl.addFinanceLogEntry(entry);
 				}
@@ -512,8 +556,10 @@ public class Task {
 		curButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				taskCtrl.deleteTaskInstance(Task.this);
-				taskCtrl.save();
+				if (AccountingUtils.confirmDelete("task '" + getTitle() + "'")) {
+					taskCtrl.deleteTaskInstance(Task.this);
+					taskCtrl.save();
+				}
 			}
 		});
 

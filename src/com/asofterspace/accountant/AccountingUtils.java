@@ -400,6 +400,28 @@ public class AccountingUtils {
 		return false;
 	}
 
+	/**
+	 * Asks the user to confirm the request for deleting the thing toBeDeleted.
+	 * Returns true if the user selects Yes to the deletion.
+	 */
+	public static boolean confirmDelete(String toBeDeleted) {
+
+		Object[] options = {"Yes", "Cancel"};
+
+		int result = JOptionPane.showOptionDialog(
+			null,
+			"Do you really want to delete the " + toBeDeleted + "?",
+			Utils.getProgramTitle(),
+			JOptionPane.YES_NO_OPTION,
+			JOptionPane.QUESTION_MESSAGE,
+			null,
+			options,
+			options[1]
+		);
+
+		return result == JOptionPane.YES_OPTION;
+	}
+
 	public static String getEntryForLog(Entry entry) {
 		String result = "";
 		if (entry instanceof Incoming) {

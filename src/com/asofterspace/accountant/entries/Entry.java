@@ -374,7 +374,9 @@ public abstract class Entry {
 		curButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				Entry.this.deleteFrom(database);
+				if (AccountingUtils.confirmDelete("entry '" + getTitle() + "'")) {
+					Entry.this.deleteFrom(database);
+				}
 			}
 		});
 
