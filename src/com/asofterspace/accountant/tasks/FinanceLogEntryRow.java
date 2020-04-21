@@ -51,7 +51,11 @@ public class FinanceLogEntryRow {
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.5, 1.0));
 
 		curLabel = AccountingUtils.createLabel(AccountingUtils.formatMoney(getAmount(), Currency.EUR), textColor, "");
-		curPanel.add(curLabel, new Arrangement(1, 0, 0.5, 1.0));
+		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		curPanel.add(curLabel, new Arrangement(1, 0, 0.1, 1.0));
+
+		curLabel = AccountingUtils.createLabel("", textColor, "");
+		curPanel.add(curLabel, new Arrangement(2, 0, 0.4, 1.0));
 
 		return curPanel;
 	}

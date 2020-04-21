@@ -409,7 +409,6 @@ public class Task {
 				} else {
 					Task.this.done = true;
 					setDoneDate(new Date());
-					setDoneDate(DateUtils.parseDate(getReleasedDateStr())); // DEBUG
 				}
 				setDoneLog(taskLog.getText());
 				if (Task.this instanceof FinanceOverviewTask) {
