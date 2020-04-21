@@ -17,6 +17,8 @@ import com.asofterspace.toolbox.Utils;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.util.Collections;
@@ -490,5 +492,16 @@ public class AccountingUtils {
 		Dimension newSize = new Dimension(parentPanel.getWidth(), newHeight);
 		tab.setPreferredSize(newSize);
 		parentPanel.setPreferredSize(newSize);
+	}
+
+	public static MouseAdapter getRowHighlighter(final JPanel curPanel) {
+		return new MouseAdapter() {
+			public void mouseExited(MouseEvent e) {
+				curPanel.setBackground(new Color(255, 255, 255));
+			}
+			public void mouseEntered(MouseEvent e) {
+				curPanel.setBackground(new Color(235, 215, 255));
+			}
+		};
 	}
 }

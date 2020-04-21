@@ -16,6 +16,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -324,30 +325,37 @@ public class Task {
 		curPanel.setBackground(GUI.getBackgroundColor());
 		curPanel.setLayout(new GridBagLayout());
 
+		MouseAdapter rowHighlighter = AccountingUtils.getRowHighlighter(curPanel);
+
 		int h = 0;
 
 		CopyByClickLabel curLabel = AccountingUtils.createLabel(getReleasedDateStr(), textColor, "");
+		curLabel.addMouseListener(rowHighlighter);
 		curPanel.add(curLabel, new Arrangement(h, 0, 0.08, 1.0));
 		h++;
 
 		double titleWidth = 0.5;
 		if (done && (doneDate != null)) {
 			curLabel = AccountingUtils.createLabel(DateUtils.serializeDate(getDoneDate()), textColor, "");
+			curLabel.addMouseListener(rowHighlighter);
 			curPanel.add(curLabel, new Arrangement(h, 0, 0.08, 1.0));
 			titleWidth = 0.42;
 			h++;
 		}
 
 		curLabel = AccountingUtils.createLabel(title, textColor, "");
+		curLabel.addMouseListener(rowHighlighter);
 		curPanel.add(curLabel, new Arrangement(h, 0, titleWidth, 1.0));
 		h++;
 
 		curLabel = AccountingUtils.createLabel("", textColor, "");
+		curLabel.addMouseListener(rowHighlighter);
 		curPanel.add(curLabel, new Arrangement(h, 0, 0.0, 1.0));
 		h++;
 
 		final List<JComponent> addedLines = new ArrayList<>();
 		final JButton detailsButton = new JButton("Show Details");
+		detailsButton.addMouseListener(rowHighlighter);
 		if ((details == null) || (details.size() < 1)) {
 			detailsButton.setText("Add Details");
 			// actually keep the details button enabled in case the user want to add a log
@@ -496,6 +504,7 @@ public class Task {
 		});
 
 		JButton curButton = new JButton("Done");
+		curButton.addMouseListener(rowHighlighter);
 		if (done) {
 			curButton.setText("Save");
 		}
@@ -550,6 +559,7 @@ public class Task {
 		});
 
 		curButton = new JButton("Delete");
+		curButton.addMouseListener(rowHighlighter);
 		curButton.setPreferredSize(defaultDimension);
 		curPanel.add(curButton, new Arrangement(h, 0, 0.06, 1.0));
 		h++;
@@ -564,6 +574,7 @@ public class Task {
 		});
 
 		curLabel = AccountingUtils.createLabel("", textColor, "");
+		curLabel.addMouseListener(rowHighlighter);
 		curPanel.add(curLabel, new Arrangement(h, 0, 0.0, 1.0));
 		h++;
 

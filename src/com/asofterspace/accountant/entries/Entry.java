@@ -25,6 +25,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.Date;
@@ -301,7 +302,10 @@ public abstract class Entry {
 		curPanel.setBackground(GUI.getBackgroundColor());
 		curPanel.setLayout(new GridBagLayout());
 
+		MouseAdapter rowHighlighter = AccountingUtils.getRowHighlighter(curPanel);
+
 		CopyByClickLabel curLabel = AccountingUtils.createLabel(getDateAsText(), textColor, tooltip);
+		curLabel.addMouseListener(rowHighlighter);
 		curLabel.setHorizontalAlignment(CopyByClickLabel.CENTER);
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.1, 1.0));
 
@@ -322,31 +326,39 @@ public abstract class Entry {
 
 		// Buuut actually that gets quite confusing, so instead we just add a tooltip:
 		curLabel = AccountingUtils.createLabel(getTitle(), textColor, tooltip);
+		curLabel.addMouseListener(rowHighlighter);
 		curPanel.add(curLabel, new Arrangement(1, 0, 0.3, 1.0));
 
 		curLabel = AccountingUtils.createLabel("[" + getCategoryOrCustomer() + "]", textColor, tooltip);
+		curLabel.addMouseListener(rowHighlighter);
 		curPanel.add(curLabel, new Arrangement(2, 0, 0.11, 1.0));
 
 		curLabel = AccountingUtils.createLabel(getOriginator(), textColor, tooltip);
+		curLabel.addMouseListener(rowHighlighter);
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curPanel.add(curLabel, new Arrangement(3, 0, 0.05, 1.0));
 
 		curLabel = AccountingUtils.createLabel(getAmountAsText(), textColor, tooltip);
+		curLabel.addMouseListener(rowHighlighter);
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curPanel.add(curLabel, new Arrangement(4, 0, 0.1, 1.0));
 
 		curLabel = AccountingUtils.createLabel(getTaxPercentAsText(), textColor, tooltip);
+		curLabel.addMouseListener(rowHighlighter);
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curPanel.add(curLabel, new Arrangement(5, 0, 0.1, 1.0));
 
 		curLabel = AccountingUtils.createLabel(getPostTaxAmountAsText(), textColor, tooltip);
+		curLabel.addMouseListener(rowHighlighter);
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curPanel.add(curLabel, new Arrangement(6, 0, 0.1, 1.0));
 
 		curLabel = AccountingUtils.createLabel("", textColor, tooltip);
+		curLabel.addMouseListener(rowHighlighter);
 		curPanel.add(curLabel, new Arrangement(7, 0, 0.0, 1.0));
 
 		JButton curButton = new JButton("Paid");
+		curButton.addMouseListener(rowHighlighter);
 		curButton.setPreferredSize(defaultDimension);
 		curPanel.add(curButton, new Arrangement(8, 0, 0.05, 1.0));
 		curButton.addActionListener(new ActionListener() {
@@ -358,6 +370,7 @@ public abstract class Entry {
 		});
 
 		curButton = new JButton("Edit");
+		curButton.addMouseListener(rowHighlighter);
 		curButton.setPreferredSize(defaultDimension);
 		curPanel.add(curButton, new Arrangement(9, 0, 0.05, 1.0));
 		curButton.addActionListener(new ActionListener() {
@@ -369,6 +382,7 @@ public abstract class Entry {
 		});
 
 		curButton = new JButton("Delete");
+		curButton.addMouseListener(rowHighlighter);
 		curButton.setPreferredSize(defaultDimension);
 		curPanel.add(curButton, new Arrangement(10, 0, 0.06, 1.0));
 		curButton.addActionListener(new ActionListener() {
@@ -381,6 +395,7 @@ public abstract class Entry {
 		});
 
 		curLabel = AccountingUtils.createLabel("", textColor, tooltip);
+		curLabel.addMouseListener(rowHighlighter);
 		curPanel.add(curLabel, new Arrangement(11, 0, 0.0, 1.0));
 
 		return curPanel;
