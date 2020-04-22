@@ -20,6 +20,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 import java.awt.GridBagLayout;
 import java.util.List;
 
@@ -202,10 +203,12 @@ public class OverviewTab extends Tab {
 		for (final ConsistencyProblem curProblem : consistencyProblems) {
 
 			curPanel = new JPanel();
+			MouseAdapter rowHighlighter = AccountingUtils.getRowHighlighter(curPanel);
 			curPanel.setBackground(GUI.getBackgroundColor());
 			curPanel.setLayout(new GridBagLayout());
 
 			curLabel = new CopyByClickLabel(curProblem.getProblem());
+			curLabel.addMouseListener(rowHighlighter);
 			if (curProblem.isImportant()) {
 				curLabel.setForeground(new Color(196, 0, 0));
 			} else {
@@ -215,6 +218,7 @@ public class OverviewTab extends Tab {
 			curPanel.add(curLabel, new Arrangement(0, 0, 0.8, 1.0));
 
 			JButton curButton = new JButton("Edit");
+			curButton.addMouseListener(rowHighlighter);
 			curButton.setPreferredSize(defaultDimension);
 			curPanel.add(curButton, new Arrangement(1, 0, 0.1, 1.0));
 			curButton.addActionListener(new ActionListener() {
@@ -226,10 +230,12 @@ public class OverviewTab extends Tab {
 			});
 
 			curLabel = new CopyByClickLabel("");
+			curLabel.addMouseListener(rowHighlighter);
 			curLabel.setPreferredSize(defaultDimension);
 			curPanel.add(curLabel, new Arrangement(2, 0, 0.0, 1.0));
 
 			curButton = new JButton("Show");
+			curButton.addMouseListener(rowHighlighter);
 			curButton.setPreferredSize(defaultDimension);
 			curPanel.add(curButton, new Arrangement(3, 0, 0.1, 1.0));
 			curButton.addActionListener(new ActionListener() {
@@ -240,6 +246,7 @@ public class OverviewTab extends Tab {
 			});
 
 			curLabel = new CopyByClickLabel("");
+			curLabel.addMouseListener(rowHighlighter);
 			curLabel.setPreferredSize(defaultDimension);
 			curPanel.add(curLabel, new Arrangement(4, 0, 0.0, 1.0));
 
