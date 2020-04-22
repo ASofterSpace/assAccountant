@@ -605,6 +605,7 @@ public class GUI extends MainWindow {
 		mainPanelRight.repaint();
 		mainPanelRightScroller.revalidate();
 		mainPanelRightScroller.repaint();
+		mainPanelRightScroller.getVerticalScrollBar().setValue(0);
 	}
 
 	private void showSelectedTab() {
