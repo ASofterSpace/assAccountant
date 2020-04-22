@@ -6,6 +6,7 @@ package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
+import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.toolbox.gui.Arrangement;
@@ -94,7 +95,10 @@ public class AddPaidGUI {
 
 		curPanel = new JPanel();
 		curPanel.setLayout(new GridBagLayout());
-		curLabel = new CopyByClickLabel("Paid to Account: ");
+		curLabel = new CopyByClickLabel("Paid from Account: ");
+		if (editingEntry instanceof Outgoing) {
+			curLabel.setText("Paid to Account: ");
+		}
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
 		account = new JComboBox<>();
 		account.setEditable(true);

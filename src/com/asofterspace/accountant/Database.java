@@ -34,6 +34,10 @@ import java.util.Set;
 public class Database {
 
 	private static final String YEARS_KEY = "years";
+	private static final String BULK_IMPORT_CUSTOMERS_KEY = "bulkImportCustomers";
+	private static final String CATEGORY_MAPPINGS_KEY = "categoryMappings";
+	private static final String CATEGORY_MAPPINGS_CONTAINS_KEY = "contains";
+	private static final String CATEGORY_MAPPINGS_CATEGORY_KEY = "category";
 	private static final String BACKUP_FILE_NAME = "database_backup_";
 	private static final String CURRENT_BACKUP_KEY = "currentBackup";
 
@@ -68,58 +72,17 @@ public class Database {
 		this.loadedRoot = loadFromFile(dbFile);
 
 		// only used during bulk import of legacy data
-		potentialCustomers = new ArrayList<>();
-		potentialCustomers.add("TPZ-Vega");
-		potentialCustomers.add("Recoded");
-		potentialCustomers.add("Skyhook");
-		potentialCustomers.add("SuperVision Earth");
+		potentialCustomers = loadedRoot.getArrayAsStringList(BULK_IMPORT_CUSTOMERS_KEY);
 
+		// map incoming invoice texts to incoming invoice categories
 		titleToCategoryMapping = new HashMap<>();
-
-		titleToCategoryMapping.put("FF43", Category.PERSONAL);
-
-		titleToCategoryMapping.put("Wikimedia", Category.DONATION);
-		titleToCategoryMapping.put("Patreon", Category.DONATION);
-		titleToCategoryMapping.put("Against Malaria", Category.DONATION);
-		titleToCategoryMapping.put("Projekt Gutenberg", Category.DONATION);
-		titleToCategoryMapping.put("Internet Archive", Category.DONATION);
-		titleToCategoryMapping.put("StrongMinds", Category.DONATION);
-
-		titleToCategoryMapping.put("Fiverr", Category.EXTERNAL_SALARY);
-
-		titleToCategoryMapping.put("Fahrkarte", Category.TRAVEL);
-		titleToCategoryMapping.put("Ticket", Category.TRAVEL);
-		titleToCategoryMapping.put("Bahn", Category.TRAVEL);
-		titleToCategoryMapping.put("Flixbus", Category.TRAVEL);
-		titleToCategoryMapping.put("Travel", Category.TRAVEL);
-		titleToCategoryMapping.put("RMV", Category.TRAVEL);
-		titleToCategoryMapping.put("VBB", Category.TRAVEL);
-		titleToCategoryMapping.put("SNCF", Category.TRAVEL);
-		titleToCategoryMapping.put("inoui", Category.TRAVEL);
-
-		titleToCategoryMapping.put("Google", Category.INFRASTRUCTURE);
-		titleToCategoryMapping.put("Gsuite", Category.INFRASTRUCTURE);
-		titleToCategoryMapping.put("GSuite", Category.INFRASTRUCTURE);
-		titleToCategoryMapping.put("Speicherzentrum", Category.INFRASTRUCTURE);
-		titleToCategoryMapping.put("Speicheranbieter", Category.INFRASTRUCTURE);
-		titleToCategoryMapping.put("Microsoft", Category.INFRASTRUCTURE);
-		titleToCategoryMapping.put("Mindfactory", Category.INFRASTRUCTURE);
-		titleToCategoryMapping.put("Mobatek", Category.INFRASTRUCTURE);
-		titleToCategoryMapping.put("Oculus", Category.INFRASTRUCTURE);
-		titleToCategoryMapping.put("Computer Game", Category.INFRASTRUCTURE);
-		titleToCategoryMapping.put("Conrad", Category.INFRASTRUCTURE);
-		titleToCategoryMapping.put("Snapmaker", Category.INFRASTRUCTURE);
-		titleToCategoryMapping.put("Proengeno", Category.INFRASTRUCTURE);
-		titleToCategoryMapping.put("Vive", Category.INFRASTRUCTURE);
-		titleToCategoryMapping.put("Vroo", Category.INFRASTRUCTURE);
-
-		titleToCategoryMapping.put("ESAW", Category.EDUCATION);
-		titleToCategoryMapping.put("Expo", Category.EDUCATION);
-
-		titleToCategoryMapping.put("Sixt", Category.VEHICLE);
-
-		titleToCategoryMapping.put("Druckerei", Category.ADVERTISEMENTS);
-		titleToCategoryMapping.put("OnlinePrinters", Category.ADVERTISEMENTS);
+		List<Record> catMappings = loadedRoot.getArray(CATEGORY_MAPPINGS_KEY);
+		for (Record catMapping : catMappings) {
+			titleToCategoryMapping.put(
+				catMapping.getString(CATEGORY_MAPPINGS_CONTAINS_KEY),
+				Category.fromString(catMapping.getString(CATEGORY_MAPPINGS_CATEGORY_KEY))
+			);
+		}
 	}
 
 	private Record loadFromFile(ConfigFile fileToLoad) {
@@ -129,7 +92,11 @@ public class Database {
 		// create a default database file, if necessary
 		if (fileToLoad.getAllContents().isEmpty()) {
 			try {
-				fileToLoad.setAllContents(new JSON("{\"" + YEARS_KEY + "\":[]}"));
+				fileToLoad.setAllContents(new JSON(
+					"{\"" + YEARS_KEY + "\":[], " +
+					"\"" + BULK_IMPORT_CUSTOMERS_KEY + "\":[], " +
+					"\"" + CATEGORY_MAPPINGS_KEY + "\":[]}"
+				));
 			} catch (JsonParseException e) {
 				System.err.println("JSON parsing failed internally: " + e);
 			}
@@ -499,6 +466,21 @@ public class Database {
 
 		for (Year year : years) {
 			yearRec.append(year.toRecord());
+		}
+
+		Record bulkImportCustomersRec = Record.emptyArray();
+		root.set(BULK_IMPORT_CUSTOMERS_KEY, bulkImportCustomersRec);
+		for (String potentialCustomer : potentialCustomers) {
+			bulkImportCustomersRec.append(potentialCustomer);
+		}
+
+		Record titleToCategoryMappingRec = Record.emptyArray();
+		root.set(CATEGORY_MAPPINGS_KEY, titleToCategoryMappingRec);
+		for (Map.Entry<String, Category> mapping : titleToCategoryMapping.entrySet()) {
+			Record mappingRec = Record.emptyObject();
+			mappingRec.set(CATEGORY_MAPPINGS_CONTAINS_KEY, mapping.getKey());
+			mappingRec.set(CATEGORY_MAPPINGS_CATEGORY_KEY, mapping.getValue().toString());
+			titleToCategoryMappingRec.append(mappingRec);
 		}
 
 		taskCtrl.saveIntoRecord(root);

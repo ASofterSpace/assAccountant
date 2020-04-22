@@ -43,6 +43,9 @@ public enum Category {
 	// anything else
 	OTHER("Other", false);
 
+	// when adding keys here, ENSURE that the textual representation and the key start with the same
+	// word (until the first space or underscore, and ignoring trailing s), such that fromString works!
+
 
 	// the textual representation of each category
 	private String text;
@@ -64,6 +67,9 @@ public enum Category {
 		this.isSpecialCategory = isSpecial;
 	}
 
+	/**
+	 * Accepts both the textual representation and the enum value as input
+	 */
 	public static Category fromString(String from) {
 
 		String startFrom = getStart(from);
@@ -95,14 +101,18 @@ public enum Category {
 		val = val.trim();
 
 		if (val.contains(" ")) {
-			 val = val.substring(0, val.indexOf(" "));
-		 }
+			val = val.substring(0, val.indexOf(" "));
+		}
 
-		 val = val.toLowerCase();
+		if (val.contains("_")) {
+			val = val.substring(0, val.indexOf("_"));
+		}
 
-		 if (val.endsWith("s")) {
-			 val = val.substring(0, val.length() - 1);
-		 }
+		val = val.toLowerCase();
+
+		if (val.endsWith("s")) {
+			val = val.substring(0, val.length() - 1);
+		}
 
 		return val;
 	}
