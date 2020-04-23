@@ -662,6 +662,8 @@ public class GUI extends MainWindow {
 					database.bulkImportIncomings(new SimpleFile(curFile));
 				}
 
+				database.save();
+
 				break;
 
 			case JFileChooser.CANCEL_OPTION:
@@ -689,6 +691,8 @@ public class GUI extends MainWindow {
 					database.bulkImportOutgoings(new SimpleFile(curFile));
 				}
 
+				database.save();
+
 				break;
 
 			case JFileChooser.CANCEL_OPTION:
@@ -715,6 +719,7 @@ public class GUI extends MainWindow {
 				for (java.io.File curFile : importFilePicker.getSelectedFiles()) {
 					database.bulkImportBankStatements(new SimpleFile(curFile));
 				}
+				database.save();
 
 				break;
 

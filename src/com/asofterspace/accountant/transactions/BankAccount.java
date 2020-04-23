@@ -31,6 +31,16 @@ public class BankAccount {
 	private Set<BankTransaction> transactions;
 
 
+	private BankAccount() {
+	}
+
+	public BankAccount(String bank, String iban, String accountHolder) {
+		this.bank = bank;
+		this.iban = iban;
+		this.accountHolder = accountHolder;
+		this.transactions = new HashSet<>();
+	}
+
 	public static BankAccount fromRecord(Record rec) {
 
 		BankAccount result = new BankAccount();

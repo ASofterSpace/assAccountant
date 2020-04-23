@@ -336,6 +336,8 @@ public class Database {
 				break;
 			}
 		}
+
+		// we do NOT save here, as the caller is supposed to save after having called for several files!
 	}
 
 	public Category mapTitleToCategory(String titleStr) {
@@ -389,6 +391,8 @@ public class Database {
 				break;
 			}
 		}
+
+		// we do NOT save here, as the caller is supposed to save after having called for several files!
 	}
 
 	public void bulkImportBankStatements(SimpleFile bulkFile) {
@@ -415,10 +419,33 @@ public class Database {
 		outFile.saveContent(pdfText); // DEBUG
 
 		if (pdfText.contains("[(Sparda-Bank Berlin eG)]TJ")) {
+			String bank = "Sparda";
+			String iban = null;
+			String owner = null;
+			if (pdfText.contains("[(IBAN: ")) {
+				iban = pdfText.substring(pdfText.indexOf("[(IBAN: ") + 8);
+				iban = iban.substring(0, iban.indexOf("BIC:"));
+				iban = iban.replaceAll(" ", "");
+			}
+			if (pdfText.contains("-29.8181 -1.2424 Td")) {
+				owner = pdfText.substring(pdfText.indexOf("-29.8181 -1.2424 Td"));
+				owner = owner.substring(owner.indexOf("[(") + 2);
+				owner = owner.substring(0, owner.indexOf(")]"));
+			}
+			BankAccount curAccount = new BankAccount(bank, iban, owner);
+			for (BankAccount bankAccount : bankAccounts) {
+				if (curAccount.equals(bankAccount)) {
+					curAccount = bankAccount;
+					break;
+				}
+			}
+			bankAccounts.add(curAccount);
 
 		} else {
 			AccountingUtils.complain("The input file does not belong to a known bank!");
 		}
+
+		// we do NOT save here, as the caller is supposed to save after having called for several files!
 	}
 
 	public List<Outgoing> getOutgoings() {
