@@ -41,6 +41,7 @@ public class Database {
 	private static final String CATEGORY_MAPPINGS_KEY = "categoryMappings";
 	private static final String CATEGORY_MAPPINGS_CONTAINS_KEY = "contains";
 	private static final String CATEGORY_MAPPINGS_CATEGORY_KEY = "category";
+	private static final String BANK_ACCOUNTS_KEY = "bankAccounts";
 	private static final String BACKUP_FILE_NAME = "database_backup_";
 	private static final String CURRENT_BACKUP_KEY = "currentBackup";
 
@@ -74,19 +75,6 @@ public class Database {
 		this.dbFile = new ConfigFile("database", true);
 
 		this.loadedRoot = loadFromFile(dbFile);
-
-		// only used during bulk import of legacy data
-		potentialCustomers = loadedRoot.getArrayAsStringList(BULK_IMPORT_CUSTOMERS_KEY);
-
-		// map incoming invoice texts to incoming invoice categories
-		titleToCategoryMapping = new HashMap<>();
-		List<Record> catMappings = loadedRoot.getArray(CATEGORY_MAPPINGS_KEY);
-		for (Record catMapping : catMappings) {
-			titleToCategoryMapping.put(
-				catMapping.getString(CATEGORY_MAPPINGS_CONTAINS_KEY),
-				Category.fromString(catMapping.getString(CATEGORY_MAPPINGS_CATEGORY_KEY))
-			);
-		}
 	}
 
 	private Record loadFromFile(ConfigFile fileToLoad) {
@@ -107,12 +95,34 @@ public class Database {
 		}
 
 		Record root = fileToLoad.getAllContents();
+
+		// years containing months, themselves containing incoming and outgoing entries
 		List<Record> yearRecs = root.getArray(YEARS_KEY);
 		for (Record yearRec : yearRecs) {
 			Year curYear = new Year(yearRec, this);
 			years.add(curYear);
 		}
 		sortYears();
+
+		// bank accounts containing transactions
+		bankAccounts = new ArrayList<>();
+		List<Record> recs = root.getArray(BANK_ACCOUNTS_KEY);
+		for (Record rec : recs) {
+			bankAccounts.add(BankAccount.fromRecord(rec));
+		}
+
+		// only used during bulk import of legacy data
+		potentialCustomers = root.getArrayAsStringList(BULK_IMPORT_CUSTOMERS_KEY);
+
+		// map incoming invoice texts to incoming invoice categories
+		titleToCategoryMapping = new HashMap<>();
+		List<Record> catMappings = root.getArray(CATEGORY_MAPPINGS_KEY);
+		for (Record catMapping : catMappings) {
+			titleToCategoryMapping.put(
+				catMapping.getString(CATEGORY_MAPPINGS_CONTAINS_KEY),
+				Category.fromString(catMapping.getString(CATEGORY_MAPPINGS_CATEGORY_KEY))
+			);
+		}
 		return root;
 	}
 
@@ -500,6 +510,12 @@ public class Database {
 
 		for (Year year : years) {
 			yearRec.append(year.toRecord());
+		}
+
+		Record bankAccountsRec = Record.emptyArray();
+		root.set(BANK_ACCOUNTS_KEY, bankAccountsRec);
+		for (BankAccount bankAccount : bankAccounts) {
+			bankAccountsRec.append(bankAccount.toRecord());
 		}
 
 		Record bulkImportCustomersRec = Record.emptyArray();
