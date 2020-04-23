@@ -208,14 +208,24 @@ public class GUI extends MainWindow {
 		});
 		file.add(bulkImportOut);
 
+		JMenuItem bulkImportBankStatements = new JMenuItem("Bulk Import Bank Statements (assuming already decrypted, e.g. using qpdf)");
+		bulkImportBankStatements.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				bulkImportBankStatements();
+			}
+		});
+		file.add(bulkImportBankStatements);
+
 		file.addSeparator();
 
 		JMenuItem dropEntireDatabase = new JMenuItem("Drop Entire Database");
 		dropEntireDatabase.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO :: guard this with an extra popup!
-				database.drop();
+				if (AccountingUtils.confirmDelete("entire database")) {
+					database.drop();
+				}
 			}
 		});
 		file.add(dropEntireDatabase);
@@ -677,6 +687,33 @@ public class GUI extends MainWindow {
 				// load the files
 				for (java.io.File curFile : importFilePicker.getSelectedFiles()) {
 					database.bulkImportOutgoings(new SimpleFile(curFile));
+				}
+
+				break;
+
+			case JFileChooser.CANCEL_OPTION:
+				// cancel was pressed... do nothing!
+				break;
+		}
+	}
+
+	private void bulkImportBankStatements() {
+
+		// TODO :: actually, write our own file chooser
+		JFileChooser importFilePicker = new JFileChooser(System.getProperty("java.class.path") + "/..");
+
+		importFilePicker.setDialogTitle("Open Files to Bulk Import Bank Statements");
+		importFilePicker.setMultiSelectionEnabled(true);
+
+		int result = importFilePicker.showOpenDialog(mainFrame);
+
+		switch (result) {
+
+			case JFileChooser.APPROVE_OPTION:
+
+				// load the files
+				for (java.io.File curFile : importFilePicker.getSelectedFiles()) {
+					database.bulkImportBankStatements(new SimpleFile(curFile));
 				}
 
 				break;

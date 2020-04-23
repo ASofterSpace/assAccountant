@@ -9,12 +9,15 @@ import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
+import com.asofterspace.accountant.transactions.BankAccount;
 import com.asofterspace.accountant.world.Category;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.io.SimpleFile;
+import com.asofterspace.toolbox.pdf.PdfFile;
+import com.asofterspace.toolbox.pdf.PdfObject;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.Utils;
@@ -56,6 +59,7 @@ public class Database {
 
 	private Record loadedRoot;
 	private List<Year> years;
+	private List<BankAccount> bankAccounts;
 
 	// the following two fields are used for storing information used during legacy bulk imports only
 	private List<String> potentialCustomers;
@@ -374,6 +378,36 @@ public class Database {
 				// stop upon the first failure instead of showing a million error messages
 				break;
 			}
+		}
+	}
+
+	public void bulkImportBankStatements(SimpleFile bulkFile) {
+
+		PdfFile pdf = new PdfFile(bulkFile);
+
+		List<PdfObject> objs = pdf.getObjects();
+
+		StringBuilder pdfPlainText = new StringBuilder();
+
+		for (PdfObject obj : objs) {
+
+			try {
+				pdfPlainText.append(obj.getPlainStreamContent());
+				pdfPlainText.append("\n");
+			} catch (Exception e) {
+				// whoops!
+			}
+		}
+
+		String pdfText = pdfPlainText.toString();
+
+		SimpleFile outFile = new SimpleFile("data/pdf_debug.txt"); // DEBUG
+		outFile.saveContent(pdfText); // DEBUG
+
+		if (pdfText.contains("[(Sparda-Bank Berlin eG)]TJ")) {
+
+		} else {
+			AccountingUtils.complain("The input file does not belong to a known bank!");
 		}
 	}
 
