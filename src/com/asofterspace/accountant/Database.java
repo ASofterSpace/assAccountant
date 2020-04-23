@@ -10,6 +10,7 @@ import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.transactions.BankAccount;
+import com.asofterspace.accountant.transactions.BankTransaction;
 import com.asofterspace.accountant.world.Category;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.configuration.ConfigFile;
@@ -20,6 +21,7 @@ import com.asofterspace.toolbox.pdf.PdfFile;
 import com.asofterspace.toolbox.pdf.PdfObject;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
+import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 
 import java.util.ArrayList;
@@ -419,6 +421,8 @@ public class Database {
 		outFile.saveContent(pdfText); // DEBUG
 
 		if (pdfText.contains("[(Sparda-Bank Berlin eG)]TJ")) {
+			pdfText = pdfText.replaceAll("\\\\334", "Ü");
+			pdfText = pdfText.replaceAll("\\\\344", "ä");
 			String bank = "Sparda";
 			String iban = null;
 			String owner = null;
@@ -433,13 +437,66 @@ public class Database {
 				owner = owner.substring(0, owner.indexOf(")]"));
 			}
 			BankAccount curAccount = new BankAccount(bank, iban, owner);
+			boolean alreadyExisting = false;
 			for (BankAccount bankAccount : bankAccounts) {
 				if (curAccount.equals(bankAccount)) {
 					curAccount = bankAccount;
+					alreadyExisting = true;
 					break;
 				}
 			}
-			bankAccounts.add(curAccount);
+			if (!alreadyExisting) {
+				bankAccounts.add(curAccount);
+			}
+
+			if (pdfText.contains("[(Vorgang)]TJ")) {
+				String transStr = pdfText.substring(pdfText.indexOf("[(Vorgang)]TJ") + 13);
+				String curEntryStr = null;
+				String curDateStr = null;
+				Date curDate = null;
+				Integer amount = null;
+				String curYear = null;
+				if (pdfText.contains("2.9999 -3.0303 Td")) {
+					curYear = pdfText.substring(pdfText.indexOf("2.9999 -3.0303 Td"));
+					curYear = curYear.substring(curYear.indexOf("[(") + 2);
+					curYear = curYear.substring(curYear.indexOf("/") + 1);
+					curYear = curYear.substring(0, curYear.indexOf(")]"));
+				}
+				while (transStr.contains("[(")) {
+					transStr = transStr.substring(transStr.indexOf("[(") + 2);
+					if ((transStr.charAt(2) == '.') && (transStr.charAt(5) == '.') && (transStr.charAt(6) == ' ')) {
+						if (curEntryStr != null) {
+							// finalize previous entry
+							curAccount.addTransaction(new BankTransaction(amount, curEntryStr, curDate, curAccount));
+						}
+						curEntryStr = transStr.substring(0, transStr.indexOf(")]"));
+						curDateStr = curEntryStr.substring(0, 6) + curYear;
+						curDate = DateUtils.parseDate(curDateStr);
+						curEntryStr = curEntryStr.substring(14);
+						String amountStr = curEntryStr.substring(curEntryStr.lastIndexOf("  ") + 2);
+						amount = StrUtils.parseMoney(amountStr);
+						curEntryStr = curEntryStr.substring(0, curEntryStr.lastIndexOf("  "));
+						curEntryStr = curEntryStr.trim();
+						continue;
+					}
+					if (curEntryStr == null) {
+						continue;
+					}
+					if (transStr.startsWith("                                            Übertrag")) {
+						// finalize previous entry
+						curAccount.addTransaction(new BankTransaction(amount, curEntryStr, curDate, curAccount));
+
+						if (transStr.contains("[(Vorgang)]TJ")) {
+							transStr = transStr.substring(transStr.indexOf("[(Vorgang)]TJ") + 13);
+							curEntryStr = null;
+						} else {
+							break;
+						}
+					} else {
+						curEntryStr += "\n" + transStr.substring(0, transStr.indexOf(")]")).trim();
+					}
+				}
+			}
 
 		} else {
 			AccountingUtils.complain("The input file does not belong to a known bank!");

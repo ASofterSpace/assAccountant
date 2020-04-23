@@ -30,6 +30,16 @@ public class BankTransaction {
 	private BankAccount belongsTo;
 
 
+	private BankTransaction() {
+	}
+
+	public BankTransaction(Integer amount, String title, Date date, BankAccount belongsTo) {
+		this.amount = amount;
+		this.title = title;
+		this.date = date;
+		this.belongsTo = belongsTo;
+	}
+
 	public static BankTransaction fromRecord(Record rec, BankAccount parent) {
 
 		BankTransaction result = new BankTransaction();

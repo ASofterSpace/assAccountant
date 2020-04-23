@@ -96,6 +96,10 @@ public class BankAccount {
 		return transactions;
 	}
 
+	public void addTransaction(BankTransaction newTrans) {
+		transactions.add(newTrans);
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		if (other == null) {
