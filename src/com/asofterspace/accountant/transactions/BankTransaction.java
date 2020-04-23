@@ -27,8 +27,10 @@ public class BankTransaction {
 
 	private Date date;
 
+	private BankAccount belongsTo;
 
-	public static BankTransaction fromRecord(Record rec) {
+
+	public static BankTransaction fromRecord(Record rec, BankAccount parent) {
 
 		BankTransaction result = new BankTransaction();
 
@@ -37,6 +39,8 @@ public class BankTransaction {
 		result.title = rec.getString(TITLE_KEY);
 
 		result.date = DateUtils.parseDate(rec.getString(DATE_KEY));
+
+		result.belongsTo = parent;
 
 		return result;
 	}
@@ -64,6 +68,35 @@ public class BankTransaction {
 
 	public Date getDate() {
 		return date;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other == null) {
+			return false;
+		}
+		if (other instanceof BankTransaction) {
+			BankTransaction otherBankTransaction = (BankTransaction) other;
+			if (!this.amount.equals(otherBankTransaction.amount)) {
+				 return false;
+			}
+			if (!this.title.equals(otherBankTransaction.title)) {
+				 return false;
+			}
+			if (!this.date.equals(otherBankTransaction.date)) {
+				 return false;
+			}
+			if (!this.belongsTo.equals(otherBankTransaction.belongsTo)) {
+				 return false;
+			}
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return amount;
 	}
 
 }

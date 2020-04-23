@@ -6,8 +6,9 @@ package com.asofterspace.accountant.transactions;
 
 import com.asofterspace.toolbox.utils.Record;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -26,7 +27,8 @@ public class BankAccount {
 
 	private String accountHolder;
 
-	private List<BankTransaction> transactions;
+	// we use a set here, such that we automatically only get each transaction once
+	private Set<BankTransaction> transactions;
 
 
 	public static BankAccount fromRecord(Record rec) {
@@ -39,11 +41,11 @@ public class BankAccount {
 
 		result.accountHolder = rec.getString(OWNER_KEY);
 
-		result.transactions = new ArrayList<>();
+		result.transactions = new HashSet<>();
 
 		List<Record> recs = rec.getArray(TRANSACTIONS_KEY);
 		for (Record trans : recs) {
-			result.transactions.add(BankTransaction.fromRecord(trans));
+			result.transactions.add(BankTransaction.fromRecord(trans, result));
 		}
 
 		return result;
@@ -80,8 +82,34 @@ public class BankAccount {
 		return accountHolder;
 	}
 
-	public List<BankTransaction> getTransactions() {
+	public Set<BankTransaction> getTransactions() {
 		return transactions;
+	}
+
+	@Override
+	public boolean equals(Object other) {
+		if (other == null) {
+			return false;
+		}
+		if (other instanceof BankAccount) {
+			BankAccount otherBankAccount = (BankAccount) other;
+			if (!this.bank.equals(otherBankAccount.bank)) {
+				 return false;
+			}
+			if (!this.iban.equals(otherBankAccount.iban)) {
+				 return false;
+			}
+			if (!this.accountHolder.equals(otherBankAccount.accountHolder)) {
+				 return false;
+			}
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return this.iban.hashCode();
 	}
 
 }
