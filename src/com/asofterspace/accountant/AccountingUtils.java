@@ -38,6 +38,13 @@ public class AccountingUtils {
 			return "N/A";
 		}
 
+		// let the main part of the function work only on positive values, and just add the minus sign
+		// in the very end again
+		boolean isNegative = amount < 0;
+		if (isNegative) {
+			amount = - amount;
+		}
+
 		String result = "" + amount;
 
 		// 1 to 001
@@ -55,6 +62,10 @@ public class AccountingUtils {
 		// 2739,800.00 to 2,739,800.00
 		if (result.length() > 10) {
 			result = result.substring(0, result.length() - 10) + "," + result.substring(result.length() - 10);
+		}
+
+		if (isNegative) {
+			result = "- " + result;
 		}
 
 		// 0.01 to 0.01 EUR
@@ -176,7 +187,7 @@ public class AccountingUtils {
 		return curPanel;
 	}
 
-	public static int createTimeSpanTabMainContent(TimeSpan timeSpan, JPanel tab, int i, Database database) {
+	public static int createTimeSpanTabMainContent(TimeSpan timeSpan, JPanel tab, int i, Database database, String searchFor) {
 
 		CopyByClickLabel outgoingLabel = AccountingUtils.createSubHeadLabel("Outgoing Invoices - that is, we get paid:");
 		tab.add(outgoingLabel, new Arrangement(0, i, 1.0, 0.0));
@@ -184,14 +195,30 @@ public class AccountingUtils {
 
 		JPanel curPanel;
 
+		int totalBeforeTax = 0;
+		int totalTax = 0;
+		int totalAfterTax = 0;
 		List<Outgoing> outgoings = timeSpan.getOutgoings();
 		for (Outgoing cur : outgoings) {
-			curPanel = cur.createPanelOnGUI(database);
-			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
-			i++;
+			if (cur.matches(searchFor)) {
+				curPanel = cur.createPanelOnGUI(database);
+				tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+				totalBeforeTax += cur.getAmount();
+				totalAfterTax += cur.getPostTaxAmount();
+				i++;
+			}
+		}
+		totalTax = totalAfterTax - totalBeforeTax;
+
+		if ("".equals(searchFor)) {
+			if ((totalBeforeTax != timeSpan.getOutTotalBeforeTax()) ||
+				(totalTax != timeSpan.getOutTotalTax()) ||
+				(totalAfterTax != timeSpan.getOutTotalAfterTax())) {
+				AccountingUtils.complain("There was an outgoing calculation mixup! Something is wrong! Cats and dogs! Oh no!");
+			}
 		}
 
-		curPanel = AccountingUtils.createTotalPanelOnGUI(timeSpan.getOutTotalBeforeTax(), timeSpan.getOutTotalTax(), timeSpan.getOutTotalAfterTax());
+		curPanel = AccountingUtils.createTotalPanelOnGUI(totalBeforeTax, totalTax, totalAfterTax);
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
@@ -200,14 +227,30 @@ public class AccountingUtils {
 		tab.add(incomingLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
+		totalBeforeTax = 0;
+		totalTax = 0;
+		totalAfterTax = 0;
 		List<Incoming> incomings = timeSpan.getIncomings();
 		for (Incoming cur : incomings) {
-			curPanel = cur.createPanelOnGUI(database);
-			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
-			i++;
+			if (cur.matches(searchFor)) {
+				curPanel = cur.createPanelOnGUI(database);
+				tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+				totalBeforeTax += cur.getAmount();
+				totalAfterTax += cur.getPostTaxAmount();
+				i++;
+			}
+		}
+		totalTax = totalAfterTax - totalBeforeTax;
+
+		if ("".equals(searchFor)) {
+			if ((totalBeforeTax != timeSpan.getInTotalBeforeTax()) ||
+				(totalTax != timeSpan.getInTotalTax()) ||
+				(totalAfterTax != timeSpan.getInTotalAfterTax())) {
+				AccountingUtils.complain("There was an incoming calculation mixup! Something is wrong! Cats and dogs! Oh no!");
+			}
 		}
 
-		curPanel = AccountingUtils.createTotalPanelOnGUI(timeSpan.getInTotalBeforeTax(), timeSpan.getInTotalTax(), timeSpan.getInTotalAfterTax());
+		curPanel = AccountingUtils.createTotalPanelOnGUI(totalBeforeTax, totalTax, totalAfterTax);
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
@@ -216,14 +259,30 @@ public class AccountingUtils {
 		tab.add(donationLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
+		totalBeforeTax = 0;
+		totalTax = 0;
+		totalAfterTax = 0;
 		List<Incoming> donations = timeSpan.getDonations();
 		for (Incoming cur : donations) {
-			curPanel = cur.createPanelOnGUI(database);
-			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
-			i++;
+			if (cur.matches(searchFor)) {
+				curPanel = cur.createPanelOnGUI(database);
+				tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+				totalBeforeTax += cur.getAmount();
+				totalAfterTax += cur.getPostTaxAmount();
+				i++;
+			}
+		}
+		totalTax = totalAfterTax - totalBeforeTax;
+
+		if ("".equals(searchFor)) {
+			if ((totalBeforeTax != timeSpan.getDonTotalBeforeTax()) ||
+				(totalTax != timeSpan.getDonTotalTax()) ||
+				(totalAfterTax != timeSpan.getDonTotalAfterTax())) {
+				AccountingUtils.complain("There was a donations calculation mixup! Something is wrong! Cats and dogs! Oh no!");
+			}
 		}
 
-		curPanel = AccountingUtils.createTotalPanelOnGUI(timeSpan.getDonTotalBeforeTax(), timeSpan.getDonTotalTax(), timeSpan.getDonTotalAfterTax());
+		curPanel = AccountingUtils.createTotalPanelOnGUI(totalBeforeTax, totalTax, totalAfterTax);
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
@@ -232,14 +291,30 @@ public class AccountingUtils {
 		tab.add(personalLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
+		totalBeforeTax = 0;
+		totalTax = 0;
+		totalAfterTax = 0;
 		List<Incoming> personals = timeSpan.getPersonals();
 		for (Incoming cur : personals) {
-			curPanel = cur.createPanelOnGUI(database);
-			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
-			i++;
+			if (cur.matches(searchFor)) {
+				curPanel = cur.createPanelOnGUI(database);
+				tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+				totalBeforeTax += cur.getAmount();
+				totalAfterTax += cur.getPostTaxAmount();
+				i++;
+			}
+		}
+		totalTax = totalAfterTax - totalBeforeTax;
+
+		if ("".equals(searchFor)) {
+			if ((totalBeforeTax != timeSpan.getPersTotalBeforeTax()) ||
+				(totalTax != timeSpan.getPersTotalTax()) ||
+				(totalAfterTax != timeSpan.getPersTotalAfterTax())) {
+				AccountingUtils.complain("There was a personals calculation mixup! Something is wrong! Cats and dogs! Oh no!");
+			}
 		}
 
-		curPanel = AccountingUtils.createTotalPanelOnGUI(timeSpan.getPersTotalBeforeTax(), timeSpan.getPersTotalTax(), timeSpan.getPersTotalAfterTax());
+		curPanel = AccountingUtils.createTotalPanelOnGUI(totalBeforeTax, totalTax, totalAfterTax);
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 

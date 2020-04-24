@@ -6,6 +6,9 @@ package com.asofterspace.accountant.transactions;
 
 import com.asofterspace.toolbox.utils.Record;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -92,8 +95,23 @@ public class BankAccount {
 		return accountHolder;
 	}
 
-	public Set<BankTransaction> getTransactions() {
-		return transactions;
+	public List<BankTransaction> getTransactions() {
+
+		List<BankTransaction> result = new ArrayList<>();
+		result.addAll(transactions);
+
+		Collections.sort(result, new Comparator<BankTransaction>() {
+			public int compare(BankTransaction a, BankTransaction b) {
+				// break ties using the title (such that a higher number in a title gets sorted to the top)
+				if (a.getDate().equals(b.getDate())) {
+					return b.getTitle().compareTo(a.getTitle());
+				}
+				// usually, compare using the date
+				return b.getDate().compareTo(a.getDate());
+			}
+		});
+
+		return result;
 	}
 
 	public void addTransaction(BankTransaction newTrans) {
@@ -108,13 +126,16 @@ public class BankAccount {
 		if (other instanceof BankAccount) {
 			BankAccount otherBankAccount = (BankAccount) other;
 			if (!this.bank.equals(otherBankAccount.bank)) {
-				 return false;
+				return false;
 			}
 			if (!this.iban.equals(otherBankAccount.iban)) {
-				 return false;
+				return false;
 			}
-			if (!this.accountHolder.equals(otherBankAccount.accountHolder)) {
-				 return false;
+			// match null to any, or else require exact match
+			if ((this.accountHolder != null) && (otherBankAccount.accountHolder != null)) {
+				if (!this.accountHolder.equals(otherBankAccount.accountHolder)) {
+					return false;
+				}
 			}
 			return true;
 		}

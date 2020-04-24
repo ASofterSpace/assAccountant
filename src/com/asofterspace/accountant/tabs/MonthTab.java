@@ -31,7 +31,7 @@ public class MonthTab extends TimeSpanTab {
 	}
 
 	@Override
-	public void createTabOnGUI(JPanel parentPanel, Database database) {
+	public void createTabOnGUI(JPanel parentPanel, Database database, String searchFor) {
 
 		if (tab != null) {
 			destroyTabOnGUI(parentPanel);
@@ -56,10 +56,12 @@ public class MonthTab extends TimeSpanTab {
 		i++;
 
 
-		i = AccountingUtils.createTimeSpanTabMainContent(month, tab, i, database);
+		i = AccountingUtils.createTimeSpanTabMainContent(month, tab, i, database, searchFor);
 
 
-		i = AccountingUtils.createOverviewAndTaxInfo(month, tab, i);
+		if ("".equals(searchFor)) {
+			i = AccountingUtils.createOverviewAndTaxInfo(month, tab, i);
+		}
 
 
 		JPanel footer = new JPanel();
@@ -91,6 +93,16 @@ public class MonthTab extends TimeSpanTab {
 		}
 		if (tab instanceof FinanceLogTab) {
 			return 1;
+		}
+		if (tab instanceof BankStatementTab) {
+			return 1;
+		}
+		if (tab instanceof BankStatementYearTab) {
+			int result = ((BankStatementYearTab) tab).getYear().getNum() - getYear().getNum();
+			if (result == 0) {
+				return -1;
+			}
+			return result;
 		}
 		if (tab instanceof MonthTab) {
 			int result = ((MonthTab) tab).getYear().getNum() - getYear().getNum();

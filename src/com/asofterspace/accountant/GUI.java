@@ -20,7 +20,7 @@ import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.gui.MainWindow;
 import com.asofterspace.toolbox.gui.MenuItemForMainMenu;
 import com.asofterspace.toolbox.io.Directory;
-import com.asofterspace.toolbox.io.SimpleFile;
+import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 
@@ -278,6 +278,18 @@ public class GUI extends MainWindow {
 		});
 		edit.add(redo);
 
+		edit.addSeparator();
+
+		JMenuItem showSearch = new JMenuItem("Search");
+		showSearch.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.CTRL_MASK));
+		showSearch.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showSearchBar();
+			}
+		});
+		edit.add(showSearch);
+
 		AbstractButton addEntry = new MenuItemForMainMenu("Add Entry");
 		addEntry.addActionListener(new ActionListener() {
 			@Override
@@ -462,18 +474,14 @@ public class GUI extends MainWindow {
 				search();
 			}
 			private void search() {
-				String searchFor = searchField.getText();
-
-				// TODO :: actually search for the year ;)
+				refreshOpenTab();
 			}
 		});
 
 		// listen to the enter key being pressed (which does not create text updates)
 		searchField.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String searchFor = searchField.getText();
-
-				// TODO :: actually search for the year ;)
+				refreshOpenTab();
 			}
 		});
 
@@ -604,7 +612,7 @@ public class GUI extends MainWindow {
 
 		// open new tab
 		if (currentlyOpenedTab != null) {
-			currentlyOpenedTab.createTabOnGUI(mainPanelRight, database);
+			currentlyOpenedTab.createTabOnGUI(mainPanelRight, database, searchField.getText());
 		} else {
 			emptyTab = new JPanel();
 			emptyTab.setBackground(GUI.getBackgroundColor());
@@ -635,7 +643,7 @@ public class GUI extends MainWindow {
 	public void refreshOpenTab() {
 		if (currentlyOpenedTab != null) {
 			currentlyOpenedTab.destroyTabOnGUI(mainPanelRight);
-			currentlyOpenedTab.createTabOnGUI(mainPanelRight, database);
+			currentlyOpenedTab.createTabOnGUI(mainPanelRight, database, searchField.getText());
 			mainPanelRight.revalidate();
 			mainPanelRight.repaint();
 			mainPanelRightScroller.revalidate();
@@ -658,11 +666,8 @@ public class GUI extends MainWindow {
 			case JFileChooser.APPROVE_OPTION:
 
 				// load the files
-				for (java.io.File curFile : importFilePicker.getSelectedFiles()) {
-					database.bulkImportIncomings(new SimpleFile(curFile));
-				}
-
-				database.save();
+				List<File> files = File.fromJavaFiles(importFilePicker.getSelectedFiles());
+				database.bulkImportIncomings(files);
 
 				break;
 
@@ -687,11 +692,8 @@ public class GUI extends MainWindow {
 			case JFileChooser.APPROVE_OPTION:
 
 				// load the files
-				for (java.io.File curFile : importFilePicker.getSelectedFiles()) {
-					database.bulkImportOutgoings(new SimpleFile(curFile));
-				}
-
-				database.save();
+				List<File> files = File.fromJavaFiles(importFilePicker.getSelectedFiles());
+				database.bulkImportOutgoings(files);
 
 				break;
 
@@ -716,10 +718,8 @@ public class GUI extends MainWindow {
 			case JFileChooser.APPROVE_OPTION:
 
 				// load the files
-				for (java.io.File curFile : importFilePicker.getSelectedFiles()) {
-					database.bulkImportBankStatements(new SimpleFile(curFile));
-				}
-				database.save();
+				List<File> files = File.fromJavaFiles(importFilePicker.getSelectedFiles());
+				database.bulkImportBankStatements(files);
 
 				break;
 

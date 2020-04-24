@@ -462,6 +462,16 @@ public abstract class Entry {
 		}
 	}
 
+	public boolean matches(String searchFor) {
+		if ("".equals(searchFor)) {
+			return true;
+		}
+		if (getTitle().replace("\\n", "").toLowerCase().contains(searchFor.toLowerCase())) {
+			return true;
+		}
+		return false;
+	}
+
 	@Override
 	public String toString() {
 		return getAmountAsText() + " on " + getDateAsText() + " " + getTitle() + " [" + getCategoryOrCustomer() + "] ";

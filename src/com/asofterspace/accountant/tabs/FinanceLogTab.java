@@ -31,7 +31,7 @@ public class FinanceLogTab extends Tab {
 	}
 
 	@Override
-	public void createTabOnGUI(final JPanel parentPanel, final Database database) {
+	public void createTabOnGUI(final JPanel parentPanel, final Database database, String searchFor) {
 
 		if (tab != null) {
 			destroyTabOnGUI(parentPanel);

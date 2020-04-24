@@ -4,10 +4,31 @@
  */
 package com.asofterspace.accountant.transactions;
 
+import com.asofterspace.accountant.AccountingUtils;
+import com.asofterspace.accountant.AddEntryGUI;
+import com.asofterspace.accountant.Database;
+import com.asofterspace.accountant.entries.Entry;
+import com.asofterspace.accountant.entries.Incoming;
+import com.asofterspace.accountant.entries.Outgoing;
+import com.asofterspace.accountant.GUI;
+import com.asofterspace.accountant.timespans.Year;
+import com.asofterspace.accountant.world.Currency;
+import com.asofterspace.toolbox.gui.Arrangement;
+import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.GridBagLayout;
 import java.util.Date;
+
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 
 
 /**
@@ -78,6 +99,136 @@ public class BankTransaction {
 
 	public Date getDate() {
 		return date;
+	}
+
+	public JPanel createPanelOnGUI(Database database) {
+
+		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
+		Color textColor = new Color(0, 0, 0);
+		CopyByClickLabel curLabel;
+
+		JPanel curPanel = new JPanel();
+		curPanel.setBackground(GUI.getBackgroundColor());
+		curPanel.setLayout(new GridBagLayout());
+
+		MouseAdapter rowHighlighter = AccountingUtils.getRowHighlighter(curPanel);
+
+		String[] titleRows = getTitle().split("\n");
+
+		int i = 0;
+
+		JPanel curCurPanel = new JPanel();
+		curCurPanel.setOpaque(false);
+		curCurPanel.setLayout(new GridBagLayout());
+
+		curLabel = AccountingUtils.createLabel(DateUtils.serializeDate(getDate()), textColor, "");
+		curLabel.addMouseListener(rowHighlighter);
+		curCurPanel.add(curLabel, new Arrangement(0, 0, 0.1, 1.0));
+
+		curLabel = AccountingUtils.createLabel(titleRows[0], textColor, "");
+		curLabel.addMouseListener(rowHighlighter);
+		curCurPanel.add(curLabel, new Arrangement(1, 0, 0.7, 1.0));
+
+		curLabel = AccountingUtils.createLabel(AccountingUtils.formatMoney(getAmount(), Currency.EUR), textColor, "");
+		curLabel.addMouseListener(rowHighlighter);
+		curLabel.setHorizontalAlignment(JLabel.RIGHT);
+		curCurPanel.add(curLabel, new Arrangement(2, 0, 0.1, 1.0));
+
+		curLabel = new CopyByClickLabel("");
+		curLabel.addMouseListener(rowHighlighter);
+		curLabel.setPreferredSize(defaultDimension);
+		curCurPanel.add(curLabel, new Arrangement(3, 0, 0.0, 1.0));
+
+		JButton curButton = new JButton("Prepare Entry");
+		curButton.addMouseListener(rowHighlighter);
+		curButton.setMinimumSize(defaultDimension);
+		curButton.setPreferredSize(defaultDimension);
+		curCurPanel.add(curButton, new Arrangement(4, 0, 0.1, 1.0));
+		curButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Entry fakeEntry = null;
+				Integer preTaxAmount = (int) Math.round(amount / 1.19);
+				if (amount > 0) {
+					fakeEntry = new Outgoing(preTaxAmount, Currency.EUR, 19, getDate(), getTitle(), "", "", null);
+				} else {
+					fakeEntry = new Incoming(-preTaxAmount, Currency.EUR, 19, getDate(), getTitle(), "", null, null);
+				}
+				AddEntryGUI addEntryGUI = new AddEntryGUI(database.getGUI(), database, fakeEntry);
+				addEntryGUI.show();
+			}
+		});
+
+		curLabel = new CopyByClickLabel("");
+		curLabel.addMouseListener(rowHighlighter);
+		curLabel.setPreferredSize(defaultDimension);
+		curCurPanel.add(curLabel, new Arrangement(5, 0, 0.0, 1.0));
+
+		curPanel.add(curCurPanel, new Arrangement(0, i, 1.0, 1.0));
+		i++;
+
+		for (int s = 1; s < titleRows.length; s++) {
+
+			curCurPanel = new JPanel();
+			curCurPanel.setOpaque(false);
+			curCurPanel.setLayout(new GridBagLayout());
+
+			curLabel = new CopyByClickLabel("");
+			curLabel.addMouseListener(rowHighlighter);
+			curLabel.setPreferredSize(defaultDimension);
+			curCurPanel.add(curLabel, new Arrangement(0, 0, 0.1, 1.0));
+
+			curLabel = AccountingUtils.createLabel(titleRows[s], textColor, "");
+			curLabel.addMouseListener(rowHighlighter);
+			curCurPanel.add(curLabel, new Arrangement(1, 0, 0.7, 1.0));
+
+			curLabel = new CopyByClickLabel("");
+			curLabel.addMouseListener(rowHighlighter);
+			curLabel.setPreferredSize(defaultDimension);
+			curCurPanel.add(curLabel, new Arrangement(2, 0, 0.1, 1.0));
+
+			curLabel = new CopyByClickLabel("");
+			curLabel.addMouseListener(rowHighlighter);
+			curLabel.setPreferredSize(defaultDimension);
+			curCurPanel.add(curLabel, new Arrangement(3, 0, 0.0, 1.0));
+
+			curLabel = new CopyByClickLabel("");
+			curLabel.addMouseListener(rowHighlighter);
+			curLabel.setMinimumSize(defaultDimension);
+			curLabel.setPreferredSize(defaultDimension);
+			curCurPanel.add(curLabel, new Arrangement(4, 0, 0.1, 1.0));
+
+			curLabel = new CopyByClickLabel("");
+			curLabel.addMouseListener(rowHighlighter);
+			curLabel.setPreferredSize(defaultDimension);
+			curCurPanel.add(curLabel, new Arrangement(5, 0, 0.0, 1.0));
+
+			curPanel.add(curCurPanel, new Arrangement(0, i, 1.0, 1.0));
+			i++;
+		}
+
+		return curPanel;
+	}
+
+	public boolean matches(String searchFor) {
+		if ("".equals(searchFor)) {
+			return true;
+		}
+		if (title.replace("\\n", "").toLowerCase().contains(searchFor.toLowerCase())) {
+			return true;
+		}
+		return false;
+	}
+
+	public boolean belongsTo(Year year) {
+		// every entry belongs to a wildcard year :)
+		if (year == null) {
+			return true;
+		}
+		if (getDate() == null) {
+			return false;
+		}
+		return DateUtils.serializeDate(getDate()).substring(0, 4).equals(""+year.getNum());
 	}
 
 	@Override

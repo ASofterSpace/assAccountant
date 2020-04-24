@@ -11,7 +11,7 @@ import javax.swing.JPanel;
 
 public abstract class Tab {
 
-	public abstract void createTabOnGUI(JPanel parentPanel, Database database);
+	public abstract void createTabOnGUI(JPanel parentPanel, Database database, String searchFor);
 
 	public abstract void destroyTabOnGUI(JPanel parentPanel);
 

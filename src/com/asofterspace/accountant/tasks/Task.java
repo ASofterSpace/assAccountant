@@ -583,6 +583,23 @@ public class Task {
 		return containerPanel;
 	}
 
+	public boolean matches(String searchFor) {
+		if ("".equals(searchFor)) {
+			return true;
+		}
+		if (getTitle().replace("\\n", "").toLowerCase().contains(searchFor.toLowerCase())) {
+			return true;
+		}
+		if (details != null) {
+			for (String detail : details) {
+				if (detail.replace("\\n", "").toLowerCase().contains(searchFor.toLowerCase())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	@Override
 	public boolean equals(Object other) {
 		if (other == null) {

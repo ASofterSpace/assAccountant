@@ -58,6 +58,9 @@ public class Incoming extends Entry {
 	}
 
 	public String getCategoryAsText() {
+		if (category == null) {
+			return "";
+		}
 		return category.getText();
 	}
 
@@ -67,8 +70,10 @@ public class Incoming extends Entry {
 
 	@Override
 	public void deleteFrom(Database database) {
-		parent.removeIncoming(this);
-		database.save();
+		if (parent != null) {
+			parent.removeIncoming(this);
+			database.save();
+		}
 	}
 
 	@Override

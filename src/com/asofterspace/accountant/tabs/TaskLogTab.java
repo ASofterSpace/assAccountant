@@ -30,7 +30,7 @@ public class TaskLogTab extends Tab {
 	}
 
 	@Override
-	public void createTabOnGUI(final JPanel parentPanel, final Database database) {
+	public void createTabOnGUI(final JPanel parentPanel, final Database database, String searchFor) {
 
 		if (tab != null) {
 			destroyTabOnGUI(parentPanel);
@@ -63,7 +63,7 @@ public class TaskLogTab extends Tab {
 
 		boolean tasksShown = false;
 		for (Task task : tasks) {
-			if (task.hasBeenDone()) {
+			if (task.hasBeenDone() && task.matches(searchFor)) {
 				tasksShown = true;
 				break;
 			}
@@ -103,7 +103,7 @@ public class TaskLogTab extends Tab {
 		}
 
 		for (Task task : tasks) {
-			if (task.hasBeenDone()) {
+			if (task.hasBeenDone() && task.matches(searchFor)) {
 				curPanel = task.createPanelOnGUI(database, tab, parentPanel);
 				curPanel.setBackground(GUI.getBackgroundColor());
 				tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
