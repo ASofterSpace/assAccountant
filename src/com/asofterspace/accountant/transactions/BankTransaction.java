@@ -97,6 +97,10 @@ public class BankTransaction {
 		return title;
 	}
 
+	public void setTitle(String newTitle) {
+		this.title = newTitle;
+	}
+
 	public Date getDate() {
 		return date;
 	}
@@ -123,27 +127,27 @@ public class BankTransaction {
 
 		curLabel = AccountingUtils.createLabel(DateUtils.serializeDate(getDate()), textColor, "");
 		curLabel.addMouseListener(rowHighlighter);
-		curCurPanel.add(curLabel, new Arrangement(0, 0, 0.1, 1.0));
+		curCurPanel.add(curLabel, new Arrangement(0, 0, 0.1, 0.0));
 
 		curLabel = AccountingUtils.createLabel(titleRows[0], textColor, "");
 		curLabel.addMouseListener(rowHighlighter);
-		curCurPanel.add(curLabel, new Arrangement(1, 0, 0.7, 1.0));
+		curCurPanel.add(curLabel, new Arrangement(1, 0, 0.7, 0.0));
 
 		curLabel = AccountingUtils.createLabel(AccountingUtils.formatMoney(getAmount(), Currency.EUR), textColor, "");
 		curLabel.addMouseListener(rowHighlighter);
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
-		curCurPanel.add(curLabel, new Arrangement(2, 0, 0.1, 1.0));
+		curCurPanel.add(curLabel, new Arrangement(2, 0, 0.1, 0.0));
 
 		curLabel = new CopyByClickLabel("");
 		curLabel.addMouseListener(rowHighlighter);
 		curLabel.setPreferredSize(defaultDimension);
-		curCurPanel.add(curLabel, new Arrangement(3, 0, 0.0, 1.0));
+		curCurPanel.add(curLabel, new Arrangement(3, 0, 0.0, 0.0));
 
 		JButton curButton = new JButton("Prepare Entry");
 		curButton.addMouseListener(rowHighlighter);
 		curButton.setMinimumSize(defaultDimension);
 		curButton.setPreferredSize(defaultDimension);
-		curCurPanel.add(curButton, new Arrangement(4, 0, 0.1, 1.0));
+		curCurPanel.add(curButton, new Arrangement(4, 0, 0.1, 0.0));
 		curButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -162,9 +166,9 @@ public class BankTransaction {
 		curLabel = new CopyByClickLabel("");
 		curLabel.addMouseListener(rowHighlighter);
 		curLabel.setPreferredSize(defaultDimension);
-		curCurPanel.add(curLabel, new Arrangement(5, 0, 0.0, 1.0));
+		curCurPanel.add(curLabel, new Arrangement(5, 0, 0.0, 0.0));
 
-		curPanel.add(curCurPanel, new Arrangement(0, i, 1.0, 1.0));
+		curPanel.add(curCurPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
 		for (int s = 1; s < titleRows.length; s++) {
@@ -176,34 +180,34 @@ public class BankTransaction {
 			curLabel = new CopyByClickLabel("");
 			curLabel.addMouseListener(rowHighlighter);
 			curLabel.setPreferredSize(defaultDimension);
-			curCurPanel.add(curLabel, new Arrangement(0, 0, 0.1, 1.0));
+			curCurPanel.add(curLabel, new Arrangement(0, 0, 0.1, 0.0));
 
 			curLabel = AccountingUtils.createLabel(titleRows[s], textColor, "");
 			curLabel.addMouseListener(rowHighlighter);
-			curCurPanel.add(curLabel, new Arrangement(1, 0, 0.7, 1.0));
+			curCurPanel.add(curLabel, new Arrangement(1, 0, 0.7, 0.0));
 
 			curLabel = new CopyByClickLabel("");
 			curLabel.addMouseListener(rowHighlighter);
 			curLabel.setPreferredSize(defaultDimension);
-			curCurPanel.add(curLabel, new Arrangement(2, 0, 0.1, 1.0));
+			curCurPanel.add(curLabel, new Arrangement(2, 0, 0.1, 0.0));
 
 			curLabel = new CopyByClickLabel("");
 			curLabel.addMouseListener(rowHighlighter);
 			curLabel.setPreferredSize(defaultDimension);
-			curCurPanel.add(curLabel, new Arrangement(3, 0, 0.0, 1.0));
+			curCurPanel.add(curLabel, new Arrangement(3, 0, 0.0, 0.0));
 
 			curLabel = new CopyByClickLabel("");
 			curLabel.addMouseListener(rowHighlighter);
 			curLabel.setMinimumSize(defaultDimension);
 			curLabel.setPreferredSize(defaultDimension);
-			curCurPanel.add(curLabel, new Arrangement(4, 0, 0.1, 1.0));
+			curCurPanel.add(curLabel, new Arrangement(4, 0, 0.1, 0.0));
 
 			curLabel = new CopyByClickLabel("");
 			curLabel.addMouseListener(rowHighlighter);
 			curLabel.setPreferredSize(defaultDimension);
-			curCurPanel.add(curLabel, new Arrangement(5, 0, 0.0, 1.0));
+			curCurPanel.add(curLabel, new Arrangement(5, 0, 0.0, 0.0));
 
-			curPanel.add(curCurPanel, new Arrangement(0, i, 1.0, 1.0));
+			curPanel.add(curCurPanel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
 		}
 

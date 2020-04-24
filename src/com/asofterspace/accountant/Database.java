@@ -14,6 +14,7 @@ import com.asofterspace.accountant.transactions.BankTransaction;
 import com.asofterspace.accountant.world.Category;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.configuration.ConfigFile;
+import com.asofterspace.toolbox.io.CsvFile;
 import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonParseException;
@@ -145,8 +146,36 @@ public class Database {
 		return taskCtrl;
 	}
 
+	// gets the main years for which we have entries etc.
 	public List<Year> getYears() {
 		return years;
+	}
+
+	// gets the years for which we have bank statements but no entries
+	public List<Integer> getBankStatementOnlyYears() {
+		List<Integer> result = new ArrayList<>();
+		for (BankAccount bA : bankAccounts) {
+			for (BankTransaction bT : bA.getTransactions()) {
+				int curYear = DateUtils.getYear(bT.getDate());
+				boolean foundYear = false;
+				for (Year year : years) {
+					if (curYear == year.getNum()) {
+						foundYear = true;
+						break;
+					}
+				}
+				for (Integer year : result) {
+					if (curYear == (int) year) {
+						foundYear = true;
+						break;
+					}
+				}
+				if (!foundYear) {
+					result.add(curYear);
+				}
+			}
+		}
+		return result;
 	}
 
 	public Set<String> getCustomers() {
@@ -192,6 +221,13 @@ public class Database {
 	}
 
 	public List<BankAccount> getBankAccounts() {
+
+		Collections.sort(bankAccounts, new Comparator<BankAccount>() {
+			public int compare(BankAccount a, BankAccount b) {
+				return b.getTransactions().size() - a.getTransactions().size();
+			}
+		});
+
 		return bankAccounts;
 	}
 
@@ -416,131 +452,353 @@ public class Database {
 
 		for (File bulkFile : bulkFiles) {
 
-			PdfFile pdf = new PdfFile(bulkFile);
+			String filetype = bulkFile.getFiletype().toLowerCase();
 
-			List<PdfObject> objs = pdf.getObjects();
+			switch (filetype) {
 
-			StringBuilder pdfPlainText = new StringBuilder();
+				case "csv":
+					bulkImportBankStatementsFromCsv(new CsvFile(bulkFile));
+					break;
 
-			for (PdfObject obj : objs) {
+				case "pdf":
+					bulkImportBankStatementsFromPdf(new PdfFile(bulkFile));
+					break;
 
-				try {
-					pdfPlainText.append(obj.getPlainStreamContent());
-					pdfPlainText.append("\n");
-				} catch (Exception e) {
-					// whoops!
-				}
-			}
-
-			String pdfText = pdfPlainText.toString();
-
-			SimpleFile outFile = new SimpleFile("data/pdf_debug.txt"); // DEBUG
-			outFile.saveContent(pdfText); // DEBUG
-
-			if (pdfText.contains("[(Sparda-Bank Berlin eG)]TJ")) {
-				pdfText = pdfText.replaceAll("\\\\334", "Ü");
-				pdfText = pdfText.replaceAll("\\\\344", "ä");
-				pdfText = pdfText.replaceAll("\\\\374", "ü");
-				pdfText = pdfText.replaceAll("\\\\\\)", ")");
-				// do not leave backslashes in, as we don't want them to wreak havoc with stuff later...
-				pdfText = pdfText.replaceAll("\\\\", "Ux");
-				String bank = "Sparda";
-				String iban = null;
-				String owner = null;
-				if (pdfText.contains("[(IBAN: ")) {
-					iban = pdfText.substring(pdfText.indexOf("[(IBAN: ") + 8);
-					iban = iban.substring(0, iban.indexOf("BIC:"));
-					iban = iban.replaceAll(" ", "");
-				}
-				if (pdfText.contains("-29.8181 -1.2424 Td")) {
-					owner = pdfText.substring(pdfText.indexOf("-29.8181 -1.2424 Td"));
-					owner = owner.substring(owner.indexOf("[(") + 2);
-					owner = owner.substring(0, owner.indexOf(")]"));
-				}
-				BankAccount curAccount = new BankAccount(bank, iban, owner);
-				boolean alreadyExisting = false;
-				for (BankAccount bankAccount : bankAccounts) {
-					if (curAccount.equals(bankAccount)) {
-						curAccount = bankAccount;
-						alreadyExisting = true;
-						break;
-					}
-				}
-				if (!alreadyExisting) {
-					bankAccounts.add(curAccount);
-				}
-
-				if (pdfText.contains("[(Vorgang)]TJ")) {
-					String transStr = pdfText.substring(pdfText.indexOf("[(Vorgang)]TJ") + 13);
-					String curEntryStr = null;
-					String curDateStr = null;
-					Date curDate = null;
-					Integer amount = null;
-					String curYear = null;
-					if (pdfText.contains("2.9999 -3.0303 Td")) {
-						curYear = pdfText.substring(pdfText.indexOf("2.9999 -3.0303 Td"));
-						curYear = curYear.substring(curYear.indexOf("[(") + 2);
-						curYear = curYear.substring(curYear.indexOf("/") + 1);
-						curYear = curYear.substring(0, curYear.indexOf(")]"));
-					}
-
-					boolean properExit = false;
-
-					while (transStr.contains("[(")) {
-						transStr = transStr.substring(transStr.indexOf("[(") + 2);
-						if ((transStr.charAt(2) == '.') && (transStr.charAt(5) == '.') && (transStr.charAt(6) == ' ')) {
-							if (curEntryStr != null) {
-								// finalize previous entry
-								curAccount.addTransaction(new BankTransaction(amount, curEntryStr, curDate, curAccount));
-							}
-							curEntryStr = transStr.substring(0, transStr.indexOf(")]"));
-							curDateStr = curEntryStr.substring(0, 6) + curYear;
-							curDate = DateUtils.parseDate(curDateStr);
-							curEntryStr = curEntryStr.substring(14);
-							String amountStr = curEntryStr.substring(curEntryStr.lastIndexOf("  ") + 2);
-							// H: positive, S: negative
-							if (amountStr.endsWith("S")) {
-								amountStr = "-" + amountStr;
-							}
-							amountStr = amountStr.substring(0, amountStr.length() - 1);
-							amount = StrUtils.parseMoney(amountStr);
-							curEntryStr = curEntryStr.substring(0, curEntryStr.lastIndexOf("  "));
-							curEntryStr = curEntryStr.trim();
-							continue;
-						}
-						if (curEntryStr == null) {
-							continue;
-						}
-						// regularly, we expect to end here by using the break
-						if ((transStr.startsWith("                                            Übertrag")) ||
-							(transStr.startsWith("                                    neuer Kontostand vom"))) {
-							// finalize previous entry
-							if (curEntryStr != null) {
-								curAccount.addTransaction(new BankTransaction(amount, curEntryStr, curDate, curAccount));
-							}
-
-							if (transStr.contains("[(Vorgang)]TJ")) {
-								transStr = transStr.substring(transStr.indexOf("[(Vorgang)]TJ") + 13);
-								curEntryStr = null;
-							} else {
-								properExit = true;
-								break;
-							}
-						} else {
-							curEntryStr += "\n" + transStr.substring(0, transStr.indexOf(")]")).trim();
-						}
-					}
-					if (!properExit) {
-						AccountingUtils.complain("We did not exit the parsing of the PDF as expected, some entries may have been missed!");
-					}
-				}
-
-			} else {
-				AccountingUtils.complain("The input file does not belong to a known bank!");
+				default:
+					AccountingUtils.complain("The file " + bulkFile.getFilename() + " has type " +
+						filetype.toUpperCase() + ", which cannot be imported!");
+					break;
 			}
 		}
 
 		save();
+	}
+
+	public void bulkImportBankStatementsFromCsv(CsvFile csv) {
+
+		String headLine = csv.getHeadLine();
+
+		switch (headLine) {
+
+			case "\"Date\",\"Payee\",\"Account number\",\"Transaction type\",\"Payment reference\",\"Category\",\"Amount (EUR)\",\"Amount (Foreign Currency)\",\"Type Foreign Currency\",\"Exchange Rate\"":
+				String bank = "n26";
+				String iban = null;
+				String bic = "NTSBDEB1XXX";
+				String owner = null;
+
+				BankAccount curAccount = getOrAddBankAccount(bank, iban, bic, owner);
+
+				List<String> line = csv.getContentLineInColumns();
+				while (line != null) {
+					Date date = DateUtils.parseDate(line.get(0));
+					String content = line.get(1);
+					if (!"".equals(line.get(2).trim())) {
+						content += "\n" + line.get(2);
+					}
+					if (!"".equals(line.get(4).trim())) {
+						content += "\n" + line.get(4);
+					}
+					int amount = StrUtils.parseMoney(line.get(6));
+					curAccount.addTransaction(new BankTransaction(amount, content, date, curAccount));
+					line = csv.getContentLineInColumns();
+				}
+				break;
+
+			default:
+				AccountingUtils.complain("The input file " + csv.getFilename() + " does not belong to a known bank!");
+				break;
+		}
+	}
+
+	public void bulkImportBankStatementsFromPdf(PdfFile pdf) {
+
+		List<PdfObject> objs = pdf.getObjects();
+
+		StringBuilder pdfPlainText = new StringBuilder();
+
+		for (PdfObject obj : objs) {
+
+			try {
+				pdfPlainText.append(obj.getPlainStreamContent());
+				pdfPlainText.append("\n");
+			} catch (Exception e) {
+				// whoops!
+			}
+		}
+
+		String pdfText = pdfPlainText.toString();
+
+		SimpleFile outFile = new SimpleFile("data/pdf_debug.txt"); // DEBUG
+		outFile.saveContent(pdfText); // DEBUG
+
+		if (pdfText.contains("[(Sparda-Bank Berlin eG)]TJ")) {
+			pdfText = pdfText.replaceAll("\\\\334", "Ü");
+			pdfText = pdfText.replaceAll("\\\\337", "ß");
+			pdfText = pdfText.replaceAll("\\\\344", "ä");
+			pdfText = pdfText.replaceAll("\\\\374", "ü");
+			pdfText = pdfText.replaceAll("\\\\\\(", "(");
+			pdfText = pdfText.replaceAll("\\\\\\)", ")");
+			// do not leave backslashes in, as we don't want them to wreak havoc with stuff later...
+			pdfText = pdfText.replaceAll("\\\\", "Ux");
+
+			String bank = "Sparda";
+			String iban = null;
+			String bic = null;
+			String owner = null;
+			if (pdfText.contains("[(IBAN: ")) {
+				iban = pdfText.substring(pdfText.indexOf("[(IBAN: ") + 8);
+				bic = iban.substring(iban.indexOf("BIC:") + 4);
+				bic = bic.substring(0, bic.indexOf(")"));
+				bic = bic.replaceAll(" ", "");
+				iban = iban.substring(0, iban.indexOf("BIC:"));
+				iban = iban.replaceAll(" ", "");
+			}
+			if (pdfText.contains("-29.8181 -1.2424 Td")) {
+				owner = pdfText.substring(pdfText.indexOf("-29.8181 -1.2424 Td"));
+				owner = owner.substring(owner.indexOf("[(") + 2);
+				owner = owner.substring(0, owner.indexOf(")]"));
+			}
+			BankAccount curAccount = getOrAddBankAccount(bank, iban, bic, owner);
+
+			if (pdfText.contains("[(Vorgang)]TJ")) {
+				String transStr = pdfText.substring(pdfText.indexOf("[(Vorgang)]TJ") + 13);
+				String curEntryStr = null;
+				String curDateStr = null;
+				Date curDate = null;
+				Integer amount = null;
+				String curYear = null;
+				if (pdfText.contains("2.9999 -3.0303 Td")) {
+					curYear = pdfText.substring(pdfText.indexOf("2.9999 -3.0303 Td"));
+					curYear = curYear.substring(curYear.indexOf("[(") + 2);
+					curYear = curYear.substring(curYear.indexOf("/") + 1);
+					curYear = curYear.substring(0, curYear.indexOf(")]"));
+				}
+
+				boolean properExit = false;
+
+				while (transStr.contains("[(")) {
+					transStr = transStr.substring(transStr.indexOf("[(") + 2);
+					if ((transStr.charAt(2) == '.') && (transStr.charAt(5) == '.') && (transStr.charAt(6) == ' ')) {
+						if (curEntryStr != null) {
+							// finalize previous entry
+							curAccount.addTransaction(new BankTransaction(amount, curEntryStr, curDate, curAccount));
+						}
+						curEntryStr = transStr.substring(0, transStr.indexOf(")]"));
+						curDateStr = curEntryStr.substring(0, 6) + curYear;
+						curDate = DateUtils.parseDate(curDateStr);
+						curEntryStr = curEntryStr.substring(14);
+						String amountStr = curEntryStr.substring(curEntryStr.lastIndexOf("  ") + 2);
+						// H: positive, S: negative
+						if (amountStr.endsWith("S")) {
+							amountStr = "-" + amountStr;
+						}
+						amountStr = amountStr.substring(0, amountStr.length() - 1);
+						amount = StrUtils.parseMoney(amountStr);
+						curEntryStr = curEntryStr.substring(0, curEntryStr.lastIndexOf("  "));
+						curEntryStr = curEntryStr.trim();
+						continue;
+					}
+					if (curEntryStr == null) {
+						continue;
+					}
+					// regularly, we expect to end here by using the break
+					if ((transStr.startsWith("                                            Übertrag")) ||
+						(transStr.startsWith("                                    neuer Kontostand vom"))) {
+						// finalize previous entry
+						if (curEntryStr != null) {
+							curAccount.addTransaction(new BankTransaction(amount, curEntryStr, curDate, curAccount));
+						}
+
+						if (transStr.contains("[(Vorgang)]TJ")) {
+							transStr = transStr.substring(transStr.indexOf("[(Vorgang)]TJ") + 13);
+							curEntryStr = null;
+						} else {
+							properExit = true;
+							break;
+						}
+					} else {
+						curEntryStr += "\n" + transStr.substring(0, transStr.indexOf(")]")).trim();
+					}
+				}
+				if (!properExit) {
+					AccountingUtils.complain("We did not exit the parsing of the PDF as expected, some entries may have been missed!");
+				}
+			}
+
+		} else {
+			if (pdfText.contains("(DEUTSCHE KREDITBANK AG)Tj")) {
+
+				String bank = "DKB";
+				String iban = null;
+				String bic = null;
+				String owner = null;
+				if (pdfText.contains("\n(IBAN: ")) {
+					iban = pdfText.substring(pdfText.indexOf("\n(IBAN: ") + 8);
+					iban = iban.substring(0, iban.indexOf(")"));
+					iban = iban.replaceAll(" ", "");
+				}
+				if (pdfText.contains("\n(BIC: ")) {
+					bic = pdfText.substring(pdfText.indexOf("\n(BIC: ") + 7);
+					bic = bic.substring(0, bic.indexOf(")"));
+					bic = bic.replaceAll(" ", "");
+				}
+				if (pdfText.contains("/F4 10 Tf")) {
+					owner = pdfText.substring(pdfText.indexOf("/F4 10 Tf"));
+					owner = owner.substring(owner.indexOf("(") + 1);
+					owner = owner.substring(0, owner.indexOf(")"));
+				}
+				BankAccount curAccount = getOrAddBankAccount(bank, iban, bic, owner);
+
+				if (pdfText.contains("(Wir haben für Sie gebucht)Tj")) {
+					pdfText = pdfText.replaceAll("\\\\\\(", "(");
+					pdfText = pdfText.replaceAll("\\\\\\)", ")");
+					// do not leave backslashes in, as we don't want them to wreak havoc with stuff later...
+					pdfText = pdfText.replaceAll("\\\\", "Ux");
+
+					String transStr = pdfText.substring(pdfText.indexOf("(Wir haben für Sie gebucht)Tj") + 13);
+					Date curDate = null;
+					String curEntryStr = null;
+					Integer amount = null;
+					String curYear = null;
+					int lastLeftPos = 0;
+					int leftPos = 0;
+					BankTransaction lastTransaction = null;
+					if (pdfText.contains("(Kontoauszug Nummer ")) {
+						curYear = pdfText.substring(pdfText.indexOf("(Kontoauszug Nummer "));
+						curYear = pdfText.substring(pdfText.indexOf(" / ") + 3);
+						curYear = curYear.substring(0, 4);
+					}
+
+					boolean properExit = false;
+
+					// tracks occurrences of /F4 9 Tf
+					// 0 .. date, 1 .. second date, 2 .. title, 3 .. amount
+					int whatNow = 0;
+
+					while (transStr.contains("/F4 9 Tf")) {
+
+						// here comes Alter Kontostand: - only printed after all statements are done
+						if (transStr.indexOf("/F2 9 Tf") < transStr.indexOf("/F4 9 Tf")) {
+							properExit = true;
+							break;
+						}
+
+						String beforeStr = transStr.substring(0, transStr.indexOf("/F4 9 Tf"));
+
+						// before Str contains something like:
+						// ...
+						// 1 0 0 1 451.49 417.56 Tm
+						// we want to get the first of the two numbers, and e.g. if it is below
+						// 500, we have a negative amount...
+						beforeStr = beforeStr.substring(0, beforeStr.lastIndexOf(" Tm"));
+						beforeStr = beforeStr.substring(0, beforeStr.lastIndexOf(" "));
+						beforeStr = beforeStr.substring(beforeStr.lastIndexOf(" ") + 1);
+						if (beforeStr.contains(".")) {
+							beforeStr = beforeStr.substring(0, beforeStr.indexOf("."));
+						}
+						lastLeftPos = leftPos;
+						leftPos = Integer.parseInt(beforeStr);
+
+						transStr = transStr.substring(transStr.indexOf("/F4 9 Tf") + 2);
+						transStr = transStr.substring(transStr.indexOf("\n(") + 2);
+						String curStr = transStr.substring(0, transStr.indexOf(")Tj"));
+
+						// in some older DKB PDFs, empty cells are explicitly written where no amounts are present
+						if ("".equals(curStr)) {
+							continue;
+						}
+
+						switch (whatNow) {
+							case 0:
+								// if one entry spilled over two pages, then the first thing that we get is not a valid date,
+								// but instead the continuation of the title!
+								if ((curStr.length() != 6) || (curStr.charAt(2) != '.') || (curStr.charAt(5) != '.')) {
+									curEntryStr += "\n" + curStr;
+									// in newer DKB PDFs, the /F4 0 Tf is not printed a second time, but instead the next lines
+									// just follow... so we read them here!
+									while (transStr.indexOf("\n(") < transStr.indexOf("/F4 9 Tf")) {
+										transStr = transStr.substring(transStr.indexOf("\n(") + 2);
+										curEntryStr += "\n" + transStr.substring(0, transStr.indexOf(")Tj"));
+									}
+									if (lastTransaction != null) {
+										lastTransaction.setTitle(curEntryStr);
+									}
+									whatNow--;
+								} else {
+									curDate = DateUtils.parseDate(curStr + curYear);
+								}
+								break;
+							case 2:
+								curEntryStr = curStr;
+								while (transStr.indexOf("\n(") < transStr.indexOf("/F4 9 Tf")) {
+									transStr = transStr.substring(transStr.indexOf("\n(") + 2);
+									curEntryStr += "\n" + transStr.substring(0, transStr.indexOf(")Tj"));
+								}
+								break;
+							case 3:
+								// if we have not advanced to the right, then we are in another line for the title
+								// (this happens in older DKB PDFs, in newer ones the /F4 0 Tf is not printed another time)
+								if (lastLeftPos == leftPos) {
+									curEntryStr += "\n" + curStr;
+									whatNow--;
+								} else {
+									if (leftPos < 500) {
+										curStr = "-" + curStr;
+									}
+									amount = StrUtils.parseMoney(curStr);
+								}
+								break;
+						}
+						whatNow++;
+
+						if (whatNow > 3) {
+							if (amount == null) {
+								AccountingUtils.complain("The amount of a bank statement in " + pdf.getFilename() + " could not be read!");
+							} else {
+								if (curDate == null) {
+									AccountingUtils.complain("The date of a bank statement in " + pdf.getFilename() + " could not be read!");
+								} else {
+									lastTransaction = new BankTransaction(amount, curEntryStr, curDate, curAccount);
+									curAccount.addTransaction(lastTransaction);
+								}
+							}
+							whatNow = 0;
+						}
+					}
+					if (!properExit) {
+						AccountingUtils.complain("We did not exit the parsing of " + pdf.getFilename() + " as expected, some entries may have been missed!");
+					}
+				}
+
+			} else {
+				AccountingUtils.complain("The input file " + pdf.getFilename() + " does not belong to a known bank!");
+			}
+		}
+	}
+
+	private BankAccount getOrAddBankAccount(String bank, String iban, String bic, String owner) {
+
+		BankAccount curAccount = new BankAccount(bank, iban, bic, owner);
+
+		boolean alreadyExisting = false;
+
+		for (BankAccount bankAccount : bankAccounts) {
+			if (curAccount.equals(bankAccount)) {
+				curAccount = bankAccount;
+				alreadyExisting = true;
+				break;
+			}
+		}
+
+		curAccount.setIbanOptionally(iban);
+		curAccount.setBicOptionally(bic);
+		curAccount.setAccountHolderOptionally(owner);
+
+		if (!alreadyExisting) {
+			bankAccounts.add(curAccount);
+		}
+
+		return curAccount;
 	}
 
 	public List<Outgoing> getOutgoings() {
@@ -620,6 +878,13 @@ public class Database {
 		gui.showTab(null);
 
 		years = new ArrayList<>();
+
+		save();
+	}
+
+	public void dropBankStatements() {
+
+		bankAccounts = new ArrayList<>();
 
 		save();
 	}

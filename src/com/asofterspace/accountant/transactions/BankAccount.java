@@ -21,12 +21,15 @@ public class BankAccount {
 
 	private static final String BANK_KEY = "bank";
 	private static final String IBAN_KEY = "iban";
+	private static final String BIC_KEY = "bic";
 	private static final String OWNER_KEY = "owner";
 	private static final String TRANSACTIONS_KEY = "transactions";
 
 	private String bank;
 
 	private String iban;
+
+	private String bic;
 
 	private String accountHolder;
 
@@ -37,9 +40,10 @@ public class BankAccount {
 	private BankAccount() {
 	}
 
-	public BankAccount(String bank, String iban, String accountHolder) {
+	public BankAccount(String bank, String iban, String bic, String accountHolder) {
 		this.bank = bank;
 		this.iban = iban;
+		this.bic = bic;
 		this.accountHolder = accountHolder;
 		this.transactions = new HashSet<>();
 	}
@@ -51,6 +55,8 @@ public class BankAccount {
 		result.bank = rec.getString(BANK_KEY);
 
 		result.iban = rec.getString(IBAN_KEY);
+
+		result.bic = rec.getString(BIC_KEY);
 
 		result.accountHolder = rec.getString(OWNER_KEY);
 
@@ -72,6 +78,8 @@ public class BankAccount {
 
 		result.set(IBAN_KEY, iban);
 
+		result.set(BIC_KEY, bic);
+
 		result.set(OWNER_KEY, accountHolder);
 
 		Record transRec = Record.emptyArray();
@@ -88,11 +96,42 @@ public class BankAccount {
 	}
 
 	public String getIban() {
+		if (iban == null) {
+			return "N/A";
+		}
 		return iban;
 	}
 
+	public void setIbanOptionally(String newIban) {
+		if (newIban != null) {
+			this.iban = newIban;
+		}
+	}
+
+	public String getBic() {
+		if (bic == null) {
+			return "N/A";
+		}
+		return bic;
+	}
+
+	public void setBicOptionally(String newBic) {
+		if (newBic != null) {
+			this.bic = newBic;
+		}
+	}
+
 	public String getAccountHolder() {
+		if (accountHolder == null) {
+			return "N/A";
+		}
 		return accountHolder;
+	}
+
+	public void setAccountHolderOptionally(String newAccountHolder) {
+		if (newAccountHolder != null) {
+			this.accountHolder = newAccountHolder;
+		}
 	}
 
 	public List<BankTransaction> getTransactions() {
@@ -128,8 +167,17 @@ public class BankAccount {
 			if (!this.bank.equals(otherBankAccount.bank)) {
 				return false;
 			}
-			if (!this.iban.equals(otherBankAccount.iban)) {
-				return false;
+			// match null to any, or else require exact match
+			if ((this.iban != null) && (otherBankAccount.iban != null)) {
+				if (!this.iban.equals(otherBankAccount.iban)) {
+					return false;
+				}
+			}
+			// match null to any, or else require exact match
+			if ((this.bic != null) && (otherBankAccount.bic != null)) {
+				if (!this.bic.equals(otherBankAccount.bic)) {
+					return false;
+				}
 			}
 			// match null to any, or else require exact match
 			if ((this.accountHolder != null) && (otherBankAccount.accountHolder != null)) {

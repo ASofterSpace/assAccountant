@@ -62,7 +62,7 @@ public class BankStatementYearTab extends Tab {
 		topHUD.setLayout(new GridBagLayout());
 
 		CopyByClickLabel nameLabel = AccountingUtils.createHeadLabel(title);
-		topHUD.add(nameLabel, new Arrangement(0, 0, 1.0, 1.0));
+		topHUD.add(nameLabel, new Arrangement(0, 0, 1.0, 0.0));
 
 		tab.add(topHUD, new Arrangement(0, i, 1.0, 0.0));
 		i++;
@@ -75,8 +75,10 @@ public class BankStatementYearTab extends Tab {
 		List<BankAccount> accounts = database.getBankAccounts();
 
 		for (BankAccount account : accounts) {
-			curLabel = AccountingUtils.createSubHeadLabel(account.getBank() + ": " + account.getIban());
-			tab.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
+			curLabel = AccountingUtils.createSubHeadLabel(
+				account.getBank() + ", IBAN: " + account.getIban() + ", BIC: " + account.getBic()
+			);
+			tab.add(curLabel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
 
 			List<BankTransaction> transactions = account.getTransactions();
@@ -87,7 +89,7 @@ public class BankStatementYearTab extends Tab {
 					foundSome = true;
 					total += transaction.getAmount();
 					curPanel = transaction.createPanelOnGUI(database);
-					tab.add(curPanel, new Arrangement(0, i, 1.0, 1.0));
+					tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 					i++;
 
 					Dimension newSize = new Dimension(parentPanel.getWidth(), curPanel.getMinimumSize().height);
@@ -101,31 +103,31 @@ public class BankStatementYearTab extends Tab {
 
 				curLabel = new CopyByClickLabel("");
 				curLabel.setPreferredSize(defaultDimension);
-				curPanel.add(curLabel, new Arrangement(0, 0, 0.1, 1.0));
+				curPanel.add(curLabel, new Arrangement(0, 0, 0.1, 0.0));
 
 				curLabel = AccountingUtils.createLabel("Total, assuming +/- 0 at the top:", textColor, "");
 				curLabel.setHorizontalAlignment(JLabel.RIGHT);
-				curPanel.add(curLabel, new Arrangement(1, 0, 0.7, 1.0));
+				curPanel.add(curLabel, new Arrangement(1, 0, 0.7, 0.0));
 
 				curLabel = new CopyByClickLabel(AccountingUtils.formatMoney(total, Currency.EUR));
 				curLabel.setHorizontalAlignment(JLabel.RIGHT);
 				curLabel.setPreferredSize(defaultDimension);
-				curPanel.add(curLabel, new Arrangement(2, 0, 0.1, 1.0));
+				curPanel.add(curLabel, new Arrangement(2, 0, 0.1, 0.0));
 
 				curLabel = new CopyByClickLabel("");
 				curLabel.setPreferredSize(defaultDimension);
-				curPanel.add(curLabel, new Arrangement(3, 0, 0.0, 1.0));
+				curPanel.add(curLabel, new Arrangement(3, 0, 0.0, 0.0));
 
 				curLabel = new CopyByClickLabel("");
 				curLabel.setMinimumSize(defaultDimension);
 				curLabel.setPreferredSize(defaultDimension);
-				curPanel.add(curLabel, new Arrangement(4, 0, 0.1, 1.0));
+				curPanel.add(curLabel, new Arrangement(4, 0, 0.1, 0.0));
 
 				curLabel = new CopyByClickLabel("");
 				curLabel.setPreferredSize(defaultDimension);
-				curPanel.add(curLabel, new Arrangement(5, 0, 0.0, 1.0));
+				curPanel.add(curLabel, new Arrangement(5, 0, 0.0, 0.0));
 
-				tab.add(curPanel, new Arrangement(0, i, 1.0, 1.0));
+				tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 				i++;
 
 			} else {

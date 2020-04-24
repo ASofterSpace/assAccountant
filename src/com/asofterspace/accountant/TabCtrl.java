@@ -57,6 +57,10 @@ public class TabCtrl {
 			result.add(new BankStatementYearTab(year));
 		}
 
+		for (Integer year : database.getBankStatementOnlyYears()) {
+			result.add(new BankStatementYearTab(new Year(year, database)));
+		}
+
 		Collections.sort(result, new Comparator<Tab>() {
 			public int compare(Tab a, Tab b) {
 				return a.compareTo(b);

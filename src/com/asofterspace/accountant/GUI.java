@@ -7,6 +7,7 @@ package com.asofterspace.accountant;
 import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
+import com.asofterspace.accountant.tabs.BankStatementYearTab;
 import com.asofterspace.accountant.tabs.MonthTab;
 import com.asofterspace.accountant.tabs.Tab;
 import com.asofterspace.accountant.tabs.TimeSpanTab;
@@ -218,6 +219,17 @@ public class GUI extends MainWindow {
 		file.add(bulkImportBankStatements);
 
 		file.addSeparator();
+
+		JMenuItem dropBankStatements = new JMenuItem("Drop All Bank Statements");
+		dropBankStatements.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (AccountingUtils.confirmDelete("all bank statements")) {
+					database.dropBankStatements();
+				}
+			}
+		});
+		file.add(dropBankStatements);
 
 		JMenuItem dropEntireDatabase = new JMenuItem("Drop Entire Database");
 		dropEntireDatabase.addActionListener(new ActionListener() {
@@ -520,13 +532,13 @@ public class GUI extends MainWindow {
 		ArrayList<String> strTabList = new ArrayList<>();
 
 		for (Tab tab : tabs) {
-			if ((tab instanceof YearTab) && (strTabList.size() > 0)) {
-				strTabList.add(" ");
-			}
 			if (tab.equals(currentlyOpenedTab)) {
 				strTabList.add(">> " + tab.toString() + " <<");
 			} else {
 				strTabList.add(tab.toString());
+			}
+			if (tab instanceof BankStatementYearTab) {
+				strTabList.add(" ");
 			}
 		}
 
