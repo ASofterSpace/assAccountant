@@ -519,8 +519,11 @@ public class Database {
 		for (PdfObject obj : objs) {
 
 			try {
-				pdfPlainText.append(obj.getPlainStreamContent());
-				pdfPlainText.append("\n");
+				String contentPiece = obj.getPlainStreamContent();
+				if (contentPiece != null) {
+					pdfPlainText.append(contentPiece);
+					pdfPlainText.append("\n");
+				}
 			} catch (Exception e) {
 				// whoops!
 			}

@@ -14,10 +14,13 @@ import com.asofterspace.accountant.transactions.BankTransaction;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
+import com.asofterspace.toolbox.gui.GraphPanel;
+import com.asofterspace.toolbox.gui.GraphTimeDataPoint;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -72,6 +75,15 @@ public class BankStatementYearTab extends Tab {
 		JPanel curPanel;
 
 
+		List<GraphTimeDataPoint> timeData = new ArrayList<>();
+
+		GraphPanel graph = new GraphPanel();
+		graph.setBackground(GUI.getBackgroundColor());
+		graph.setMinimumHeight(500);
+		tab.add(graph, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+
 		List<BankAccount> accounts = database.getBankAccounts();
 
 		for (BankAccount account : accounts) {
@@ -88,6 +100,7 @@ public class BankStatementYearTab extends Tab {
 				if (transaction.belongsTo(year) && transaction.matches(searchFor)) {
 					foundSome = true;
 					total += transaction.getAmount();
+					timeData.add(new GraphTimeDataPoint(transaction.getDate(), transaction.getAmount()));
 					curPanel = transaction.createPanelOnGUI(database);
 					tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 					i++;
@@ -144,6 +157,13 @@ public class BankStatementYearTab extends Tab {
 			i++;
 		}
 
+
+		graph.setTimeDataPoints(timeData);
+
+		double graphMin = graph.getMinimumValue();
+		if (graphMin < 0) {
+			graph.shiftValues(-graphMin);
+		}
 
 		JPanel footer = new JPanel();
 		footer.setBackground(GUI.getBackgroundColor());
