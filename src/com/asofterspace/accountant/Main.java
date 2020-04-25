@@ -5,9 +5,13 @@
 package com.asofterspace.accountant;
 
 import com.asofterspace.toolbox.configuration.ConfigFile;
+import com.asofterspace.toolbox.io.Directory;
+import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.Utils;
+
+import java.util.List;
 
 import javax.swing.SwingUtilities;
 
@@ -61,12 +65,12 @@ public class Main {
 		Utils.setVersionDate(VERSION_DATE);
 
 		if (args.length > 0) {
-			if (args[0].equals("--version")) {
+			if (args[0].replaceAll("-", "").toLowerCase().trim().equals("version")) {
 				System.out.println(Utils.getFullProgramIdentifierWithDate());
 				return;
 			}
 
-			if (args[0].equals("--version_for_zip")) {
+			if (args[0].replaceAll("-", "").toLowerCase().trim().equals("version_for_zip")) {
 				System.out.println("version " + Utils.getVersionNumber());
 				return;
 			}
@@ -96,10 +100,83 @@ public class Main {
 		}
 
 		System.out.println("Hi there! :)");
+		if (args.length < 1) {
+			System.out.println("You have started me without any arguments, so I will just load up the GUI for you...");
+		}
 		System.out.println("Database has been loaded; I am ready!");
 
 		tabCtrl = new TabCtrl(database);
 		taskCtrl = new TaskCtrl(database);
+
+		boolean doExit = false;
+
+		if (args.length > 0) {
+			for (int i = 0; i < args.length; i++) {
+				switch (args[i].replaceAll("-", "").trim().toLowerCase()) {
+					case "help":
+						System.out.println("You asked me to show the help; so I will do that and then exit...");
+						System.out.println("");
+						System.out.println("Here are all the configuration files that I use:");
+						System.out.println("");
+						System.out.println(config.getAbsoluteFilename() + " .. general settings file (JSON)");
+						System.out.println(database.getDbFile().getAbsoluteFilename() + " .. main database file (JSON)");
+						System.out.println("");
+						System.out.println("Here is the list of all commandline arguments that I understand:");
+						System.out.println("");
+						System.out.println("help .. show this help, then exit");
+						System.out.println("version .. show the version number of this program, then exit");
+						System.out.println("version_for_zip .. show the condensed version number of this program, then exit");
+						System.out.println("");
+						System.out.println("drop_database .. drop the entire database");
+						System.out.println("drop_bank_statements .. drop the bank statements from the database");
+						System.out.println("import_bank_statements [folder] .. import (unencrypted!) bank statements from this folder, recursively");
+						System.out.println("");
+						System.out.println("exit .. after all other commands have been worked through, exit");
+						System.out.println("");
+						System.out.println("That was the help... kthxbye!");
+						return;
+					case "exit":
+						System.out.println("You asked me to exit after being done with everything else... so I will!");
+						doExit = true;
+						break;
+					case "drop_database":
+						System.out.println("You asked me to drop the database, so it will be done...");
+						database.drop();
+						System.out.println("Done!");
+						break;
+					case "drop_bank_statements":
+						System.out.println("You asked me to drop the bank statements, so it will be done...");
+						database.dropBankStatements();
+						System.out.println("Done!");
+						break;
+					case "import_bank_statements":
+						i++;
+						if (i < args.length) {
+							Directory folder = new Directory(args[i]);
+							System.out.println(
+								"You asked me to import bank statements from the folder '" +
+								folder.getAbsoluteDirname() + "'...");
+							boolean recursively = true;
+							List<File> filesToImport = folder.getAllFiles(recursively);
+							database.bulkImportBankStatements(filesToImport);
+							System.out.println("Done!");
+						} else {
+							System.out.println(
+								"You asked me to import bank statements from a folder, " +
+								"but did not give me a folder as next argument!");
+							System.out.println(
+								"Exiting as something went wrong...");
+							System.exit(1);
+						}
+						break;
+				}
+			}
+		}
+
+		if (doExit) {
+			System.out.println("Exiting, as you asked for it... byo!");
+			return;
+		}
 
 		SwingUtilities.invokeLater(new GUI(database, tabCtrl, config));
 	}

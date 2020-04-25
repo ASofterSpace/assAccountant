@@ -273,8 +273,10 @@ public class Database {
 			// back to the front of the queue!
 			dbFile.setAllContents(root);
 
-			gui.showTab(null);
-			gui.regenerateTabList();
+			if (gui != null) {
+				gui.showTab(null);
+				gui.regenerateTabList();
+			}
 
 		} catch (JsonParseException e) {
 			System.err.println("JSON parsing failed for " + BACKUP_FILE_NAME + currentBackup + ": " + e);
@@ -1162,9 +1164,15 @@ public class Database {
 		return loadedRoot;
 	}
 
+	public File getDbFile() {
+		return dbFile;
+	}
+
 	public void drop() {
 
-		gui.showTab(null);
+		if (gui != null) {
+			gui.showTab(null);
+		}
 
 		years = new ArrayList<>();
 
@@ -1217,7 +1225,9 @@ public class Database {
 		overflowCheckBackups();
 		new ConfigFile(BACKUP_FILE_NAME + currentBackup, true, root);
 
-		gui.refreshOpenTab();
+		if (gui != null) {
+			gui.refreshOpenTab();
+		}
 	}
 
 	private void overflowCheckBackups() {
