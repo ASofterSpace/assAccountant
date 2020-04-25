@@ -528,9 +528,11 @@ public class Database {
 
 		String pdfText = pdfPlainText.toString();
 
+		pdfText = pdfText.replaceAll("\\\\045", "%");
 		pdfText = pdfText.replaceAll("\\\\334", "Ü");
 		pdfText = pdfText.replaceAll("\\\\337", "ß");
 		pdfText = pdfText.replaceAll("\\\\344", "ä");
+		pdfText = pdfText.replaceAll("\\\\366", "ö");
 		pdfText = pdfText.replaceAll("\\\\374", "ü");
 		pdfText = pdfText.replaceAll("\\\\\\(", "(");
 		pdfText = pdfText.replaceAll("\\\\\\)", ")");
@@ -540,19 +542,174 @@ public class Database {
 		SimpleFile outFile = new SimpleFile("data/pdf_debug.txt"); // DEBUG
 		outFile.saveContent(pdfText); // DEBUG
 
-		if (pdfText.contains("[(Sparda-Bank Berlin eG)]TJ")) {
+		if (pdfText.contains("\n72.90 51.47 Td (Sparda-) Tj\n21.35 0.00 Td (Bank ) Tj\n15.35 0.00 Td (Berlin ) Tj\n17.01 0.00 Td (eG) Tj")) {
+			bulkImportBankStatementsFromPdfForSpardaUntil2018(pdf, pdfText);
+			return;
+		}
+		if (pdfText.contains("\n[(Sparda-Bank Berlin eG)]TJ")) {
 			bulkImportBankStatementsFromPdfForSparda(pdf, pdfText);
 			return;
 		}
-		if (pdfText.contains("(DEUTSCHE KREDITBANK AG)Tj")) {
+		if (pdfText.contains("\n(DEUTSCHE KREDITBANK AG)Tj")) {
 			bulkImportBankStatementsFromPdfForDKB(pdf, pdfText);
 			return;
 		}
-		if (pdfText.contains("[(GLS Gemeinschaftsbank eG)]TJ")) {
+		if (pdfText.contains("\n[(GLS Gemeinschaftsbank eG)]TJ")) {
 			bulkImportBankStatementsFromPdfForGLS(pdf, pdfText);
 			return;
 		}
 		AccountingUtils.complain("The input file " + pdf.getFilename() + " does not belong to a known bank!");
+	}
+
+	/**
+	 * We have a text like:
+	 * foo.bar (bla blubb)Tj
+	 * foo.bar (blubb2)Tj
+	 * ET
+	 * foo.bar (bla blubb)Tj
+	 *
+	 * We call this with endsWith = ET
+	 *
+	 * Then the result will be:
+	 * bla blubbblubb2
+	 */
+	private String concatPdfCellsUntil(String text, String endsWith) {
+
+		String result = "";
+
+		while (text.contains("\n")) {
+			String line = text.substring(0, text.indexOf("\n"));
+			text = text.substring(text.indexOf("\n") + 1);
+			if (line.startsWith(endsWith)) {
+				return result;
+			}
+			if (line.contains("(") && line.contains(")")) {
+				line = line.substring(line.indexOf("(") + 1);
+				line = line.substring(0, line.indexOf(")"));
+				result += line;
+			}
+		}
+
+		return result;
+	}
+
+	private void bulkImportBankStatementsFromPdfForSpardaUntil2018(PdfFile pdf, String pdfText) {
+
+		String bank = "Sparda";
+		String iban = null;
+		String bic = null;
+		String owner = null;
+		int lastLeftPos = 0;
+		int leftPos = 0;
+
+		if (pdfText.contains("76.30 732.54 Td (IBAN: ) Tj")) {
+			iban = pdfText.substring(pdfText.indexOf("76.30 732.54 Td (IBAN: ) Tj") + "76.30 732.54 Td (IBAN: ) Tj".length());
+			iban = concatPdfCellsUntil(iban, "ET");
+			iban = iban.replaceAll(" ", "");
+		}
+
+		if (pdfText.contains("72.90 30.76 Td (BIC: ) Tj")) {
+			bic = pdfText.substring(pdfText.indexOf("72.90 30.76 Td (BIC: ) Tj") + "72.90 30.76 Td (BIC: ) Tj".length());
+			bic = bic.substring(bic.indexOf("(") + 1);
+			bic = bic.substring(0, bic.indexOf(")"));
+			bic = bic.replaceAll(" ", "");
+		}
+
+		if (pdfText.contains("/F0 12.0 Tf")) {
+			owner = pdfText.substring(pdfText.indexOf("/F0 12.0 Tf"));
+			owner = concatPdfCellsUntil(owner, "ET");
+		}
+		BankAccount curAccount = getOrAddBankAccount(bank, iban, bic, owner);
+
+		if (pdfText.contains("76.30 667.63 Td (")) {
+
+			String transStr = pdfText.substring(pdfText.lastIndexOf("/F1 8.0 Tf", pdfText.indexOf("76.30 667.63 Td (")) - 1);
+
+			// tracks occurrences of /F1 8.0 Tf
+			// 0 .. date, 1 .. title, 2 .. second date, 3 .. amount
+			int whatNow = 0;
+
+			boolean properExit = false;
+			Date curDate = null;
+			Integer amount = null;
+			String curEntryStr = null;
+			BankTransaction lastTransaction;
+
+			while (transStr.contains("/F1 8.0 Tf")) {
+
+				if (transStr.indexOf("/F0 8.0 Tf") < transStr.indexOf("/F1 8.0 Tf")) {
+					properExit = true;
+					break;
+				}
+
+				transStr = transStr.substring(transStr.indexOf("/F1 8.0 Tf") + 2);
+
+				String beforeStr = transStr.substring(0, transStr.indexOf("("));
+
+				// before Str contains something like:
+				// ...
+				// 451.49 417.56 Td
+				// we want to get the first of the two numbers
+				beforeStr = beforeStr.substring(beforeStr.lastIndexOf("\n") + 1);
+				beforeStr = beforeStr.substring(0, beforeStr.indexOf(" "));
+				if (beforeStr.contains(".")) {
+					beforeStr = beforeStr.substring(0, beforeStr.indexOf("."));
+				}
+				lastLeftPos = leftPos;
+				leftPos = Integer.parseInt(beforeStr);
+
+				String curStr = concatPdfCellsUntil(transStr, "ET");
+
+				switch (whatNow) {
+					case 0:
+						// jump to the next page
+						if (curStr.contains("Übertrag")) {
+							transStr = transStr.substring(transStr.lastIndexOf("/F1 8.0 Tf", transStr.indexOf("76.30 700.98 Td (")) - 1);
+							whatNow--;
+							break;
+						}
+						// ignore empty fields (just jump over them - there is one just before the end anyway...)
+						if ("".equals(curStr.trim())) {
+							whatNow--;
+							break;
+						}
+						curDate = DateUtils.parseDate(curStr);
+						amount = null;
+						break;
+					case 1:
+						curEntryStr = curStr;
+						break;
+					case 2:
+						// if we have not advanced to the right, then we are in another line for the title
+						if (lastLeftPos == leftPos) {
+							curEntryStr += "\n" + curStr;
+							whatNow--;
+						}
+						break;
+					case 3:
+						amount = StrUtils.parseMoney(curStr);
+						break;
+				}
+				whatNow++;
+
+				if (whatNow > 3) {
+					if (amount == null) {
+						AccountingUtils.complain("The amount of a bank statement in " + pdf.getFilename() + " could not be read!");
+					} else {
+						if (curDate == null) {
+							AccountingUtils.complain("The date of a bank statement in " + pdf.getFilename() + " could not be read!");
+						} else {
+							lastTransaction = new BankTransaction(amount, curEntryStr, curDate, curAccount);
+							curAccount.addTransaction(lastTransaction);
+						}
+					}
+					whatNow = 0;
+				}
+			}
+			if (!properExit) {
+				AccountingUtils.complain("We did not exit the parsing of " + pdf.getFilename() + " as expected, some entries may have been missed!");
+			}
+		}
 	}
 
 	private void bulkImportBankStatementsFromPdfForSparda(PdfFile pdf, String pdfText) {
@@ -738,6 +895,7 @@ public class Database {
 							whatNow--;
 						} else {
 							curDate = DateUtils.parseDate(curStr + curYear);
+							amount = null;
 						}
 						break;
 					case 2:
