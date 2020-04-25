@@ -542,7 +542,8 @@ public class Database {
 		SimpleFile outFile = new SimpleFile("data/pdf_debug.txt"); // DEBUG
 		outFile.saveContent(pdfText); // DEBUG
 
-		if (pdfText.contains("\n72.90 51.47 Td (Sparda-) Tj\n21.35 0.00 Td (Bank ) Tj\n15.35 0.00 Td (Berlin ) Tj\n17.01 0.00 Td (eG) Tj")) {
+		if (pdfText.contains("(Sparda-) Tj\n21.35 0.00 Td (Bank ) Tj\n15.34 0.00 Td (Berlin ) Tj\n17.01 0.00 Td (eG) Tj") ||
+			pdfText.contains("(Sparda-) Tj\n21.35 0.00 Td (Bank ) Tj\n15.35 0.00 Td (Berlin ) Tj\n17.01 0.00 Td (eG) Tj")) {
 			bulkImportBankStatementsFromPdfForSpardaUntil2018(pdf, pdfText);
 			return;
 		}
@@ -607,12 +608,29 @@ public class Database {
 			iban = concatPdfCellsUntil(iban, "ET");
 			iban = iban.replaceAll(" ", "");
 		}
+		if (pdfText.contains("76.30 740.75 Td (IBAN: ) Tj")) {
+			iban = pdfText.substring(pdfText.indexOf("76.30 740.75 Td (IBAN: ) Tj") + "76.30 740.75 Td (IBAN: ) Tj".length());
+			iban = concatPdfCellsUntil(iban, "ET");
+			iban = iban.replaceAll(" ", "");
+		}
 
 		if (pdfText.contains("72.90 30.76 Td (BIC: ) Tj")) {
-			bic = pdfText.substring(pdfText.indexOf("72.90 30.76 Td (BIC: ) Tj") + "72.90 30.76 Td (BIC: ) Tj".length());
+			bic = pdfText.substring(pdfText.indexOf("72.90 30.76 Td (BIC: ) Tj"));
+			bic = bic.substring(bic.indexOf("(") + 1);
 			bic = bic.substring(bic.indexOf("(") + 1);
 			bic = bic.substring(0, bic.indexOf(")"));
 			bic = bic.replaceAll(" ", "");
+		}
+		if (pdfText.contains("72.90 37.86 Td (BIC: ) Tj")) {
+			bic = pdfText.substring(pdfText.indexOf("72.90 37.86 Td (BIC: ) Tj"));
+			bic = bic.substring(bic.indexOf("(") + 1);
+			bic = bic.substring(bic.indexOf("(") + 1);
+			bic = bic.substring(0, bic.indexOf(")"));
+			bic = bic.replaceAll(" ", "");
+		}
+
+		if ((iban == null) && (bic == null)) {
+			AccountingUtils.complain("Could read out neither IBAN nor BIC for " + pdf.getFilename() + "!");
 		}
 
 		if (pdfText.contains("/F0 12.0 Tf")) {
@@ -621,9 +639,15 @@ public class Database {
 		}
 		BankAccount curAccount = getOrAddBankAccount(bank, iban, bic, owner);
 
-		if (pdfText.contains("76.30 667.63 Td (")) {
+		if (pdfText.contains("76.30 667.63 Td (") || pdfText.contains("76.30 675.83 Td (")) {
 
-			String transStr = pdfText.substring(pdfText.lastIndexOf("/F1 8.0 Tf", pdfText.indexOf("76.30 667.63 Td (")) - 1);
+			String transStr = null;
+			if (pdfText.contains("76.30 667.63 Td (")) {
+				transStr = pdfText.substring(pdfText.lastIndexOf("/F1 8.0 Tf", pdfText.indexOf("76.30 667.63 Td (")) - 1);
+			}
+			if (pdfText.contains("76.30 675.83 Td (")) {
+				transStr = pdfText.substring(pdfText.lastIndexOf("/F1 8.0 Tf", pdfText.indexOf("76.30 675.83 Td (")) - 1);
+			}
 
 			// tracks occurrences of /F1 8.0 Tf
 			// 0 .. date, 1 .. title, 2 .. second date, 3 .. amount
