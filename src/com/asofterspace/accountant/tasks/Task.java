@@ -134,15 +134,10 @@ public class Task {
 		return DateUtils.parseDate(getReleasedInYear() + "-" + (getReleasedInMonth() + 1) + "-" + getReleasedOnDay());
 	}
 
-	/**
-	 * Actually return the instructions as shown to the user, with information replaced with
-	 * actual info
-	 */
-	public List<JPanel> getDetailsToShowToUser(Database database) {
+	public String getDetailsToShowToUser(Database database) {
 
-		List<JPanel> results = new ArrayList<>();
 		if ((details == null) || (details.size() < 1)) {
-			return results;
+			return null;
 		}
 
 		Month curMonth = database.getMonthFromEntryDate(getReleaseDate());
@@ -171,6 +166,23 @@ public class Task {
 		detail = replaceDetailsFor(detail, "MONTH", curMonth);
 		detail = replaceDetailsFor(detail, "PREV_YEAR", prevYear);
 		detail = replaceDetailsFor(detail, "YEAR", curYear);
+
+		return detail;
+	}
+
+	/**
+	 * Actually return the instructions as shown to the user, with information replaced with
+	 * actual info
+	 */
+	public List<JPanel> getDetailPanelsToShowToUser(Database database) {
+
+		List<JPanel> results = new ArrayList<>();
+
+		String detail = getDetailsToShowToUser(database);
+
+		if (detail == null) {
+			return results;
+		}
 
 		String[] detailsAfterReplacement = detail.split("\n");
 
@@ -498,7 +510,7 @@ public class Task {
 						addedLines.add(curPanel);
 						i++;
 					} else {
-						for (JPanel detail : getDetailsToShowToUser(database)) {
+						for (JPanel detail : getDetailPanelsToShowToUser(database)) {
 							containerPanel.add(detail, new Arrangement(0, i, 1.0, 1.0));
 							addedLines.add(detail);
 							i++;
@@ -580,11 +592,24 @@ public class Task {
 					if (Task.this instanceof FinanceOverviewTask) {
 						taskCtrl.removeFinanceLogForDate(doneDate);
 					}
+					setDoneLog(taskLog.getText());
 				} else {
 					Task.this.done = true;
 					setDoneDate(new Date());
+					String detailsForUser = getDetailsToShowToUser(database);
+					if (detailsForUser == null) {
+						setDoneLog(taskLog.getText());
+					} else {
+						StringBuilder originalDetails = new StringBuilder();
+						originalDetails.append(taskLog.getText());
+						originalDetails.append("\n\n");
+						originalDetails.append("Original Details:");
+						originalDetails.append("\n");
+						originalDetails.append(detailsForUser);
+						setDoneLog(originalDetails.toString());
+					}
 				}
-				setDoneLog(taskLog.getText());
+
 				if (Task.this instanceof FinanceOverviewTask) {
 					FinanceLogEntry entry = new FinanceLogEntry(doneDate);
 					String[] finLogLines = finLog.getText().split("\n");
