@@ -6,6 +6,7 @@ package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.timespans.Month;
+import com.asofterspace.accountant.timespans.TimeSpan;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
@@ -200,6 +201,7 @@ public class Task {
 				detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_PREV_YEAR_TAX_0%\\]",
 					AccountingUtils.formatMoney(cur, Currency.EUR));
 			}
+			detail = replaceComplexVatInDetails(detail, "VAT_TOTAL_OUTGOING_PREV_YEAR_TAX_0%_", prevYear);
 			if (detail.contains("%[VAT_TOTAL_OUTGOING_PREV_YEAR_JUST_TAX]")) {
 				int cur = 0;
 				for (Outgoing entry : prevYear.getOutgoings()) {
@@ -228,41 +230,7 @@ public class Task {
 				detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_MONTH_TAX_0%\\]",
 					AccountingUtils.formatMoney(cur, Currency.EUR));
 			}
-			String vat0complex = "%[VAT_TOTAL_OUTGOING_MONTH_TAX_0%_";
-			String vat0complexBracket = vat0complex + "(";
-			if (detail.contains(vat0complexBracket)) {
-				List<String> included = new ArrayList<>();
-				String findInc = detail.substring(detail.indexOf(vat0complexBracket) + vat0complexBracket.length());
-				if (findInc.contains(")")) {
-					while ((findInc.indexOf(")") > findInc.indexOf(",")) && (findInc.indexOf(",") >= 0)) {
-						included.add(findInc.substring(0, findInc.indexOf(",")).toLowerCase().trim());
-						findInc = findInc.substring(findInc.indexOf(",") + 1);
-					}
-					included.add(findInc.substring(0, findInc.indexOf(")")).toLowerCase().trim());
-					int curInc = 0;
-					int curRest = 0;
-					for (Outgoing entry : curMonth.getOutgoings()) {
-						if (0 == (int) entry.getTaxPercent()) {
-							String curCustomer = entry.getCategoryOrCustomer().toLowerCase().trim();
-							boolean includeThisOne = false;
-							for (String incCustomer : included) {
-								if (curCustomer.equals(incCustomer)) {
-									includeThisOne = true;
-								}
-							}
-							if (includeThisOne) {
-								curInc += entry.getAmount();
-							} else {
-								curRest += entry.getAmount();
-							}
-						}
-					}
-					detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_MONTH_TAX_0%_\\(.*\\)\\]",
-						AccountingUtils.formatMoney(curInc, Currency.EUR));
-					detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_MONTH_TAX_0%_REST\\]",
-						AccountingUtils.formatMoney(curRest, Currency.EUR));
-				}
-			}
+			detail = replaceComplexVatInDetails(detail, "VAT_TOTAL_OUTGOING_MONTH_TAX_0%_", curMonth);
 
 			String[] detailsAfterReplacement = detail.split("\n");
 
@@ -300,6 +268,45 @@ public class Task {
 			}
 		}
 		return results;
+	}
+
+	public String replaceComplexVatInDetails(String detail, String complexKey, TimeSpan timeSpan) {
+		String vat0complex = "%[" + complexKey;
+		String vat0complexBracket = vat0complex + "(";
+		if (detail.contains(vat0complexBracket)) {
+			List<String> included = new ArrayList<>();
+			String findInc = detail.substring(detail.indexOf(vat0complexBracket) + vat0complexBracket.length());
+			if (findInc.contains(")")) {
+				while ((findInc.indexOf(")") > findInc.indexOf(",")) && (findInc.indexOf(",") >= 0)) {
+					included.add(findInc.substring(0, findInc.indexOf(",")).toLowerCase().trim());
+					findInc = findInc.substring(findInc.indexOf(",") + 1);
+				}
+				included.add(findInc.substring(0, findInc.indexOf(")")).toLowerCase().trim());
+				int curInc = 0;
+				int curRest = 0;
+				for (Outgoing entry : timeSpan.getOutgoings()) {
+					if (0 == (int) entry.getTaxPercent()) {
+						String curCustomer = entry.getCategoryOrCustomer().toLowerCase().trim();
+						boolean includeThisOne = false;
+						for (String incCustomer : included) {
+							if (curCustomer.equals(incCustomer)) {
+								includeThisOne = true;
+							}
+						}
+						if (includeThisOne) {
+							curInc += entry.getAmount();
+						} else {
+							curRest += entry.getAmount();
+						}
+					}
+				}
+				detail = detail.replaceAll("%\\[" + complexKey + "\\(.*\\)\\]",
+					AccountingUtils.formatMoney(curInc, Currency.EUR));
+				detail = detail.replaceAll("%\\[" + complexKey + "REST\\]",
+					AccountingUtils.formatMoney(curRest, Currency.EUR));
+			}
+		}
+		return detail;
 	}
 
 	public Boolean hasBeenDone() {
