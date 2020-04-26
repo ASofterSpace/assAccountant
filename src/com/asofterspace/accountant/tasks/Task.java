@@ -132,142 +132,138 @@ public class Task {
 	 */
 	public List<JPanel> getDetailsToShowToUser(Database database) {
 
+		List<JPanel> results = new ArrayList<>();
+		if ((details == null) || (details.size() < 1)) {
+			return results;
+		}
+
 		Month curMonth = database.getMonthFromEntryDate(getReleaseDate());
+		Month prevMonth = database.getPrevMonthFromEntryDate(getReleaseDate());
 		Year curYear = database.getYearFromEntryDate(getReleaseDate());
 		Year prevYear = database.getPrevYearFromEntryDate(getReleaseDate());
 
-		List<JPanel> results = new ArrayList<>();
-		if (details != null) {
-			// actually join all the individual lines to a big text first, and make all the replacements
-			// just once for which this works (and afterwards split again for the more line-specific
-			// replacements such as %[CHECK])
-			String detail = StrUtils.join("\n", details);
-			detail = detail.replaceAll("%\\[DAY\\]", ""+releasedOnDay);
-			detail = detail.replaceAll("%\\[MONTH\\]", ""+releasedInMonth);
-			detail = detail.replaceAll("%\\[NAME_OF_MONTH\\]", DateUtils.monthNumToName(releasedInMonth));
-			detail = detail.replaceAll("%\\[YEAR\\]", ""+releasedInYear);
-			detail = detail.replaceAll("%\\[PREV_DAY\\]", ""+(releasedOnDay-1));
-			int prevMonth = releasedInMonth - 1;
-			if (prevMonth < 0) {
-				prevMonth = 11;
-			}
-			detail = detail.replaceAll("%\\[PREV_MONTH\\]", ""+prevMonth);
-			detail = detail.replaceAll("%\\[NAME_OF_PREV_MONTH\\]", DateUtils.monthNumToName(prevMonth));
-			detail = detail.replaceAll("%\\[PREV_YEAR\\]", ""+(releasedInYear-1));
+		// actually join all the individual lines to a big text first, and make all the replacements
+		// just once for which this works (and afterwards split again for the more line-specific
+		// replacements such as %[CHECK])
+		String detail = StrUtils.join("\n", details);
+		detail = detail.replaceAll("%\\[DAY\\]", ""+releasedOnDay);
+		detail = detail.replaceAll("%\\[MONTH\\]", ""+releasedInMonth);
+		detail = detail.replaceAll("%\\[NAME_OF_MONTH\\]", DateUtils.monthNumToName(releasedInMonth));
+		detail = detail.replaceAll("%\\[YEAR\\]", ""+releasedInYear);
+		detail = detail.replaceAll("%\\[PREV_DAY\\]", ""+(releasedOnDay-1));
+		int prevMonthNum = releasedInMonth - 1;
+		if (prevMonthNum < 0) {
+			prevMonthNum = 11;
+		}
+		detail = detail.replaceAll("%\\[PREV_MONTH\\]", ""+prevMonthNum);
+		detail = detail.replaceAll("%\\[NAME_OF_PREV_MONTH\\]", DateUtils.monthNumToName(prevMonthNum));
+		detail = detail.replaceAll("%\\[PREV_YEAR\\]", ""+(releasedInYear-1));
 
-			if (detail.contains("%[VAT_TOTAL_DISCOUNTABLE_PRETAX]")) {
-				detail = detail.replaceAll("%\\[VAT_TOTAL_DISCOUNTABLE_PRETAX\\]",
-					AccountingUtils.formatMoney(curMonth.getDiscountablePreTax(), Currency.EUR));
-			}
-			if (detail.contains("%[VAT_TOTAL_REMAINING_TAX]")) {
-				detail = detail.replaceAll("%\\[VAT_TOTAL_REMAINING_TAX\\]",
-					AccountingUtils.formatMoney(curMonth.getRemainingVatPayments(), Currency.EUR));
-			}
-			if (detail.contains("%[VAT_TOTAL_DISCOUNTABLE_PRETAX_PREV_YEAR]")) {
-				detail = detail.replaceAll("%\\[VAT_TOTAL_DISCOUNTABLE_PRETAX_PREV_YEAR\\]",
-					AccountingUtils.formatMoney(prevYear.getDiscountablePreTax(), Currency.EUR));
-			}
-			if (detail.contains("%[VAT_TOTAL_REMAINING_TAX_PREV_YEAR]")) {
-				detail = detail.replaceAll("%\\[VAT_TOTAL_REMAINING_TAX_PREV_YEAR\\]",
-					AccountingUtils.formatMoney(prevYear.getRemainingVatPayments(), Currency.EUR));
-			}
-			if (detail.contains("%[VAT_TOTAL_OUTGOING_PREV_YEAR_TAX_19%]")) {
-				int cur = 0;
-				for (Outgoing entry : prevYear.getOutgoings()) {
-					if (19 == (int) entry.getTaxPercent()) {
-						cur += entry.getAmount();
-					}
-				}
-				detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_PREV_YEAR_TAX_19%\\]",
-					AccountingUtils.formatMoney(cur, Currency.EUR));
-			}
-			if (detail.contains("%[VAT_TOTAL_OUTGOING_PREV_YEAR_TAX_7%]")) {
-				int cur = 0;
-				for (Outgoing entry : prevYear.getOutgoings()) {
-					if (7 == (int) entry.getTaxPercent()) {
-						cur += entry.getAmount();
-					}
-				}
-				detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_PREV_YEAR_TAX_7%\\]",
-					AccountingUtils.formatMoney(cur, Currency.EUR));
-			}
-			if (detail.contains("%[VAT_TOTAL_OUTGOING_PREV_YEAR_TAX_0%]")) {
-				int cur = 0;
-				for (Outgoing entry : prevYear.getOutgoings()) {
-					if (0 == (int) entry.getTaxPercent()) {
-						cur += entry.getAmount();
-					}
-				}
-				detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_PREV_YEAR_TAX_0%\\]",
-					AccountingUtils.formatMoney(cur, Currency.EUR));
-			}
-			detail = replaceComplexVatInDetails(detail, "VAT_TOTAL_OUTGOING_PREV_YEAR_TAX_0%_", prevYear);
-			if (detail.contains("%[VAT_TOTAL_OUTGOING_PREV_YEAR_JUST_TAX]")) {
-				int cur = 0;
-				for (Outgoing entry : prevYear.getOutgoings()) {
-					cur += entry.getTaxAmount();
-				}
-				detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_PREV_YEAR_JUST_TAX\\]",
-					AccountingUtils.formatMoney(cur, Currency.EUR));
-			}
-			if (detail.contains("%[VAT_TOTAL_OUTGOING_MONTH_TAX_19%]")) {
-				int cur = 0;
-				for (Outgoing entry : curMonth.getOutgoings()) {
-					if (19 == (int) entry.getTaxPercent()) {
-						cur += entry.getAmount();
-					}
-				}
-				detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_MONTH_TAX_19%\\]",
-					AccountingUtils.formatMoney(cur, Currency.EUR));
-			}
-			if (detail.contains("%[VAT_TOTAL_OUTGOING_MONTH_TAX_0%]")) {
-				int cur = 0;
-				for (Outgoing entry : curMonth.getOutgoings()) {
-					if (0 == (int) entry.getTaxPercent()) {
-						cur += entry.getAmount();
-					}
-				}
-				detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_MONTH_TAX_0%\\]",
-					AccountingUtils.formatMoney(cur, Currency.EUR));
-			}
-			detail = replaceComplexVatInDetails(detail, "VAT_TOTAL_OUTGOING_MONTH_TAX_0%_", curMonth);
+		detail = replaceDetailsFor(detail, "PREV_MONTH", prevMonth);
+		detail = replaceDetailsFor(detail, "MONTH", curMonth);
+		detail = replaceDetailsFor(detail, "PREV_YEAR", prevYear);
+		detail = replaceDetailsFor(detail, "YEAR", curYear);
 
-			String[] detailsAfterReplacement = detail.split("\n");
+		String[] detailsAfterReplacement = detail.split("\n");
 
-			for (String detailLine : detailsAfterReplacement) {
+		for (String detailLine : detailsAfterReplacement) {
 
-				JPanel curPanel = new JPanel();
-				curPanel.setBackground(GUI.getBackgroundColor());
-				curPanel.setLayout(new GridBagLayout());
+			JPanel curPanel = new JPanel();
+			curPanel.setBackground(GUI.getBackgroundColor());
+			curPanel.setLayout(new GridBagLayout());
 
-				if (detailLine.contains("%[LIST_OUTGOING_UNPAID]")) {
-					List<Outgoing> outgoings = database.getOutgoings();
-					int i = 0;
-					for (Outgoing outgoing : outgoings) {
-						if (!outgoing.getReceived()) {
-							JPanel curCurPanel = outgoing.createPanelOnGUI(database);
-							curPanel.add(curCurPanel, new Arrangement(0, i, 1.0, 0.0));
-							i++;
-						}
+			if (detailLine.contains("%[LIST_OUTGOING_UNPAID]")) {
+				List<Outgoing> outgoings = database.getOutgoings();
+				int i = 0;
+				for (Outgoing outgoing : outgoings) {
+					if (!outgoing.getReceived()) {
+						JPanel curCurPanel = outgoing.createPanelOnGUI(database);
+						curPanel.add(curCurPanel, new Arrangement(0, i, 1.0, 0.0));
+						i++;
 					}
+				}
+			} else {
+				if (detailLine.trim().startsWith("%[CHECK]")) {
+					JCheckBox checkBox = new JCheckBox();
+					checkBox.setBackground(GUI.getBackgroundColor());
+					curPanel.add(checkBox, new Arrangement(0, 0, 0.0, 1.0));
+					CopyByClickLabel curLabel = AccountingUtils.createLabel(detailLine.replaceAll("%\\[CHECK\\]", ""),
+						new Color(0, 0, 0), "");
+					curPanel.add(curLabel, new Arrangement(1, 0, 1.0, 1.0));
 				} else {
-					if (detailLine.trim().startsWith("%[CHECK]")) {
-						JCheckBox checkBox = new JCheckBox();
-						checkBox.setBackground(GUI.getBackgroundColor());
-						curPanel.add(checkBox, new Arrangement(0, 0, 0.0, 1.0));
-						CopyByClickLabel curLabel = AccountingUtils.createLabel(detailLine.replaceAll("%\\[CHECK\\]", ""),
-							new Color(0, 0, 0), "");
-						curPanel.add(curLabel, new Arrangement(1, 0, 1.0, 1.0));
-					} else {
-						CopyByClickLabel curLabel = AccountingUtils.createLabel(detailLine, new Color(0, 0, 0), "");
-						curPanel.add(curLabel, new Arrangement(0, 0, 1.0, 1.0));
-					}
+					CopyByClickLabel curLabel = AccountingUtils.createLabel(detailLine, new Color(0, 0, 0), "");
+					curPanel.add(curLabel, new Arrangement(0, 0, 1.0, 1.0));
 				}
-
-				results.add(curPanel);
 			}
+
+			results.add(curPanel);
 		}
 		return results;
+	}
+
+	private String replaceDetailsFor(String detail, String timeSpanStr, TimeSpan timeSpan) {
+/*
+		// USt Vorauszahlungssoll:
+		if (detail.contains("%[TOTAL_PAID_VAT_PREPAYMENTS_" + timeSpanStr + "]")) {
+			detail = detail.replaceAll("%\\[TOTAL_PAID_VAT_PREPAYMENTS_" + timeSpanStr + "\\]",
+				AccountingUtils.formatMoney(timeSpan.getVatPrepaymentsPaidTotal(), Currency.EUR));
+		}*/
+
+		// Total deductible already paid VAT / USt Gesamte abziehbare Vorsteuerbeträge:
+		if (detail.contains("%[VAT_TOTAL_DISCOUNTABLE_PRETAX_" + timeSpanStr + "]")) {
+			detail = detail.replaceAll("%\\[VAT_TOTAL_DISCOUNTABLE_PRETAX_" + timeSpanStr + "\\]",
+				AccountingUtils.formatMoney(timeSpan.getDiscountablePreTax(), Currency.EUR));
+		}
+
+		// Remaining VAT advance payment / Verbleibende Umsatzsteuer-Vorauszahlung:
+		if (detail.contains("%[VAT_TOTAL_REMAINING_TAX_" + timeSpanStr + "]")) {
+			detail = detail.replaceAll("%\\[VAT_TOTAL_REMAINING_TAX_" + timeSpanStr + "\\]",
+				AccountingUtils.formatMoney(timeSpan.getRemainingVatPayments(), Currency.EUR));
+		}
+
+		if (detail.contains("%[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_19%]")) {
+			int cur = 0;
+			for (Outgoing entry : timeSpan.getOutgoings()) {
+				if (19 == (int) entry.getTaxPercent()) {
+					cur += entry.getAmount();
+				}
+			}
+			detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_19%\\]",
+				AccountingUtils.formatMoney(cur, Currency.EUR));
+		}
+		if (detail.contains("%[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_7%]")) {
+			int cur = 0;
+			for (Outgoing entry : timeSpan.getOutgoings()) {
+				if (7 == (int) entry.getTaxPercent()) {
+					cur += entry.getAmount();
+				}
+			}
+			detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_7%\\]",
+				AccountingUtils.formatMoney(cur, Currency.EUR));
+		}
+		if (detail.contains("%[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_0%]")) {
+			int cur = 0;
+			for (Outgoing entry : timeSpan.getOutgoings()) {
+				if (0 == (int) entry.getTaxPercent()) {
+					cur += entry.getAmount();
+				}
+			}
+			detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_0%\\]",
+				AccountingUtils.formatMoney(cur, Currency.EUR));
+		}
+
+		detail = replaceComplexVatInDetails(detail, "VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_0%_", timeSpan);
+
+		if (detail.contains("%[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_JUST_TAX]")) {
+			int cur = 0;
+			for (Outgoing entry : timeSpan.getOutgoings()) {
+				cur += entry.getTaxAmount();
+			}
+			detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_JUST_TAX\\]",
+				AccountingUtils.formatMoney(cur, Currency.EUR));
+		}
+
+		return detail;
 	}
 
 	public String replaceComplexVatInDetails(String detail, String complexKey, TimeSpan timeSpan) {

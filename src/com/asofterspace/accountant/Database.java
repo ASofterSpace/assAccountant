@@ -309,35 +309,20 @@ public class Database {
 	}
 
 	public Year getYearFromEntryDate(Date date) {
-
-		Calendar calendar = Calendar.getInstance();
-		calendar.setTime(date);
-		int yearNum = calendar.get(Calendar.YEAR);
-
-		addYear(yearNum);
-		Year curYear = null;
-		for (Year year : years) {
-			if (year.getNum() == yearNum) {
-				curYear = year;
-				break;
-			}
-		}
-		if (curYear == null) {
-			AccountingUtils.complain("The entry could not be added as the year " + yearNum +
-					" - which we just added! - went missing again...");
-			return null;
-		}
-
-		return curYear;
+		return getYearFromEntryDate(date, 0);
 	}
 
 	public Year getPrevYearFromEntryDate(Date date) {
+		return getYearFromEntryDate(date, -1);
+	}
+
+	private Year getYearFromEntryDate(Date date, int offset) {
 
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		int yearNum = calendar.get(Calendar.YEAR);
 
-		yearNum--;
+		yearNum += offset;
 
 		addYear(yearNum);
 		Year curYear = null;
@@ -357,11 +342,24 @@ public class Database {
 	}
 
 	public Month getMonthFromEntryDate(Date date) {
+		return getMonthFromEntryDate(date, 0);
+	}
+
+	public Month getPrevMonthFromEntryDate(Date date) {
+		return getMonthFromEntryDate(date, -1);
+	}
+
+	private Month getMonthFromEntryDate(Date date, int offset) {
 
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		int yearNum = calendar.get(Calendar.YEAR);
 		int monthNum = calendar.get(Calendar.MONTH);
+		monthNum += offset;
+		if (monthNum < 0) {
+			monthNum += 12;
+			yearNum--;
+		}
 
 		addYear(yearNum);
 		Year curYear = null;
