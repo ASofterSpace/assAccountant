@@ -49,6 +49,9 @@ public class Task {
 
 	protected List<String> details;
 
+	// what should be done once this task is completed?
+	protected List<String> onDone;
+
 	// has this task already been done?
 	protected Boolean done;
 
@@ -71,17 +74,18 @@ public class Task {
 
 
 	public Task(TaskCtrl taskCtrl, String title, Integer scheduledOnDay, Integer scheduledInMonth,
-		List<String> details) {
+		List<String> details, List<String> onDone) {
 
 		this.taskCtrl = taskCtrl;
 		this.title = title;
 		this.scheduledOnDay = scheduledOnDay;
 		this.scheduledInMonth = scheduledInMonth;
 		this.details = details;
+		this.onDone = onDone;
 	}
 
 	public Task getNewInstance() {
-		return new Task(taskCtrl, title, scheduledOnDay, scheduledInMonth, details);
+		return new Task(taskCtrl, title, scheduledOnDay, scheduledInMonth, details, onDone);
 	}
 
 	public boolean isScheduledOn(Date date) {
@@ -120,6 +124,10 @@ public class Task {
 	 */
 	public List<String> getDetails() {
 		return details;
+	}
+
+	public List<String> getOnDone() {
+		return onDone;
 	}
 
 	public Date getReleaseDate() {
@@ -202,12 +210,12 @@ public class Task {
 	}
 
 	private String replaceDetailsFor(String detail, String timeSpanStr, TimeSpan timeSpan) {
-/*
+
 		// USt Vorauszahlungssoll:
 		if (detail.contains("%[TOTAL_PAID_VAT_PREPAYMENTS_" + timeSpanStr + "]")) {
 			detail = detail.replaceAll("%\\[TOTAL_PAID_VAT_PREPAYMENTS_" + timeSpanStr + "\\]",
 				AccountingUtils.formatMoney(timeSpan.getVatPrepaymentsPaidTotal(), Currency.EUR));
-		}*/
+		}
 
 		// Total deductible already paid VAT / USt Gesamte abziehbare Vorsteuerbeträge:
 		if (detail.contains("%[VAT_TOTAL_DISCOUNTABLE_PRETAX_" + timeSpanStr + "]")) {
@@ -521,6 +529,7 @@ public class Task {
 
 					curLabel = AccountingUtils.createLabel("Task Log - for logging anything interesting that happened " +
 						"while doing this task:", textColor, "");
+
 					containerPanel.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
 					addedLines.add(curLabel);
 					i++;
@@ -607,6 +616,25 @@ public class Task {
 					}
 					taskCtrl.addFinanceLogEntry(entry);
 				}
+
+				if (Task.this.onDone != null) {
+					for (String onDoneStr : Task.this.onDone) {
+						if (onDoneStr == null) {
+							continue;
+						}
+						switch (onDoneStr) {
+							case "setVatPrepaymentsPaidForPrevMonth":
+								Month prevMonth = database.getPrevMonthFromEntryDate(getReleaseDate());
+								prevMonth.setVatPrepaymentsPaidTotal(prevMonth.getRemainingVatPayments());
+								break;
+							default:
+								AccountingUtils.complain("After finishing this task, the on-done-hook " + onDoneStr +
+									" should be executed... but I do not know what this one means!");
+								break;
+						}
+					}
+				}
+
 				taskCtrl.save();
 			}
 		});

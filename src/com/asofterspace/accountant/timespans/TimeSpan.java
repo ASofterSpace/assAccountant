@@ -82,4 +82,9 @@ public abstract class TimeSpan {
 		return remainVATpay;
 	}
 
+	// actually paid VAT (originally equal to getRemainingVatPayments(), but if after setting
+	// the USt-Voranmeldung some new invoices come in, this will keep track of what was actually
+	// paid, while the other will adjust itself)
+	public abstract int getVatPrepaymentsPaidTotal();
+
 }

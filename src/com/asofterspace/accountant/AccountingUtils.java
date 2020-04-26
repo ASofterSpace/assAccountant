@@ -369,6 +369,10 @@ public class AccountingUtils {
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Actual VAT advance payments made / Umsatzsteuer-Vorauszahlungssoll: ", timeSpan.getVatPrepaymentsPaidTotal());
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
 		sep = new JLabel("-------------- Income Tax / ESt --------------");
 		sep.setHorizontalAlignment(JLabel.CENTER);
 		tab.add(sep, new Arrangement(0, i, 1.0, 0.0));

@@ -30,6 +30,7 @@ public class Month extends TimeSpan {
 	private final static String MONTH_NUM_KEY = "monthNum";
 	private final static String OUTGOING_KEY = "outgoings";
 	private final static String INCOMING_KEY = "incomings";
+	private final static String VAT_PREPAID_KEY = "vatPrepaymentsPaid";
 	private final static String[] MONTH_NUM_TO_NAME = {
 		"January",
 		"February",
@@ -52,6 +53,8 @@ public class Month extends TimeSpan {
 	private List<Outgoing> outgoings;
 
 	private List<Incoming> incomings;
+
+	private Integer vatPrepaymentsPaidTotal;
 
 
 	/**
@@ -85,6 +88,8 @@ public class Month extends TimeSpan {
 		for (Record rec : monthRecord.getArray(INCOMING_KEY)) {
 			incomings.add(new Incoming(rec, this));
 		}
+
+		this.vatPrepaymentsPaidTotal = monthRecord.getInteger(VAT_PREPAID_KEY);
 	}
 
 	@Override
@@ -105,6 +110,8 @@ public class Month extends TimeSpan {
 		for (Incoming entry : incomings) {
 			incomingRec.append(entry.toRecord());
 		}
+
+		result.set(VAT_PREPAID_KEY, vatPrepaymentsPaidTotal);
 
 		return result;
 	}
@@ -308,6 +315,19 @@ public class Month extends TimeSpan {
 			result += cur.getPostTaxAmount();
 		}
 		return result;
+	}
+
+	public void setVatPrepaymentsPaidTotal(int newVal) {
+		this.vatPrepaymentsPaidTotal = newVal;
+	}
+
+	@Override
+	public int getVatPrepaymentsPaidTotal() {
+		// the current value is better than no value at all...
+		if (vatPrepaymentsPaidTotal == null) {
+			return getRemainingVatPayments();
+		}
+		return vatPrepaymentsPaidTotal;
 	}
 
 	public Database getDatabase() {

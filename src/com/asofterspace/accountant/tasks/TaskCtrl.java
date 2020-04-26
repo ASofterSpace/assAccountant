@@ -28,6 +28,7 @@ public class TaskCtrl {
 	private final String DAY = "day";
 	private final String MONTH = "month";
 	private final String DETAILS = "details";
+	private final String ON_DONE = "onDone";
 	private final String DONE = "done";
 	private final String RELEASED_ON_DAY = "releasedOnDay";
 	private final String RELEASED_IN_MONTH = "releasedInMonth";
@@ -135,7 +136,8 @@ public class TaskCtrl {
 				recordTask.getString(TITLE),
 				recordTask.getInteger(DAY),
 				DateUtils.monthNameToNum(recordTask.getString(MONTH)),
-				recordTask.getArrayAsStringList(DETAILS)
+				recordTask.getArrayAsStringList(DETAILS),
+				recordTask.getArrayAsStringList(ON_DONE)
 			);
 		}
 		if (recordTask.getString(KIND).equals(GENERIC)) {
@@ -144,7 +146,8 @@ public class TaskCtrl {
 				recordTask.getString(TITLE),
 				recordTask.getInteger(DAY),
 				DateUtils.monthNameToNum(recordTask.getString(MONTH)),
-				recordTask.getArrayAsStringList(DETAILS)
+				recordTask.getArrayAsStringList(DETAILS),
+				recordTask.getArrayAsStringList(ON_DONE)
 			);
 		}
 		AccountingUtils.complain("The task " + recordTask.getString(TITLE) + " could not be loaded!");
@@ -202,6 +205,7 @@ public class TaskCtrl {
 		taskRecord.set(DAY, task.getScheduledOnDay());
 		taskRecord.set(MONTH, DateUtils.monthNumToName(task.getScheduledInMonth()));
 		taskRecord.set(DETAILS, task.getDetails());
+		taskRecord.set(ON_DONE, task.getOnDone());
 		return taskRecord;
 	}
 

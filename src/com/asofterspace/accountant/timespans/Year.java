@@ -264,6 +264,15 @@ public class Year extends TimeSpan {
 		return (long) result;
 	}
 
+	@Override
+	public int getVatPrepaymentsPaidTotal() {
+		int result = 0;
+		for (Month month : months) {
+			result += month.getVatPrepaymentsPaidTotal();
+		}
+		return result;
+	}
+
 	public Database getDatabase() {
 		return database;
 	}
