@@ -308,6 +308,54 @@ public class Database {
 		return false;
 	}
 
+	public Year getYearFromEntryDate(Date date) {
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		int yearNum = calendar.get(Calendar.YEAR);
+
+		addYear(yearNum);
+		Year curYear = null;
+		for (Year year : years) {
+			if (year.getNum() == yearNum) {
+				curYear = year;
+				break;
+			}
+		}
+		if (curYear == null) {
+			AccountingUtils.complain("The entry could not be added as the year " + yearNum +
+					" - which we just added! - went missing again...");
+			return null;
+		}
+
+		return curYear;
+	}
+
+	public Year getPrevYearFromEntryDate(Date date) {
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		int yearNum = calendar.get(Calendar.YEAR);
+
+		yearNum--;
+
+		addYear(yearNum);
+		Year curYear = null;
+		for (Year year : years) {
+			if (year.getNum() == yearNum) {
+				curYear = year;
+				break;
+			}
+		}
+		if (curYear == null) {
+			AccountingUtils.complain("The entry could not be added as the year " + yearNum +
+					" - which we just added! - went missing again...");
+			return null;
+		}
+
+		return curYear;
+	}
+
 	public Month getMonthFromEntryDate(Date date) {
 
 		Calendar calendar = Calendar.getInstance();

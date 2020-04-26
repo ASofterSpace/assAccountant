@@ -180,6 +180,10 @@ public abstract class Entry {
 		this.currency = currency;
 	}
 
+	public Integer getTaxAmount() {
+		return getPostTaxAmount() - getAmount();
+	}
+
 	public Integer getTaxPercent() {
 		return taxationPercent;
 	}

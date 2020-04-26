@@ -6,6 +6,7 @@ package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.timespans.Month;
+import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
@@ -131,6 +132,8 @@ public class Task {
 	public List<JPanel> getDetailsToShowToUser(Database database) {
 
 		Month curMonth = database.getMonthFromEntryDate(getReleaseDate());
+		Year curYear = database.getYearFromEntryDate(getReleaseDate());
+		Year prevYear = database.getPrevYearFromEntryDate(getReleaseDate());
 
 		List<JPanel> results = new ArrayList<>();
 		if (details != null) {
@@ -150,6 +153,44 @@ public class Task {
 			detail = detail.replaceAll("%\\[PREV_MONTH\\]", ""+prevMonth);
 			detail = detail.replaceAll("%\\[NAME_OF_PREV_MONTH\\]", DateUtils.monthNumToName(prevMonth));
 			detail = detail.replaceAll("%\\[PREV_YEAR\\]", ""+(releasedInYear-1));
+			if (detail.contains("%[VAT_TOTAL_OUTGOING_PREV_YEAR_TAX_19%]")) {
+				int cur = 0;
+				for (Outgoing entry : prevYear.getOutgoings()) {
+					if (19 == (int) entry.getTaxPercent()) {
+						cur += entry.getAmount();
+					}
+				}
+				detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_PREV_YEAR_TAX_19%\\]",
+					AccountingUtils.formatMoney(cur, Currency.EUR));
+			}
+			if (detail.contains("%[VAT_TOTAL_OUTGOING_PREV_YEAR_TAX_7%]")) {
+				int cur = 0;
+				for (Outgoing entry : prevYear.getOutgoings()) {
+					if (7 == (int) entry.getTaxPercent()) {
+						cur += entry.getAmount();
+					}
+				}
+				detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_PREV_YEAR_TAX_7%\\]",
+					AccountingUtils.formatMoney(cur, Currency.EUR));
+			}
+			if (detail.contains("%[VAT_TOTAL_OUTGOING_PREV_YEAR_TAX_0%]")) {
+				int cur = 0;
+				for (Outgoing entry : prevYear.getOutgoings()) {
+					if (0 == (int) entry.getTaxPercent()) {
+						cur += entry.getAmount();
+					}
+				}
+				detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_PREV_YEAR_TAX_0%\\]",
+					AccountingUtils.formatMoney(cur, Currency.EUR));
+			}
+			if (detail.contains("%[VAT_TOTAL_OUTGOING_PREV_YEAR_JUST_TAX]")) {
+				int cur = 0;
+				for (Outgoing entry : prevYear.getOutgoings()) {
+					cur += entry.getTaxAmount();
+				}
+				detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_PREV_YEAR_JUST_TAX\\]",
+					AccountingUtils.formatMoney(cur, Currency.EUR));
+			}
 			if (detail.contains("%[VAT_TOTAL_OUTGOING_MONTH_TAX_19%]")) {
 				int cur = 0;
 				for (Outgoing entry : curMonth.getOutgoings()) {
