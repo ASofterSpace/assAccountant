@@ -153,6 +153,23 @@ public class Task {
 			detail = detail.replaceAll("%\\[PREV_MONTH\\]", ""+prevMonth);
 			detail = detail.replaceAll("%\\[NAME_OF_PREV_MONTH\\]", DateUtils.monthNumToName(prevMonth));
 			detail = detail.replaceAll("%\\[PREV_YEAR\\]", ""+(releasedInYear-1));
+
+			if (detail.contains("%[VAT_TOTAL_DISCOUNTABLE_PRETAX]")) {
+				detail = detail.replaceAll("%\\[VAT_TOTAL_DISCOUNTABLE_PRETAX\\]",
+					AccountingUtils.formatMoney(curMonth.getDiscountablePreTax(), Currency.EUR));
+			}
+			if (detail.contains("%[VAT_TOTAL_REMAINING_TAX]")) {
+				detail = detail.replaceAll("%\\[VAT_TOTAL_REMAINING_TAX\\]",
+					AccountingUtils.formatMoney(curMonth.getRemainingVatPayments(), Currency.EUR));
+			}
+			if (detail.contains("%[VAT_TOTAL_DISCOUNTABLE_PRETAX_PREV_YEAR]")) {
+				detail = detail.replaceAll("%\\[VAT_TOTAL_DISCOUNTABLE_PRETAX_PREV_YEAR\\]",
+					AccountingUtils.formatMoney(prevYear.getDiscountablePreTax(), Currency.EUR));
+			}
+			if (detail.contains("%[VAT_TOTAL_REMAINING_TAX_PREV_YEAR]")) {
+				detail = detail.replaceAll("%\\[VAT_TOTAL_REMAINING_TAX_PREV_YEAR\\]",
+					AccountingUtils.formatMoney(prevYear.getRemainingVatPayments(), Currency.EUR));
+			}
 			if (detail.contains("%[VAT_TOTAL_OUTGOING_PREV_YEAR_TAX_19%]")) {
 				int cur = 0;
 				for (Outgoing entry : prevYear.getOutgoings()) {
@@ -245,14 +262,6 @@ public class Task {
 					detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_MONTH_TAX_0%_REST\\]",
 						AccountingUtils.formatMoney(curRest, Currency.EUR));
 				}
-			}
-			if (detail.contains("%[VAT_TOTAL_DISCOUNTABLE_PRETAX]")) {
-				detail = detail.replaceAll("%\\[VAT_TOTAL_DISCOUNTABLE_PRETAX\\]",
-					AccountingUtils.formatMoney(curMonth.getDiscountablePreTax(), Currency.EUR));
-			}
-			if (detail.contains("%[VAT_TOTAL_REMAINING_TAX]")) {
-				detail = detail.replaceAll("%\\[VAT_TOTAL_REMAINING_TAX\\]",
-					AccountingUtils.formatMoney(curMonth.getRemainingVatPayments(), Currency.EUR));
 			}
 
 			String[] detailsAfterReplacement = detail.split("\n");
