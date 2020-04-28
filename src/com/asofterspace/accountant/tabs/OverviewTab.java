@@ -161,13 +161,9 @@ public class OverviewTab extends Tab {
 				}
 			});
 
-			curLabel = new CopyByClickLabel("");
-			curLabel.setPreferredSize(defaultDimension);
-			curPanel.add(curLabel, new Arrangement(2, 0, 0.0, 1.0));
-
 			curButton = new JButton("Show");
 			curButton.setPreferredSize(defaultDimension);
-			curPanel.add(curButton, new Arrangement(3, 0, 0.1, 1.0));
+			curPanel.add(curButton, new Arrangement(2, 0, 0.1, 1.0));
 			curButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -177,7 +173,7 @@ public class OverviewTab extends Tab {
 
 			curLabel = new CopyByClickLabel("");
 			curLabel.setPreferredSize(defaultDimension);
-			curPanel.add(curLabel, new Arrangement(4, 0, 0.0, 1.0));
+			curPanel.add(curLabel, new Arrangement(3, 0, 0.0, 1.0));
 
 			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
@@ -220,7 +216,7 @@ public class OverviewTab extends Tab {
 			JButton curButton = new JButton("Edit");
 			curButton.addMouseListener(rowHighlighter);
 			curButton.setPreferredSize(defaultDimension);
-			curPanel.add(curButton, new Arrangement(1, 0, 0.1, 1.0));
+			curPanel.add(curButton, new Arrangement(1, 0, 0.08, 1.0));
 			curButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
@@ -229,19 +225,25 @@ public class OverviewTab extends Tab {
 				}
 			});
 
-			curLabel = new CopyByClickLabel("");
-			curLabel.addMouseListener(rowHighlighter);
-			curLabel.setPreferredSize(defaultDimension);
-			curPanel.add(curLabel, new Arrangement(2, 0, 0.0, 1.0));
-
 			curButton = new JButton("Show");
+			curButton.addMouseListener(rowHighlighter);
+			curButton.setPreferredSize(defaultDimension);
+			curPanel.add(curButton, new Arrangement(2, 0, 0.08, 1.0));
+			curButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					database.getGUI().showMonthTabForEntry(curProblem.getEntry());
+				}
+			});
+
+			curButton = new JButton("Acknowledge");
 			curButton.addMouseListener(rowHighlighter);
 			curButton.setPreferredSize(defaultDimension);
 			curPanel.add(curButton, new Arrangement(3, 0, 0.1, 1.0));
 			curButton.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					database.getGUI().showMonthTabForEntry(curProblem.getEntry());
+					database.acknowledge(curProblem.getProblem());
 				}
 			});
 
@@ -255,7 +257,7 @@ public class OverviewTab extends Tab {
 		}
 		// for-else:
 		if (consistencyProblems.size() < 1) {
-			curLabel = new CopyByClickLabel("No problems have been found!");
+			curLabel = new CopyByClickLabel("No unacknowledged problems have been found!");
 			tab.add(curLabel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
 		}

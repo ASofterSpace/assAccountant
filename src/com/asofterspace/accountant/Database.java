@@ -45,6 +45,7 @@ public class Database {
 	private static final String CATEGORY_MAPPINGS_KEY = "categoryMappings";
 	private static final String CATEGORY_MAPPINGS_CONTAINS_KEY = "contains";
 	private static final String CATEGORY_MAPPINGS_CATEGORY_KEY = "category";
+	private static final String ACKNOWLEDGEMENTS_KEY = "acknowledgements";
 	private static final String BANK_ACCOUNTS_KEY = "bankAccounts";
 	private static final String BACKUP_FILE_NAME = "database_backup_";
 	private static final String CURRENT_BACKUP_KEY = "currentBackup";
@@ -69,6 +70,7 @@ public class Database {
 	// the following two fields are used for storing information used during legacy bulk imports only
 	private List<String> potentialCustomers;
 	private Map<String, Category> titleToCategoryMapping;
+	private List<String> acknowledgedProblems;
 
 
 	public Database(ConfigFile settings) throws JsonParseException {
@@ -127,6 +129,10 @@ public class Database {
 				Category.fromString(catMapping.getString(CATEGORY_MAPPINGS_CATEGORY_KEY))
 			);
 		}
+
+		// read out acknowledgements
+		acknowledgedProblems = root.getArrayAsStringList(ACKNOWLEDGEMENTS_KEY);
+
 		return root;
 	}
 
@@ -1193,13 +1199,23 @@ public class Database {
 		return result;
 	}
 
+	public void acknowledge(String problemStr) {
+		acknowledgedProblems.add(problemStr);
+		save();
+	}
+
+	/**
+	 * Get all un-acknowledged consistency problems
+	 */
 	public List<ConsistencyProblem> getConsistencyProblems() {
 
 		List<ConsistencyProblem> result = new ArrayList<>();
 
 		for (Problem problem : getProblems()) {
 			if (problem instanceof ConsistencyProblem) {
-				result.add((ConsistencyProblem) problem);
+				if (!acknowledgedProblems.contains(problem.getProblem())) {
+					result.add((ConsistencyProblem) problem);
+				}
 			}
 		}
 
@@ -1262,6 +1278,8 @@ public class Database {
 			mappingRec.set(CATEGORY_MAPPINGS_CATEGORY_KEY, mapping.getValue().toString());
 			titleToCategoryMappingRec.append(mappingRec);
 		}
+
+		root.set(ACKNOWLEDGEMENTS_KEY, acknowledgedProblems);
 
 		taskCtrl.saveIntoRecord(root);
 
