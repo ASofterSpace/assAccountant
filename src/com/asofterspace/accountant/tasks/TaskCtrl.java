@@ -113,20 +113,24 @@ public class TaskCtrl {
 
 			for (Task task : tasks) {
 				if (task.isScheduledOn(day)) {
-					Task taskInstance = task.getNewInstance();
-					Calendar cal = Calendar.getInstance();
-					cal.setTime(day);
-					taskInstance.setDone(false);
-					taskInstance.setReleasedOnDay(cal.get(Calendar.DAY_OF_MONTH));
-					taskInstance.setReleasedInMonth(cal.get(Calendar.MONTH));
-					taskInstance.setReleasedInYear(cal.get(Calendar.YEAR));
-					taskInstance.setDoneDate(null);
-					taskInstances.add(taskInstance);
+					releaseTaskOn(task, day);
 				}
 			}
 
 			lastTaskGeneration = day;
 		}
+	}
+
+	private void releaseTaskOn(Task task, Date day) {
+		Task taskInstance = task.getNewInstance();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(day);
+		taskInstance.setDone(false);
+		taskInstance.setReleasedOnDay(cal.get(Calendar.DAY_OF_MONTH));
+		taskInstance.setReleasedInMonth(cal.get(Calendar.MONTH));
+		taskInstance.setReleasedInYear(cal.get(Calendar.YEAR));
+		taskInstance.setDoneDate(null);
+		taskInstances.add(taskInstance);
 	}
 
 	private Task taskFromRecord(Record recordTask) {
@@ -284,6 +288,37 @@ public class TaskCtrl {
 				taskInstances.remove(i);
 			}
 		}
+	}
+
+	public boolean addAdHocTask(String title, String details, String dateStr) {
+
+		Date scheduleDate = DateUtils.parseDate(dateStr);
+
+		if (scheduleDate == null) {
+			return false;
+		}
+
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(scheduleDate);
+
+		List<String> detailsList = new ArrayList<>();
+		for (String detail : details.split("\n")) {
+			detailsList.add(detail);
+		}
+
+		List<String> onDone = new ArrayList<>();
+
+		// this is an ad-hoc task which is not scheduled ever
+		Integer scheduledOnDay = null;
+		Integer scheduledInMonth = null;
+
+		Task newTask = new Task(this, title, scheduledOnDay, scheduledInMonth, detailsList, onDone);
+
+		releaseTaskOn(newTask, scheduleDate);
+
+		database.save();
+
+		return true;
 	}
 
 	public void save() {

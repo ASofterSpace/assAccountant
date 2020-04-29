@@ -89,7 +89,7 @@ public class AddPaidGUI {
 		curPanel.setLayout(new GridBagLayout());
 		curLabel = new CopyByClickLabel("Paid by Date: ");
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
-		dateText = new JTextField(DateUtils.serializeDate(null));
+		dateText = new JTextField(DateUtils.serializeDate(new Date()));
 		curPanel.add(dateText, new Arrangement(1, 0, 1.0, 1.0));
 		dialog.add(curPanel);
 

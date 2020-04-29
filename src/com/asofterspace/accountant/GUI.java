@@ -92,6 +92,7 @@ public class GUI extends MainWindow {
 
 	private NewYearGUI newYearGUI;
 	private AddEntryGUI addEntryGUI;
+	private AddTaskGUI addTaskGUI;
 
 
 	public GUI(Database database, TabCtrl tabCtrl, ConfigFile config) {
@@ -314,6 +315,19 @@ public class GUI extends MainWindow {
 			}
 		});
 		menu.add(addEntry);
+
+		AbstractButton addTask = new MenuItemForMainMenu("Add Task");
+		addTask.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// show the add task GUI
+				if (addTaskGUI == null) {
+					addTaskGUI = new AddTaskGUI(GUI.this, database);
+				}
+				addTaskGUI.show();
+			}
+		});
+		menu.add(addTask);
 
 		// open the invoice file location on disk
 		AbstractButton openOnDisk = new MenuItemForMainMenu("Open on Disk");
