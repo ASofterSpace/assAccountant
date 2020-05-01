@@ -150,15 +150,22 @@ public class Task {
 		// replacements such as %[CHECK])
 		String detail = StrUtils.join("\n", details);
 		detail = detail.replaceAll("%\\[DAY\\]", ""+releasedOnDay);
-		detail = detail.replaceAll("%\\[MONTH\\]", ""+releasedInMonth);
+		detail = detail.replaceAll("%\\[DAY_2_DIG\\]", StrUtils.leftPad0(releasedOnDay, 2));
+		detail = detail.replaceAll("%\\[MONTH\\]", ""+(releasedInMonth+1));
+		detail = detail.replaceAll("%\\[MONTH_2_DIG\\]", StrUtils.leftPad0(releasedInMonth+1, 2));
 		detail = detail.replaceAll("%\\[NAME_OF_MONTH\\]", DateUtils.monthNumToName(releasedInMonth));
 		detail = detail.replaceAll("%\\[YEAR\\]", ""+releasedInYear);
 		detail = detail.replaceAll("%\\[PREV_DAY\\]", ""+(releasedOnDay-1));
+		detail = detail.replaceAll("%\\[PREV_DAY_2_DIG\\]", StrUtils.leftPad0(releasedOnDay-1, 2));
 		int prevMonthNum = releasedInMonth - 1;
 		if (prevMonthNum < 0) {
 			prevMonthNum = 11;
+			detail = detail.replaceAll("%\\[PREV_MONTHS_YEAR\\]", ""+(releasedInYear-1));
+		} else {
+			detail = detail.replaceAll("%\\[PREV_MONTHS_YEAR\\]", ""+releasedInYear);
 		}
-		detail = detail.replaceAll("%\\[PREV_MONTH\\]", ""+prevMonthNum);
+		detail = detail.replaceAll("%\\[PREV_MONTH\\]", ""+(prevMonthNum+1));
+		detail = detail.replaceAll("%\\[PREV_MONTH_2_DIG\\]", StrUtils.leftPad0(prevMonthNum+1, 2));
 		detail = detail.replaceAll("%\\[NAME_OF_PREV_MONTH\\]", DateUtils.monthNumToName(prevMonthNum));
 		detail = detail.replaceAll("%\\[PREV_YEAR\\]", ""+(releasedInYear-1));
 
