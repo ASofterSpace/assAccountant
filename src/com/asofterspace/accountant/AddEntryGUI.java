@@ -334,7 +334,7 @@ public class AddEntryGUI {
 				isOutgoing.setSelected(true);
 			}
 			if (editingEntry.hasPreTaxAmount()) {
-				amount.setText(AccountingUtils.formatMoney(editingEntry.getAmount()));
+				amount.setText(AccountingUtils.formatMoney(editingEntry.getPreTaxAmount()));
 			} else {
 				amount.setText("");
 			}

@@ -168,18 +168,18 @@ public abstract class Entry {
 		return preTaxAmount != null;
 	}
 
-	public Integer getAmount() {
+	public Integer getPreTaxAmount() {
 		if (!usesPreTaxAmount()) {
 			return AccountingUtils.calcPreTax(postTaxAmount, taxationPercent);
 		}
 		return preTaxAmount;
 	}
 
-	public String getAmountAsText() {
-		return AccountingUtils.formatMoney(getAmount(), currency);
+	public String getPreTaxAmountAsText() {
+		return AccountingUtils.formatMoney(getPreTaxAmount(), currency);
 	}
 
-	public void setAmount(Integer preTaxAmount) {
+	public void setPreTaxAmount(Integer preTaxAmount) {
 		this.preTaxAmount = preTaxAmount;
 		this.postTaxAmount = null;
 	}
@@ -213,7 +213,7 @@ public abstract class Entry {
 	}
 
 	public Integer getTaxAmount() {
-		return getPostTaxAmount() - getAmount();
+		return getPostTaxAmount() - getPreTaxAmount();
 	}
 
 	public Integer getTaxPercent() {
@@ -374,7 +374,7 @@ public abstract class Entry {
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curPanel.add(curLabel, new Arrangement(3, 0, 0.05, 1.0));
 
-		curLabel = AccountingUtils.createLabel(getAmountAsText(), textColor, tooltip);
+		curLabel = AccountingUtils.createLabel(getPreTaxAmountAsText(), textColor, tooltip);
 		curLabel.addMouseListener(rowHighlighter);
 		curLabel.setHorizontalAlignment(CopyByClickLabel.RIGHT);
 		curPanel.add(curLabel, new Arrangement(4, 0, 0.1, 1.0));
@@ -514,7 +514,7 @@ public abstract class Entry {
 
 	@Override
 	public String toString() {
-		return getAmountAsText() + " on " + getDateAsText() + " " + getTitle() + " [" + getCategoryOrCustomer() + "] ";
+		return getPreTaxAmountAsText() + " on " + getDateAsText() + " " + getTitle() + " [" + getCategoryOrCustomer() + "] ";
 	}
 
 }

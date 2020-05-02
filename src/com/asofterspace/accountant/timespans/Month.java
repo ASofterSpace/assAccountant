@@ -240,7 +240,7 @@ public class Month extends TimeSpan {
 	public int getOutTotalBeforeTax() {
 		int result = 0;
 		for (Outgoing cur : outgoings) {
-			result += cur.getAmount();
+			result += cur.getPreTaxAmount();
 		}
 		return result;
 	}
@@ -258,7 +258,7 @@ public class Month extends TimeSpan {
 	public int getInTotalBeforeTax() {
 		int result = 0;
 		for (Incoming cur : getIncomings()) {
-			result += cur.getAmount();
+			result += cur.getPreTaxAmount();
 		}
 		return result;
 	}
@@ -268,7 +268,7 @@ public class Month extends TimeSpan {
 		int result = 0;
 		for (Incoming cur : incomings) {
 			if (cur.getCategory() == category) {
-				result += cur.getAmount();
+				result += cur.getPreTaxAmount();
 			}
 		}
 		return result;
@@ -287,7 +287,7 @@ public class Month extends TimeSpan {
 	public int getDonTotalBeforeTax() {
 		int result = 0;
 		for (Incoming cur : getDonations()) {
-			result += cur.getAmount();
+			result += cur.getPreTaxAmount();
 		}
 		return result;
 	}
@@ -305,7 +305,7 @@ public class Month extends TimeSpan {
 	public int getPersTotalBeforeTax() {
 		int result = 0;
 		for (Incoming cur : getPersonals()) {
-			result += cur.getAmount();
+			result += cur.getPreTaxAmount();
 		}
 		return result;
 	}

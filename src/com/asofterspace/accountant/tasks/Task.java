@@ -290,7 +290,7 @@ public class Task {
 			int cur = 0;
 			for (Outgoing entry : timeSpan.getOutgoings()) {
 				if (19 == (int) entry.getTaxPercent()) {
-					cur += entry.getAmount();
+					cur += entry.getPreTaxAmount();
 				}
 			}
 			detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_19%\\]",
@@ -300,7 +300,7 @@ public class Task {
 			int cur = 0;
 			for (Outgoing entry : timeSpan.getOutgoings()) {
 				if (7 == (int) entry.getTaxPercent()) {
-					cur += entry.getAmount();
+					cur += entry.getPreTaxAmount();
 				}
 			}
 			detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_7%\\]",
@@ -310,7 +310,7 @@ public class Task {
 			int cur = 0;
 			for (Outgoing entry : timeSpan.getOutgoings()) {
 				if (0 == (int) entry.getTaxPercent()) {
-					cur += entry.getAmount();
+					cur += entry.getPreTaxAmount();
 				}
 			}
 			detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_0%\\]",
@@ -355,9 +355,9 @@ public class Task {
 							}
 						}
 						if (includeThisOne) {
-							curInc += entry.getAmount();
+							curInc += entry.getPreTaxAmount();
 						} else {
-							curRest += entry.getAmount();
+							curRest += entry.getPreTaxAmount();
 						}
 					}
 				}

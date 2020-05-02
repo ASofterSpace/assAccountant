@@ -212,7 +212,7 @@ public class AccountingUtils {
 			if (cur.matches(searchFor)) {
 				curPanel = cur.createPanelOnGUI(database);
 				tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
-				totalBeforeTax += cur.getAmount();
+				totalBeforeTax += cur.getPreTaxAmount();
 				totalAfterTax += cur.getPostTaxAmount();
 				i++;
 			}
@@ -244,7 +244,7 @@ public class AccountingUtils {
 			if (cur.matches(searchFor)) {
 				curPanel = cur.createPanelOnGUI(database);
 				tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
-				totalBeforeTax += cur.getAmount();
+				totalBeforeTax += cur.getPreTaxAmount();
 				totalAfterTax += cur.getPostTaxAmount();
 				i++;
 			}
@@ -276,7 +276,7 @@ public class AccountingUtils {
 			if (cur.matches(searchFor)) {
 				curPanel = cur.createPanelOnGUI(database);
 				tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
-				totalBeforeTax += cur.getAmount();
+				totalBeforeTax += cur.getPreTaxAmount();
 				totalAfterTax += cur.getPostTaxAmount();
 				i++;
 			}
@@ -308,7 +308,7 @@ public class AccountingUtils {
 			if (cur.matches(searchFor)) {
 				curPanel = cur.createPanelOnGUI(database);
 				tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
-				totalBeforeTax += cur.getAmount();
+				totalBeforeTax += cur.getPreTaxAmount();
 				totalAfterTax += cur.getPostTaxAmount();
 				i++;
 			}
