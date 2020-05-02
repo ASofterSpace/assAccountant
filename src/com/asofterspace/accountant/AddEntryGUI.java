@@ -216,52 +216,6 @@ public class AddEntryGUI {
 		curPanel.add(curLabel, new Arrangement(2, 0, 0.0, 1.0));
 		dialog.add(curPanel);
 
-		DocumentListener preTaxUpdateListener = new DocumentListener() {
-			public void changedUpdate(DocumentEvent e) {
-				lastTaxChangeWasPreTax = true;
-				refreshTax();
-			}
-			public void removeUpdate(DocumentEvent e) {
-				lastTaxChangeWasPreTax = true;
-				refreshTax();
-			}
-			public void insertUpdate(DocumentEvent e) {
-				lastTaxChangeWasPreTax = true;
-				refreshTax();
-			}
-		};
-
-		DocumentListener generalTaxUpdateListener = new DocumentListener() {
-			public void changedUpdate(DocumentEvent e) {
-				refreshTax();
-			}
-			public void removeUpdate(DocumentEvent e) {
-				refreshTax();
-			}
-			public void insertUpdate(DocumentEvent e) {
-				refreshTax();
-			}
-		};
-
-		DocumentListener afterTaxUpdateListener = new DocumentListener() {
-			public void changedUpdate(DocumentEvent e) {
-				lastTaxChangeWasPreTax = false;
-				refreshTax();
-			}
-			public void removeUpdate(DocumentEvent e) {
-				lastTaxChangeWasPreTax = false;
-				refreshTax();
-			}
-			public void insertUpdate(DocumentEvent e) {
-				lastTaxChangeWasPreTax = false;
-				refreshTax();
-			}
-		};
-
-		amount.getDocument().addDocumentListener(preTaxUpdateListener);
-		taxPerc.getDocument().addDocumentListener(generalTaxUpdateListener);
-		amountPostTax.getDocument().addDocumentListener(afterTaxUpdateListener);
-
 		JPanel buttonRow = new JPanel();
 		GridLayout buttonRowLayout = null;
 		if (editingEntry == null) {
@@ -338,7 +292,7 @@ public class AddEntryGUI {
 			} else {
 				amount.setText("");
 			}
-			taxPerc.setText(editingEntry.getTaxPercentAsText());
+			taxPerc.setText(""+editingEntry.getTaxPercent());
 			if (editingEntry.hasPostTaxAmount()) {
 				amountPostTax.setText(AccountingUtils.formatMoney(editingEntry.getPostTaxAmount()));
 			} else {
@@ -352,6 +306,52 @@ public class AddEntryGUI {
 				}
 			}
 		}
+
+		DocumentListener preTaxUpdateListener = new DocumentListener() {
+			public void changedUpdate(DocumentEvent e) {
+				lastTaxChangeWasPreTax = true;
+				refreshTax();
+			}
+			public void removeUpdate(DocumentEvent e) {
+				lastTaxChangeWasPreTax = true;
+				refreshTax();
+			}
+			public void insertUpdate(DocumentEvent e) {
+				lastTaxChangeWasPreTax = true;
+				refreshTax();
+			}
+		};
+
+		DocumentListener generalTaxUpdateListener = new DocumentListener() {
+			public void changedUpdate(DocumentEvent e) {
+				refreshTax();
+			}
+			public void removeUpdate(DocumentEvent e) {
+				refreshTax();
+			}
+			public void insertUpdate(DocumentEvent e) {
+				refreshTax();
+			}
+		};
+
+		DocumentListener afterTaxUpdateListener = new DocumentListener() {
+			public void changedUpdate(DocumentEvent e) {
+				lastTaxChangeWasPreTax = false;
+				refreshTax();
+			}
+			public void removeUpdate(DocumentEvent e) {
+				lastTaxChangeWasPreTax = false;
+				refreshTax();
+			}
+			public void insertUpdate(DocumentEvent e) {
+				lastTaxChangeWasPreTax = false;
+				refreshTax();
+			}
+		};
+
+		amount.getDocument().addDocumentListener(preTaxUpdateListener);
+		taxPerc.getDocument().addDocumentListener(generalTaxUpdateListener);
+		amountPostTax.getDocument().addDocumentListener(afterTaxUpdateListener);
 
 		return dialog;
 	}
