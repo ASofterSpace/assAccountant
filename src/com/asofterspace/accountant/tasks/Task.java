@@ -4,6 +4,8 @@
  */
 package com.asofterspace.accountant;
 
+import com.asofterspace.accountant.entries.Entry;
+import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.TimeSpan;
@@ -11,6 +13,8 @@ import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
+import com.asofterspace.toolbox.io.JSON;
+import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.StrUtils;
 
@@ -149,6 +153,9 @@ public class Task {
 		// just once for which this works (and afterwards split again for the more line-specific
 		// replacements such as %[CHECK])
 		String detail = StrUtils.join("\n", details);
+		detail = detail.replaceAll("%\\[DATE_NOW\\]", DateUtils.serializeDate(new Date()));
+		detail = detail.replaceAll("%\\[DATE\\]", releasedInYear+"-"+StrUtils.leftPad0(releasedInMonth+1, 2)+
+			"-"+StrUtils.leftPad0(releasedOnDay, 2));
 		detail = detail.replaceAll("%\\[DAY\\]", ""+releasedOnDay);
 		detail = detail.replaceAll("%\\[DAY_2_DIG\\]", StrUtils.leftPad0(releasedOnDay, 2));
 		detail = detail.replaceAll("%\\[MONTH\\]", ""+(releasedInMonth+1));
@@ -210,16 +217,47 @@ public class Task {
 					}
 				}
 			} else {
-				if (detailLine.trim().startsWith("%[CHECK]")) {
-					JCheckBox checkBox = new JCheckBox();
-					checkBox.setBackground(GUI.getBackgroundColor());
-					curPanel.add(checkBox, new Arrangement(0, 0, 0.0, 1.0));
-					CopyByClickLabel curLabel = AccountingUtils.createLabel(detailLine.replaceAll("%\\[CHECK\\]", ""),
-						new Color(0, 0, 0), "");
-					curPanel.add(curLabel, new Arrangement(1, 0, 1.0, 1.0));
+				String keyBefore = "%[ADD_ENTRY_BTN(";
+				String keyAfter = ")]";
+				int indexBefore = detailLine.indexOf(keyBefore) + keyBefore.length();
+				int indexAfter = detailLine.lastIndexOf(keyAfter);
+				if ((indexBefore >= 0) && (indexAfter >= 0) && (indexBefore <= indexAfter)) {
+					detailLine = detailLine.substring(0, indexAfter);
+					detailLine = detailLine.substring(indexBefore);
+					try {
+						final JSON entryData = new JSON(detailLine);
+						JButton curAddEntryBtn = new JButton(entryData.getString("buttonText"));
+						curPanel.add(curAddEntryBtn, new Arrangement(0, 0, 1.0, 0.0));
+						curAddEntryBtn.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								Entry fakeEntry = null;
+								if ("outgoing".equals(entryData.getString("kind").toLowerCase())) {
+									fakeEntry = new Outgoing(entryData, null);
+								} else {
+									fakeEntry = new Incoming(entryData, null);
+								}
+								AddEntryGUI addEntryGUI = new AddEntryGUI(database.getGUI(), database, fakeEntry);
+								addEntryGUI.show();
+							}
+						});
+					} catch (JsonParseException e) {
+						CopyByClickLabel curLabel = AccountingUtils.createLabel(
+							"Here should be a button, but I could not parse the json: " + detailLine, new Color(0, 0, 0), "");
+						curPanel.add(curLabel, new Arrangement(0, 0, 1.0, 0.0));
+					}
 				} else {
-					CopyByClickLabel curLabel = AccountingUtils.createLabel(detailLine, new Color(0, 0, 0), "");
-					curPanel.add(curLabel, new Arrangement(0, 0, 1.0, 1.0));
+					if (detailLine.trim().startsWith("%[CHECK]")) {
+						JCheckBox checkBox = new JCheckBox();
+						checkBox.setBackground(GUI.getBackgroundColor());
+						curPanel.add(checkBox, new Arrangement(0, 0, 0.0, 0.0));
+						CopyByClickLabel curLabel = AccountingUtils.createLabel(detailLine.replaceAll("%\\[CHECK\\]", ""),
+							new Color(0, 0, 0), "");
+						curPanel.add(curLabel, new Arrangement(1, 0, 1.0, 0.0));
+					} else {
+						CopyByClickLabel curLabel = AccountingUtils.createLabel(detailLine, new Color(0, 0, 0), "");
+						curPanel.add(curLabel, new Arrangement(0, 0, 1.0, 0.0));
+					}
 				}
 			}
 

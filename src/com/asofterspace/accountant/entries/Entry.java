@@ -407,6 +407,10 @@ public abstract class Entry {
 
 	public void reportProblemsTo(List<Problem> result) {
 
+		if (parent == null) {
+			return;
+		}
+
 		Database database = parent.getDatabase();
 
 		if (this instanceof Incoming) {

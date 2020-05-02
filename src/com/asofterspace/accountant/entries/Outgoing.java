@@ -62,8 +62,10 @@ public class Outgoing extends Entry {
 
 	@Override
 	public void deleteFrom(Database database) {
-		parent.removeOutgoing(this);
-		database.save();
+		if (parent != null) {
+			parent.removeOutgoing(this);
+			database.save();
+		}
 	}
 
 	@Override
