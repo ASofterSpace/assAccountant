@@ -152,11 +152,10 @@ public class BankTransaction {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Entry fakeEntry = null;
-				Integer preTaxAmount = (int) Math.round(amount / 1.19);
 				if (amount > 0) {
-					fakeEntry = new Outgoing(preTaxAmount, Currency.EUR, 19, getDate(), getTitle(), "", "", null);
+					fakeEntry = new Outgoing(null, Currency.EUR, 19, amount, getDate(), getTitle(), "", "", null);
 				} else {
-					fakeEntry = new Incoming(-preTaxAmount, Currency.EUR, 19, getDate(), getTitle(), "", null, null);
+					fakeEntry = new Incoming(null, Currency.EUR, 19, -amount, getDate(), getTitle(), "", null, null);
 				}
 				AddEntryGUI addEntryGUI = new AddEntryGUI(database.getGUI(), database, fakeEntry);
 				addEntryGUI.show();

@@ -32,7 +32,7 @@ import javax.swing.JPanel;
 
 public class AccountingUtils {
 
-	public static String formatMoney(Integer amount, Currency currency) {
+	public static String formatMoney(Integer amount) {
 
 		if (amount == null) {
 			return "N/A";
@@ -68,8 +68,17 @@ public class AccountingUtils {
 			result = "- " + result;
 		}
 
+		return result;
+	}
+
+	public static String formatMoney(Integer amount, Currency currency) {
+
+		if (amount == null) {
+			return formatMoney(amount);
+		}
+
 		// 0.01 to 0.01 EUR
-		return result + " " + currency;
+		return formatMoney(amount) + " " + currency;
 	}
 
 	public static JPanel createTotalPanelOnGUI(int totalBeforeTax, int totalTax, int totalAfterTax) {
@@ -544,6 +553,13 @@ public class AccountingUtils {
 			return null;
 		}
 		return (int) Math.round((amount * (100 + taxationPercent)) / 100.0);
+	}
+
+	public static Integer calcPreTax(Integer postTaxAmount, Integer taxationPercent) {
+		if ((postTaxAmount == null) || (taxationPercent == null)) {
+			return null;
+		}
+		return (int) Math.round((postTaxAmount * 100.00) / (100 + taxationPercent));
 	}
 
 	/**

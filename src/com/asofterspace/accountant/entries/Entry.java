@@ -37,7 +37,8 @@ import javax.swing.JPanel;
 
 public abstract class Entry {
 
-	private static final String AMOUNT_KEY = "amount";
+	private static final String PRE_TAX_AMOUNT_KEY = "amount";
+	private static final String POST_TAX_AMOUNT_KEY = "postTaxAmount";
 	private static final String CURRENCY_KEY = "currency";
 	private static final String TAXATION_PERCENT = "taxationPercent";
 	private static final String DATE_KEY = "date";
@@ -47,8 +48,9 @@ public abstract class Entry {
 	private static final String RECEIVED_ON_DATE_KEY = "receivedOnDate";
 	private static final String RECEIVED_ON_ACCOUNT_KEY = "receivedOnAccount";
 
-	// this is the amount pre-tax!
-	private Integer amount;
+	private Integer preTaxAmount;
+
+	private Integer postTaxAmount;
 
 	private Currency currency;
 
@@ -72,10 +74,12 @@ public abstract class Entry {
 	/**
 	 * Create an entry at runtime
 	 */
-	public Entry(Integer amount, Currency currency, Integer taxationPercent, Date date,
-		String title, String originator, Month parent) {
+	public Entry(Integer preTaxAmount, Currency currency, Integer taxationPercent, Integer postTaxAmount,
+		Date date, String title, String originator, Month parent) {
 
-		this.amount = amount;
+		this.preTaxAmount = preTaxAmount;
+
+		this.postTaxAmount = postTaxAmount;
 
 		this.currency = currency;
 
@@ -97,7 +101,9 @@ public abstract class Entry {
 	 */
 	public Entry(Record entryRecord, Month parent) {
 
-		this.amount = entryRecord.getInteger(AMOUNT_KEY);
+		this.preTaxAmount = entryRecord.getInteger(PRE_TAX_AMOUNT_KEY);
+
+		this.postTaxAmount = entryRecord.getInteger(POST_TAX_AMOUNT_KEY);
 
 		this.currency = Currency.valueOf(entryRecord.getString(CURRENCY_KEY));
 
@@ -126,7 +132,9 @@ public abstract class Entry {
 
 		Record result = new Record();
 
-		result.set(AMOUNT_KEY, amount);
+		result.set(PRE_TAX_AMOUNT_KEY, preTaxAmount);
+
+		result.set(POST_TAX_AMOUNT_KEY, postTaxAmount);
 
 		result.set(CURRENCY_KEY, currency);
 
@@ -152,24 +160,48 @@ public abstract class Entry {
 		return result;
 	}
 
+	public boolean usesPreTaxAmount() {
+		return !hasPostTaxAmount();
+	}
+
+	public boolean hasPreTaxAmount() {
+		return preTaxAmount != null;
+	}
+
 	public Integer getAmount() {
-		return amount;
+		if (!usesPreTaxAmount()) {
+			return AccountingUtils.calcPreTax(postTaxAmount, taxationPercent);
+		}
+		return preTaxAmount;
 	}
 
 	public String getAmountAsText() {
-		return AccountingUtils.formatMoney(amount, currency);
+		return AccountingUtils.formatMoney(getAmount(), currency);
 	}
 
-	public void setAmount(Integer amount) {
-		this.amount = amount;
+	public void setAmount(Integer preTaxAmount) {
+		this.preTaxAmount = preTaxAmount;
+		this.postTaxAmount = null;
+	}
+
+	public boolean hasPostTaxAmount() {
+		return postTaxAmount != null;
 	}
 
 	public Integer getPostTaxAmount() {
-		return AccountingUtils.calcPostTax(amount, taxationPercent);
+		if (usesPreTaxAmount()) {
+			return AccountingUtils.calcPostTax(preTaxAmount, taxationPercent);
+		}
+		return postTaxAmount;
 	}
 
 	public String getPostTaxAmountAsText() {
 		return AccountingUtils.formatMoney(getPostTaxAmount(), currency);
+	}
+
+	public void setPostTaxAmount(Integer postTaxAmount) {
+		this.postTaxAmount = postTaxAmount;
+		this.preTaxAmount = null;
 	}
 
 	public Currency getCurrency() {

@@ -290,7 +290,7 @@ public class Database {
 	}
 
 	public boolean addEntry(String dateStr, String title, Object catOrCustomer, String amount,
-		Currency currency, String taxationPercent, String originator, boolean isIncoming) {
+		Currency currency, String taxationPercent, String postTaxAmount, String originator, boolean isIncoming) {
 
 		Date date = DateUtils.parseDate(dateStr);
 		if (date == null) {
@@ -304,7 +304,8 @@ public class Database {
 			return false;
 		}
 
-		if (curMonth.addEntry(date, title, catOrCustomer, amount, currency, taxationPercent, originator, isIncoming)) {
+		if (curMonth.addEntry(date, title, catOrCustomer, amount, currency, taxationPercent,
+			postTaxAmount, originator, isIncoming)) {
 
 			save();
 
@@ -432,7 +433,7 @@ public class Database {
 
 				Category category = mapTitleToCategory(titleStr);
 
-				if (!addEntry(dateStr, titleStr, category.getText(), amountStr, Currency.EUR, taxationPercentStr, "", true)) {
+				if (!addEntry(dateStr, titleStr, category.getText(), amountStr, Currency.EUR, taxationPercentStr, null, "", true)) {
 					// stop upon the first failure instead of showing a million error messages
 					break;
 				}
@@ -492,7 +493,7 @@ public class Database {
 					}
 				}
 
-				if (!addEntry(dateStr, titleStr, customer, amountStr, Currency.EUR, taxationPercentStr, "", false)) {
+				if (!addEntry(dateStr, titleStr, customer, amountStr, Currency.EUR, taxationPercentStr, null, "", false)) {
 					// stop upon the first failure instead of showing a million error messages
 					break;
 				}

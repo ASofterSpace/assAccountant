@@ -183,15 +183,15 @@ public class Month extends TimeSpan {
 	}
 
 	public boolean addEntry(Date date, String title, Object catOrCustomerObj, String amountStr,
-		Currency currency, String taxationPercentStr, String originator, boolean isIncoming) {
+		Currency currency, String taxationPercentStr, String postTaxAmountStr, String originator, boolean isIncoming) {
 
 		Integer amountObj = StrUtils.parseMoney(amountStr);
+		Integer postTaxAmountObj = StrUtils.parseMoney(postTaxAmountStr);
 
-		if (amountObj == null) {
-			return AccountingUtils.complain("The text " + amountStr + " could not be parsed as amount of money!");
+		if ((amountObj == null) && (postTaxAmountObj == null)) {
+			return AccountingUtils.complain("The texts " + amountStr + " and " + postTaxAmountStr +
+				" could both not be parsed as amounts of money!");
 		}
-
-		int amount = amountObj;
 
 		Integer taxationPercent = AccountingUtils.parseTaxes(taxationPercentStr);
 		if (taxationPercent == null) {
@@ -212,7 +212,8 @@ public class Month extends TimeSpan {
 				return AccountingUtils.complain("The text " + catOrCustomer + " could not be parsed as category!");
 			}
 
-			Incoming newIn = new Incoming(amount, currency, taxationPercent, date, title, originator, category, this);
+			Incoming newIn = new Incoming(amountObj, currency, taxationPercent, postTaxAmountObj,
+				date, title, originator, category, this);
 			incomings.add(newIn);
 
 		} else {
@@ -223,7 +224,8 @@ public class Month extends TimeSpan {
 				return AccountingUtils.complain("The text " + catOrCustomer + " should contain a customer!");
 			}
 
-			Outgoing newOut = new Outgoing(amount, currency, taxationPercent, date, title, originator, customer, this);
+			Outgoing newOut = new Outgoing(amountObj, currency, taxationPercent, postTaxAmountObj,
+				date, title, originator, customer, this);
 			outgoings.add(newOut);
 		}
 

@@ -59,7 +59,11 @@ public class AddEntryGUI {
 	private JTextField dateText;
 	private JTextField titleText;
 	private JTextField amount;
+	private JTextField amountPostTax;
 	private JTextField taxPerc;
+
+	private boolean ignoreTaxUpdates = false;
+	private boolean lastTaxChangeWasPreTax = true;
 
 
 	public AddEntryGUI(GUI mainGUI, Database database, Entry editingEntry) {
@@ -184,7 +188,7 @@ public class AddEntryGUI {
 
 		curPanel = new JPanel();
 		curPanel.setLayout(new GridBagLayout());
-		curLabel = new CopyByClickLabel("Amount before tax (both . and , taken as decimal separator): ");
+		curLabel = new CopyByClickLabel("Amount before tax: ");
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
 		amount = new JTextField();
 		curPanel.add(amount, new Arrangement(1, 0, 1.0, 1.0));
@@ -206,35 +210,57 @@ public class AddEntryGUI {
 		curPanel.setLayout(new GridBagLayout());
 		curLabel = new CopyByClickLabel("Amount after tax: ");
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
-		final CopyByClickLabel amountPostTaxLabel = new CopyByClickLabel("");
-		curPanel.add(amountPostTaxLabel, new Arrangement(1, 0, 1.0, 1.0));
+		amountPostTax = new JTextField();
+		curPanel.add(amountPostTax, new Arrangement(1, 0, 1.0, 1.0));
+		curLabel = new CopyByClickLabel(" €");
+		curPanel.add(curLabel, new Arrangement(2, 0, 0.0, 1.0));
 		dialog.add(curPanel);
 
-		DocumentListener afterTaxUpdateListener = new DocumentListener() {
+		DocumentListener preTaxUpdateListener = new DocumentListener() {
 			public void changedUpdate(DocumentEvent e) {
-				refreshPostTax();
+				lastTaxChangeWasPreTax = true;
+				refreshTax();
 			}
 			public void removeUpdate(DocumentEvent e) {
-				refreshPostTax();
+				lastTaxChangeWasPreTax = true;
+				refreshTax();
 			}
 			public void insertUpdate(DocumentEvent e) {
-				refreshPostTax();
-			}
-
-			public void refreshPostTax() {
-				Integer amountPreTax = StrUtils.parseMoney(amount.getText());
-				Integer amountTax = AccountingUtils.parseTaxes(taxPerc.getText());
-				Integer amountPostTax = AccountingUtils.calcPostTax(amountPreTax, amountTax);
-				if (amountPostTax == null) {
-					amountPostTaxLabel.setText("");
-				} else {
-					amountPostTaxLabel.setText(AccountingUtils.formatMoney(amountPostTax, Currency.EUR));
-				}
+				lastTaxChangeWasPreTax = true;
+				refreshTax();
 			}
 		};
 
-		amount.getDocument().addDocumentListener(afterTaxUpdateListener);
-		taxPerc.getDocument().addDocumentListener(afterTaxUpdateListener);
+		DocumentListener generalTaxUpdateListener = new DocumentListener() {
+			public void changedUpdate(DocumentEvent e) {
+				refreshTax();
+			}
+			public void removeUpdate(DocumentEvent e) {
+				refreshTax();
+			}
+			public void insertUpdate(DocumentEvent e) {
+				refreshTax();
+			}
+		};
+
+		DocumentListener afterTaxUpdateListener = new DocumentListener() {
+			public void changedUpdate(DocumentEvent e) {
+				lastTaxChangeWasPreTax = false;
+				refreshTax();
+			}
+			public void removeUpdate(DocumentEvent e) {
+				lastTaxChangeWasPreTax = false;
+				refreshTax();
+			}
+			public void insertUpdate(DocumentEvent e) {
+				lastTaxChangeWasPreTax = false;
+				refreshTax();
+			}
+		};
+
+		amount.getDocument().addDocumentListener(preTaxUpdateListener);
+		taxPerc.getDocument().addDocumentListener(generalTaxUpdateListener);
+		amountPostTax.getDocument().addDocumentListener(afterTaxUpdateListener);
 
 		JPanel buttonRow = new JPanel();
 		GridLayout buttonRowLayout = null;
@@ -307,8 +333,19 @@ public class AddEntryGUI {
 				isIncoming.setSelected(false);
 				isOutgoing.setSelected(true);
 			}
-			amount.setText(editingEntry.getAmountAsText());
+			if (editingEntry.hasPreTaxAmount()) {
+				amount.setText(AccountingUtils.formatMoney(editingEntry.getAmount()));
+			} else {
+				amount.setText("");
+			}
 			taxPerc.setText(editingEntry.getTaxPercentAsText());
+			if (editingEntry.hasPostTaxAmount()) {
+				amountPostTax.setText(AccountingUtils.formatMoney(editingEntry.getPostTaxAmount()));
+			} else {
+				amountPostTax.setText("");
+			}
+			lastTaxChangeWasPreTax = editingEntry.usesPreTaxAmount();
+			refreshTax();
 			for (int i = 0; i < originator.getItemCount(); i++) {
 				if (originator.getItemAt(i).equals(editingEntry.getOriginator())) {
 					originator.setSelectedIndex(i);
@@ -317,6 +354,47 @@ public class AddEntryGUI {
 		}
 
 		return dialog;
+	}
+
+	public synchronized void refreshTax() {
+
+		if (ignoreTaxUpdates) {
+			return;
+		}
+
+		ignoreTaxUpdates = true;
+		boolean lastTaxChangeWasPreTaxOrig = lastTaxChangeWasPreTax;
+
+		if (lastTaxChangeWasPreTax) {
+			if (!amountPostTax.isFocusOwner()) {
+				Integer amountPreTaxInt = StrUtils.parseMoney(amount.getText());
+				Integer amountTaxInt = AccountingUtils.parseTaxes(taxPerc.getText());
+				Integer amountPostTaxInt = AccountingUtils.calcPostTax(amountPreTaxInt, amountTaxInt);
+				String target = "";
+				if (amountPostTaxInt != null) {
+					target = AccountingUtils.formatMoney(amountPostTaxInt);
+				}
+				if (!target.equals(amountPostTax.getText())) {
+					amountPostTax.setText(target);
+				}
+			}
+		} else {
+			if (!amount.isFocusOwner()) {
+				Integer amountTaxInt = AccountingUtils.parseTaxes(taxPerc.getText());
+				Integer amountPostTaxInt = StrUtils.parseMoney(amountPostTax.getText());
+				Integer amountPreTaxInt = AccountingUtils.calcPreTax(amountPostTaxInt, amountTaxInt);
+				String target = "";
+				if (amountPreTaxInt != null) {
+					target = AccountingUtils.formatMoney(amountPreTaxInt);
+				}
+				if (!target.equals(amount.getText())) {
+					amount.setText(target);
+				}
+			}
+		}
+		lastTaxChangeWasPreTax = lastTaxChangeWasPreTaxOrig;
+
+		ignoreTaxUpdates = false;
 	}
 
 	public void show() {
@@ -331,10 +409,19 @@ public class AddEntryGUI {
 			catOrCustomer = category.getSelectedItem();
 		}
 
+		String preTaxAmountStr = null;
+		String postTaxAmountStr = null;
+
+		if (lastTaxChangeWasPreTax) {
+			preTaxAmountStr = amount.getText();
+		} else {
+			postTaxAmountStr = amountPostTax.getText();
+		}
+
 		// we add the new entry (no matter if we are editing a new one or editing an existing one)...
 		if (database.addEntry(dateText.getText(), titleText.getText(), catOrCustomer,
-			amount.getText(), Currency.EUR, taxPerc.getText(), (String) originator.getSelectedItem(),
-			isIncoming.isSelected())) {
+			preTaxAmountStr, Currency.EUR, taxPerc.getText(), postTaxAmountStr,
+			(String) originator.getSelectedItem(), isIncoming.isSelected())) {
 
 			// ... and if we are editing an existing one, we delete the existing one
 			// (think about this as the scifi transporter approach to editing ^^)
