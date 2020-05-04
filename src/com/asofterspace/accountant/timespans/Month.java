@@ -13,6 +13,7 @@ import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.world.Category;
 import com.asofterspace.accountant.world.Currency;
+import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
@@ -189,17 +190,17 @@ public class Month extends TimeSpan {
 		Integer postTaxAmountObj = StrUtils.parseMoney(postTaxAmountStr);
 
 		if ((amountObj == null) && (postTaxAmountObj == null)) {
-			return AccountingUtils.complain("The texts " + amountStr + " and " + postTaxAmountStr +
+			return GuiUtils.complain("The texts " + amountStr + " and " + postTaxAmountStr +
 				" could both not be parsed as amounts of money!");
 		}
 
 		Integer taxationPercent = AccountingUtils.parseTaxes(taxationPercentStr);
 		if (taxationPercent == null) {
-			return AccountingUtils.complain("The text " + taxationPercentStr + " could not be parsed as integer!");
+			return GuiUtils.complain("The text " + taxationPercentStr + " could not be parsed as integer!");
 		}
 
 		if (catOrCustomerObj == null) {
-			return AccountingUtils.complain("The no category or customer entered!");
+			return GuiUtils.complain("The no category or customer entered!");
 		}
 
 		String catOrCustomer = catOrCustomerObj.toString();
@@ -209,7 +210,7 @@ public class Month extends TimeSpan {
 			Category category = Category.fromString(catOrCustomer);
 
 			if (category == null) {
-				return AccountingUtils.complain("The text " + catOrCustomer + " could not be parsed as category!");
+				return GuiUtils.complain("The text " + catOrCustomer + " could not be parsed as category!");
 			}
 
 			Incoming newIn = new Incoming(amountObj, currency, taxationPercent, postTaxAmountObj,
@@ -221,7 +222,7 @@ public class Month extends TimeSpan {
 			String customer = catOrCustomer;
 
 			if ((customer == null) || "".equals(customer)) {
-				return AccountingUtils.complain("The text " + catOrCustomer + " should contain a customer!");
+				return GuiUtils.complain("The text " + catOrCustomer + " should contain a customer!");
 			}
 
 			Outgoing newOut = new Outgoing(amountObj, currency, taxationPercent, postTaxAmountObj,

@@ -13,6 +13,7 @@ import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
+import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.utils.DateUtils;
@@ -670,18 +671,18 @@ public class Task {
 							entry.add(new FinanceLogEntryRow(lineSplit[0], amount));
 							wroteARow = true;
 							if (lineSplit.length > 2) {
-								AccountingUtils.complain("The line '" + line + "' contained more than one : sign!\n" +
+								GuiUtils.complain("The line '" + line + "' contained more than one : sign!\n" +
 									"It was parsed as " + lineSplit[0] + ": " + AccountingUtils.formatMoney(amount,
 									Currency.EUR));
 							}
 						}
 						if (lineSplit.length < 2) {
-							AccountingUtils.complain("The line '" + line + "' contained no : sign!\n" +
+							GuiUtils.complain("The line '" + line + "' contained no : sign!\n" +
 								"It was ignored.");
 						}
 					}
 					if (!wroteARow) {
-						AccountingUtils.complain("It looks like the Finance Log section was not filled!\n" +
+						GuiUtils.complain("It looks like the Finance Log section was not filled!\n" +
 							"You can edit the Finance Log section in the task's details on the Task Log tab.");
 					}
 					taskCtrl.addFinanceLogEntry(entry);
@@ -698,7 +699,7 @@ public class Task {
 								prevMonth.setVatPrepaymentsPaidTotal(prevMonth.getRemainingVatPayments());
 								break;
 							default:
-								AccountingUtils.complain("After finishing this task, the on-done-hook " + onDoneStr +
+								GuiUtils.complain("After finishing this task, the on-done-hook " + onDoneStr +
 									" should be executed... but I do not know what this one means!");
 								break;
 						}
@@ -717,7 +718,7 @@ public class Task {
 		curButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (AccountingUtils.confirmDelete("task '" + getTitle() + "'")) {
+				if (GuiUtils.confirmDelete("task '" + getTitle() + "'")) {
 					taskCtrl.deleteTaskInstance(Task.this);
 					taskCtrl.save();
 				}

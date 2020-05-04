@@ -4,6 +4,7 @@
  */
 package com.asofterspace.accountant;
 
+import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
 
@@ -154,7 +155,7 @@ public class TaskCtrl {
 				recordTask.getArrayAsStringList(ON_DONE)
 			);
 		}
-		AccountingUtils.complain("The task " + recordTask.getString(TITLE) + " could not be loaded!");
+		GuiUtils.complain("The task " + recordTask.getString(TITLE) + " could not be loaded!");
 		return null;
 	}
 

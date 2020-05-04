@@ -225,7 +225,7 @@ public class GUI extends MainWindow {
 		dropBankStatements.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (AccountingUtils.confirmDelete("all bank statements")) {
+				if (GuiUtils.confirmDelete("all bank statements")) {
 					database.dropBankStatements();
 				}
 			}
@@ -236,7 +236,7 @@ public class GUI extends MainWindow {
 		dropEntireDatabase.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (AccountingUtils.confirmDelete("entire database")) {
+				if (GuiUtils.confirmDelete("entire database")) {
 					database.drop();
 				}
 			}
@@ -336,7 +336,7 @@ public class GUI extends MainWindow {
 			public void actionPerformed(ActionEvent e) {
 				String diskLocation = configuration.getValue(CONFIG_KEY_INVOICE_LOCATION_ON_DISK);
 				if (diskLocation == null) {
-					AccountingUtils.complain("Sorry, the key " +
+					GuiUtils.complain("Sorry, the key " +
 						CONFIG_KEY_INVOICE_LOCATION_ON_DISK + " in the configuration file " +
 						configuration.getAbsoluteFilename() + " has not been set!");
 					return;
@@ -357,7 +357,7 @@ public class GUI extends MainWindow {
 				try {
 					Desktop.getDesktop().open(diskLocationFile.getJavaFile());
 				} catch (IOException ex) {
-					AccountingUtils.complain("Sorry, the folder " +
+					GuiUtils.complain("Sorry, the folder " +
 						diskLocationFile.getAbsoluteDirname() + " could not be opened!");
 				}
 			}
@@ -373,7 +373,7 @@ public class GUI extends MainWindow {
 				try {
 					Desktop.getDesktop().open(configuration.getParentDirectory().getJavaFile());
 				} catch (IOException ex) {
-					AccountingUtils.complain("Sorry, the folder " +
+					GuiUtils.complain("Sorry, the folder " +
 						configuration.getParentDirectory().getAbsoluteDirname() + " could not be opened!");
 				}
 			}

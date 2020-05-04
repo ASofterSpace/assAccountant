@@ -13,6 +13,7 @@ import com.asofterspace.accountant.world.Category;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
+import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.Utils;
 
 import java.awt.Color;
@@ -26,7 +27,6 @@ import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 
@@ -223,7 +223,7 @@ public class AccountingUtils {
 			if ((totalBeforeTax != timeSpan.getOutTotalBeforeTax()) ||
 				(totalTax != timeSpan.getOutTotalTax()) ||
 				(totalAfterTax != timeSpan.getOutTotalAfterTax())) {
-				AccountingUtils.complain("There was an outgoing calculation mixup! Something is wrong! Cats and dogs! Oh no!");
+				GuiUtils.complain("There was an outgoing calculation mixup! Something is wrong! Cats and dogs! Oh no!");
 			}
 		}
 
@@ -255,7 +255,7 @@ public class AccountingUtils {
 			if ((totalBeforeTax != timeSpan.getInTotalBeforeTax()) ||
 				(totalTax != timeSpan.getInTotalTax()) ||
 				(totalAfterTax != timeSpan.getInTotalAfterTax())) {
-				AccountingUtils.complain("There was an incoming calculation mixup! Something is wrong! Cats and dogs! Oh no!");
+				GuiUtils.complain("There was an incoming calculation mixup! Something is wrong! Cats and dogs! Oh no!");
 			}
 		}
 
@@ -287,7 +287,7 @@ public class AccountingUtils {
 			if ((totalBeforeTax != timeSpan.getDonTotalBeforeTax()) ||
 				(totalTax != timeSpan.getDonTotalTax()) ||
 				(totalAfterTax != timeSpan.getDonTotalAfterTax())) {
-				AccountingUtils.complain("There was a donations calculation mixup! Something is wrong! Cats and dogs! Oh no!");
+				GuiUtils.complain("There was a donations calculation mixup! Something is wrong! Cats and dogs! Oh no!");
 			}
 		}
 
@@ -319,7 +319,7 @@ public class AccountingUtils {
 			if ((totalBeforeTax != timeSpan.getPersTotalBeforeTax()) ||
 				(totalTax != timeSpan.getPersTotalTax()) ||
 				(totalAfterTax != timeSpan.getPersTotalAfterTax())) {
-				AccountingUtils.complain("There was a personals calculation mixup! Something is wrong! Cats and dogs! Oh no!");
+				GuiUtils.complain("There was a personals calculation mixup! Something is wrong! Cats and dogs! Oh no!");
 			}
 		}
 
@@ -475,41 +475,6 @@ public class AccountingUtils {
 		result.setHorizontalAlignment(CopyByClickLabel.CENTER);
 		result.setVerticalAlignment(CopyByClickLabel.BOTTOM);
 		return result;
-	}
-
-	public static boolean complain(String complainAbout) {
-
-		JOptionPane.showMessageDialog(
-			null,
-			complainAbout,
-			Utils.getProgramTitle(),
-			JOptionPane.ERROR_MESSAGE
-		);
-
-		// we return false, which can then immediately be returned by the caller
-		return false;
-	}
-
-	/**
-	 * Asks the user to confirm the request for deleting the thing toBeDeleted.
-	 * Returns true if the user selects Yes to the deletion.
-	 */
-	public static boolean confirmDelete(String toBeDeleted) {
-
-		Object[] options = {"Yes", "Cancel"};
-
-		int result = JOptionPane.showOptionDialog(
-			null,
-			"Do you really want to delete the " + toBeDeleted + "?",
-			Utils.getProgramTitle(),
-			JOptionPane.YES_NO_OPTION,
-			JOptionPane.QUESTION_MESSAGE,
-			null,
-			options,
-			options[1]
-		);
-
-		return result == JOptionPane.YES_OPTION;
 	}
 
 	public static String getEntryForLog(Entry entry) {

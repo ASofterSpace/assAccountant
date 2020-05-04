@@ -17,6 +17,7 @@ import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
+import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.Utils;
@@ -424,7 +425,7 @@ public abstract class Entry {
 		curButton.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				if (AccountingUtils.confirmDelete("entry '" + getTitle() + "'")) {
+				if (GuiUtils.confirmDelete("entry '" + getTitle() + "'")) {
 					Entry.this.deleteFrom(database);
 				}
 			}

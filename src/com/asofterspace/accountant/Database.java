@@ -14,6 +14,7 @@ import com.asofterspace.accountant.transactions.BankTransaction;
 import com.asofterspace.accountant.world.Category;
 import com.asofterspace.accountant.world.Currency;
 import com.asofterspace.toolbox.configuration.ConfigFile;
+import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.io.CsvFile;
 import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.JSON;
@@ -294,7 +295,7 @@ public class Database {
 
 		Date date = DateUtils.parseDate(dateStr);
 		if (date == null) {
-			return AccountingUtils.complain("The text " + dateStr + " could not be parsed as date!\n" +
+			return GuiUtils.complain("The text " + dateStr + " could not be parsed as date!\n" +
 				"Please use YYYY-MM-DD or DD. MM. YYYY as date format.");
 		}
 
@@ -340,7 +341,7 @@ public class Database {
 			}
 		}
 		if (curYear == null) {
-			AccountingUtils.complain("The entry could not be added as the year " + yearNum +
+			GuiUtils.complain("The entry could not be added as the year " + yearNum +
 					" - which we just added! - went missing again...");
 			return null;
 		}
@@ -377,7 +378,7 @@ public class Database {
 			}
 		}
 		if (curYear == null) {
-			AccountingUtils.complain("The entry could not be added as the year " + yearNum +
+			GuiUtils.complain("The entry could not be added as the year " + yearNum +
 					" - which we just added! - went missing again...");
 			return null;
 		}
@@ -390,7 +391,7 @@ public class Database {
 			}
 		}
 		if (curMonth == null) {
-			AccountingUtils.complain("The entry could not be added as the month " + monthNum +
+			GuiUtils.complain("The entry could not be added as the month " + monthNum +
 					" is missing from year " + yearNum + "...");
 			return null;
 		}
@@ -520,7 +521,7 @@ public class Database {
 					break;
 
 				default:
-					AccountingUtils.complain("The file " + bulkFile.getFilename() + " has type " +
+					GuiUtils.complain("The file " + bulkFile.getFilename() + " has type " +
 						filetype.toUpperCase() + ", which cannot be imported!");
 					break;
 			}
@@ -560,7 +561,7 @@ public class Database {
 				break;
 
 			default:
-				AccountingUtils.complain("The input file " + csv.getFilename() + " does not belong to a known bank!");
+				GuiUtils.complain("The input file " + csv.getFilename() + " does not belong to a known bank!");
 				break;
 		}
 	}
@@ -617,7 +618,7 @@ public class Database {
 			bulkImportBankStatementsFromPdfForGLS(pdf, pdfText);
 			return;
 		}
-		AccountingUtils.complain("The input file " + pdf.getFilename() + " does not belong to a known bank!");
+		GuiUtils.complain("The input file " + pdf.getFilename() + " does not belong to a known bank!");
 	}
 
 	/**
@@ -688,7 +689,7 @@ public class Database {
 		}
 
 		if ((iban == null) && (bic == null)) {
-			AccountingUtils.complain("Could read out neither IBAN nor BIC for " + pdf.getFilename() + "!");
+			GuiUtils.complain("Could read out neither IBAN nor BIC for " + pdf.getFilename() + "!");
 		}
 
 		if (pdfText.contains("/F0 12.0 Tf")) {
@@ -776,10 +777,10 @@ public class Database {
 
 				if (whatNow > 3) {
 					if (amount == null) {
-						AccountingUtils.complain("The amount of a bank statement in " + pdf.getFilename() + " could not be read!");
+						GuiUtils.complain("The amount of a bank statement in " + pdf.getFilename() + " could not be read!");
 					} else {
 						if (curDate == null) {
-							AccountingUtils.complain("The date of a bank statement in " + pdf.getFilename() + " could not be read!");
+							GuiUtils.complain("The date of a bank statement in " + pdf.getFilename() + " could not be read!");
 						} else {
 							lastTransaction = new BankTransaction(amount, curEntryStr, curDate, curAccount);
 							curAccount.addTransaction(lastTransaction);
@@ -789,7 +790,7 @@ public class Database {
 				}
 			}
 			if (!properExit) {
-				AccountingUtils.complain("We did not exit the parsing of " + pdf.getFilename() + " as expected, some entries may have been missed!");
+				GuiUtils.complain("We did not exit the parsing of " + pdf.getFilename() + " as expected, some entries may have been missed!");
 			}
 		}
 	}
@@ -876,7 +877,7 @@ public class Database {
 				}
 			}
 			if (!properExit) {
-				AccountingUtils.complain("We did not exit the parsing of the PDF as expected, some entries may have been missed!");
+				GuiUtils.complain("We did not exit the parsing of the PDF as expected, some entries may have been missed!");
 			}
 		}
 	}
@@ -1005,10 +1006,10 @@ public class Database {
 
 				if (whatNow > 3) {
 					if (amount == null) {
-						AccountingUtils.complain("The amount of a bank statement in " + pdf.getFilename() + " could not be read!");
+						GuiUtils.complain("The amount of a bank statement in " + pdf.getFilename() + " could not be read!");
 					} else {
 						if (curDate == null) {
-							AccountingUtils.complain("The date of a bank statement in " + pdf.getFilename() + " could not be read!");
+							GuiUtils.complain("The date of a bank statement in " + pdf.getFilename() + " could not be read!");
 						} else {
 							lastTransaction = new BankTransaction(amount, curEntryStr, curDate, curAccount);
 							curAccount.addTransaction(lastTransaction);
@@ -1018,7 +1019,7 @@ public class Database {
 				}
 			}
 			if (!properExit) {
-				AccountingUtils.complain("We did not exit the parsing of " + pdf.getFilename() + " as expected, some entries may have been missed!");
+				GuiUtils.complain("We did not exit the parsing of " + pdf.getFilename() + " as expected, some entries may have been missed!");
 			}
 		}
 	}
@@ -1098,10 +1099,10 @@ public class Database {
 					curEntryStr = curEntryStr.trim();
 
 					if (amount == null) {
-						AccountingUtils.complain("The amount of a bank statement in " + pdf.getFilename() + " could not be read!");
+						GuiUtils.complain("The amount of a bank statement in " + pdf.getFilename() + " could not be read!");
 					} else {
 						if (curDate == null) {
-							AccountingUtils.complain("The date of a bank statement in " + pdf.getFilename() + " could not be read!");
+							GuiUtils.complain("The date of a bank statement in " + pdf.getFilename() + " could not be read!");
 						} else {
 							lastTransaction = new BankTransaction(amount, curEntryStr, curDate, curAccount);
 							curAccount.addTransaction(lastTransaction);
@@ -1115,7 +1116,7 @@ public class Database {
 				}
 			}
 			if (!properExit) {
-				AccountingUtils.complain("We did not exit the parsing of " + pdf.getFilename() + " as expected, some entries may have been missed!");
+				GuiUtils.complain("We did not exit the parsing of " + pdf.getFilename() + " as expected, some entries may have been missed!");
 			}
 		}
 	}
