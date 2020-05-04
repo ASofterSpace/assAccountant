@@ -13,6 +13,7 @@ import com.asofterspace.accountant.tabs.TimeSpanTab;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.world.Category;
 import com.asofterspace.accountant.world.Currency;
+import com.asofterspace.toolbox.barcodes.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.gui.GuiUtils;
@@ -288,13 +289,13 @@ public class AddEntryGUI {
 				isOutgoing.setSelected(true);
 			}
 			if (editingEntry.hasPreTaxAmount()) {
-				amount.setText(AccountingUtils.formatMoney(editingEntry.getPreTaxAmount()));
+				amount.setText(FinanceUtils.formatMoney(editingEntry.getPreTaxAmount()));
 			} else {
 				amount.setText("");
 			}
 			taxPerc.setText(""+editingEntry.getTaxPercent());
 			if (editingEntry.hasPostTaxAmount()) {
-				amountPostTax.setText(AccountingUtils.formatMoney(editingEntry.getPostTaxAmount()));
+				amountPostTax.setText(FinanceUtils.formatMoney(editingEntry.getPostTaxAmount()));
 			} else {
 				amountPostTax.setText("");
 			}
@@ -369,10 +370,10 @@ public class AddEntryGUI {
 			if (!amountPostTax.isFocusOwner()) {
 				Integer amountPreTaxInt = StrUtils.parseMoney(amount.getText());
 				Integer amountTaxInt = AccountingUtils.parseTaxes(taxPerc.getText());
-				Integer amountPostTaxInt = AccountingUtils.calcPostTax(amountPreTaxInt, amountTaxInt);
+				Integer amountPostTaxInt = FinanceUtils.calcPostTax(amountPreTaxInt, amountTaxInt);
 				String target = "";
 				if (amountPostTaxInt != null) {
-					target = AccountingUtils.formatMoney(amountPostTaxInt);
+					target = FinanceUtils.formatMoney(amountPostTaxInt);
 				}
 				if (!target.equals(amountPostTax.getText())) {
 					amountPostTax.setText(target);
@@ -382,10 +383,10 @@ public class AddEntryGUI {
 			if (!amount.isFocusOwner()) {
 				Integer amountTaxInt = AccountingUtils.parseTaxes(taxPerc.getText());
 				Integer amountPostTaxInt = StrUtils.parseMoney(amountPostTax.getText());
-				Integer amountPreTaxInt = AccountingUtils.calcPreTax(amountPostTaxInt, amountTaxInt);
+				Integer amountPreTaxInt = FinanceUtils.calcPreTax(amountPostTaxInt, amountTaxInt);
 				String target = "";
 				if (amountPreTaxInt != null) {
-					target = AccountingUtils.formatMoney(amountPreTaxInt);
+					target = FinanceUtils.formatMoney(amountPreTaxInt);
 				}
 				if (!target.equals(amount.getText())) {
 					amount.setText(target);

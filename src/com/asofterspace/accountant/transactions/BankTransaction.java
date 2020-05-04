@@ -13,6 +13,7 @@ import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.world.Currency;
+import com.asofterspace.toolbox.barcodes.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.utils.DateUtils;
@@ -133,7 +134,7 @@ public class BankTransaction {
 		curLabel.addMouseListener(rowHighlighter);
 		curCurPanel.add(curLabel, new Arrangement(1, 0, 0.7, 0.0));
 
-		curLabel = AccountingUtils.createLabel(AccountingUtils.formatMoney(getAmount(), Currency.EUR), textColor, "");
+		curLabel = AccountingUtils.createLabel(FinanceUtils.formatMoney(getAmount(), Currency.EUR), textColor, "");
 		curLabel.addMouseListener(rowHighlighter);
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curCurPanel.add(curLabel, new Arrangement(2, 0, 0.1, 0.0));

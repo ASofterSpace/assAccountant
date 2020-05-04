@@ -5,6 +5,7 @@
 package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.world.Currency;
+import com.asofterspace.toolbox.barcodes.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.utils.DateUtils;
@@ -76,7 +77,7 @@ public class FinanceLogEntry {
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curCurPanel.add(curLabel, new Arrangement(0, 0, 0.5, 1.0));
 
-		curLabel = AccountingUtils.createLabel(AccountingUtils.formatMoney(totalAmount, Currency.EUR), textColor, "");
+		curLabel = AccountingUtils.createLabel(FinanceUtils.formatMoney(totalAmount, Currency.EUR), textColor, "");
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curCurPanel.add(curLabel, new Arrangement(1, 0, 0.1, 1.0));
 

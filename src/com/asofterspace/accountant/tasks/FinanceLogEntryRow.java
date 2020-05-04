@@ -5,6 +5,7 @@
 package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.world.Currency;
+import com.asofterspace.toolbox.barcodes.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 
@@ -49,7 +50,7 @@ public class FinanceLogEntryRow {
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.5, 1.0));
 
-		curLabel = new CopyByClickLabel(AccountingUtils.formatMoney(getAmount(), Currency.EUR));
+		curLabel = new CopyByClickLabel(FinanceUtils.formatMoney(getAmount(), Currency.EUR));
 		curLabel.setPreferredSize(defaultDimension);
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curPanel.add(curLabel, new Arrangement(1, 0, 0.1, 1.0));

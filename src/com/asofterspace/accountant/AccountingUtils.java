@@ -11,6 +11,7 @@ import com.asofterspace.accountant.timespans.TimeSpan;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.world.Category;
 import com.asofterspace.accountant.world.Currency;
+import com.asofterspace.toolbox.barcodes.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.gui.GuiUtils;
@@ -31,55 +32,6 @@ import javax.swing.JPanel;
 
 
 public class AccountingUtils {
-
-	public static String formatMoney(Integer amount) {
-
-		if (amount == null) {
-			return "N/A";
-		}
-
-		// let the main part of the function work only on positive values, and just add the minus sign
-		// in the very end again
-		boolean isNegative = amount < 0;
-		if (isNegative) {
-			amount = - amount;
-		}
-
-		String result = "" + amount;
-
-		// 1 to 001
-		while (result.length() < 3) {
-			result = "0" + result;
-		}
-
-		// 001 to 0.01
-		result = result.substring(0, result.length() - 2) + "." + result.substring(result.length() - 2);
-
-		// 2739.80 to 2,739.80
-		if (result.length() > 6) {
-			result = result.substring(0, result.length() - 6) + "," + result.substring(result.length() - 6);
-		}
-		// 2739,800.00 to 2,739,800.00
-		if (result.length() > 10) {
-			result = result.substring(0, result.length() - 10) + "," + result.substring(result.length() - 10);
-		}
-
-		if (isNegative) {
-			result = "- " + result;
-		}
-
-		return result;
-	}
-
-	public static String formatMoney(Integer amount, Currency currency) {
-
-		if (amount == null) {
-			return formatMoney(amount);
-		}
-
-		// 0.01 to 0.01 EUR
-		return formatMoney(amount) + " " + currency;
-	}
 
 	public static JPanel createTotalPanelOnGUI(int totalBeforeTax, int totalTax, int totalAfterTax) {
 
@@ -109,17 +61,17 @@ public class AccountingUtils {
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(3, 0, 0.5, 1.0));
 
-		curLabel = new JLabel(AccountingUtils.formatMoney(totalBeforeTax, Currency.EUR));
+		curLabel = new JLabel(FinanceUtils.formatMoney(totalBeforeTax, Currency.EUR));
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(4, 0, 0.1, 1.0));
 
-		curLabel = new JLabel(AccountingUtils.formatMoney(totalTax, Currency.EUR));
+		curLabel = new JLabel(FinanceUtils.formatMoney(totalTax, Currency.EUR));
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(5, 0, 0.1, 1.0));
 
-		curLabel = new JLabel(AccountingUtils.formatMoney(totalAfterTax, Currency.EUR));
+		curLabel = new JLabel(FinanceUtils.formatMoney(totalAfterTax, Currency.EUR));
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(6, 0, 0.1, 1.0));
@@ -160,7 +112,7 @@ public class AccountingUtils {
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.5, 1.0));
 
-		curLabel = new CopyByClickLabel(AccountingUtils.formatMoney(amount, Currency.EUR));
+		curLabel = new CopyByClickLabel(FinanceUtils.formatMoney(amount, Currency.EUR));
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(1, 0, 0.5, 1.0));
 
@@ -180,7 +132,7 @@ public class AccountingUtils {
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.5, 1.0));
 
-		curLabel = new CopyByClickLabel(AccountingUtils.formatMoney(amount1, Currency.EUR));
+		curLabel = new CopyByClickLabel(FinanceUtils.formatMoney(amount1, Currency.EUR));
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(1, 0, 0.1, 1.0));
 
@@ -189,7 +141,7 @@ public class AccountingUtils {
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(2, 0, 0.1, 1.0));
 
-		curLabel = new CopyByClickLabel(AccountingUtils.formatMoney(amount2, Currency.EUR));
+		curLabel = new CopyByClickLabel(FinanceUtils.formatMoney(amount2, Currency.EUR));
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(3, 0, 0.3, 1.0));
 
@@ -511,20 +463,6 @@ public class AccountingUtils {
 		}
 
 		return null;
-	}
-
-	public static Integer calcPostTax(Integer amount, Integer taxationPercent) {
-		if ((amount == null) || (taxationPercent == null)) {
-			return null;
-		}
-		return (int) Math.round((amount * (100 + taxationPercent)) / 100.0);
-	}
-
-	public static Integer calcPreTax(Integer postTaxAmount, Integer taxationPercent) {
-		if ((postTaxAmount == null) || (taxationPercent == null)) {
-			return null;
-		}
-		return (int) Math.round((postTaxAmount * 100.00) / (100 + taxationPercent));
 	}
 
 	/**

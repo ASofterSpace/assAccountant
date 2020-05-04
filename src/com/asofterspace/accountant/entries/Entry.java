@@ -15,6 +15,7 @@ import com.asofterspace.accountant.PaymentProblem;
 import com.asofterspace.accountant.Problem;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.world.Currency;
+import com.asofterspace.toolbox.barcodes.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.gui.GuiUtils;
@@ -171,13 +172,13 @@ public abstract class Entry {
 
 	public Integer getPreTaxAmount() {
 		if (!usesPreTaxAmount()) {
-			return AccountingUtils.calcPreTax(postTaxAmount, taxationPercent);
+			return FinanceUtils.calcPreTax(postTaxAmount, taxationPercent);
 		}
 		return preTaxAmount;
 	}
 
 	public String getPreTaxAmountAsText() {
-		return AccountingUtils.formatMoney(getPreTaxAmount(), currency);
+		return FinanceUtils.formatMoney(getPreTaxAmount(), currency);
 	}
 
 	public void setPreTaxAmount(Integer preTaxAmount) {
@@ -191,13 +192,13 @@ public abstract class Entry {
 
 	public Integer getPostTaxAmount() {
 		if (usesPreTaxAmount()) {
-			return AccountingUtils.calcPostTax(preTaxAmount, taxationPercent);
+			return FinanceUtils.calcPostTax(preTaxAmount, taxationPercent);
 		}
 		return postTaxAmount;
 	}
 
 	public String getPostTaxAmountAsText() {
-		return AccountingUtils.formatMoney(getPostTaxAmount(), currency);
+		return FinanceUtils.formatMoney(getPostTaxAmount(), currency);
 	}
 
 	public void setPostTaxAmount(Integer postTaxAmount) {

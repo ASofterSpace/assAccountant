@@ -11,6 +11,7 @@ import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.TimeSpan;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.world.Currency;
+import com.asofterspace.toolbox.barcodes.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.gui.GuiUtils;
@@ -272,19 +273,19 @@ public class Task {
 		// USt Vorauszahlungssoll:
 		if (detail.contains("%[TOTAL_PAID_VAT_PREPAYMENTS_" + timeSpanStr + "]")) {
 			detail = detail.replaceAll("%\\[TOTAL_PAID_VAT_PREPAYMENTS_" + timeSpanStr + "\\]",
-				AccountingUtils.formatMoney(timeSpan.getVatPrepaymentsPaidTotal(), Currency.EUR));
+				FinanceUtils.formatMoney(timeSpan.getVatPrepaymentsPaidTotal(), Currency.EUR));
 		}
 
 		// Total deductible already paid VAT / USt Gesamte abziehbare Vorsteuerbeträge:
 		if (detail.contains("%[VAT_TOTAL_DISCOUNTABLE_PRETAX_" + timeSpanStr + "]")) {
 			detail = detail.replaceAll("%\\[VAT_TOTAL_DISCOUNTABLE_PRETAX_" + timeSpanStr + "\\]",
-				AccountingUtils.formatMoney(timeSpan.getDiscountablePreTax(), Currency.EUR));
+				FinanceUtils.formatMoney(timeSpan.getDiscountablePreTax(), Currency.EUR));
 		}
 
 		// Remaining VAT advance payment / Verbleibende Umsatzsteuer-Vorauszahlung:
 		if (detail.contains("%[VAT_TOTAL_REMAINING_TAX_" + timeSpanStr + "]")) {
 			detail = detail.replaceAll("%\\[VAT_TOTAL_REMAINING_TAX_" + timeSpanStr + "\\]",
-				AccountingUtils.formatMoney(timeSpan.getRemainingVatPayments(), Currency.EUR));
+				FinanceUtils.formatMoney(timeSpan.getRemainingVatPayments(), Currency.EUR));
 		}
 
 		if (detail.contains("%[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_19%]")) {
@@ -295,7 +296,7 @@ public class Task {
 				}
 			}
 			detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_19%\\]",
-				AccountingUtils.formatMoney(cur, Currency.EUR));
+				FinanceUtils.formatMoney(cur, Currency.EUR));
 		}
 		if (detail.contains("%[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_7%]")) {
 			int cur = 0;
@@ -305,7 +306,7 @@ public class Task {
 				}
 			}
 			detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_7%\\]",
-				AccountingUtils.formatMoney(cur, Currency.EUR));
+				FinanceUtils.formatMoney(cur, Currency.EUR));
 		}
 		if (detail.contains("%[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_0%]")) {
 			int cur = 0;
@@ -315,7 +316,7 @@ public class Task {
 				}
 			}
 			detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_0%\\]",
-				AccountingUtils.formatMoney(cur, Currency.EUR));
+				FinanceUtils.formatMoney(cur, Currency.EUR));
 		}
 
 		detail = replaceComplexVatInDetails(detail, "VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_0%_", timeSpan);
@@ -326,7 +327,7 @@ public class Task {
 				cur += entry.getTaxAmount();
 			}
 			detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_JUST_TAX\\]",
-				AccountingUtils.formatMoney(cur, Currency.EUR));
+				FinanceUtils.formatMoney(cur, Currency.EUR));
 		}
 
 		return detail;
@@ -363,9 +364,9 @@ public class Task {
 					}
 				}
 				detail = detail.replaceAll("%\\[" + complexKey + "\\(.*\\)\\]",
-					AccountingUtils.formatMoney(curInc, Currency.EUR));
+					FinanceUtils.formatMoney(curInc, Currency.EUR));
 				detail = detail.replaceAll("%\\[" + complexKey + "REST\\]",
-					AccountingUtils.formatMoney(curRest, Currency.EUR));
+					FinanceUtils.formatMoney(curRest, Currency.EUR));
 			}
 		}
 		return detail;
@@ -508,7 +509,7 @@ public class Task {
 						for (FinanceLogEntryRow row : entry.getRows()) {
 							finLogText.append(row.getAccount());
 							finLogText.append(": ");
-							finLogText.append(AccountingUtils.formatMoney(row.getAmount(), Currency.EUR));
+							finLogText.append(FinanceUtils.formatMoney(row.getAmount(), Currency.EUR));
 							finLogText.append("\n");
 						}
 					}
@@ -672,7 +673,7 @@ public class Task {
 							wroteARow = true;
 							if (lineSplit.length > 2) {
 								GuiUtils.complain("The line '" + line + "' contained more than one : sign!\n" +
-									"It was parsed as " + lineSplit[0] + ": " + AccountingUtils.formatMoney(amount,
+									"It was parsed as " + lineSplit[0] + ": " + FinanceUtils.formatMoney(amount,
 									Currency.EUR));
 							}
 						}
