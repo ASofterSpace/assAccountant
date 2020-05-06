@@ -6,7 +6,7 @@ package com.asofterspace.accountant.entries;
 
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.timespans.Month;
-import com.asofterspace.accountant.world.Currency;
+import com.asofterspace.toolbox.accounting.Currency;
 import com.asofterspace.toolbox.utils.Record;
 
 import java.util.Date;

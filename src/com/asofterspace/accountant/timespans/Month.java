@@ -12,7 +12,7 @@ import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.world.Category;
-import com.asofterspace.accountant.world.Currency;
+import com.asofterspace.toolbox.accounting.Currency;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.utils.StrUtils;

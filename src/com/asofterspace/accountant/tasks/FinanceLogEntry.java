@@ -4,8 +4,8 @@
  */
 package com.asofterspace.accountant;
 
-import com.asofterspace.accountant.world.Currency;
-import com.asofterspace.toolbox.barcodes.FinanceUtils;
+import com.asofterspace.toolbox.accounting.Currency;
+import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.utils.DateUtils;
