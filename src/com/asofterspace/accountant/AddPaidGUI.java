@@ -139,7 +139,8 @@ public class AddPaidGUI {
 			received.setSelected(true);
 			Date date = editingEntry.getReceivedOnDate();
 			if (date == null) {
-				dateText.setText("");
+				// set this to today as default
+				dateText.setText(DateUtils.serializeDate(new Date()));
 			} else {
 				dateText.setText(DateUtils.serializeDate(date));
 			}
