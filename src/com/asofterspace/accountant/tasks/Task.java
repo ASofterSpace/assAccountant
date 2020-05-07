@@ -668,7 +668,7 @@ public class Task {
 						}
 						String[] lineSplit = line.split(":");
 						if (lineSplit.length > 1) {
-							Integer amount = StrUtils.parseMoney(lineSplit[1]);
+							Integer amount = FinanceUtils.parseMoney(lineSplit[1]);
 							entry.add(new FinanceLogEntryRow(lineSplit[0], amount));
 							wroteARow = true;
 							if (lineSplit.length > 2) {

@@ -13,6 +13,7 @@ import com.asofterspace.accountant.transactions.BankAccount;
 import com.asofterspace.accountant.transactions.BankTransaction;
 import com.asofterspace.accountant.world.Category;
 import com.asofterspace.toolbox.accounting.Currency;
+import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.io.CsvFile;
@@ -24,7 +25,6 @@ import com.asofterspace.toolbox.pdf.PdfFile;
 import com.asofterspace.toolbox.pdf.PdfObject;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
-import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 
 import java.util.ArrayList;
@@ -554,7 +554,7 @@ public class Database {
 					if (!"".equals(line.get(4).trim())) {
 						content += "\n" + line.get(4);
 					}
-					int amount = StrUtils.parseMoney(line.get(6));
+					int amount = FinanceUtils.parseMoney(line.get(6));
 					curAccount.addTransaction(new BankTransaction(amount, content, date, curAccount));
 					line = csv.getContentLineInColumns();
 				}
@@ -770,7 +770,7 @@ public class Database {
 						}
 						break;
 					case 3:
-						amount = StrUtils.parseMoney(curStr);
+						amount = FinanceUtils.parseMoney(curStr);
 						break;
 				}
 				whatNow++;
@@ -849,7 +849,7 @@ public class Database {
 						amountStr = "-" + amountStr;
 					}
 					amountStr = amountStr.substring(0, amountStr.length() - 1);
-					amount = StrUtils.parseMoney(amountStr);
+					amount = FinanceUtils.parseMoney(amountStr);
 					curEntryStr = curEntryStr.substring(0, curEntryStr.lastIndexOf("  "));
 					curEntryStr = curEntryStr.trim();
 					continue;
@@ -998,7 +998,7 @@ public class Database {
 							if (leftPos < 500) {
 								curStr = "-" + curStr;
 							}
-							amount = StrUtils.parseMoney(curStr);
+							amount = FinanceUtils.parseMoney(curStr);
 						}
 						break;
 				}
@@ -1094,7 +1094,7 @@ public class Database {
 					if (curEntryStr.charAt(curEntryStr.length() - 1) == 'S') {
 						amountStr = "-" + amountStr;
 					}
-					amount = StrUtils.parseMoney(amountStr);
+					amount = FinanceUtils.parseMoney(amountStr);
 					curEntryStr = curEntryStr.substring(0, curEntryStr.length() - (amountStr.length() + 1));
 					curEntryStr = curEntryStr.trim();
 

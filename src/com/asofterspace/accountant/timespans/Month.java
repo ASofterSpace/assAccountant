@@ -13,9 +13,9 @@ import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.world.Category;
 import com.asofterspace.toolbox.accounting.Currency;
+import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.utils.Record;
-import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 
 import java.util.ArrayList;
@@ -186,8 +186,8 @@ public class Month extends TimeSpan {
 	public boolean addEntry(Date date, String title, Object catOrCustomerObj, String amountStr,
 		Currency currency, String taxationPercentStr, String postTaxAmountStr, String originator, boolean isIncoming) {
 
-		Integer amountObj = StrUtils.parseMoney(amountStr);
-		Integer postTaxAmountObj = StrUtils.parseMoney(postTaxAmountStr);
+		Integer amountObj = FinanceUtils.parseMoney(amountStr);
+		Integer postTaxAmountObj = FinanceUtils.parseMoney(postTaxAmountStr);
 
 		if ((amountObj == null) && (postTaxAmountObj == null)) {
 			return GuiUtils.complain("The texts " + amountStr + " and " + postTaxAmountStr +

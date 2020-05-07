@@ -18,7 +18,6 @@ import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.utils.DateUtils;
-import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 
 import java.awt.Dimension;
@@ -368,7 +367,7 @@ public class AddEntryGUI {
 
 		if (lastTaxChangeWasPreTax) {
 			if (!amountPostTax.isFocusOwner()) {
-				Integer amountPreTaxInt = StrUtils.parseMoney(amount.getText());
+				Integer amountPreTaxInt = FinanceUtils.parseMoney(amount.getText());
 				Integer amountTaxInt = AccountingUtils.parseTaxes(taxPerc.getText());
 				Integer amountPostTaxInt = FinanceUtils.calcPostTax(amountPreTaxInt, amountTaxInt);
 				String target = "";
@@ -382,7 +381,7 @@ public class AddEntryGUI {
 		} else {
 			if (!amount.isFocusOwner()) {
 				Integer amountTaxInt = AccountingUtils.parseTaxes(taxPerc.getText());
-				Integer amountPostTaxInt = StrUtils.parseMoney(amountPostTax.getText());
+				Integer amountPostTaxInt = FinanceUtils.parseMoney(amountPostTax.getText());
 				Integer amountPreTaxInt = FinanceUtils.calcPreTax(amountPostTaxInt, amountTaxInt);
 				String target = "";
 				if (amountPreTaxInt != null) {
