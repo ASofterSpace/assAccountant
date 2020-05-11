@@ -130,7 +130,7 @@ public class AddEntryGUI {
 		curPanel.setLayout(new GridBagLayout());
 		curLabel = new CopyByClickLabel("Date in YYYY-MM-DD or DD. MM. YYYY: ");
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
-		dateText = new JTextField(DateUtils.serializeDate(null));
+		dateText = new JTextField(DateUtils.serializeDate(new Date()));
 		curPanel.add(dateText, new Arrangement(1, 0, 1.0, 1.0));
 		dialog.add(curPanel);
 
