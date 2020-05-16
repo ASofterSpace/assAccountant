@@ -199,6 +199,11 @@ public class Database {
 		return result;
 	}
 
+	/**
+	 * Returns the originators that are contained in the database, newest one first
+	 * (Because we want to maintain that ordering we are using a List rather than just
+	 * a Set, even though we do want to keep all entries unique.)
+	 */
 	public List<String> getOriginators() {
 		List<String> result = new ArrayList<>();
 		for (Year year : years) {
