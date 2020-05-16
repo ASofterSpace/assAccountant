@@ -199,12 +199,13 @@ public class Database {
 		return result;
 	}
 
-	public Set<String> getOriginators() {
-		Set<String> result = new HashSet<>();
+	public List<String> getOriginators() {
+		List<String> result = new ArrayList<>();
 		for (Year year : years) {
 			for (Month month : year.getMonths()) {
 				for (Entry entry : month.getEntries()) {
-					if (entry.getOriginator() != null) {
+					String originator = entry.getOriginator();
+					if ((originator != null) && !result.contains(originator)) {
 						result.add(entry.getOriginator());
 					}
 				}
