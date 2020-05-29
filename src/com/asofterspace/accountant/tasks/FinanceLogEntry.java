@@ -41,6 +41,17 @@ public class FinanceLogEntry {
 		return createdOn;
 	}
 
+	public int getTotalAmount() {
+
+		int totalAmount = 0;
+
+		for (FinanceLogEntryRow row : rows) {
+			totalAmount += row.getAmount();
+		}
+
+		return totalAmount;
+	}
+
 	public List<FinanceLogEntryRow> getRows() {
 		return rows;
 	}

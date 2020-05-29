@@ -82,6 +82,7 @@ public class BankStatementYearTab extends Tab {
 		graph.setBackground(GUI.getBackgroundColor());
 		graph.setDataColor(new Color(80, 0, 160));
 		graph.setMinimumHeight(500);
+		graph.setBaseYmin(0.0);
 		tab.add(graph, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
@@ -160,7 +161,7 @@ public class BankStatementYearTab extends Tab {
 		}
 
 
-		graph.setTimeDataPoints(timeData);
+		graph.setRelativeTimeDataPoints(timeData);
 
 		double graphMin = graph.getMinimumValue();
 		if (graphMin < 0) {

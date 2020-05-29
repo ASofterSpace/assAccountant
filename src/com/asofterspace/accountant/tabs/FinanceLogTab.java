@@ -11,10 +11,13 @@ import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.Task;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
+import com.asofterspace.toolbox.gui.GraphPanel;
+import com.asofterspace.toolbox.gui.GraphTimeDataPoint;
 
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -59,6 +62,17 @@ public class FinanceLogTab extends Tab {
 		JPanel curPanel;
 
 
+		List<GraphTimeDataPoint> timeData = new ArrayList<>();
+
+		GraphPanel graph = new GraphPanel();
+		graph.setBackground(GUI.getBackgroundColor());
+		graph.setDataColor(new Color(80, 0, 160));
+		graph.setMinimumHeight(500);
+		graph.setBaseYmin(0.0);
+		tab.add(graph, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+
 		List<FinanceLogEntry> entries = database.getTaskCtrl().getFinanceLogs();
 		boolean foundEntry = false;
 		for (FinanceLogEntry entry : entries) {
@@ -71,6 +85,8 @@ public class FinanceLogTab extends Tab {
 				Dimension newSize = new Dimension(parentPanel.getWidth(), curPanel.getMinimumSize().height);
 				curPanel.setPreferredSize(newSize);
 				foundEntry = true;
+
+				timeData.add(new GraphTimeDataPoint(entry.getDate(), entry.getTotalAmount()));
 			}
 		}
 		// for-else:
@@ -79,6 +95,9 @@ public class FinanceLogTab extends Tab {
 			tab.add(curLabel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
 		}
+
+
+		graph.setAbsoluteTimeDataPoints(timeData);
 
 
 		JPanel footer = new JPanel();
