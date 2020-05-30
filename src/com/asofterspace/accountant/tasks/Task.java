@@ -208,6 +208,8 @@ public class Task {
 			curPanel.setBackground(GUI.getBackgroundColor());
 			curPanel.setLayout(new GridBagLayout());
 
+			boolean specialRow = false;
+
 			if (detailLine.contains("%[LIST_OUTGOING_UNPAID]")) {
 				List<Outgoing> outgoings = database.getOutgoings();
 				int i = 0;
@@ -218,49 +220,103 @@ public class Task {
 						i++;
 					}
 				}
-			} else {
-				String keyBefore = "%[ADD_ENTRY_BTN(";
-				String keyAfter = ")]";
-				int indexBefore = detailLine.indexOf(keyBefore) + keyBefore.length();
-				int indexAfter = detailLine.lastIndexOf(keyAfter);
-				if ((indexBefore >= 0) && (indexAfter >= 0) && (indexBefore <= indexAfter)) {
-					detailLine = detailLine.substring(0, indexAfter);
-					detailLine = detailLine.substring(indexBefore);
-					try {
-						final JSON entryData = new JSON(detailLine);
-						JButton curAddEntryBtn = new JButton(entryData.getString("buttonText"));
-						curPanel.add(curAddEntryBtn, new Arrangement(0, 0, 1.0, 0.0));
-						curAddEntryBtn.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								Entry fakeEntry = null;
-								if ("outgoing".equals(entryData.getString("kind").toLowerCase())) {
-									fakeEntry = new Outgoing(entryData, null);
-								} else {
-									fakeEntry = new Incoming(entryData, null);
-								}
-								AddEntryGUI addEntryGUI = new AddEntryGUI(database.getGUI(), database, fakeEntry);
-								addEntryGUI.show();
+				specialRow = true;
+			}
+
+			String keyBefore = "%[ADD_ENTRY_BTN(";
+			String keyAfter = ")]";
+			int indexBefore = detailLine.indexOf(keyBefore) + keyBefore.length();
+			int indexAfter = detailLine.lastIndexOf(keyAfter);
+			if ((indexBefore >= 0) && (indexAfter >= 0) && (indexBefore <= indexAfter)) {
+				detailLine = detailLine.substring(0, indexAfter);
+				detailLine = detailLine.substring(indexBefore);
+				try {
+					final JSON entryData = new JSON(detailLine);
+					JButton curAddEntryBtn = new JButton(entryData.getString("buttonText"));
+					curPanel.add(curAddEntryBtn, new Arrangement(0, 0, 1.0, 0.0));
+					curAddEntryBtn.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							Entry fakeEntry = null;
+							if ("outgoing".equals(entryData.getString("kind").toLowerCase())) {
+								fakeEntry = new Outgoing(entryData, null);
+							} else {
+								fakeEntry = new Incoming(entryData, null);
 							}
-						});
-					} catch (JsonParseException e) {
-						CopyByClickLabel curLabel = AccountingUtils.createLabel(
-							"Here should be a button, but I could not parse the json: " + detailLine, new Color(0, 0, 0), "");
-						curPanel.add(curLabel, new Arrangement(0, 0, 1.0, 0.0));
-					}
-				} else {
-					if (detailLine.trim().startsWith("%[CHECK]")) {
-						JCheckBox checkBox = new JCheckBox();
-						checkBox.setBackground(GUI.getBackgroundColor());
-						curPanel.add(checkBox, new Arrangement(0, 0, 0.0, 0.0));
-						CopyByClickLabel curLabel = AccountingUtils.createLabel(detailLine.replaceAll("%\\[CHECK\\]", ""),
-							new Color(0, 0, 0), "");
-						curPanel.add(curLabel, new Arrangement(1, 0, 1.0, 0.0));
-					} else {
-						CopyByClickLabel curLabel = AccountingUtils.createLabel(detailLine, new Color(0, 0, 0), "");
-						curPanel.add(curLabel, new Arrangement(0, 0, 1.0, 0.0));
-					}
+							AddEntryGUI addEntryGUI = new AddEntryGUI(database.getGUI(), database, fakeEntry);
+							addEntryGUI.show();
+						}
+					});
+				} catch (JsonParseException e) {
+					CopyByClickLabel curLabel = AccountingUtils.createLabel(
+						"Here should be a button, but I could not parse the json: " + detailLine, new Color(0, 0, 0), "");
+					curPanel.add(curLabel, new Arrangement(0, 0, 1.0, 0.0));
 				}
+				specialRow = true;
+			}
+
+			if (detailLine.trim().startsWith("%[ADD_GULP_BANK_STATEMENTS_BTN]")) {
+				JButton gulpBankStatementsBtn = new JButton("Gulp Bank Statements");
+				curPanel.add(gulpBankStatementsBtn, new Arrangement(0, 0, 1.0, 0.0));
+				gulpBankStatementsBtn.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+
+						// SPARDA
+
+						// find all Sparda bank statements in the Downloads folder
+
+						// put them into the official folder
+
+						// apply un-secure script
+
+						// copy them into the assAccountant
+
+						// import them into the assAccountant
+
+
+						// DKB
+
+						// find all DKB bank statements in the Downloads folder
+
+						// put them into the official folder
+
+						// copy them into the assAccountant
+
+						// import them into the assAccountant
+
+
+						// n26
+
+						// find all N26 bank statements in the Downloads folder
+
+						// put them into the official folder
+
+						// find all N26 bank statement CSV in the Downloads folder
+
+						// put them into the official folder
+
+						// copy them into the assAccountant
+
+						// import them into the assAccountant
+					}
+				});
+				specialRow = true;
+			}
+
+			if (detailLine.trim().startsWith("%[CHECK]")) {
+				JCheckBox checkBox = new JCheckBox();
+				checkBox.setBackground(GUI.getBackgroundColor());
+				curPanel.add(checkBox, new Arrangement(0, 0, 0.0, 0.0));
+				CopyByClickLabel curLabel = AccountingUtils.createLabel(detailLine.replaceAll("%\\[CHECK\\]", ""),
+					new Color(0, 0, 0), "");
+				curPanel.add(curLabel, new Arrangement(1, 0, 1.0, 0.0));
+				specialRow = true;
+			}
+
+			if (!specialRow) {
+				CopyByClickLabel curLabel = AccountingUtils.createLabel(detailLine, new Color(0, 0, 0), "");
+				curPanel.add(curLabel, new Arrangement(0, 0, 1.0, 0.0));
 			}
 
 			results.add(curPanel);
