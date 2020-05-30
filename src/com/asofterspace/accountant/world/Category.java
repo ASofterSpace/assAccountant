@@ -7,6 +7,9 @@ package com.asofterspace.accountant.world;
 
 public enum Category {
 
+	// wares, goods that we buy and resell, raw materials that we buy and refine, etc.
+	WARES("Wares and Raw Materials", false),
+
 	// salaries for a softer space employees
 	INTERNAL_SALARY("Internal Salary", false),
 

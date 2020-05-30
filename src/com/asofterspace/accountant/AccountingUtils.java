@@ -348,12 +348,16 @@ public class AccountingUtils {
 		int advertisementCosts = timeSpan.getInTotalBeforeTax(Category.ADVERTISEMENTS);
 		int infrastructureCosts = timeSpan.getInTotalBeforeTax(Category.INFRASTRUCTURE);
 		int entertainmentCosts = timeSpan.getInTotalBeforeTax(Category.ENTERTAINMENT);
+		int wareCosts = timeSpan.getInTotalBeforeTax(Category.WARES);
 
 		// this does NOT include donations, as we will not get donation amounts from timeSpan.getInTotalBeforeTax() anyway, so we do not want to subtract them from it!
+		// (in general, this is only the sum of non-special categories except other)
 		int categoryTally = externalSalary + internalSalary + vehicleCosts + travelCosts + locationCosts +
-			educationCosts + advertisementCosts + infrastructureCosts + entertainmentCosts;
+			educationCosts + advertisementCosts + infrastructureCosts + entertainmentCosts + wareCosts;
 
-		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount spent on items, raw materials etc.: ", timeSpan.getInTotalBeforeTax() - categoryTally);
+		int otherCosts = timeSpan.getInTotalBeforeTax() - categoryTally;
+
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount spent on items, raw materials etc.: ", wareCosts + otherCosts);
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
