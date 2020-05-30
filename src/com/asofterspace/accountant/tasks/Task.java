@@ -15,6 +15,9 @@ import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.gui.GuiUtils;
+import com.asofterspace.toolbox.io.Directory;
+import com.asofterspace.toolbox.io.File;
+import com.asofterspace.toolbox.io.IoUtils;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.utils.DateUtils;
@@ -262,13 +265,43 @@ public class Task {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 
+						StringBuilder importStr = new StringBuilder();
+
+						Directory downloadsDir = new Directory("C:\\Users\\Moyaccercchi\\Downloads");
+						boolean recursive = false;
+
+
 						// SPARDA
 
 						// find all Sparda bank statements in the Downloads folder
+						List<File> downloadFiles = downloadsDir.getAllFiles(recursive);
+						List<File> anyBankFiles = new ArrayList<>();
+						List<File> bankStatements = new ArrayList<>();
+						for (File file : downloadFiles) {
+							String localName = file.getLocalFilename();
+							if (!localName.endsWith(".pdf")) {
+								continue;
+							}
+							if (!(localName.startsWith("1480748_") || localName.startsWith("5001480748_"))) {
+								continue;
+							}
+							anyBankFiles.add(file);
+							if (localName.contains("_Kontoauszug_")) {
+								bankStatements.add(file);
+								importStr.append("\n" + localName + " (Sparda bank statement)");
+							} else {
+								importStr.append("\n" + localName + " (Sparda generic file)");
+							}
+						}
 
 						// put them into the official folder
+						Directory spardaDir = new Directory("C:\\home\\official\\Sparda");
+						for (File file : anyBankFiles) {
+							file.moveTo(spardaDir);
+						}
 
 						// apply un-secure script
+						IoUtils.execute(spardaDir.getAbsoluteDirname() + "\\0 decrypt pdfs.bat");
 
 						// copy them into the assAccountant
 
@@ -299,6 +332,11 @@ public class Task {
 						// copy them into the assAccountant
 
 						// import them into the assAccountant
+
+						if (importStr.length() < 1) {
+							importStr.append("\nNo files at all - sorry!");
+						}
+						GuiUtils.complain("Imported:\n" + importStr.toString());
 					}
 				});
 				specialRow = true;
