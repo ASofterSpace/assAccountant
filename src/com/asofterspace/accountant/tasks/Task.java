@@ -337,7 +337,9 @@ public class Task {
 								continue;
 							}
 							anyBankFiles.add(file);
-							if (localName.contains("Kontoauszug_") || localName.contains("Kreditkartenabrechnung_")) {
+							// currently, we can only import Kontoauszug_, but we should in future also be able to import the credit card stuff
+							if (localName.contains("Kontoauszug_")) {
+							// if (localName.contains("Kontoauszug_") || localName.contains("Kreditkartenabrechnung_")) {
 								bankStatements.add(file);
 								importStr.append("\n" + localName + " (DKB bank statement)");
 							} else {
