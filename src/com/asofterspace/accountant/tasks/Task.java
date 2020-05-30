@@ -304,34 +304,127 @@ public class Task {
 						IoUtils.execute(spardaDir.getAbsoluteDirname() + "\\0 decrypt pdfs.bat");
 
 						// copy them into the assAccountant
+						Directory accImportDir = new Directory("C:\\home\\prog\\asofterspace\\assAccountant\\import");
+						Directory decryptDir = new Directory("C:\\home\\official\\Sparda\\decrypted");
+
+						List<File> importFiles = new ArrayList<>();
+
+						for (File file : bankStatements) {
+
+							File decryptedFile = new File(decryptDir, file.getLocalFilename());
+
+							decryptedFile.copyToDisk(accImportDir);
+
+							importFiles.add(new File(accImportDir, file.getLocalFilename()));
+						}
 
 						// import them into the assAccountant
+						database.bulkImportBankStatements(importFiles);
 
 
 						// DKB
 
 						// find all DKB bank statements in the Downloads folder
+						downloadFiles = downloadsDir.getAllFiles(recursive);
+						anyBankFiles = new ArrayList<>();
+						bankStatements = new ArrayList<>();
+						for (File file : downloadFiles) {
+							String localName = file.getLocalFilename();
+							if (!localName.endsWith(".pdf")) {
+								continue;
+							}
+							if (!(localName.startsWith("Kontoauszug_1011709415_") || localName.startsWith("Kreditkartenabrechnung_4748xxxxxxxx7849_"))) {
+								continue;
+							}
+							anyBankFiles.add(file);
+							if (localName.contains("Kontoauszug_") || localName.contains("Kreditkartenabrechnung_")) {
+								bankStatements.add(file);
+								importStr.append("\n" + localName + " (DKB bank statement)");
+							} else {
+								importStr.append("\n" + localName + " (DKB generic file)");
+							}
+						}
 
 						// put them into the official folder
+						Directory dkbDir = new Directory("C:\\home\\official\\DKB");
+						for (File file : anyBankFiles) {
+							file.moveTo(dkbDir);
+						}
 
 						// copy them into the assAccountant
+						importFiles = new ArrayList<>();
+
+						for (File file : bankStatements) {
+
+							file.copyToDisk(accImportDir);
+
+							importFiles.add(new File(accImportDir, file.getLocalFilename()));
+						}
 
 						// import them into the assAccountant
+						database.bulkImportBankStatements(importFiles);
 
 
 						// n26
 
 						// find all N26 bank statements in the Downloads folder
+						downloadFiles = downloadsDir.getAllFiles(recursive);
+						anyBankFiles = new ArrayList<>();
+						bankStatements = new ArrayList<>();
+						for (File file : downloadFiles) {
+							String localName = file.getLocalFilename();
+							if (!localName.endsWith(".pdf")) {
+								continue;
+							}
+							if (!localName.startsWith("statement-")) {
+								continue;
+							}
+							anyBankFiles.add(file);
+							bankStatements.add(file);
+							importStr.append("\n" + localName + " (n26 bank statement)");
+						}
 
 						// put them into the official folder
+						Directory n26Dir = new Directory("C:\\home\\official\\n26");
+						for (File file : anyBankFiles) {
+							file.moveTo(n26Dir);
+						}
 
 						// find all N26 bank statement CSV in the Downloads folder
+						downloadFiles = downloadsDir.getAllFiles(recursive);
+						anyBankFiles = new ArrayList<>();
+						bankStatements = new ArrayList<>();
+						for (File file : downloadFiles) {
+							String localName = file.getLocalFilename();
+							if (!localName.endsWith(".csv")) {
+								continue;
+							}
+							if (!localName.startsWith("n26-csv-transactions-")) {
+								continue;
+							}
+							anyBankFiles.add(file);
+							bankStatements.add(file);
+							importStr.append("\n" + localName + " (n26 bank statement)");
+						}
 
 						// put them into the official folder
+						for (File file : anyBankFiles) {
+							file.moveTo(n26Dir);
+						}
 
 						// copy them into the assAccountant
+						importFiles = new ArrayList<>();
+
+						for (File file : bankStatements) {
+
+							file.copyToDisk(accImportDir);
+
+							importFiles.add(new File(accImportDir, file.getLocalFilename()));
+						}
 
 						// import them into the assAccountant
+						database.bulkImportBankStatements(importFiles);
+
 
 						if (importStr.length() < 1) {
 							importStr.append("\nNo files at all - sorry!");
