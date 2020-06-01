@@ -14,6 +14,7 @@ md accounting
 md coders
 md configuration
 md gui
+md guiImages
 md images
 md io
 md pdf
@@ -27,6 +28,7 @@ copy "..\Toolbox-Java\src\com\asofterspace\toolbox\accounting\*.*" "src\com\asof
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\coders\*.*" "src\com\asofterspace\toolbox\coders"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\configuration\*.*" "src\com\asofterspace\toolbox\configuration"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\gui\*.*" "src\com\asofterspace\toolbox\gui"
+copy "..\Toolbox-Java\src\com\asofterspace\toolbox\guiImages\*.*" "src\com\asofterspace\toolbox\guiImages"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\images\*.*" "src\com\asofterspace\toolbox\images"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\io\*.*" "src\com\asofterspace\toolbox\io"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\pdf\*.*" "src\com\asofterspace\toolbox\pdf"

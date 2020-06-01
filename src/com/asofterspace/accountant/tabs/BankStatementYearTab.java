@@ -15,8 +15,10 @@ import com.asofterspace.toolbox.accounting.Currency;
 import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
-import com.asofterspace.toolbox.gui.GraphPanel;
-import com.asofterspace.toolbox.gui.GraphTimeDataPoint;
+import com.asofterspace.toolbox.guiImages.ImagePanel;
+import com.asofterspace.toolbox.images.ColorRGB;
+import com.asofterspace.toolbox.images.GraphImage;
+import com.asofterspace.toolbox.images.GraphTimeDataPoint;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -78,12 +80,13 @@ public class BankStatementYearTab extends Tab {
 
 		List<GraphTimeDataPoint> timeData = new ArrayList<>();
 
-		GraphPanel graph = new GraphPanel();
-		graph.setBackground(GUI.getBackgroundColor());
-		graph.setDataColor(new Color(80, 0, 160));
-		graph.setMinimumHeight(500);
+		GraphImage graph = new GraphImage();
+		graph.setBackgroundColor(new ColorRGB(GUI.getBackgroundColor()));
+		graph.setDataColor(new ColorRGB(80, 0, 160));
 		graph.setBaseYmin(0.0);
-		tab.add(graph, new Arrangement(0, i, 1.0, 0.0));
+		ImagePanel graphPanel = new ImagePanel(graph);
+		graphPanel.setMinimumHeight(500);
+		tab.add(graphPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
 
