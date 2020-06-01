@@ -97,6 +97,7 @@ public class FinanceLogTab extends Tab {
 		}
 
 
+		graph.setIncludeTodayInTimeData(true);
 		graph.setAbsoluteTimeDataPoints(timeData);
 
 

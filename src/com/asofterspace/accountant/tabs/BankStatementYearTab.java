@@ -161,6 +161,7 @@ public class BankStatementYearTab extends Tab {
 		}
 
 
+		graph.setIncludeTodayInTimeData(true);
 		graph.setRelativeTimeDataPoints(timeData);
 
 		double graphMin = graph.getMinimumValue();
