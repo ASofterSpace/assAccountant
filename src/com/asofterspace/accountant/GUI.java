@@ -549,7 +549,7 @@ public class GUI extends MainWindow {
 			if (tab.equals(currentlyOpenedTab)) {
 				strTabList.add(">> " + tab.toString() + " <<");
 			} else {
-				strTabList.add(tab.toString());
+				strTabList.add(" " + tab.toString());
 			}
 			if (tab instanceof BankStatementYearTab) {
 				strTabList.add(" ");
@@ -576,7 +576,7 @@ public class GUI extends MainWindow {
 				// highlight tab the list
 				int i = 0;
 				for (String strTab : strTabs) {
-					if (strTab.equals(tab.toString()) || strTab.equals(">> " + tab.toString() + " <<")) {
+					if (strTab.equals(" " + tab.toString()) || strTab.equals(">> " + tab.toString() + " <<")) {
 						tabListComponent.setSelectedIndex(i);
 						break;
 					}
@@ -655,7 +655,7 @@ public class GUI extends MainWindow {
 	private void showSelectedTab() {
 		String strTab = strTabs[tabListComponent.getSelectedIndex()];
 		for (Tab tab : tabs) {
-			if (strTab.equals(tab.toString()) || strTab.equals(">> " + tab.toString() + " <<")) {
+			if (strTab.equals(" " + tab.toString()) || strTab.equals(">> " + tab.toString() + " <<")) {
 				showTab(tab);
 				return;
 			}
