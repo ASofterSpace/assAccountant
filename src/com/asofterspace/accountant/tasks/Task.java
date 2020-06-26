@@ -703,6 +703,7 @@ public class Task {
 						}
 					}
 				}
+				finLogText.append("\n\nCopy this to an external editor, modify it there, and copy it back in here (without this line) just before you click on [Done]!");
 				finLog.setText(finLogText.toString());
 			}
 			// if this has not been done before, load the latest finance log keys, but do not assing values
