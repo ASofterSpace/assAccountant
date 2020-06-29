@@ -345,6 +345,8 @@ public class GUI extends MainWindow {
 		});
 		tasksMenu.add(addFutureTasksBtn);
 
+		menu.add(tasksMenu);
+
 		// open the invoice file location on disk
 		AbstractButton openOnDisk = new MenuItemForMainMenu("Open on Disk");
 		openOnDisk.addActionListener(new ActionListener() {
