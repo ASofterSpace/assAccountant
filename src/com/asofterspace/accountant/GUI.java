@@ -340,7 +340,11 @@ public class GUI extends MainWindow {
 				Date until = DateUtils.addDays(database.getTaskCtrl().getLastTaskGeneration(), 7);
 				database.getTaskCtrl().generateNewInstances(until);
 				GuiUtils.notify("Added tasks until " + DateUtils.serializeDate(until));
+
 				// we explicitly do NOT save yet - we only save once one of the tasks is actually worked on
+
+				// refresh selected tab - which might be the overview tab...
+				refreshCurrentTab();
 			}
 		});
 		tasksMenu.add(addFutureTasksBtn);
@@ -643,6 +647,11 @@ public class GUI extends MainWindow {
 			}
 		}
 
+		refreshTab(tab);
+	}
+
+	private void refreshTab(Tab tab) {
+
 		// remove previous tab
 		if (currentlyOpenedTab != null) {
 			currentlyOpenedTab.destroyTabOnGUI(mainPanelRight);
@@ -675,6 +684,17 @@ public class GUI extends MainWindow {
 		for (Tab tab : tabs) {
 			if (strTab.equals(" " + tab.toString()) || strTab.equals(">> " + tab.toString() + " <<")) {
 				showTab(tab);
+				return;
+			}
+		}
+		showTab(null);
+	}
+
+	private void refreshCurrentTab() {
+		String strTab = strTabs[tabListComponent.getSelectedIndex()];
+		for (Tab tab : tabs) {
+			if (strTab.equals(" " + tab.toString()) || strTab.equals(">> " + tab.toString() + " <<")) {
+				refreshTab(tab);
 				return;
 			}
 		}
