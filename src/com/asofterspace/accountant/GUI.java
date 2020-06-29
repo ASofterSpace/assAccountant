@@ -22,6 +22,7 @@ import com.asofterspace.toolbox.gui.MainWindow;
 import com.asofterspace.toolbox.gui.MenuItemForMainMenu;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
+import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 
@@ -316,7 +317,9 @@ public class GUI extends MainWindow {
 		});
 		menu.add(addEntry);
 
-		AbstractButton addTask = new MenuItemForMainMenu("Add Task");
+		JMenu tasksMenu = new JMenu("Tasks");
+
+		JMenuItem addTask = new JMenuItem("Add Task");
 		addTask.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -327,7 +330,20 @@ public class GUI extends MainWindow {
 				addTaskGUI.show();
 			}
 		});
-		menu.add(addTask);
+		tasksMenu.add(addTask);
+
+		// add tasks a week into the future button
+		JMenuItem addFutureTasksBtn = new JMenuItem("Add Tasks Scheduled for One More Week into the Future");
+		addFutureTasksBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Date until = DateUtils.addDays(database.getTaskCtrl().getLastTaskGeneration(), 7);
+				database.getTaskCtrl().generateNewInstances(until);
+				GuiUtils.notify("Added tasks until " + DateUtils.serializeDate(until));
+				// we explicitly do NOT save yet - we only save once one of the tasks is actually worked on
+			}
+		});
+		tasksMenu.add(addFutureTasksBtn);
 
 		// open the invoice file location on disk
 		AbstractButton openOnDisk = new MenuItemForMainMenu("Open on Disk");

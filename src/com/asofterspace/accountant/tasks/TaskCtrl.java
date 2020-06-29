@@ -63,7 +63,7 @@ public class TaskCtrl {
 
 		loadFromDatabase();
 
-		generateNewInstances();
+		generateNewInstances(DateUtils.now());
 	}
 
 	private void loadFromDatabase() {
@@ -102,9 +102,9 @@ public class TaskCtrl {
 		this.lastTaskGeneration = DateUtils.parseDate(root.getString(LAST_TASK_GENERATION));
 	}
 
-	private void generateNewInstances() {
+	public void generateNewInstances(Date until) {
 
-		List<Date> daysToGenerate = DateUtils.listDaysFromTo(lastTaskGeneration, DateUtils.now());
+		List<Date> daysToGenerate = DateUtils.listDaysFromTo(lastTaskGeneration, until);
 
 		// we ignore the very first day that is returned,
 		// as we already reported tasks for that one last time!
@@ -320,6 +320,10 @@ public class TaskCtrl {
 		database.save();
 
 		return true;
+	}
+
+	public Date getLastTaskGeneration() {
+		return lastTaskGeneration;
 	}
 
 	public void save() {

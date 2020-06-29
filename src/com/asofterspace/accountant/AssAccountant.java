@@ -19,8 +19,8 @@ import javax.swing.SwingUtilities;
 public class AssAccountant {
 
 	public final static String PROGRAM_TITLE = "assAccountant";
-	public final static String VERSION_NUMBER = "0.0.0.6(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "5. April 2020 - 4. May 2020";
+	public final static String VERSION_NUMBER = "0.0.0.7(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "5. April 2020 - 29. June 2020";
 
 	private static ConfigFile config;
 
@@ -49,10 +49,6 @@ public class AssAccountant {
 	 * output information on how to integrate accounting information with other programs
 	 *   (online USt, third party ESt, etc.)
 	 * automatically add years when the current date is later than an existing year
-	 * perform and log finance days (1, 1.5 and 2 - each performance could be done through
-	 *   the accountant, as much as possible being automated, and it having been done can
-	 *   be logged, such that upon next startup it can be shown which next finance day is
-	 *   now outstanding, if any, and which might come up over the coming weeks etc.)
 	 * generate outgoing invoices (as pdfs?) with just a few clicks, and have them logged
 	 *   immediately etc.
 	 * automatically read incoming emails and scan for incoming invoices
