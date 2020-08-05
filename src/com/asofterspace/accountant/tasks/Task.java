@@ -477,39 +477,25 @@ public class Task {
 				FinanceUtils.formatMoney(timeSpan.getRemainingVatPayments(), Currency.EUR));
 		}
 
-		if (detail.contains("%[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_19%]")) {
-			int cur = 0;
-			for (Outgoing entry : timeSpan.getOutgoings()) {
-				if (19 == (int) entry.getTaxPercent()) {
-					cur += entry.getPreTaxAmount();
+		int[] taxAmounts = {0, 5, 7, 16, 19};
+
+		// handle stuff like %[VAT_TOTAL_OUTGOING_PREV_MONTH_TAX_16%]
+		for (int curTaxAmount : taxAmounts) {
+			if (detail.contains("%[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_" + curTaxAmount + "%]")) {
+				int cur = 0;
+				for (Outgoing entry : timeSpan.getOutgoings()) {
+					if (curTaxAmount == (int) entry.getTaxPercent()) {
+						cur += entry.getPreTaxAmount();
+					}
 				}
+				detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_" + curTaxAmount + "%\\]",
+					FinanceUtils.formatMoney(cur, Currency.EUR));
 			}
-			detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_19%\\]",
-				FinanceUtils.formatMoney(cur, Currency.EUR));
-		}
-		if (detail.contains("%[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_7%]")) {
-			int cur = 0;
-			for (Outgoing entry : timeSpan.getOutgoings()) {
-				if (7 == (int) entry.getTaxPercent()) {
-					cur += entry.getPreTaxAmount();
-				}
-			}
-			detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_7%\\]",
-				FinanceUtils.formatMoney(cur, Currency.EUR));
-		}
-		if (detail.contains("%[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_0%]")) {
-			int cur = 0;
-			for (Outgoing entry : timeSpan.getOutgoings()) {
-				if (0 == (int) entry.getTaxPercent()) {
-					cur += entry.getPreTaxAmount();
-				}
-			}
-			detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_0%\\]",
-				FinanceUtils.formatMoney(cur, Currency.EUR));
 		}
 
 		detail = replaceComplexVatInDetails(detail, "VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_0%_", timeSpan);
 
+		// handle stuff like %[VAT_TOTAL_OUTGOING_PREV_MONTH_JUST_TAX]
 		if (detail.contains("%[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_JUST_TAX]")) {
 			int cur = 0;
 			for (Outgoing entry : timeSpan.getOutgoings()) {
@@ -517,6 +503,20 @@ public class Task {
 			}
 			detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_JUST_TAX\\]",
 				FinanceUtils.formatMoney(cur, Currency.EUR));
+		}
+
+		// handle stuff like %[VAT_TOTAL_OUTGOING_PREV_MONTH_TAX_16%_JUST_TAX]
+		for (int curTaxAmount : taxAmounts) {
+			if (detail.contains("%[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_" + curTaxAmount + "%_JUST_TAX]")) {
+				int cur = 0;
+				for (Outgoing entry : timeSpan.getOutgoings()) {
+					if (curTaxAmount == (int) entry.getTaxPercent()) {
+						cur += entry.getTaxAmount();
+					}
+				}
+				detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_" + curTaxAmount + "%_JUST_TAX\\]",
+					FinanceUtils.formatMoney(cur, Currency.EUR));
+			}
 		}
 
 		return detail;
