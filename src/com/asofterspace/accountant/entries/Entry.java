@@ -489,8 +489,9 @@ public abstract class Entry {
 				this));
 		} else {
 			boolean okay = false;
-			Date startCovidVAT = DateUtils.parseDate("2020-07-01");
-			Date endCovidVAT = DateUtils.parseDate("2020-12-31");
+			Date startCovidVAT = DateUtils.parseDate("2020-07-01"); // CovidVAT started to be used
+			Date expectCovidVAT = DateUtils.parseDate("2020-08-01"); // CovidVAT expected to be used for all entries
+			Date endCovidVAT = DateUtils.parseDate("2020-12-31"); // CovidVAT usage ended
 			if ((date == null) || date.before(startCovidVAT) || date.after(endCovidVAT)) {
 				// regular German VAT
 				switch (getTaxPercent()) {
@@ -500,12 +501,24 @@ public abstract class Entry {
 						okay = true;
 				}
 			} else {
-				// German VAT during Covid-19 times
-				switch (getTaxPercent()) {
-					case 0:
-					case 5:
-					case 16:
-						okay = true;
+				if (date.before(expectCovidVAT)) {
+					// regular German VAT or CovidVAT both fine for one month
+					switch (getTaxPercent()) {
+						case 0:
+						case 5:
+						case 7:
+						case 16:
+						case 19:
+							okay = true;
+					}
+				} else {
+					// German VAT during Covid-19 times
+					switch (getTaxPercent()) {
+						case 0:
+						case 5:
+						case 16:
+							okay = true;
+					}
 				}
 			}
 			if (!okay) {
