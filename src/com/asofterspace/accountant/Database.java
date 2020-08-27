@@ -1170,15 +1170,17 @@ public class Database {
 
 	public List<Entry> getEntries() {
 		List<Entry> result = new ArrayList<>();
-		result.addAll(getOutgoings());
-		result.addAll(getIncomings());
+		for (Year year : getYears()) {
+			result.addAll(year.getEntries());
+		}
 		return result;
 	}
 
 	public List<Entry> getEntriesOrdered() {
 		List<Entry> result = new ArrayList<>();
-		result.addAll(getOutgoings());
-		result.addAll(getIncomings());
+		for (Year year : getYears()) {
+			result.addAll(year.getEntries());
+		}
 		AccountingUtils.sortEntries(result);
 		return result;
 	}

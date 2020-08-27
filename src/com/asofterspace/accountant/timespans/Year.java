@@ -5,6 +5,7 @@
 package com.asofterspace.accountant.timespans;
 
 import com.asofterspace.accountant.Database;
+import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.world.Category;
@@ -93,6 +94,15 @@ public class Year extends TimeSpan {
 			}
 		});
 		return months;
+	}
+
+	@Override
+	public List<Entry> getEntries() {
+		List<Entry> result = new ArrayList<>();
+		for (Month month : getMonths()) {
+			result.addAll(month.getEntries());
+		}
+		return result;
 	}
 
 	@Override

@@ -132,6 +132,7 @@ public class Month extends TimeSpan {
 		return outgoings;
 	}
 
+	@Override
 	public List<Entry> getEntries() {
 		List<Entry> result = new ArrayList<>();
 		result.addAll(incomings);

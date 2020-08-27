@@ -528,6 +528,14 @@ public abstract class Entry {
 					this));
 			}
 		}
+
+		// if the title contains patreon and the entry is from 2020 or later
+		if (getTitle().toLowerCase().contains("patreon") &&
+			((date == null) || (date.after(DateUtils.parseDate("2020-01-01"))))) {
+			result.add(new ConsistencyProblem(
+				"The " + AccountingUtils.getEntryForLog(this) + " is about Patreon, which gives no invoices, so should never appear!",
+				this));
+		}
 	}
 
 	public boolean matches(String searchFor) {

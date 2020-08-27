@@ -28,4 +28,5 @@ public abstract class Problem {
 	}
 
 	public abstract boolean isImportant();
+
 }

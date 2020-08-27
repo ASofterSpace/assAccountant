@@ -4,6 +4,7 @@
  */
 package com.asofterspace.accountant.timespans;
 
+import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.world.Category;
@@ -20,6 +21,9 @@ public abstract class TimeSpan {
 	public abstract Record toRecord();
 
 	public abstract int getNum();
+
+	// gets all entries
+	public abstract List<Entry> getEntries();
 
 	// gets all outgoing invoices
 	public abstract List<Outgoing> getOutgoings();
