@@ -319,7 +319,7 @@ public class GUI extends MainWindow {
 
 		JMenu tasksMenu = new JMenu("Tasks");
 
-		JMenuItem addTask = new JMenuItem("Add Task");
+		JMenuItem addTask = new JMenuItem("Add Ad-hoc Task");
 		addTask.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -333,7 +333,7 @@ public class GUI extends MainWindow {
 		tasksMenu.add(addTask);
 
 		// add tasks a week into the future button
-		JMenuItem addFutureTasksBtn = new JMenuItem("Add Tasks Scheduled for One More Week into the Future");
+		JMenuItem addFutureTasksBtn = new JMenuItem("Materialize Tasks Scheduled for One More Week into the Future");
 		addFutureTasksBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
