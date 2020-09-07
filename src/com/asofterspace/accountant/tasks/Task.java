@@ -2,11 +2,15 @@
  * Unlicensed code created by A Softer Space, 2020
  * www.asofterspace.com/licenses/unlicense.txt
  */
-package com.asofterspace.accountant;
+package com.asofterspace.accountant.tasks;
 
+import com.asofterspace.accountant.AccountingUtils;
+import com.asofterspace.accountant.AddEntryGUI;
+import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
+import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.TimeSpan;
 import com.asofterspace.accountant.timespans.Year;
@@ -81,6 +85,22 @@ public class Task {
 
 	protected TaskCtrl taskCtrl;
 
+	// these are our current contect for showing us, which will be used by showDetails and hideDetails
+	// if this task is shown on one panel, the user opens the TaskDetailEditGUI, and the task gets shown
+	// on another panel, and the user saved in the TaskDetailEditGUI, only the new panel will contain a
+	// refreshed view of the task (as only the latest of these properties here are used), but as we
+	// only show tasks in one place for any view and never the same task in several places, this will
+	// never lead to any problems
+	private JPanel containerPanel;
+	private JPanel parentPanel;
+	private JPanel tab;
+	private JButton detailsButton;
+	private List<JComponent> addedLines;
+	private JTextPane finLog;
+	private JTextPane taskLog;
+	private Color textColor;
+	private Database database;
+
 
 	public Task(TaskCtrl taskCtrl, String title, Integer scheduledOnDay, Integer scheduledInMonth,
 		List<String> details, List<String> onDone) {
@@ -133,6 +153,10 @@ public class Task {
 	 */
 	public List<String> getDetails() {
 		return details;
+	}
+
+	public void setDetails(List<String> newDetails) {
+		this.details = newDetails;
 	}
 
 	public List<String> getOnDone() {
@@ -623,10 +647,14 @@ public class Task {
 
 	public JPanel createPanelOnGUI(Database database, JPanel tab, JPanel parentPanel) {
 
-		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
-		Color textColor = new Color(0, 0, 0);
+		this.database = database;
+		this.tab = tab;
+		this.parentPanel = parentPanel;
 
-		final JPanel containerPanel = new JPanel();
+		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
+		textColor = new Color(0, 0, 0);
+
+		containerPanel = new JPanel();
 		containerPanel.setBackground(GUI.getBackgroundColor());
 		containerPanel.setLayout(new GridBagLayout());
 
@@ -662,12 +690,12 @@ public class Task {
 		curPanel.add(curLabel, new Arrangement(h, 0, 0.0, 1.0));
 		h++;
 
-		final List<JComponent> addedLines = new ArrayList<>();
-		final JButton detailsButton = new JButton("Show Details");
+		addedLines = new ArrayList<>();
+		detailsButton = new JButton("Show Details");
 		detailsButton.addMouseListener(rowHighlighter);
 		if ((details == null) || (details.size() < 1)) {
 			detailsButton.setText("Add Details");
-			// actually keep the details button enabled in case the user want to add a log
+			// actually keep the details button enabled in case the user wants to add a log
 			// detailsButton.setEnabled(false);
 		}
 		if (done) {
@@ -677,7 +705,7 @@ public class Task {
 		curPanel.add(detailsButton, new Arrangement(h, 0, 0.1, 1.0));
 		h++;
 
-		final JTextPane taskLog = new JTextPane();
+		taskLog = new JTextPane();
 		if (doneLog != null) {
 			taskLog.setText(doneLog);
 		}
@@ -687,7 +715,7 @@ public class Task {
 		}
 		taskLog.setPreferredSize(new Dimension(128, newHeight));
 
-		final JTextPane finLog = new JTextPane();
+		finLog = new JTextPane();
 		if (Task.this instanceof FinanceOverviewTask) {
 			// if this was done before, load the finance log contents as filled in back then
 			if (done && (doneDate != null)) {
@@ -731,86 +759,10 @@ public class Task {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (!detailsButton.getText().startsWith("Hide")) {
-					detailsButton.setText("Hide Details");
-
-					int i = 1;
-
-					if ((details == null) || (details.size() < 1)) {
-						JPanel curPanel = new JPanel();
-						curPanel.setBackground(GUI.getBackgroundColor());
-						curPanel.setLayout(new GridBagLayout());
-
-						CopyByClickLabel curLabel = AccountingUtils.createLabel("There are no details for this task!", textColor, "");
-						curPanel.add(curLabel, new Arrangement(0, 0, 1.0, 1.0));
-
-						containerPanel.add(curPanel, new Arrangement(0, i, 1.0, 1.0));
-						addedLines.add(curPanel);
-						i++;
-					} else {
-						for (JPanel detail : getDetailPanelsToShowToUser(database)) {
-							containerPanel.add(detail, new Arrangement(0, i, 1.0, 1.0));
-							addedLines.add(detail);
-							i++;
-						}
-					}
-
-					if (Task.this instanceof FinanceOverviewTask) {
-						CopyByClickLabel curLabel = AccountingUtils.createLabel("", textColor, "");
-						containerPanel.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
-						addedLines.add(curLabel);
-						i++;
-
-						curLabel = AccountingUtils.createLabel("Finance Log - on each line put an Account: Amount, " +
-							"so e.g. Iron Bank: 3.14 €:", textColor, "");
-						containerPanel.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
-						addedLines.add(curLabel);
-						i++;
-
-						containerPanel.add(finLog, new Arrangement(0, i, 1.0, 1.0));
-						addedLines.add(finLog);
-						i++;
-					}
-
-					CopyByClickLabel curLabel = AccountingUtils.createLabel("", textColor, "");
-					containerPanel.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
-					addedLines.add(curLabel);
-					i++;
-
-					curLabel = AccountingUtils.createLabel("Task Log - for logging anything interesting that happened " +
-						"while doing this task:", textColor, "");
-
-					containerPanel.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
-					addedLines.add(curLabel);
-					i++;
-
-					containerPanel.add(taskLog, new Arrangement(0, i, 1.0, 1.0));
-					addedLines.add(taskLog);
-					i++;
-
-					containerPanel.setBorder(BorderFactory.createEtchedBorder());
-
+					showDetails();
 				} else {
-					if ((details == null) || (details.size() < 1)) {
-						detailsButton.setText("Add Details");
-					} else {
-						detailsButton.setText("Show Details");
-					}
-					if (Task.this.done) {
-						detailsButton.setText("Show Details");
-					}
-
-					// hide the detail lines again
-					for (JComponent line : addedLines) {
-						containerPanel.remove(line);
-					}
-
-					// and clear them (such that we do not attempt to remove them again)
-					addedLines.clear();
-
-					containerPanel.setBorder(BorderFactory.createEmptyBorder());
+					hideDetails();
 				}
-
-				AccountingUtils.resetTabSize(tab, parentPanel);
 			}
 		});
 
@@ -924,6 +876,110 @@ public class Task {
 		containerPanel.add(curPanel, new Arrangement(0, 0, 1.0, 1.0));
 
 		return containerPanel;
+	}
+
+	public void showDetails() {
+
+		detailsButton.setText("Hide Details");
+
+		int i = 1;
+
+		if ((details == null) || (details.size() < 1)) {
+			JPanel curPanel = new JPanel();
+			curPanel.setBackground(GUI.getBackgroundColor());
+			curPanel.setLayout(new GridBagLayout());
+
+			CopyByClickLabel curLabel = AccountingUtils.createLabel("There are no details for this task!", textColor, "");
+			curPanel.add(curLabel, new Arrangement(0, 0, 1.0, 1.0));
+
+			containerPanel.add(curPanel, new Arrangement(0, i, 1.0, 1.0));
+			addedLines.add(curPanel);
+			i++;
+		} else {
+			for (JPanel detail : getDetailPanelsToShowToUser(database)) {
+				containerPanel.add(detail, new Arrangement(0, i, 1.0, 1.0));
+				addedLines.add(detail);
+				i++;
+			}
+		}
+
+		JPanel detailEditPanel = new JPanel();
+		detailEditPanel.setBackground(GUI.getBackgroundColor());
+		detailEditPanel.setLayout(new GridBagLayout());
+		JButton detailEditButton = new JButton("Edit Task Details");
+		detailEditPanel.add(detailEditButton);
+		containerPanel.add(detailEditPanel, new Arrangement(0, i, 1.0, 1.0));
+		addedLines.add(detailEditPanel);
+		i++;
+
+		detailEditButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				TaskDetailEditGUI taskEditGUI = new TaskDetailEditGUI(database.getGUI(), database, Task.this);
+				taskEditGUI.show();
+			}
+		});
+
+		if (Task.this instanceof FinanceOverviewTask) {
+			CopyByClickLabel curLabel = AccountingUtils.createLabel("", textColor, "");
+			containerPanel.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
+			addedLines.add(curLabel);
+			i++;
+
+			curLabel = AccountingUtils.createLabel("Finance Log - on each line put an Account: Amount, " +
+				"so e.g. Iron Bank: 3.14 €:", textColor, "");
+			containerPanel.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
+			addedLines.add(curLabel);
+			i++;
+
+			containerPanel.add(finLog, new Arrangement(0, i, 1.0, 1.0));
+			addedLines.add(finLog);
+			i++;
+		}
+
+		CopyByClickLabel curLabel = AccountingUtils.createLabel("", textColor, "");
+		containerPanel.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
+		addedLines.add(curLabel);
+		i++;
+
+		curLabel = AccountingUtils.createLabel("Task Log - for logging anything interesting that happened " +
+			"while doing this task:", textColor, "");
+
+		containerPanel.add(curLabel, new Arrangement(0, i, 1.0, 1.0));
+		addedLines.add(curLabel);
+		i++;
+
+		containerPanel.add(taskLog, new Arrangement(0, i, 1.0, 1.0));
+		addedLines.add(taskLog);
+		i++;
+
+		containerPanel.setBorder(BorderFactory.createEtchedBorder());
+
+		AccountingUtils.resetTabSize(tab, parentPanel);
+	}
+
+	public void hideDetails() {
+
+		if ((details == null) || (details.size() < 1)) {
+			detailsButton.setText("Add Details");
+		} else {
+			detailsButton.setText("Show Details");
+		}
+		if (Task.this.done) {
+			detailsButton.setText("Show Details");
+		}
+
+		// hide the detail lines again
+		for (JComponent line : addedLines) {
+			containerPanel.remove(line);
+		}
+
+		// and clear them (such that we do not attempt to remove them again)
+		addedLines.clear();
+
+		containerPanel.setBorder(BorderFactory.createEmptyBorder());
+
+		AccountingUtils.resetTabSize(tab, parentPanel);
 	}
 
 	public boolean matches(String searchFor) {

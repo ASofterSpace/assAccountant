@@ -6,9 +6,9 @@ package com.asofterspace.accountant.tabs;
 
 import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.Database;
-import com.asofterspace.accountant.FinanceLogEntry;
 import com.asofterspace.accountant.GUI;
-import com.asofterspace.accountant.Task;
+import com.asofterspace.accountant.tasks.FinanceLogEntry;
+import com.asofterspace.accountant.tasks.Task;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.guiImages.ImagePanel;

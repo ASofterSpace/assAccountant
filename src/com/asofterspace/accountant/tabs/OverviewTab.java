@@ -12,7 +12,7 @@ import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.PaymentProblem;
-import com.asofterspace.accountant.Task;
+import com.asofterspace.accountant.tasks.Task;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 

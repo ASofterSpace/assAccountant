@@ -2,8 +2,10 @@
  * Unlicensed code created by A Softer Space, 2020
  * www.asofterspace.com/licenses/unlicense.txt
  */
-package com.asofterspace.accountant;
+package com.asofterspace.accountant.tasks;
 
+import com.asofterspace.accountant.Database;
+import com.asofterspace.accountant.GUI;
 import com.asofterspace.toolbox.accounting.Currency;
 import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
