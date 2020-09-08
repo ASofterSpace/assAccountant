@@ -85,6 +85,10 @@ public class Task {
 
 	protected TaskCtrl taskCtrl;
 
+	// in case we get hidden and shown again, let us keep track of what the user entered so far...
+	private String lastFinLogText = null;
+	private String lastTaskLogText = null;
+
 	// these are our current contect for showing us, which will be used by showDetails and hideDetails
 	// if this task is shown on one panel, the user opens the TaskDetailEditGUI, and the task gets shown
 	// on another panel, and the user saved in the TaskDetailEditGUI, only the new panel will contain a
@@ -651,6 +655,11 @@ public class Task {
 		this.tab = tab;
 		this.parentPanel = parentPanel;
 
+		// if we can save last user input, that means that this task has already been shown before,
+		// and we can still get the user input from the previously shown GUI parts before showing
+		// the next ones!
+		saveLastUserInput();
+
 		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
 		textColor = new Color(0, 0, 0);
 
@@ -706,8 +715,16 @@ public class Task {
 		h++;
 
 		taskLog = new JTextPane();
+		// if the task is already done...
 		if (doneLog != null) {
+			// ... set the saved task log text!
 			taskLog.setText(doneLog);
+		} else {
+			// if it is not yet done, but we have a "last" text...
+			if ((lastTaskLogText != null) && !("".equals(lastTaskLogText))) {
+				// ... show this one!
+				taskLog.setText(lastTaskLogText);
+			}
 		}
 		int newHeight = taskLog.getPreferredSize().height + 48;
 		if (newHeight < 128) {
@@ -734,18 +751,25 @@ public class Task {
 				finLogText.append("\n\nCopy this to an external editor, modify it there, and copy it back in here (without this line) just before you click on [Done]!");
 				finLog.setText(finLogText.toString());
 			}
-			// if this has not been done before, load the latest finance log keys, but do not assing values
+			// if this has not been done before, ...
 			if (!done) {
-				List<FinanceLogEntry> entries = taskCtrl.getFinanceLogs();
-				if (entries.size() > 0) {
-					StringBuilder finLogText = new StringBuilder();
-					FinanceLogEntry entry = entries.get(0);
-					for (FinanceLogEntryRow row : entry.getRows()) {
-						finLogText.append(row.getAccount());
-						finLogText.append(": ");
-						finLogText.append("\n");
+				// ... but has been shown and filled with data before...
+				if ((lastFinLogText != null) && !("".equals(lastFinLogText))) {
+					// ... keep showing the data that the user previously entered!
+					finLog.setText(lastFinLogText);
+				} else {
+					// ... or load the latest finance log keys, but do not assign values, to get a "fresh" finLog!
+					List<FinanceLogEntry> entries = taskCtrl.getFinanceLogs();
+					if (entries.size() > 0) {
+						StringBuilder finLogText = new StringBuilder();
+						FinanceLogEntry entry = entries.get(0);
+						for (FinanceLogEntryRow row : entry.getRows()) {
+							finLogText.append(row.getAccount());
+							finLogText.append(": ");
+							finLogText.append("\n");
+						}
+						finLog.setText(finLogText.toString());
 					}
-					finLog.setText(finLogText.toString());
 				}
 			}
 		}
@@ -960,6 +984,8 @@ public class Task {
 
 	public void hideDetails() {
 
+		saveLastUserInput();
+
 		if ((details == null) || (details.size() < 1)) {
 			detailsButton.setText("Add Details");
 		} else {
@@ -980,6 +1006,16 @@ public class Task {
 		containerPanel.setBorder(BorderFactory.createEmptyBorder());
 
 		AccountingUtils.resetTabSize(tab, parentPanel);
+	}
+
+	private void saveLastUserInput() {
+
+		if (finLog != null) {
+			lastFinLogText = finLog.getText();
+		}
+		if (taskLog != null) {
+			lastTaskLogText = taskLog.getText();
+		}
 	}
 
 	public boolean matches(String searchFor) {
