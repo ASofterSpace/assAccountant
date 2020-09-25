@@ -57,8 +57,8 @@ public class Task {
 	// on which day of the month is this task scheduled?
 	protected Integer scheduledOnDay;
 
-	// in which month is this task scheduled?
-	protected Integer scheduledInMonth;
+	// in which months is this task scheduled?
+	protected List<Integer> scheduledInMonths;
 
 	protected List<String> details;
 
@@ -106,19 +106,19 @@ public class Task {
 	private Database database;
 
 
-	public Task(TaskCtrl taskCtrl, String title, Integer scheduledOnDay, Integer scheduledInMonth,
+	public Task(TaskCtrl taskCtrl, String title, Integer scheduledOnDay, List<Integer> scheduledInMonths,
 		List<String> details, List<String> onDone) {
 
 		this.taskCtrl = taskCtrl;
 		this.title = title;
 		this.scheduledOnDay = scheduledOnDay;
-		this.scheduledInMonth = scheduledInMonth;
+		this.scheduledInMonths = scheduledInMonths;
 		this.details = details;
 		this.onDone = onDone;
 	}
 
 	public Task getNewInstance() {
-		return new Task(taskCtrl, title, scheduledOnDay, scheduledInMonth, details, onDone);
+		return new Task(taskCtrl, title, scheduledOnDay, scheduledInMonths, details, onDone);
 	}
 
 	public boolean isScheduledOn(Date date) {
@@ -131,9 +131,17 @@ public class Task {
 			}
 		}
 
-		if (scheduledInMonth != null) {
-			if (!scheduledInMonth.equals(cal.get(Calendar.MONTH))) {
-				return false;
+		if (scheduledInMonths != null) {
+			if (scheduledInMonths.size() > 0) {
+				boolean foundMonth = false;
+				for (Integer month : scheduledInMonths) {
+					if (month.equals(cal.get(Calendar.MONTH))) {
+						foundMonth = true;
+					}
+				}
+				if (!foundMonth) {
+					return false;
+				}
 			}
 		}
 
@@ -148,8 +156,8 @@ public class Task {
 		return scheduledOnDay;
 	}
 
-	public Integer getScheduledInMonth() {
-		return scheduledInMonth;
+	public List<Integer> getScheduledInMonths() {
+		return scheduledInMonths;
 	}
 
 	/**

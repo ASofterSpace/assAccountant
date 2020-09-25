@@ -29,6 +29,7 @@ public class TaskCtrl {
 	private final String TITLE = "title";
 	private final String DAY = "day";
 	private final String MONTH = "month";
+	private final String MONTHS = "months";
 	private final String DETAILS = "details";
 	private final String ON_DONE = "onDone";
 	private final String DONE = "done";
@@ -136,12 +137,26 @@ public class TaskCtrl {
 	}
 
 	private Task taskFromRecord(Record recordTask) {
+
+		List<Integer> months = new ArrayList<>();
+		List<String> monthNames = recordTask.getArrayAsStringList(MONTHS);
+		if (monthNames.size() < 1) {
+			Integer month = DateUtils.monthNameToNum(recordTask.getString(MONTH));
+			if (month != null) {
+				months.add(month);
+			}
+		} else {
+			for (String month : monthNames) {
+				months.add(DateUtils.monthNameToNum(month));
+			}
+		}
+
 		if (recordTask.getString(KIND).equals(FINANCE_OVERVIEW)) {
 			return new FinanceOverviewTask(
 				this,
 				recordTask.getString(TITLE),
 				recordTask.getInteger(DAY),
-				DateUtils.monthNameToNum(recordTask.getString(MONTH)),
+				months,
 				recordTask.getArrayAsStringList(DETAILS),
 				recordTask.getArrayAsStringList(ON_DONE)
 			);
@@ -151,7 +166,7 @@ public class TaskCtrl {
 				this,
 				recordTask.getString(TITLE),
 				recordTask.getInteger(DAY),
-				DateUtils.monthNameToNum(recordTask.getString(MONTH)),
+				months,
 				recordTask.getArrayAsStringList(DETAILS),
 				recordTask.getArrayAsStringList(ON_DONE)
 			);
@@ -209,7 +224,23 @@ public class TaskCtrl {
 		}
 		taskRecord.set(TITLE, task.getTitle());
 		taskRecord.set(DAY, task.getScheduledOnDay());
-		taskRecord.set(MONTH, DateUtils.monthNumToName(task.getScheduledInMonth()));
+
+		List<Integer> months = task.getScheduledInMonths();
+		taskRecord.set(MONTH, null);
+		taskRecord.remove(MONTHS);
+		if (months != null) {
+			if (months.size() == 1) {
+				taskRecord.set(MONTH, DateUtils.monthNumToName(months.get(0)));
+			} else {
+				List<String> monthNames = new ArrayList<>();
+				for (Integer month : months) {
+					monthNames.add(DateUtils.monthNumToName(month));
+				}
+				taskRecord.remove(MONTH);
+				taskRecord.set(MONTHS, monthNames);
+			}
+		}
+
 		taskRecord.set(DETAILS, task.getDetails());
 		taskRecord.set(ON_DONE, task.getOnDone());
 		return taskRecord;
@@ -312,9 +343,9 @@ public class TaskCtrl {
 
 		// this is an ad-hoc task which is not scheduled ever
 		Integer scheduledOnDay = null;
-		Integer scheduledInMonth = null;
+		List<Integer> scheduledInMonths = null;
 
-		Task newTask = new Task(this, title, scheduledOnDay, scheduledInMonth, detailsList, onDone);
+		Task newTask = new Task(this, title, scheduledOnDay, scheduledInMonths, detailsList, onDone);
 
 		releaseTaskOn(newTask, scheduleDate);
 
