@@ -37,6 +37,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
@@ -61,6 +62,7 @@ public class AddEntryGUI {
 	private JTextField amount;
 	private JTextField amountPostTax;
 	private JTextField taxPerc;
+	private JLabel taxLabel;
 
 	private boolean ignoreTaxUpdates = false;
 	private boolean lastTaxChangeWasPreTax = true;
@@ -202,8 +204,8 @@ public class AddEntryGUI {
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
 		taxPerc = new JTextField();
 		curPanel.add(taxPerc, new Arrangement(1, 0, 1.0, 1.0));
-		curLabel = new CopyByClickLabel(" %");
-		curPanel.add(curLabel, new Arrangement(2, 0, 0.0, 1.0));
+		taxLabel = new CopyByClickLabel(" %");
+		curPanel.add(taxLabel, new Arrangement(2, 0, 0.0, 1.0));
 		dialog.add(curPanel);
 
 		curPanel = new JPanel();
@@ -377,6 +379,7 @@ public class AddEntryGUI {
 				if (!target.equals(amountPostTax.getText())) {
 					amountPostTax.setText(target);
 				}
+				taxLabel.setText(" % (" + FinanceUtils.formatMoney(amountPostTaxInt - amountPreTaxInt) + " €)");
 			}
 		} else {
 			if (!amount.isFocusOwner()) {
@@ -390,8 +393,10 @@ public class AddEntryGUI {
 				if (!target.equals(amount.getText())) {
 					amount.setText(target);
 				}
+				taxLabel.setText(" % (" + FinanceUtils.formatMoney(amountPostTaxInt - amountPreTaxInt) + " €)");
 			}
 		}
+
 		lastTaxChangeWasPreTax = lastTaxChangeWasPreTaxOrig;
 
 		ignoreTaxUpdates = false;
