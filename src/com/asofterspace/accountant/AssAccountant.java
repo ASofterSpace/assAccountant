@@ -19,9 +19,9 @@ import javax.swing.SwingUtilities;
 
 public class AssAccountant {
 
-	public final static String PROGRAM_TITLE = "assAccountant";
+	public final static String PROGRAM_TITLE = "assAccountant (Mari)";
 	public final static String VERSION_NUMBER = "0.0.1.0(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "5. April 2020 - 26. September 2020";
+	public final static String VERSION_DATE = "5. April 2020 - 21. October 2020";
 
 	private static ConfigFile config;
 
@@ -96,7 +96,7 @@ public class AssAccountant {
 			System.exit(1);
 		}
 
-		System.out.println("Hi there! :)");
+		System.out.println("Hi there, Mari here! :)");
 		if (args.length < 1) {
 			System.out.println("You have started me without any arguments, so I will just load up the GUI for you...");
 		}

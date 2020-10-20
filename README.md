@@ -1,4 +1,4 @@
-# assAccountant
+# assAccountant (Mari)
 
 **Class:** A Softer Space Internal
 
@@ -6,7 +6,8 @@
 
 **Platform:** Windows / Linux
 
-This is our accountant. We tell them which invoices we sent out, and which ones we received, and they prepare everything that is necessary for our taxes. :)
+This is our accountant, Mari (Multifunctional Accounting & Reminding Infrastructure.)
+We tell them which invoices we sent out, and which ones we received, and they prepare everything that is necessary for our taxes. :)
 
 ## Setup
 
