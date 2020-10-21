@@ -104,6 +104,7 @@ public class AssAccountant {
 
 		tabCtrl = new TabCtrl(database);
 		taskCtrl = new TaskCtrl(database);
+		taskCtrl.init();
 
 		boolean doExit = false;
 
@@ -176,6 +177,10 @@ public class AssAccountant {
 		}
 
 		SwingUtilities.invokeLater(new GUI(database, tabCtrl, config));
+	}
+
+	public static TaskCtrl getTaskCtrl() {
+		return taskCtrl;
 	}
 
 }

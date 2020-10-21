@@ -11,6 +11,7 @@ md toolbox
 cd toolbox
 
 md accounting
+md calendar
 md coders
 md configuration
 md gui
@@ -25,6 +26,7 @@ cd ..\..\..\..
 
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\*.java" "src\com\asofterspace\toolbox"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\accounting\*.*" "src\com\asofterspace\toolbox\accounting"
+copy "..\Toolbox-Java\src\com\asofterspace\toolbox\calendar\*.*" "src\com\asofterspace\toolbox\calendar"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\coders\*.*" "src\com\asofterspace\toolbox\coders"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\configuration\*.*" "src\com\asofterspace\toolbox\configuration"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\gui\*.*" "src\com\asofterspace\toolbox\gui"

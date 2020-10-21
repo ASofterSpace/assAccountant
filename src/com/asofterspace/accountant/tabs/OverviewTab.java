@@ -13,6 +13,7 @@ import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.PaymentProblem;
 import com.asofterspace.accountant.tasks.Task;
+import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 
@@ -72,10 +73,10 @@ public class OverviewTab extends Tab {
 		tab.add(outstandingTasksLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		List<Task> tasks = database.getTaskCtrl().getTaskInstances();
+		List<GenericTask> tasks = database.getTaskCtrl().getTaskInstances();
 
 		boolean tasksShown = false;
-		for (Task task : tasks) {
+		for (GenericTask task : tasks) {
 			if ((!task.hasBeenDone()) && task.matches(searchFor)) {
 				tasksShown = true;
 				break;
@@ -112,12 +113,16 @@ public class OverviewTab extends Tab {
 			i++;
 		}
 
-		for (Task task : tasks) {
+		for (GenericTask task : tasks) {
 			if ((!task.hasBeenDone()) && task.matches(searchFor)) {
-				curPanel = task.createPanelOnGUI(database, tab, parentPanel);
-				curPanel.setBackground(GUI.getBackgroundColor());
-				tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
-				i++;
+				if (task instanceof Task) {
+					curPanel = ((Task) task).createPanelOnGUI(database, tab, parentPanel);
+					curPanel.setBackground(GUI.getBackgroundColor());
+					tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+					i++;
+				} else {
+					System.out.println("Expected a task but got " + task + "!");
+				}
 			}
 		}
 		// for-else:

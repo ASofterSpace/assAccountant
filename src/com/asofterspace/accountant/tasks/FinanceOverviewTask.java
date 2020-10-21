@@ -4,6 +4,8 @@
  */
 package com.asofterspace.accountant.tasks;
 
+import com.asofterspace.toolbox.calendar.GenericTask;
+
 import java.util.List;
 
 
@@ -12,14 +14,18 @@ import java.util.List;
  */
 public class FinanceOverviewTask extends Task {
 
-	public FinanceOverviewTask(TaskCtrl taskCtrl, String title, Integer scheduledOnDay,
+	public FinanceOverviewTask(String title, Integer scheduledOnDay,
 		List<Integer> scheduledInMonths, List<String> details, List<String> onDone) {
 
-		super(taskCtrl, title, scheduledOnDay, scheduledInMonths, details, onDone);
+		super(title, scheduledOnDay, scheduledInMonths, details, onDone);
+	}
+
+	public FinanceOverviewTask(GenericTask other) {
+		super(other);
 	}
 
 	@Override
 	public FinanceOverviewTask getNewInstance() {
-		return new FinanceOverviewTask(taskCtrl, title, scheduledOnDay, scheduledInMonths, details, onDone);
+		return new FinanceOverviewTask(this);
 	}
 }

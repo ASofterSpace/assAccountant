@@ -5,6 +5,8 @@
 package com.asofterspace.accountant.tasks;
 
 import com.asofterspace.accountant.Database;
+import com.asofterspace.toolbox.calendar.GenericTask;
+import com.asofterspace.toolbox.calendar.TaskCtrlBase;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
@@ -17,40 +19,10 @@ import java.util.Date;
 import java.util.List;
 
 
-public class TaskCtrl {
+public class TaskCtrl extends TaskCtrlBase {
 
-	private final String TASKS = "tasks";
-	private final String TASK_INSTANCES = "taskInstances";
-	private final String LAST_TASK_GENERATION = "lastTaskGeneration";
 	private final String FINANCE_LOGS = "financeLogs";
-	private final String GENERIC = "generic";
 	private final String FINANCE_OVERVIEW = "financeOverview";
-	private final String KIND = "kind";
-	private final String TITLE = "title";
-	private final String DAY = "day";
-	private final String MONTH = "month";
-	private final String MONTHS = "months";
-	private final String DETAILS = "details";
-	private final String ON_DONE = "onDone";
-	private final String DONE = "done";
-	private final String RELEASED_ON_DAY = "releasedOnDay";
-	private final String RELEASED_IN_MONTH = "releasedInMonth";
-	private final String RELEASED_IN_YEAR = "releasedInYear";
-	private final String DONE_DATE = "doneDate";
-	private final String DONE_LOG = "doneLog";
-	private final String DATE = "date";
-	private final String ROWS = "rows";
-	private final String AMOUNT = "amount";
-	private final String ACCOUNT = "account";
-
-	// contains one instance of each task, such that for a given day we can check which of
-	// these potential tasks actually occurs on that day
-	private List<Task> tasks;
-
-	// contains the actual released and potentially worked on tasks
-	private List<Task> taskInstances;
-
-	private Date lastTaskGeneration;
 
 	private List<FinanceLogEntry> financeLogs;
 
@@ -62,6 +34,9 @@ public class TaskCtrl {
 		this.database = database;
 
 		database.setTaskCtrl(this);
+	}
+
+	public void init() {
 
 		loadFromDatabase();
 
@@ -72,23 +47,7 @@ public class TaskCtrl {
 
 		Record root = database.getLoadedRoot();
 
-		List<Record> taskRecordsInDatabase = root.getArray(TASKS);
-		this.tasks = new ArrayList<>();
-		for (Record curTask : taskRecordsInDatabase) {
-			Task task = taskFromRecord(curTask);
-			if (task != null) {
-				tasks.add(task);
-			}
-		}
-
-		List<Record> taskInstanceRecordsInDatabase = root.getArray(TASK_INSTANCES);
-		this.taskInstances = new ArrayList<>();
-		for (Record curTask : taskInstanceRecordsInDatabase) {
-			Task task = taskInstanceFromRecord(curTask);
-			if (task != null) {
-				taskInstances.add(task);
-			}
-		}
+		loadFromRoot(root);
 
 		List<Record> financeLogsRecordsInDatabase = root.getArray(FINANCE_LOGS);
 		this.financeLogs = new ArrayList<>();
@@ -100,93 +59,6 @@ public class TaskCtrl {
 			}
 			financeLogs.add(entry);
 		}
-
-		this.lastTaskGeneration = DateUtils.parseDate(root.getString(LAST_TASK_GENERATION));
-	}
-
-	public void generateNewInstances(Date until) {
-
-		List<Date> daysToGenerate = DateUtils.listDaysFromTo(lastTaskGeneration, until);
-
-		// we ignore the very first day that is returned,
-		// as we already reported tasks for that one last time!
-		for (int i = 1; i < daysToGenerate.size(); i++) {
-
-			Date day = daysToGenerate.get(i);
-
-			for (Task task : tasks) {
-				if (task.isScheduledOn(day)) {
-					releaseTaskOn(task, day);
-				}
-			}
-
-			lastTaskGeneration = day;
-		}
-	}
-
-	private void releaseTaskOn(Task task, Date day) {
-		Task taskInstance = task.getNewInstance();
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(day);
-		taskInstance.setDone(false);
-		taskInstance.setReleasedOnDay(cal.get(Calendar.DAY_OF_MONTH));
-		taskInstance.setReleasedInMonth(cal.get(Calendar.MONTH));
-		taskInstance.setReleasedInYear(cal.get(Calendar.YEAR));
-		taskInstance.setDoneDate(null);
-		taskInstances.add(taskInstance);
-	}
-
-	private Task taskFromRecord(Record recordTask) {
-
-		List<Integer> months = new ArrayList<>();
-		List<String> monthNames = recordTask.getArrayAsStringList(MONTHS);
-		if (monthNames.size() < 1) {
-			Integer month = DateUtils.monthNameToNum(recordTask.getString(MONTH));
-			if (month != null) {
-				months.add(month);
-			}
-		} else {
-			for (String month : monthNames) {
-				months.add(DateUtils.monthNameToNum(month));
-			}
-		}
-
-		if (recordTask.getString(KIND).equals(FINANCE_OVERVIEW)) {
-			return new FinanceOverviewTask(
-				this,
-				recordTask.getString(TITLE),
-				recordTask.getInteger(DAY),
-				months,
-				recordTask.getArrayAsStringList(DETAILS),
-				recordTask.getArrayAsStringList(ON_DONE)
-			);
-		}
-		if (recordTask.getString(KIND).equals(GENERIC)) {
-			return new Task(
-				this,
-				recordTask.getString(TITLE),
-				recordTask.getInteger(DAY),
-				months,
-				recordTask.getArrayAsStringList(DETAILS),
-				recordTask.getArrayAsStringList(ON_DONE)
-			);
-		}
-		GuiUtils.complain("The task " + recordTask.getString(TITLE) + " could not be loaded!");
-		return null;
-	}
-
-	private Task taskInstanceFromRecord(Record recordTask) {
-		Task result = taskFromRecord(recordTask);
-		if (result == null) {
-			return null;
-		}
-		result.setDone(recordTask.getBoolean(DONE));
-		result.setReleasedOnDay(recordTask.getInteger(RELEASED_ON_DAY));
-		result.setReleasedInMonth(recordTask.getInteger(RELEASED_IN_MONTH));
-		result.setReleasedInYear(recordTask.getInteger(RELEASED_IN_YEAR));
-		result.setDoneDate(DateUtils.parseDate(recordTask.getString(DONE_DATE)));
-		result.setDoneLog(recordTask.getString(DONE_LOG));
-		return result;
 	}
 
 	public void saveIntoRecord(Record root) {
@@ -194,6 +66,20 @@ public class TaskCtrl {
 		root.set(TASK_INSTANCES, getTaskInstancesAsRecord());
 		root.set(FINANCE_LOGS, getFinanceLogsAsRecord());
 		root.set(LAST_TASK_GENERATION, DateUtils.serializeDate(lastTaskGeneration));
+	}
+
+	protected GenericTask taskFromRecord(Record recordTask) {
+
+		GenericTask task = super.taskFromRecord(recordTask);
+
+		if (recordTask.getString(KIND).equals(FINANCE_OVERVIEW)) {
+			return new FinanceOverviewTask(task);
+		}
+		if (recordTask.getString(KIND).equals(GENERIC)) {
+			return new Task(task);
+		}
+		GuiUtils.complain("The task " + recordTask.getString(TITLE) + " could not be loaded!");
+		return null;
 	}
 
 	private Record getFinanceLogsAsRecord() {
@@ -216,78 +102,13 @@ public class TaskCtrl {
 		return base;
 	}
 
-	private Record taskToRecord(Task task) {
-		Record taskRecord = Record.emptyObject();
-		taskRecord.set(KIND, GENERIC);
+	@Override
+	protected Record taskToRecord(GenericTask task) {
+		Record taskRecord = super.taskToRecord(task);
 		if (task instanceof FinanceOverviewTask) {
 			taskRecord.set(KIND, FINANCE_OVERVIEW);
 		}
-		taskRecord.set(TITLE, task.getTitle());
-		taskRecord.set(DAY, task.getScheduledOnDay());
-
-		List<Integer> months = task.getScheduledInMonths();
-		taskRecord.set(MONTH, null);
-		taskRecord.remove(MONTHS);
-		if (months != null) {
-			if (months.size() == 1) {
-				taskRecord.set(MONTH, DateUtils.monthNumToName(months.get(0)));
-			} else {
-				List<String> monthNames = new ArrayList<>();
-				for (Integer month : months) {
-					monthNames.add(DateUtils.monthNumToName(month));
-				}
-				taskRecord.remove(MONTH);
-				taskRecord.set(MONTHS, monthNames);
-			}
-		}
-
-		taskRecord.set(DETAILS, task.getDetails());
-		taskRecord.set(ON_DONE, task.getOnDone());
 		return taskRecord;
-	}
-
-	private Record getTasksAsRecord() {
-		Record base = Record.emptyArray();
-		for (Task task : tasks) {
-			Record taskRecord = taskToRecord(task);
-			base.append(taskRecord);
-		}
-		return base;
-	}
-
-	private Record getTaskInstancesAsRecord() {
-		Record base = Record.emptyArray();
-		for (Task task : taskInstances) {
-			Record taskRecord = taskToRecord(task);
-			taskRecord.set(DONE, task.hasBeenDone());
-			taskRecord.set(RELEASED_ON_DAY, task.getReleasedOnDay());
-			taskRecord.set(RELEASED_IN_MONTH, task.getReleasedInMonth());
-			taskRecord.set(RELEASED_IN_YEAR, task.getReleasedInYear());
-			taskRecord.set(DONE_DATE, DateUtils.serializeDate(task.getDoneDate()));
-			taskRecord.set(DONE_LOG, task.getDoneLog());
-			base.append(taskRecord);
-		}
-		return base;
-	}
-
-	public List<Task> getTaskInstances() {
-
-		Collections.sort(taskInstances, new Comparator<Task>() {
-			public int compare(Task a, Task b) {
-				if (a.getReleasedInYear().equals(b.getReleasedInYear())) {
-					if (a.getReleasedInMonth().equals(b.getReleasedInMonth())) {
-						if (a.getReleasedOnDay().equals(b.getReleasedOnDay())) {
-							return a.getTitle().compareTo(b.getTitle());
-						}
-						return b.getReleasedOnDay() - a.getReleasedOnDay();
-					}
-					return b.getReleasedInMonth() - a.getReleasedInMonth();
-				}
-				return b.getReleasedInYear() - a.getReleasedInYear();
-			}
-		});
-
-		return taskInstances;
 	}
 
 	public List<FinanceLogEntry> getFinanceLogs() {
@@ -345,7 +166,7 @@ public class TaskCtrl {
 		Integer scheduledOnDay = null;
 		List<Integer> scheduledInMonths = null;
 
-		Task newTask = new Task(this, title, scheduledOnDay, scheduledInMonths, detailsList, onDone);
+		Task newTask = new Task(title, scheduledOnDay, scheduledInMonths, detailsList, onDone);
 
 		releaseTaskOn(newTask, scheduleDate);
 

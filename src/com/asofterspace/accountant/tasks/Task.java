@@ -6,6 +6,7 @@ package com.asofterspace.accountant.tasks;
 
 import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.AddEntryGUI;
+import com.asofterspace.accountant.AssAccountant;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.entries.Incoming;
@@ -16,6 +17,7 @@ import com.asofterspace.accountant.timespans.TimeSpan;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.toolbox.accounting.Currency;
 import com.asofterspace.toolbox.accounting.FinanceUtils;
+import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.gui.GuiUtils;
@@ -34,7 +36,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -50,38 +51,7 @@ import javax.swing.JTextPane;
  * A task describes some action that will have to be taken at a certain time,
  * and whose execution can be logged
  */
-public class Task {
-
-	protected String title;
-
-	// on which day of the month is this task scheduled?
-	protected Integer scheduledOnDay;
-
-	// in which months is this task scheduled?
-	protected List<Integer> scheduledInMonths;
-
-	protected List<String> details;
-
-	// what should be done once this task is completed?
-	protected List<String> onDone;
-
-	// has this task already been done?
-	protected Boolean done;
-
-	// for which date was this task instance released for the user to look at?
-	// (this might be before or after the date the user actually first saw it,
-	// e.g. the user have have seen it as a future task, or it may have been
-	// generated days later... this is really the date in the calendar that
-	// triggered the schedule for this task to generate this instance!)
-	protected Integer releasedOnDay;
-	protected Integer releasedInMonth;
-	protected Integer releasedInYear;
-
-	// when was this task done?
-	protected Date doneDate;
-
-	// what interesting things did the user encounter while doing this task?
-	protected String doneLog;
+public class Task extends GenericTask {
 
 	protected TaskCtrl taskCtrl;
 
@@ -106,77 +76,23 @@ public class Task {
 	private Database database;
 
 
-	public Task(TaskCtrl taskCtrl, String title, Integer scheduledOnDay, List<Integer> scheduledInMonths,
+	public Task(String title, Integer scheduledOnDay, List<Integer> scheduledInMonths,
 		List<String> details, List<String> onDone) {
 
-		this.taskCtrl = taskCtrl;
-		this.title = title;
-		this.scheduledOnDay = scheduledOnDay;
-		this.scheduledInMonths = scheduledInMonths;
-		this.details = details;
-		this.onDone = onDone;
+		super(title, scheduledOnDay, scheduledInMonths, details, onDone);
+
+		this.taskCtrl = AssAccountant.getTaskCtrl();
 	}
 
+	public Task(GenericTask other) {
+		super(other);
+
+		this.taskCtrl = AssAccountant.getTaskCtrl();
+	}
+
+	@Override
 	public Task getNewInstance() {
-		return new Task(taskCtrl, title, scheduledOnDay, scheduledInMonths, details, onDone);
-	}
-
-	public boolean isScheduledOn(Date date) {
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(date);
-
-		if (scheduledOnDay != null) {
-			if (!scheduledOnDay.equals(cal.get(Calendar.DAY_OF_MONTH))) {
-				return false;
-			}
-		}
-
-		if (scheduledInMonths != null) {
-			if (scheduledInMonths.size() > 0) {
-				boolean foundMonth = false;
-				for (Integer month : scheduledInMonths) {
-					if (month.equals(cal.get(Calendar.MONTH))) {
-						foundMonth = true;
-					}
-				}
-				if (!foundMonth) {
-					return false;
-				}
-			}
-		}
-
-		return true;
-	}
-
-	public String getTitle() {
-		return title;
-	}
-
-	public Integer getScheduledOnDay() {
-		return scheduledOnDay;
-	}
-
-	public List<Integer> getScheduledInMonths() {
-		return scheduledInMonths;
-	}
-
-	/**
-	 * Return detailed instructions for the user such that they know what to do with this task
-	 */
-	public List<String> getDetails() {
-		return details;
-	}
-
-	public void setDetails(List<String> newDetails) {
-		this.details = newDetails;
-	}
-
-	public List<String> getOnDone() {
-		return onDone;
-	}
-
-	public Date getReleaseDate() {
-		return DateUtils.parseDate(getReleasedInYear() + "-" + (getReleasedInMonth() + 1) + "-" + getReleasedOnDay());
+		return new Task(this);
 	}
 
 	public String getDetailsToShowToUser(Database database) {
@@ -597,66 +513,6 @@ public class Task {
 		return detail;
 	}
 
-	public Boolean hasBeenDone() {
-		return done;
-	}
-
-	public void setDone(Boolean done) {
-		this.done = done;
-	}
-
-	public Integer getReleasedOnDay() {
-		return releasedOnDay;
-	}
-
-	public void setReleasedOnDay(Integer releasedOnDay) {
-		this.releasedOnDay = releasedOnDay;
-	}
-
-	public Integer getReleasedInMonth() {
-		return releasedInMonth;
-	}
-
-	public void setReleasedInMonth(Integer releasedInMonth) {
-		this.releasedInMonth = releasedInMonth;
-	}
-
-	public Integer getReleasedInYear() {
-		return releasedInYear;
-	}
-
-	public void setReleasedInYear(Integer releasedInYear) {
-		this.releasedInYear = releasedInYear;
-	}
-
-	public String getReleasedDateStr() {
-		String day = ""+getReleasedOnDay();
-		if (day.length() < 2) {
-			day = "0" + day;
-		}
-		String month = ""+(getReleasedInMonth()+1);
-		if (month.length() < 2) {
-			month = "0" + month;
-		}
-		return getReleasedInYear() + "-" + month + "-" + day;
-	}
-
-	public Date getDoneDate() {
-		return doneDate;
-	}
-
-	public void setDoneDate(Date doneDate) {
-		this.doneDate = doneDate;
-	}
-
-	public String getDoneLog() {
-		return doneLog;
-	}
-
-	public void setDoneLog(String doneLog) {
-		this.doneLog = doneLog;
-	}
-
 	public JPanel createPanelOnGUI(Database database, JPanel tab, JPanel parentPanel) {
 
 		this.database = database;
@@ -745,7 +601,9 @@ public class Task {
 			// if this was done before, load the finance log contents as filled in back then
 			if (done && (doneDate != null)) {
 				StringBuilder finLogText = new StringBuilder();
+				System.out.println("DEBUG 1: " + taskCtrl);
 				List<FinanceLogEntry> entries = taskCtrl.getFinanceLogs();
+				System.out.println("DEBUG 2");
 				for (FinanceLogEntry entry : entries) {
 					if (DateUtils.isSameDay(entry.getDate(), doneDate)) {
 						for (FinanceLogEntryRow row : entry.getRows()) {
@@ -1024,49 +882,6 @@ public class Task {
 		if (taskLog != null) {
 			lastTaskLogText = taskLog.getText();
 		}
-	}
-
-	public boolean matches(String searchFor) {
-		if ("".equals(searchFor)) {
-			return true;
-		}
-		if (getTitle().replace("\\n", "").toLowerCase().contains(searchFor.toLowerCase())) {
-			return true;
-		}
-		if (details != null) {
-			for (String detail : details) {
-				if (detail.replace("\\n", "").toLowerCase().contains(searchFor.toLowerCase())) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	@Override
-	public boolean equals(Object other) {
-		if (other == null) {
-			return false;
-		}
-		if (other instanceof Task) {
-			Task otherTask = (Task) other;
-			if (this.title.equals(otherTask.title) &&
-				this.done.equals(otherTask.done) &&
-				this.releasedOnDay.equals(otherTask.releasedOnDay) &&
-				this.releasedInMonth.equals(otherTask.releasedInMonth) &&
-				this.releasedInYear.equals(otherTask.releasedInYear)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	@Override
-	public int hashCode() {
-		if ((done == null) || done.equals(false)) {
-			return -1;
-		}
-		return this.releasedOnDay + 64 * this.releasedInMonth + 1024 * this.releasedInYear;
 	}
 
 }
