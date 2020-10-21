@@ -601,9 +601,7 @@ public class Task extends GenericTask {
 			// if this was done before, load the finance log contents as filled in back then
 			if (done && (doneDate != null)) {
 				StringBuilder finLogText = new StringBuilder();
-				System.out.println("DEBUG 1: " + taskCtrl);
 				List<FinanceLogEntry> entries = taskCtrl.getFinanceLogs();
-				System.out.println("DEBUG 2");
 				for (FinanceLogEntry entry : entries) {
 					if (DateUtils.isSameDay(entry.getDate(), doneDate)) {
 						for (FinanceLogEntryRow row : entry.getRows()) {
