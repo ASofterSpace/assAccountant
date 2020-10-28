@@ -185,10 +185,9 @@ public class AssAccountant {
 
 		SwingUtilities.invokeLater(new GUI(database, tabCtrl, config));
 
-
-		Directory dataDir = new Directory(DATA_DIR);
-		Directory serverDir = new Directory(SERVER_DIR);
-		Directory webRoot = new Directory(WEB_ROOT_DIR);
+		Directory dataDir = new Directory(System.getProperty("java.class.path") + "/../" + DATA_DIR);
+		Directory serverDir = new Directory(System.getProperty("java.class.path") + "/../" + SERVER_DIR);
+		Directory webRoot = new Directory(System.getProperty("java.class.path") + "/../" + WEB_ROOT_DIR);
 
 		try {
 
