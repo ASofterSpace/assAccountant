@@ -74,6 +74,10 @@ public class Database {
 	private Map<String, Category> titleToCategoryMapping;
 	private List<String> acknowledgedProblems;
 
+	private Integer port;
+
+	private String username;
+
 
 	public Database(ConfigFile settings) throws JsonParseException {
 
@@ -83,6 +87,10 @@ public class Database {
 		this.dbFile = new ConfigFile("database", true);
 
 		this.loadedRoot = loadFromFile(dbFile);
+
+		this.port = settingsFile.getInteger("port");
+
+		this.username = settingsFile.getValue("username");
 	}
 
 	private Record loadFromFile(ConfigFile fileToLoad) {
@@ -1257,6 +1265,17 @@ public class Database {
 		bankAccounts = new ArrayList<>();
 
 		save();
+	}
+
+	public Integer getPort() {
+		if (port == null) {
+			return 3011;
+		}
+		return port;
+	}
+
+	public String getUsername() {
+		return username;
 	}
 
 	public void save() {

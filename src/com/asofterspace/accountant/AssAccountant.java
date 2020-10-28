@@ -5,12 +5,15 @@
 package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.tasks.TaskCtrl;
+import com.asofterspace.accountant.web.Server;
 import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.JSON;
+import com.asofterspace.toolbox.io.JsonFile;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.Utils;
+import com.asofterspace.toolbox.web.WebTemplateEngine;
 
 import java.util.List;
 
@@ -20,8 +23,12 @@ import javax.swing.SwingUtilities;
 public class AssAccountant {
 
 	public final static String PROGRAM_TITLE = "assAccountant (Mari)";
-	public final static String VERSION_NUMBER = "0.0.1.0(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "5. April 2020 - 21. October 2020";
+	public final static String VERSION_NUMBER = "0.0.1.1(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "5. April 2020 - 28. October 2020";
+
+	public final static String DATA_DIR = "config";
+	public final static String SERVER_DIR = "server";
+	public final static String WEB_ROOT_DIR = "deployed";
 
 	private static ConfigFile config;
 
@@ -177,6 +184,45 @@ public class AssAccountant {
 		}
 
 		SwingUtilities.invokeLater(new GUI(database, tabCtrl, config));
+
+
+		Directory dataDir = new Directory(DATA_DIR);
+		Directory serverDir = new Directory(SERVER_DIR);
+		Directory webRoot = new Directory(WEB_ROOT_DIR);
+
+		try {
+
+			JsonFile jsonConfigFile = new JsonFile(serverDir, "webengine.json");
+			JSON jsonConfig = jsonConfigFile.getAllContents();
+			jsonConfig.inc("version");
+			jsonConfigFile.save(jsonConfig);
+
+			List<String> whitelist = jsonConfig.getArrayAsStringList("files");
+
+			System.out.println("Templating the web application...");
+
+			WebTemplateEngine engine = new WebTemplateEngine(serverDir, jsonConfig);
+
+			engine.compileTo(webRoot);
+
+
+			System.out.println("Starting the server on port " + database.getPort() + "...");
+
+			Server server = new Server(webRoot, serverDir, database);
+
+			server.setWhitelist(whitelist);
+
+			boolean async = false;
+
+			server.serve(async);
+
+
+			System.out.println("Server done, all shut down and cleaned up! Have a nice day! :)");
+
+		} catch (JsonParseException e) {
+
+			System.out.println("Oh no! The input could not be parsed: " + e);
+		}
 	}
 
 	public static TaskCtrl getTaskCtrl() {

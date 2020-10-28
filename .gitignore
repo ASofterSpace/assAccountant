@@ -35,3 +35,9 @@ config
 data
 manual-backups
 import
+
+# runtime webserver deployment files
+/deployed
+
+# pictures
+/server/pics
