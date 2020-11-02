@@ -529,9 +529,9 @@ public abstract class Entry {
 			}
 		}
 
-		// if the title contains patreon and the entry is from 2020 or later
+		// if the title contains patreon and the entry is from between 1st Jan 2020 and 31st Oct 2020...
 		if (getTitle().toLowerCase().contains("patreon") &&
-			((date == null) || (date.after(DateUtils.parseDate("2020-01-01"))))) {
+			((date == null) || (date.after(DateUtils.parseDate("2020-01-01")) && date.before(DateUtils.parseDate("2020-10-31"))))) {
 			result.add(new ConsistencyProblem(
 				"The " + AccountingUtils.getEntryForLog(this) + " is about Patreon, which gives no invoices, so should never appear!",
 				this));
