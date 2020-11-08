@@ -327,6 +327,72 @@ public abstract class Entry {
 		return result;
 	}
 
+	public String createPanelHtml(Database database) {
+
+		// TODO - get buttons to actually work
+
+		String html = "";
+
+		Color textColor = getTextColor();
+		String tooltip = "Not yet paid!";
+		if (getReceived()) {
+			tooltip = "Paid on " + DateUtils.serializeDate(getReceivedOnDate()) + " to " + getReceivedOnAccount();
+		}
+
+		html += "<div class='line'>";
+
+		html += AccountingUtils.createLabelHtml(getDateAsText(), textColor, tooltip, "text-align: center; width: 10%;");
+		html += AccountingUtils.createLabelHtml(getTitle(), textColor, tooltip, "text-align: left; width: 30%;");
+		html += AccountingUtils.createLabelHtml("[" + getCategoryOrCustomer() + "]", textColor, tooltip, "text-align: left; width: 11%;");
+		html += AccountingUtils.createLabelHtml(getOriginator(), textColor, tooltip, "text-align: right; width: 5%;");
+		html += AccountingUtils.createLabelHtml(getPreTaxAmountAsText(), textColor, tooltip, "text-align: right; width: 10%;");
+		html += AccountingUtils.createLabelHtml(getTaxPercentAsText(), textColor, tooltip, "text-align: right; width: 10%;");
+		html += AccountingUtils.createLabelHtml(getPostTaxAmountAsText(), textColor, tooltip, "text-align: right; width: 10%;");
+
+		/*
+		JButton curButton = new JButton("Paid");
+		curButton.addMouseListener(rowHighlighter);
+		curButton.setPreferredSize(defaultDimension);
+		curPanel.add(curButton, new Arrangement(8, 0, 0.05, 1.0));
+		curButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				AddPaidGUI addPaidGUI = new AddPaidGUI(database.getGUI(), database, Entry.this);
+				addPaidGUI.show();
+			}
+		});
+
+		curButton = new JButton("Edit");
+		curButton.addMouseListener(rowHighlighter);
+		curButton.setPreferredSize(defaultDimension);
+		curPanel.add(curButton, new Arrangement(9, 0, 0.05, 1.0));
+		curButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				AddEntryGUI editEntryGUI = new AddEntryGUI(database.getGUI(), database, Entry.this);
+				editEntryGUI.show();
+			}
+		});
+
+		curButton = new JButton("Delete");
+		curButton.addMouseListener(rowHighlighter);
+		curButton.setPreferredSize(defaultDimension);
+		curPanel.add(curButton, new Arrangement(10, 0, 0.06, 1.0));
+		curButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (GuiUtils.confirmDelete("entry '" + getTitle() + "'")) {
+					Entry.this.deleteFrom(database);
+				}
+			}
+		});
+		*/
+
+		html += "</div>";
+
+		return html;
+	}
+
 	public JPanel createPanelOnGUI(Database database) {
 
 		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();

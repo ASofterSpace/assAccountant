@@ -35,9 +35,33 @@ div#tabList > div, div#tabList > a {
 	border-radius: 6pt;
 }
 
+div#mainContent {
+	overflow-x: hidden;
+	overflow-y: scroll;
+}
+
 div.mainTitle {
 	font-size: 200%;
 	text-align: center;
+	padding-top: 10pt;
+}
+
+div.secondaryTitle {
+	font-size: 150%;
+	text-align: center;
+	padding-top: 10pt;
+	padding-bottom: 10pt;
+}
+
+div.line:hover {
+	background: rgba(255, 0, 255, 0.19);
+}
+
+div.line > span {
+	display: inline-block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 div#tabList > a:hover {
@@ -64,6 +88,10 @@ a.sidebar > img.avatar {
 	border-radius: 5pt;
 	left: 0;
 	top: 0;
+}
+
+div.footer {
+	height: 200pt;
 }
 
 div.projectbar {

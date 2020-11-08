@@ -41,6 +41,8 @@ public class MonthTab extends TimeSpanTab {
 			html += AccountingUtils.createOverviewAndTaxInfoHtml(month);
 		}
 
+		html += "<div class='footer'>&nbsp;</div>";
+
 		return html;
 	}
 

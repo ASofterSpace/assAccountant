@@ -39,6 +39,8 @@ public class YearTab extends TimeSpanTab {
 			html += AccountingUtils.createOverviewAndTaxInfoHtml(year);
 		}
 
+		html += "<div class='footer'>&nbsp;</div>";
+
 		return html;
 	}
 

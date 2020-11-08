@@ -64,7 +64,9 @@ public class OverviewTab extends Tab {
 
 		// TODO - add consistency check results
 
-		taskHtml = "<div>Hej " + database.getUsername() + "! :)</div>" + taskHtml;
+		taskHtml = "<div style='padding-top:20pt; padding-bottom: 10pt;'>Hej " + database.getUsername() + "! :)</div>" + taskHtml;
+
+		taskHtml += "<div class='footer'>&nbsp;</div>";
 
 		return taskHtml;
 	}

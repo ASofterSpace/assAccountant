@@ -53,7 +53,11 @@ public class BankStatementYearTab extends Tab {
 
 		// TODO - everything
 
-		return "";
+		String html = "";
+
+		html += "<div class='footer'>&nbsp;</div>";
+
+		return html;
 	}
 
 	@Override

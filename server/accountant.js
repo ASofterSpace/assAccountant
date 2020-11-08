@@ -11,6 +11,13 @@ window.accountant = {
 			retry = true;
 		}
 
+		var mainContent = document.getElementById("mainContent");
+		if (mainContent) {
+			mainContent.style.height = (window.innerHeight - 31) + "px";
+		} else {
+			retry = true;
+		}
+
 		var tabList = document.getElementById("tabList");
 		var mariAvatar = document.getElementById("mariAvatar");
 		if (tabList && mariAvatar) {

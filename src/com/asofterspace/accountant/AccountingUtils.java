@@ -15,6 +15,7 @@ import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.gui.GuiUtils;
+import com.asofterspace.toolbox.images.ColorRGB;
 import com.asofterspace.toolbox.Utils;
 
 import java.awt.Color;
@@ -32,6 +33,27 @@ import javax.swing.JPanel;
 
 
 public class AccountingUtils {
+
+	public static String createTotalPanelHtml(int totalBeforeTax, int totalTax, int totalAfterTax) {
+
+		String html = "";
+
+		html += "<div class='line'>";
+
+		Color textColor = null;
+		String tooltip = null;
+
+		html += "<span style='width: 51%'>&nbsp;</span>";
+
+		html += AccountingUtils.createLabelHtml("Total:", textColor, tooltip, "text-align: right; width: 5%;");
+		html += AccountingUtils.createLabelHtml(FinanceUtils.formatMoney(totalBeforeTax, Currency.EUR), textColor, tooltip, "text-align: right; width: 10%;");
+		html += AccountingUtils.createLabelHtml(FinanceUtils.formatMoney(totalTax, Currency.EUR), textColor, tooltip, "text-align: right; width: 10%;");
+		html += AccountingUtils.createLabelHtml(FinanceUtils.formatMoney(totalAfterTax, Currency.EUR), textColor, tooltip, "text-align: right; width: 10%;");
+
+		html += "</div>";
+
+		return html;
+	}
 
 	public static JPanel createTotalPanelOnGUI(int totalBeforeTax, int totalTax, int totalAfterTax) {
 
@@ -150,9 +172,116 @@ public class AccountingUtils {
 
 	public static String createTimeSpanTabHtml(TimeSpan timeSpan, Database database, String searchFor) {
 
-		// TODO
-
 		String html = "";
+
+		html += "<div class='secondaryTitle'>Outgoing Invoices - that is, we get paid:</div>";
+
+		int totalBeforeTax = 0;
+		int totalTax = 0;
+		int totalAfterTax = 0;
+
+		List<Outgoing> outgoings = timeSpan.getOutgoings();
+		for (Outgoing cur : outgoings) {
+			if (cur.matches(searchFor)) {
+				html += cur.createPanelHtml(database);
+				totalBeforeTax += cur.getPreTaxAmount();
+				totalAfterTax += cur.getPostTaxAmount();
+			}
+		}
+		totalTax = totalAfterTax - totalBeforeTax;
+
+		if ("".equals(searchFor)) {
+			if ((totalBeforeTax != timeSpan.getOutTotalBeforeTax()) ||
+				(totalTax != timeSpan.getOutTotalTax()) ||
+				(totalAfterTax != timeSpan.getOutTotalAfterTax())) {
+				// TODO - complain in HTML somehow
+				GuiUtils.complain("There was an outgoing calculation mixup! Something is wrong! Cats and dogs! Oh no!");
+			}
+		}
+
+		html += AccountingUtils.createTotalPanelHtml(totalBeforeTax, totalTax, totalAfterTax);
+
+
+		html += "<div class='secondaryTitle'>Incoming Invoices - that is, we have to pay:</div>";
+
+		totalBeforeTax = 0;
+		totalTax = 0;
+		totalAfterTax = 0;
+		List<Incoming> incomings = timeSpan.getIncomings();
+		for (Incoming cur : incomings) {
+			if (cur.matches(searchFor)) {
+				html += cur.createPanelHtml(database);
+				totalBeforeTax += cur.getPreTaxAmount();
+				totalAfterTax += cur.getPostTaxAmount();
+			}
+		}
+		totalTax = totalAfterTax - totalBeforeTax;
+
+		if ("".equals(searchFor)) {
+			if ((totalBeforeTax != timeSpan.getInTotalBeforeTax()) ||
+				(totalTax != timeSpan.getInTotalTax()) ||
+				(totalAfterTax != timeSpan.getInTotalAfterTax())) {
+				// TODO - complain in HTML somehow
+				GuiUtils.complain("There was an incoming calculation mixup! Something is wrong! Cats and dogs! Oh no!");
+			}
+		}
+
+		html += AccountingUtils.createTotalPanelHtml(totalBeforeTax, totalTax, totalAfterTax);
+
+
+		html += "<div class='secondaryTitle'>Donations - which we also pay:</div>";
+
+		totalBeforeTax = 0;
+		totalTax = 0;
+		totalAfterTax = 0;
+		List<Incoming> donations = timeSpan.getDonations();
+		for (Incoming cur : donations) {
+			if (cur.matches(searchFor)) {
+				html += cur.createPanelHtml(database);
+				totalBeforeTax += cur.getPreTaxAmount();
+				totalAfterTax += cur.getPostTaxAmount();
+			}
+		}
+		totalTax = totalAfterTax - totalBeforeTax;
+
+		if ("".equals(searchFor)) {
+			if ((totalBeforeTax != timeSpan.getDonTotalBeforeTax()) ||
+				(totalTax != timeSpan.getDonTotalTax()) ||
+				(totalAfterTax != timeSpan.getDonTotalAfterTax())) {
+				// TODO - complain in HTML somehow
+				GuiUtils.complain("There was a donations calculation mixup! Something is wrong! Cats and dogs! Oh no!");
+			}
+		}
+
+		html += AccountingUtils.createTotalPanelHtml(totalBeforeTax, totalTax, totalAfterTax);
+
+
+		html += "<div class='secondaryTitle'>Personal Expenses - which we also pay:</div>";
+
+		totalBeforeTax = 0;
+		totalTax = 0;
+		totalAfterTax = 0;
+		List<Incoming> personals = timeSpan.getPersonals();
+		for (Incoming cur : personals) {
+			if (cur.matches(searchFor)) {
+				html += cur.createPanelHtml(database);
+				totalBeforeTax += cur.getPreTaxAmount();
+				totalAfterTax += cur.getPostTaxAmount();
+			}
+		}
+		totalTax = totalAfterTax - totalBeforeTax;
+
+		if ("".equals(searchFor)) {
+			if ((totalBeforeTax != timeSpan.getPersTotalBeforeTax()) ||
+				(totalTax != timeSpan.getPersTotalTax()) ||
+				(totalAfterTax != timeSpan.getPersTotalAfterTax())) {
+				// TODO - complain in HTML somehow
+				GuiUtils.complain("There was a personals calculation mixup! Something is wrong! Cats and dogs! Oh no!");
+			}
+		}
+
+		html += AccountingUtils.createTotalPanelHtml(totalBeforeTax, totalTax, totalAfterTax);
+
 
 		return html;
 	}
@@ -416,6 +545,24 @@ public class AccountingUtils {
 		i++;
 
 		return i;
+	}
+
+	public static String createLabelHtml(String text, Color color, String tooltip, String style) {
+
+		String colStr = "#88AAFF";
+		if (color != null) {
+			ColorRGB col = new ColorRGB(color);
+			if (!"#000000".equals(col.toHexString())) {
+				colStr = col.toHexString();
+			}
+		}
+
+		String altStr = "";
+		if (tooltip != null) {
+			altStr = " alt='" + tooltip + "'";
+		}
+
+		return "<span style='color: " + colStr + "; " + style + "'" + altStr + ">" + text + "</span>";
 	}
 
 	public static CopyByClickLabel createLabel(String text, Color color, String tooltip) {
