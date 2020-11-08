@@ -232,7 +232,7 @@ public class AssAccountant {
 
 			System.out.println("Starting the server on port " + database.getPort() + "...");
 
-			Server server = new Server(webRoot, serverDir, database);
+			Server server = new Server(webRoot, serverDir, database, tabCtrl);
 
 			server.setWhitelist(whitelist);
 

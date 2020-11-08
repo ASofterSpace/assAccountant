@@ -5,6 +5,8 @@
 package com.asofterspace.accountant.web;
 
 import com.asofterspace.accountant.Database;
+import com.asofterspace.accountant.TabCtrl;
+import com.asofterspace.accountant.tabs.Tab;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.web.WebServer;
 import com.asofterspace.toolbox.web.WebServerRequestHandler;
@@ -18,18 +20,31 @@ public class Server extends WebServer {
 
 	private Directory serverDir;
 
+	private TabCtrl tabCtrl;
 
-	public Server(Directory webRoot, Directory serverDir, Database db) {
+	private Tab currentlyOpenedTab;
+
+
+	public Server(Directory webRoot, Directory serverDir, Database db, TabCtrl tabCtrl) {
 
 		super(webRoot, db.getPort());
 
 		this.db = db;
 
+		this.tabCtrl = tabCtrl;
+
 		this.serverDir = serverDir;
 	}
 
 	protected WebServerRequestHandler getHandler(Socket request) {
-		return new ServerRequestHandler(this, request, webRoot, serverDir, db);
+		return new ServerRequestHandler(this, request, webRoot, serverDir, db, tabCtrl);
+	}
+
+	public Tab getCurrentlyOpenedTab() {
+		if (currentlyOpenedTab == null) {
+			currentlyOpenedTab = tabCtrl.getOverviewTab();
+		}
+		return currentlyOpenedTab;
 	}
 
 }

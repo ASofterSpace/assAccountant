@@ -5,6 +5,9 @@
 package com.asofterspace.accountant.web;
 
 import com.asofterspace.accountant.Database;
+import com.asofterspace.accountant.TabCtrl;
+import com.asofterspace.accountant.tabs.BankStatementYearTab;
+import com.asofterspace.accountant.tabs.Tab;
 import com.asofterspace.accountant.tasks.Task;
 import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.io.Directory;
@@ -31,13 +34,21 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 	private Directory serverDir;
 
+	private TabCtrl tabCtrl;
 
-	public ServerRequestHandler(WebServer server, Socket request, Directory webRoot, Directory serverDir,
-		Database db) {
+	private Server accServer;
+
+
+	public ServerRequestHandler(Server server, Socket request, Directory webRoot, Directory serverDir,
+		Database db, TabCtrl tabCtrl) {
 
 		super(server, request, webRoot);
 
+		this.accServer = server;
+
 		this.database = db;
+
+		this.tabCtrl = tabCtrl;
 
 		this.serverDir = serverDir;
 	}
@@ -151,6 +162,25 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				}
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS]]", taskHtml);
+
+				String tabsHtml = "<div id='tabList'>";
+
+				List<Tab> tabs = tabCtrl.getTabs();
+
+				for (Tab tab : tabs) {
+					if (tab.equals(accServer.getCurrentlyOpenedTab())) {
+						tabsHtml += "<div class='selectedTab'>&nbsp;" + tab.toString() + "</div>";
+					} else {
+						tabsHtml += "<div>&nbsp;" + tab.toString() + "</div>";
+					}
+					if (tab instanceof BankStatementYearTab) {
+						tabsHtml += "<div>&nbsp;</div>";
+					}
+				}
+
+				tabsHtml += "</div>";
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[TABS]]", tabsHtml);
 
 				locEquiv = "_" + locEquiv;
 				TextFile indexFile = new TextFile(webRoot, locEquiv);

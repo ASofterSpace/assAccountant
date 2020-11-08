@@ -11,12 +11,29 @@ body > div {
 	color: #88AAFF;
 }
 
-img.avatar {
+img.avatar, div#tabList {
 	position: absolute;
 	left: 10pt;
-	top: 10pt;
 	width: 200pt;
+}
+
+img.avatar {
+	top: 10pt;
 	border-radius: 20pt;
+}
+
+div#tabList {
+	overflow-y: scroll;
+	overflow-x: hidden;
+}
+
+div#tabList > div {
+	margin-right: 8pt;
+}
+
+div.selectedTab {
+	background: rgba(255, 0, 255, 0.25);
+	border-radius: 6pt;
 }
 
 a.sidebar, div.projectbar {

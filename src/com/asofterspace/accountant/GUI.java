@@ -11,7 +11,6 @@ import com.asofterspace.accountant.tabs.BankStatementYearTab;
 import com.asofterspace.accountant.tabs.MonthTab;
 import com.asofterspace.accountant.tabs.Tab;
 import com.asofterspace.accountant.tabs.TimeSpanTab;
-import com.asofterspace.accountant.tabs.YearTab;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.TimeSpan;
 import com.asofterspace.accountant.timespans.Year;
@@ -565,7 +564,7 @@ public class GUI extends MainWindow {
 
 		tabs = tabCtrl.getTabs();
 
-		ArrayList<String> strTabList = new ArrayList<>();
+		List<String> strTabList = new ArrayList<>();
 
 		for (Tab tab : tabs) {
 			if (tab.equals(currentlyOpenedTab)) {
