@@ -31,9 +31,13 @@ public class YearTab extends TimeSpanTab {
 	@Override
 	public String getHtmlGUI(Database database, String searchFor) {
 
-		// TODO - everything
-
 		String html = "<div class='mainTitle'>" + year.toString() + " (yearly overview)</div>";
+
+		html += AccountingUtils.createTimeSpanTabHtml(year, database, searchFor);
+
+		if ("".equals(searchFor)) {
+			html += AccountingUtils.createOverviewAndTaxInfoHtml(year);
+		}
 
 		return html;
 	}

@@ -33,9 +33,13 @@ public class MonthTab extends TimeSpanTab {
 	@Override
 	public String getHtmlGUI(Database database, String searchFor) {
 
-		// TODO - everything
-
 		String html = "<div class='mainTitle'>" + month.toString() + "</div>";
+
+		html += AccountingUtils.createTimeSpanTabHtml(month, database, searchFor);
+
+		if ("".equals(searchFor)) {
+			html += AccountingUtils.createOverviewAndTaxInfoHtml(month);
+		}
 
 		return html;
 	}

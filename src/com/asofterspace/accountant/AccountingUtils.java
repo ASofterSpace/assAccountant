@@ -148,6 +148,15 @@ public class AccountingUtils {
 		return curPanel;
 	}
 
+	public static String createTimeSpanTabHtml(TimeSpan timeSpan, Database database, String searchFor) {
+
+		// TODO
+
+		String html = "";
+
+		return html;
+	}
+
 	public static int createTimeSpanTabMainContent(TimeSpan timeSpan, JPanel tab, int i, Database database, String searchFor) {
 
 		CopyByClickLabel outgoingLabel = AccountingUtils.createSubHeadLabel("Outgoing Invoices - that is, we get paid:");
@@ -280,6 +289,15 @@ public class AccountingUtils {
 		i++;
 
 		return i;
+	}
+
+	public static String createOverviewAndTaxInfoHtml(TimeSpan timeSpan) {
+
+		// TODO
+
+		String html = "";
+
+		return html;
 	}
 
 	public static int createOverviewAndTaxInfo(TimeSpan timeSpan, JPanel tab, int i) {

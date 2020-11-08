@@ -183,7 +183,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TABS]]", tabsHtml);
 
-				String searchFor = null;
+				// TODO - enable actually searching for things
+				String searchFor = "";
+
 				String mainContent = currentlySelectedTab.getHtmlGUI(database, searchFor);
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[CONTENT]]", mainContent);
