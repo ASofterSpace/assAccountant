@@ -40,6 +40,36 @@ public class OverviewTab extends Tab {
 	}
 
 	@Override
+	public String getHtmlGUI(Database database, String searchFor) {
+
+		String taskHtml = "";
+
+		List<GenericTask> tasks = database.getTaskCtrl().getTaskInstances();
+
+		for (GenericTask task : tasks) {
+			if (!task.hasBeenDone()) {
+				if (task instanceof Task) {
+					taskHtml += "<div>" + task.getReleasedDateStr() + " " + task.getTitle() + "</div>";
+				}
+			}
+		}
+
+		if ("".equals(taskHtml)) {
+			taskHtml = "<div>Nothing to be done, have a chill day!</div>";
+		} else {
+			taskHtml = "<div><div>Well, fuck, there is stuff to do:</div>" + taskHtml + "</div>";
+		}
+
+		// TODO - add unpaid invoices
+
+		// TODO - add consistency check results
+
+		taskHtml = "<div>Hej " + database.getUsername() + "! :)</div>" + taskHtml;
+
+		return taskHtml;
+	}
+
+	@Override
 	public void createTabOnGUI(final JPanel parentPanel, final Database database, String searchFor) {
 
 		if (tab != null) {

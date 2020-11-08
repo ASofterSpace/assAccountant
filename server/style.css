@@ -32,11 +32,20 @@ div#tabList > div, div#tabList > a {
 	display: block;
 	text-decoration: none;
 	color: #88AAFF;
+	border-radius: 6pt;
 }
 
-a.selectedTab {
+div.mainTitle {
+	font-size: 200%;
+	text-align: center;
+}
+
+div#tabList > a:hover {
+	background: rgba(255, 0, 255, 0.1);
+}
+
+div#tabList > a.selectedTab {
 	background: rgba(255, 0, 255, 0.25);
-	border-radius: 6pt;
 }
 
 a.sidebar, div.projectbar {

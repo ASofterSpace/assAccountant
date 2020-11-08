@@ -15,5 +15,7 @@ public abstract class Tab {
 
 	public abstract void destroyTabOnGUI(JPanel parentPanel);
 
+	public abstract String getHtmlGUI(Database database, String searchFor);
+
 	public abstract int compareTo(Tab tab);
 }

@@ -36,6 +36,14 @@ public class FinanceLogTab extends Tab {
 	}
 
 	@Override
+	public String getHtmlGUI(Database database, String searchFor) {
+
+		// TODO - everything
+
+		return "";
+	}
+
+	@Override
 	public void createTabOnGUI(final JPanel parentPanel, final Database database, String searchFor) {
 
 		if (tab != null) {

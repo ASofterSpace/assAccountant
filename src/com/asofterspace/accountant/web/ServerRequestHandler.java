@@ -11,8 +11,6 @@ import com.asofterspace.accountant.tabs.BankStatementYearTab;
 import com.asofterspace.accountant.tabs.MonthTab;
 import com.asofterspace.accountant.tabs.Tab;
 import com.asofterspace.accountant.tabs.YearTab;
-import com.asofterspace.accountant.tasks.Task;
-import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.JSON;
@@ -185,30 +183,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TABS]]", tabsHtml);
 
-				if ("overview".equals(tabKind)) {
+				String searchFor = null;
+				String mainContent = currentlySelectedTab.getHtmlGUI(database, searchFor);
 
-					String taskHtml = "";
-
-					List<GenericTask> tasks = database.getTaskCtrl().getTaskInstances();
-
-					for (GenericTask task : tasks) {
-						if (!task.hasBeenDone()) {
-							if (task instanceof Task) {
-								taskHtml += "<div>" + task.getReleasedDateStr() + " " + task.getTitle() + "</div>";
-							}
-						}
-					}
-
-					if ("".equals(taskHtml)) {
-						taskHtml = "<div>Nothing to be done, have a chill day!</div>";
-					} else {
-						taskHtml = "<div><div>Well, fuck, there is stuff to do:</div>" + taskHtml + "</div>";
-					}
-
-					taskHtml = "<div>Hej " + database.getUsername() + "! :)</div>" + taskHtml;
-
-					indexContent = StrUtils.replaceAll(indexContent, "[[CONTENT]]", taskHtml);
-				}
+				indexContent = StrUtils.replaceAll(indexContent, "[[CONTENT]]", mainContent);
 
 				locEquiv = "_" + locEquiv;
 				if (!locEquiv.endsWith(".htm")) {

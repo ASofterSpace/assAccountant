@@ -31,6 +31,16 @@ public class MonthTab extends TimeSpanTab {
 	}
 
 	@Override
+	public String getHtmlGUI(Database database, String searchFor) {
+
+		// TODO - everything
+
+		String html = "<div class='mainTitle'>" + month.toString() + "</div>";
+
+		return html;
+	}
+
+	@Override
 	public void createTabOnGUI(JPanel parentPanel, Database database, String searchFor) {
 
 		if (tab != null) {
