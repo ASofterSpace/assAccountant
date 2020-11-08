@@ -27,11 +27,14 @@ div#tabList {
 	overflow-x: hidden;
 }
 
-div#tabList > div {
+div#tabList > div, div#tabList > a {
 	margin-right: 8pt;
+	display: block;
+	text-decoration: none;
+	color: #88AAFF;
 }
 
-div.selectedTab {
+a.selectedTab {
 	background: rgba(255, 0, 255, 0.25);
 	border-radius: 6pt;
 }

@@ -22,8 +22,6 @@ public class Server extends WebServer {
 
 	private TabCtrl tabCtrl;
 
-	private Tab currentlyOpenedTab;
-
 
 	public Server(Directory webRoot, Directory serverDir, Database db, TabCtrl tabCtrl) {
 
@@ -38,13 +36,6 @@ public class Server extends WebServer {
 
 	protected WebServerRequestHandler getHandler(Socket request) {
 		return new ServerRequestHandler(this, request, webRoot, serverDir, db, tabCtrl);
-	}
-
-	public Tab getCurrentlyOpenedTab() {
-		if (currentlyOpenedTab == null) {
-			currentlyOpenedTab = tabCtrl.getOverviewTab();
-		}
-		return currentlyOpenedTab;
 	}
 
 }

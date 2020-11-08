@@ -28,7 +28,7 @@ window.accountant = {
 			// if we could not fully resize now, then let's do it later...
 			window.setTimeout(function() {
 				window.accountant.onResize();
-			}, 1000);
+			}, 100);
 		}
 	},
 

@@ -6,8 +6,11 @@ package com.asofterspace.accountant.web;
 
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.TabCtrl;
+import com.asofterspace.accountant.tabs.BankStatementTab;
 import com.asofterspace.accountant.tabs.BankStatementYearTab;
+import com.asofterspace.accountant.tabs.MonthTab;
 import com.asofterspace.accountant.tabs.Tab;
+import com.asofterspace.accountant.tabs.YearTab;
 import com.asofterspace.accountant.tasks.Task;
 import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.io.Directory;
@@ -104,6 +107,20 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 	}
 
 	@Override
+	protected String getWhitelistedLocationEquivalent(String location) {
+
+		String result = super.getWhitelistedLocationEquivalent(location);
+
+		if (result == null) {
+			if (locationToTabKind(location) != null) {
+				return location;
+			}
+		}
+
+		return result;
+	}
+
+	@Override
 	protected File getFileFromLocation(String location, String[] arguments) {
 
 		// get project logo files from assWorkbench
@@ -134,45 +151,31 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				}
 			}
 
-			// answering a request for general information
-			if (locEquiv.equals("index.htm")) {
+			// answering a request for general information?
+			String tabKind = locationToTabKind(locEquiv);
 
-				System.out.println("Answering index request...");
+			if (tabKind != null) {
 
-				TextFile indexBaseFile = new TextFile(webRoot, locEquiv);
+				System.out.println("Answering " + tabKind + " request...");
+
+				TextFile indexBaseFile = new TextFile(webRoot, "index.htm");
 				String indexContent = indexBaseFile.getContent();
-
-				indexContent = StrUtils.replaceAll(indexContent, "[[USERNAME]]", database.getUsername());
-
-				List<GenericTask> tasks = database.getTaskCtrl().getTaskInstances();
-				String taskHtml = "";
-
-				for (GenericTask task : tasks) {
-					if (!task.hasBeenDone()) {
-						if (task instanceof Task) {
-							taskHtml += "<div>" + task.getReleasedDateStr() + " " + task.getTitle() + "</div>";
-						}
-					}
-				}
-
-				if ("".equals(taskHtml)) {
-					taskHtml = "<div>Nothing to be done, have a chill day!</div>";
-				} else {
-					taskHtml = "<div><div>Well, fuck, there is stuff to do:</div>" + taskHtml + "</div>";
-				}
-
-				indexContent = StrUtils.replaceAll(indexContent, "[[TASKS]]", taskHtml);
 
 				String tabsHtml = "<div id='tabList'>";
 
 				List<Tab> tabs = tabCtrl.getTabs();
 
+				Tab currentlySelectedTab = tabCtrl.getOverviewTab();
+
 				for (Tab tab : tabs) {
-					if (tab.equals(accServer.getCurrentlyOpenedTab())) {
-						tabsHtml += "<div class='selectedTab'>&nbsp;" + tab.toString() + "</div>";
-					} else {
-						tabsHtml += "<div>&nbsp;" + tab.toString() + "</div>";
+					tabsHtml += "<a href='";
+					tabsHtml += tabToLink(tab);
+					tabsHtml += "'";
+					if (tabKind.equals(tabToLink(tab))) {
+						currentlySelectedTab = tab;
+						tabsHtml += " class='selectedTab'";
 					}
+					tabsHtml += ">&nbsp;" + tab.toString() + "</a>";
 					if (tab instanceof BankStatementYearTab) {
 						tabsHtml += "<div>&nbsp;</div>";
 					}
@@ -182,7 +185,35 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TABS]]", tabsHtml);
 
+				if ("overview".equals(tabKind)) {
+
+					String taskHtml = "";
+
+					List<GenericTask> tasks = database.getTaskCtrl().getTaskInstances();
+
+					for (GenericTask task : tasks) {
+						if (!task.hasBeenDone()) {
+							if (task instanceof Task) {
+								taskHtml += "<div>" + task.getReleasedDateStr() + " " + task.getTitle() + "</div>";
+							}
+						}
+					}
+
+					if ("".equals(taskHtml)) {
+						taskHtml = "<div>Nothing to be done, have a chill day!</div>";
+					} else {
+						taskHtml = "<div><div>Well, fuck, there is stuff to do:</div>" + taskHtml + "</div>";
+					}
+
+					taskHtml = "<div>Hej " + database.getUsername() + "! :)</div>" + taskHtml;
+
+					indexContent = StrUtils.replaceAll(indexContent, "[[CONTENT]]", taskHtml);
+				}
+
 				locEquiv = "_" + locEquiv;
+				if (!locEquiv.endsWith(".htm")) {
+					locEquiv = locEquiv + ".htm";
+				}
 				TextFile indexFile = new TextFile(webRoot, locEquiv);
 				indexFile.saveContent(indexContent);
 			}
@@ -195,4 +226,43 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		// - even if it exists on the server!
 		return null;
 	}
+
+	private static String locationToTabKind(String locEquiv) {
+
+		if (locEquiv.startsWith("/")) {
+			locEquiv = locEquiv.substring(1);
+		}
+
+		if ("index.htm".equals(locEquiv) || "index".equals(locEquiv) || "overview".equals(locEquiv)) {
+			return "overview";
+		}
+
+		if ("task_log".equals(locEquiv) ||
+			"finance_log".equals(locEquiv) ||
+			"bank_statements".equals(locEquiv) ||
+			locEquiv.startsWith("year_") ||
+			locEquiv.startsWith("month_") ||
+			locEquiv.startsWith("bs_year_")) {
+			return locEquiv;
+		}
+
+		return null;
+	}
+
+	private static String tabToLink(Tab tab) {
+		String result = tab.toString().toLowerCase();
+		result = StrUtils.replaceAll(result, ":", "");
+		result = StrUtils.replaceAll(result, " ", "_");
+		if ((tab instanceof BankStatementYearTab) && !(tab instanceof BankStatementTab)) {
+			result = "bs_year_" + result;
+		}
+		if (tab instanceof YearTab) {
+			result = "year_" + result;
+		}
+		if (tab instanceof MonthTab) {
+			result = "month_" + result;
+		}
+		return result;
+	}
+
 }
