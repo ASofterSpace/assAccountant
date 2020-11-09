@@ -22,9 +22,10 @@ img.avatar {
 	border-radius: 20pt;
 }
 
-div#tabList {
+div#tabList, div#mainContent {
 	overflow-y: scroll;
 	overflow-x: hidden;
+	scrollbar-color: #402 #102;
 }
 
 div#tabList > div, div#tabList > a {
@@ -33,11 +34,6 @@ div#tabList > div, div#tabList > a {
 	text-decoration: none;
 	color: #88AAFF;
 	border-radius: 6pt;
-}
-
-div#mainContent {
-	overflow-x: hidden;
-	overflow-y: scroll;
 }
 
 div.mainTitle {
