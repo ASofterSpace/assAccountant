@@ -549,11 +549,16 @@ public class AccountingUtils {
 
 	public static String createLabelHtml(String text, Color color, String tooltip, String style) {
 
+		// default color
 		String colStr = "#88AAFF";
 		if (color != null) {
 			ColorRGB col = new ColorRGB(color);
 			if (!"#000000".equals(col.toHexString())) {
 				colStr = col.toHexString();
+			}
+			// all is awesome color
+			if ("#009C00".equals(colStr)) {
+				colStr = "#20CC00";
 			}
 			// warning color
 			if ("#949400".equals(colStr)) {
