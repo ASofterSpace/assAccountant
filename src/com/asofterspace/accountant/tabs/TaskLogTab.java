@@ -13,7 +13,6 @@ import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.util.List;
 
@@ -33,9 +32,43 @@ public class TaskLogTab extends Tab {
 	@Override
 	public String getHtmlGUI(Database database, String searchFor) {
 
-		// TODO - everything
+		String html = "<div class='mainTitle'>" + TITLE + "</div>";
 
-		String html = "";
+		Color textColor = new Color(0, 0, 0);
+
+
+		List<GenericTask> tasks = database.getTaskCtrl().getTaskInstances();
+
+		boolean tasksShown = false;
+		for (GenericTask task : tasks) {
+			if (task.hasBeenDone() && task.matches(searchFor)) {
+				tasksShown = true;
+				break;
+			}
+		}
+
+		if (tasksShown) {
+			html += "<div class='line'>";
+			html += AccountingUtils.createLabelHtml("Scheduled:", textColor, "", "text-align: left; width: 8%;");
+			html += AccountingUtils.createLabelHtml("Done:", textColor, "", "text-align: left; width: 8%;");
+			html += AccountingUtils.createLabelHtml("Title:", textColor, "", "text-align: left; width: 42%;");
+			html += "</div>";
+		}
+
+		for (GenericTask task : tasks) {
+			if (task.hasBeenDone() && task.matches(searchFor)) {
+				if (task instanceof Task) {
+					html += ((Task) task).createPanelInHtml(database);
+				} else {
+					System.out.println("Expected a task but got " + task + "!");
+				}
+			}
+		}
+
+		// for-else:
+		if (!tasksShown) {
+			html += "<div>No previously performed tasks have been found in the log!</div>";
+		}
 
 		html += "<div class='footer'>&nbsp;</div>";
 
@@ -50,8 +83,6 @@ public class TaskLogTab extends Tab {
 		}
 
 		int i = 0;
-
-		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
 
 		tab = new JPanel();
 		tab.setBackground(GUI.getBackgroundColor());

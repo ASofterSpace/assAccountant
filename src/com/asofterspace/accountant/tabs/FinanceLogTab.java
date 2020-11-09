@@ -40,8 +40,6 @@ public class FinanceLogTab extends Tab {
 	@Override
 	public String getHtmlGUI(Database database, String searchFor) {
 
-		// TODO - everything
-
 		String html = "<div class='mainTitle'>" + TITLE + "</div>";
 
 
