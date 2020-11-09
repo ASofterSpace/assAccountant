@@ -549,6 +549,15 @@ public class AccountingUtils {
 
 	public static String createLabelHtml(String text, Color color, String tooltip, String style) {
 
+		if (text == null) {
+			text = "";
+		}
+
+		// we need a tiny bit more space in the columns, so let's print € instead of EUR everywhere!
+		if (text.endsWith(" EUR")) {
+			text = text.substring(0, text.length() - 4) + " €";
+		}
+
 		// default color
 		String colStr = "#88AAFF";
 		if (color != null) {
