@@ -555,6 +555,14 @@ public class AccountingUtils {
 			if (!"#000000".equals(col.toHexString())) {
 				colStr = col.toHexString();
 			}
+			// warning color
+			if ("#949400".equals(colStr)) {
+				colStr = "#D4B430";
+			}
+			// error color
+			if ("#C40000".equals(colStr)) {
+				colStr = "#FF4020";
+			}
 		}
 
 		String altStr = "";
