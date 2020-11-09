@@ -115,6 +115,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				location = location.substring(1);
 			}
 
+			if ("bank_statement_graph.png".equals(location)) {
+				return "bank_statement_graph.png";
+			}
+
 			if ("finance_log_graph.png".equals(location)) {
 				return "finance_log_graph.png";
 			}

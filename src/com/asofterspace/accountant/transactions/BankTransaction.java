@@ -18,6 +18,7 @@ import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
+import com.asofterspace.toolbox.utils.StrUtils;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -104,6 +105,45 @@ public class BankTransaction {
 
 	public Date getDate() {
 		return date;
+	}
+
+	public String createPanelInHtml(Database database) {
+
+		String html = "";
+
+		Color textColor = new Color(0, 0, 0);
+
+		html += "<div class='line'>";
+
+		html += AccountingUtils.createLabelHtml(DateUtils.serializeDate(getDate()), textColor, "", "text-align: left; width: 10%;");
+		html += AccountingUtils.createLabelHtml(StrUtils.replaceAll(getTitle(), "\n", "<br>"), textColor, "", "text-align: left; width: 70%;");
+		html += AccountingUtils.createLabelHtml(FinanceUtils.formatMoney(getAmount(), Currency.EUR), textColor, "", "text-align: right; width: 10%;");
+
+		// TODO - add working buttons
+		/*
+		JButton curButton = new JButton("Prepare Entry");
+		curButton.addMouseListener(rowHighlighter);
+		curButton.setMinimumSize(defaultDimension);
+		curButton.setPreferredSize(defaultDimension);
+		curCurPanel.add(curButton, new Arrangement(4, 0, 0.1, 0.0));
+		curButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				Entry fakeEntry = null;
+				if (amount > 0) {
+					fakeEntry = new Outgoing(null, Currency.EUR, 19, amount, getDate(), getTitle(), "", "", null);
+				} else {
+					fakeEntry = new Incoming(null, Currency.EUR, 19, -amount, getDate(), getTitle(), "", null, null);
+				}
+				AddEntryGUI addEntryGUI = new AddEntryGUI(database.getGUI(), database, fakeEntry);
+				addEntryGUI.show();
+			}
+		});
+		*/
+
+		html += "</div>";
+
+		return html;
 	}
 
 	public JPanel createPanelOnGUI(Database database) {

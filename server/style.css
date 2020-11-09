@@ -58,6 +58,7 @@ div.line > span {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+	vertical-align: top;
 }
 
 div#tabList > a:hover {

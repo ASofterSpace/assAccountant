@@ -5,6 +5,7 @@
 package com.asofterspace.accountant.tabs;
 
 import com.asofterspace.accountant.AccountingUtils;
+import com.asofterspace.accountant.AssAccountant;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.tasks.Task;
@@ -17,6 +18,7 @@ import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.guiImages.ImagePanel;
 import com.asofterspace.toolbox.images.ColorRGB;
+import com.asofterspace.toolbox.images.DefaultImageFile;
 import com.asofterspace.toolbox.images.GraphImage;
 import com.asofterspace.toolbox.images.GraphTimeDataPoint;
 
@@ -51,9 +53,71 @@ public class BankStatementYearTab extends Tab {
 	@Override
 	public String getHtmlGUI(Database database, String searchFor) {
 
-		// TODO - everything
+		String html = "<div class='mainTitle'>" + title + "</div>";
 
-		String html = "";
+		Color textColor = new Color(0, 0, 0);
+
+
+		List<GraphTimeDataPoint> timeData = new ArrayList<>();
+
+		GraphImage graph = new GraphImage(1000, 600);
+		graph.setForegroundColor(new ColorRGB(120, 40, 220));
+		graph.setBackgroundColor(new ColorRGB(0, 0, 0, 255));
+		graph.setDataColor(new ColorRGB(160, 80, 255));
+		graph.setBaseYmin(0.0);
+
+		html += "<div><img src='bank_statement_graph.png' /></div>";
+
+
+		List<BankAccount> accounts = database.getBankAccounts();
+
+		for (BankAccount account : accounts) {
+			html += "<div>";
+			html += "<div class='secondaryTitle'>" + account.getBank() + ", IBAN: " + account.getIban() + ", BIC: " + account.getBic() + "</div>";
+
+			List<BankTransaction> transactions = account.getTransactions();
+			boolean foundSome = false;
+			int total = 0;
+			for (BankTransaction transaction : transactions) {
+				if (transaction.belongsTo(year) && transaction.matches(searchFor)) {
+					foundSome = true;
+					total += transaction.getAmount();
+					timeData.add(new GraphTimeDataPoint(transaction.getDate(), transaction.getAmount()));
+					html += transaction.createPanelInHtml(database);
+				}
+			}
+			if (foundSome) {
+				html += "<div class='line'>";
+
+				html += AccountingUtils.createLabelHtml("Total, assuming +/- 0 at the top:", textColor, "", "text-align: right; width: 80%;");
+				html += AccountingUtils.createLabelHtml(FinanceUtils.formatMoney(total, Currency.EUR), textColor, "", "text-align: right; width: 10%;");
+
+				html += "</div>";
+
+			} else {
+				// for-else:
+				html += "<div>For this account, no bank statements have been found!</div>";
+			}
+
+			html += "</div>";
+		}
+		// for-else:
+		if (accounts.size() < 1) {
+			html += "<div>No bank statements have been found!</div>";
+		}
+
+
+		graph.setIncludeTodayInTimeData(year == null);
+		graph.setRelativeTimeDataPoints(timeData);
+
+		double graphMin = graph.getMinimumValue();
+		if (graphMin < 0) {
+			graph.shiftValues(-graphMin);
+		}
+
+		DefaultImageFile graphFile = new DefaultImageFile(AssAccountant.getWebRoot(), "bank_statement_graph.png");
+		graphFile.assign(graph);
+		graphFile.saveTransparently();
 
 		html += "<div class='footer'>&nbsp;</div>";
 
@@ -176,7 +240,7 @@ public class BankStatementYearTab extends Tab {
 		}
 
 
-		graph.setIncludeTodayInTimeData(true);
+		graph.setIncludeTodayInTimeData(year == null);
 		graph.setRelativeTimeDataPoints(timeData);
 
 		double graphMin = graph.getMinimumValue();
