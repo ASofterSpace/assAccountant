@@ -513,6 +513,231 @@ public class Task extends GenericTask {
 		return detail;
 	}
 
+	public String createPanelInHtml(Database database) {
+
+		this.database = database;
+
+		String html = "";
+
+		// TODO - figure out how to do this with html
+		/*
+		// if we can save last user input, that means that this task has already been shown before,
+		// and we can still get the user input from the previously shown GUI parts before showing
+		// the next ones!
+		saveLastUserInput();
+		*/
+
+		textColor = new Color(0, 0, 0);
+
+		html += AccountingUtils.createLabelHtml(getReleasedDateStr(), textColor, "", "text-align: left; width: 8%;");
+
+		int titleWidth = 50;
+		if (done && (doneDate != null)) {
+			html += AccountingUtils.createLabelHtml(DateUtils.serializeDate(getDoneDate()), textColor, "", "text-align: left; width: 8%;");
+			titleWidth = 42;
+		}
+
+		html += AccountingUtils.createLabelHtml(title, textColor, "", "text-align: left; width: " + titleWidth + "%;");
+
+		// TODO add working buttons
+		/*
+		addedLines = new ArrayList<>();
+		detailsButton = new JButton("Show Details");
+		detailsButton.addMouseListener(rowHighlighter);
+		if ((details == null) || (details.size() < 1)) {
+			detailsButton.setText("Add Details");
+			// actually keep the details button enabled in case the user wants to add a log
+			// detailsButton.setEnabled(false);
+		}
+		if (done) {
+			detailsButton.setText("Show Details");
+		}
+		detailsButton.setPreferredSize(defaultDimension);
+		curPanel.add(detailsButton, new Arrangement(h, 0, 0.1, 1.0));
+		h++;
+
+		taskLog = new JTextPane();
+		// if the task is already done...
+		if (doneLog != null) {
+			// ... set the saved task log text!
+			taskLog.setText(doneLog);
+		} else {
+			// if it is not yet done, but we have a "last" text...
+			if ((lastTaskLogText != null) && !("".equals(lastTaskLogText))) {
+				// ... show this one!
+				taskLog.setText(lastTaskLogText);
+			}
+		}
+		int newHeight = taskLog.getPreferredSize().height + 48;
+		if (newHeight < 128) {
+			newHeight = 128;
+		}
+		taskLog.setPreferredSize(new Dimension(128, newHeight));
+
+		finLog = new JTextPane();
+		if (Task.this instanceof FinanceOverviewTask) {
+			// if this was done before, load the finance log contents as filled in back then
+			if (done && (doneDate != null)) {
+				StringBuilder finLogText = new StringBuilder();
+				List<FinanceLogEntry> entries = taskCtrl.getFinanceLogs();
+				for (FinanceLogEntry entry : entries) {
+					if (DateUtils.isSameDay(entry.getDate(), doneDate)) {
+						for (FinanceLogEntryRow row : entry.getRows()) {
+							finLogText.append(row.getAccount());
+							finLogText.append(": ");
+							finLogText.append(FinanceUtils.formatMoney(row.getAmount(), Currency.EUR));
+							finLogText.append("\n");
+						}
+					}
+				}
+				finLogText.append("\n\nCopy this to an external editor, modify it there, and copy it back in here (without this line) just before you click on [Done]!");
+				finLog.setText(finLogText.toString());
+			}
+			// if this has not been done before, ...
+			if (!done) {
+				// ... but has been shown and filled with data before...
+				if ((lastFinLogText != null) && !("".equals(lastFinLogText))) {
+					// ... keep showing the data that the user previously entered!
+					finLog.setText(lastFinLogText);
+				} else {
+					// ... or load the latest finance log keys, but do not assign values, to get a "fresh" finLog!
+					List<FinanceLogEntry> entries = taskCtrl.getFinanceLogs();
+					if (entries.size() > 0) {
+						StringBuilder finLogText = new StringBuilder();
+						FinanceLogEntry entry = entries.get(0);
+						for (FinanceLogEntryRow row : entry.getRows()) {
+							finLogText.append(row.getAccount());
+							finLogText.append(": ");
+							finLogText.append("\n");
+						}
+						finLog.setText(finLogText.toString());
+					}
+				}
+			}
+		}
+		newHeight = finLog.getPreferredSize().height + 48;
+		if (newHeight < 128) {
+			newHeight = 128;
+		}
+		finLog.setPreferredSize(new Dimension(128, newHeight));
+
+		detailsButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (!detailsButton.getText().startsWith("Hide")) {
+					showDetails();
+				} else {
+					hideDetails();
+				}
+			}
+		});
+
+		JButton curButton = new JButton("Done");
+		curButton.addMouseListener(rowHighlighter);
+		if (done) {
+			curButton.setText("Save");
+		}
+		curButton.setPreferredSize(defaultDimension);
+		curPanel.add(curButton, new Arrangement(h, 0, 0.05, 1.0));
+		h++;
+		curButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (Task.this.done) {
+					if (Task.this instanceof FinanceOverviewTask) {
+						taskCtrl.removeFinanceLogForDate(doneDate);
+					}
+					setDoneLog(taskLog.getText());
+				} else {
+					Task.this.done = true;
+					setDoneDate(new Date());
+					String detailsForUser = getDetailsToShowToUser(database);
+					if (detailsForUser == null) {
+						setDoneLog(taskLog.getText());
+					} else {
+						StringBuilder originalDetails = new StringBuilder();
+						originalDetails.append(taskLog.getText());
+						originalDetails.append("\n\n");
+						originalDetails.append("Original Details:");
+						originalDetails.append("\n");
+						originalDetails.append(detailsForUser);
+						setDoneLog(originalDetails.toString());
+					}
+				}
+
+				if (Task.this instanceof FinanceOverviewTask) {
+					FinanceLogEntry entry = new FinanceLogEntry(doneDate);
+					String[] finLogLines = finLog.getText().split("\n");
+					boolean wroteARow = false;
+					for (String line : finLogLines) {
+						line = line.trim();
+						if ("".equals(line)) {
+							continue;
+						}
+						String[] lineSplit = line.split(":");
+						if (lineSplit.length > 1) {
+							Integer amount = FinanceUtils.parseMoney(lineSplit[1]);
+							entry.add(new FinanceLogEntryRow(lineSplit[0], amount));
+							wroteARow = true;
+							if (lineSplit.length > 2) {
+								GuiUtils.complain("The line '" + line + "' contained more than one : sign!\n" +
+									"It was parsed as " + lineSplit[0] + ": " + FinanceUtils.formatMoney(amount,
+									Currency.EUR));
+							}
+						}
+						if (lineSplit.length < 2) {
+							GuiUtils.complain("The line '" + line + "' contained no : sign!\n" +
+								"It was ignored.");
+						}
+					}
+					if (!wroteARow) {
+						GuiUtils.complain("It looks like the Finance Log section was not filled!\n" +
+							"You can edit the Finance Log section in the task's details on the Task Log tab.");
+					}
+					taskCtrl.addFinanceLogEntry(entry);
+				}
+
+				if (Task.this.onDone != null) {
+					for (String onDoneStr : Task.this.onDone) {
+						if (onDoneStr == null) {
+							continue;
+						}
+						switch (onDoneStr) {
+							case "setVatPrepaymentsPaidForPrevMonth":
+								Month prevMonth = database.getPrevMonthFromEntryDate(getReleaseDate());
+								prevMonth.setVatPrepaymentsPaidTotal(prevMonth.getRemainingVatPayments());
+								break;
+							default:
+								GuiUtils.complain("After finishing this task, the on-done-hook " + onDoneStr +
+									" should be executed... but I do not know what this one means!");
+								break;
+						}
+					}
+				}
+
+				taskCtrl.save();
+			}
+		});
+
+		curButton = new JButton("Delete");
+		curButton.addMouseListener(rowHighlighter);
+		curButton.setPreferredSize(defaultDimension);
+		curPanel.add(curButton, new Arrangement(h, 0, 0.06, 1.0));
+		h++;
+		curButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (GuiUtils.confirmDelete("task '" + getTitle() + "'")) {
+					taskCtrl.deleteTaskInstance(Task.this);
+					taskCtrl.save();
+				}
+			}
+		});
+		*/
+
+		return html;
+	}
+
 	public JPanel createPanelOnGUI(Database database, JPanel tab, JPanel parentPanel) {
 
 		this.database = database;

@@ -558,7 +558,7 @@ public class AccountingUtils {
 		}
 
 		String altStr = "";
-		if (tooltip != null) {
+		if ((tooltip != null) && !"".equals(tooltip)) {
 			altStr = " alt='" + tooltip + "'";
 		}
 

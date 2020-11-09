@@ -42,33 +42,160 @@ public class OverviewTab extends Tab {
 	@Override
 	public String getHtmlGUI(Database database, String searchFor) {
 
-		String taskHtml = "";
+		String html = "<div class='mainTitle'>" + TITLE + "</div>";
+
+		Color textColor = new Color(0, 0, 0);
+
+
+		html += "<div style='padding-top:10pt; padding-bottom: 10pt;'>Hej " + database.getUsername() + "! :)</div>";
+
+
+		String simplisticHtml = html;
+
+
+		html += "<div>Well, fuck, there is stuff to do:</div>";
+
+
+		html += "<div class='secondaryTitle'>Outstanding Tasks:</div>";
 
 		List<GenericTask> tasks = database.getTaskCtrl().getTaskInstances();
 
+		boolean tasksShown = false;
 		for (GenericTask task : tasks) {
-			if (!task.hasBeenDone()) {
-				if (task instanceof Task) {
-					taskHtml += "<div>" + task.getReleasedDateStr() + " " + task.getTitle() + "</div>";
-				}
+			if ((!task.hasBeenDone()) && task.matches(searchFor)) {
+				tasksShown = true;
+				break;
 			}
 		}
 
-		if ("".equals(taskHtml)) {
-			taskHtml = "<div>Nothing to be done, have a chill day!</div>";
-		} else {
-			taskHtml = "<div><div>Well, fuck, there is stuff to do:</div>" + taskHtml + "</div>";
+		if (tasksShown) {
+			html += AccountingUtils.createLabelHtml("Scheduled:", textColor, "", "text-align: left; width: 8%;");
+			html += AccountingUtils.createLabelHtml("Title:", textColor, "", "text-align: left; width: 50%;");
 		}
 
-		// TODO - add unpaid invoices
+		for (GenericTask task : tasks) {
+			if ((!task.hasBeenDone()) && task.matches(searchFor)) {
+				if (task instanceof Task) {
+					html += ((Task) task).createPanelInHtml(database);
+				} else {
+					// TODO notify this in the HTML somehow
+					System.out.println("Expected a task but got " + task + "!");
+				}
+			}
+		}
+		// for-else:
+		if (!tasksShown) {
+			html = "<div>No outstanding tasks!</div>";
+		}
 
-		// TODO - add consistency check results
 
-		taskHtml = "<div style='padding-top:20pt; padding-bottom: 10pt;'>Hej " + database.getUsername() + "! :)</div>" + taskHtml;
+		html += "<div class='secondaryTitle'>Unpaid Invoices:</div>";
 
-		taskHtml += "<div class='footer'>&nbsp;</div>";
+		// display outgoing invoices which have been sent out more than six weeks ago and not yet
+		// been set to having come in
+		List<PaymentProblem> paymentProblems = database.getPaymentProblems();
+		for (final PaymentProblem curProblem : paymentProblems) {
 
-		return taskHtml;
+			Color curColor = new Color(148, 148, 0);
+			if (curProblem.isImportant()) {
+				curColor = new Color(196, 0, 0);
+			}
+
+			html += AccountingUtils.createLabelHtml(curProblem.getProblem(), curColor, "", "text-align: left; width: 80%;");
+
+			// TODO :: add working buttons
+			/*
+			JButton curButton = new JButton("Paid");
+			curButton.setPreferredSize(defaultDimension);
+			curPanel.add(curButton, new Arrangement(1, 0, 0.1, 1.0));
+			curButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					AddPaidGUI addPaidGUI = new AddPaidGUI(database.getGUI(), database, curProblem.getEntry());
+					addPaidGUI.show();
+				}
+			});
+
+			curButton = new JButton("Show");
+			curButton.setPreferredSize(defaultDimension);
+			curPanel.add(curButton, new Arrangement(2, 0, 0.1, 1.0));
+			curButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					database.getGUI().showMonthTabForEntry(curProblem.getEntry());
+				}
+			});
+			*/
+		}
+		// for-else:
+		if (paymentProblems.size() < 1) {
+			html = "<div>No problems!</div>";
+		}
+
+
+		html += "<div class='secondaryTitle'>Consistency Checks:</div>";
+
+		List<ConsistencyProblem> consistencyProblems = database.getConsistencyProblems();
+		for (final ConsistencyProblem curProblem : consistencyProblems) {
+
+			Color curColor = new Color(148, 148, 0);
+			if (curProblem.isImportant()) {
+				curColor = new Color(196, 0, 0);
+			}
+
+			html += AccountingUtils.createLabelHtml(curProblem.getProblem(), curColor, "", "text-align: left; width: 80%;");
+
+			// TODO - add working buttons
+			/*
+			JButton curButton = new JButton("Edit");
+			curButton.addMouseListener(rowHighlighter);
+			curButton.setPreferredSize(defaultDimension);
+			curPanel.add(curButton, new Arrangement(1, 0, 0.08, 1.0));
+			curButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					AddEntryGUI addEntryGUI = new AddEntryGUI(database.getGUI(), database, curProblem.getEntry());
+					addEntryGUI.show();
+				}
+			});
+
+			curButton = new JButton("Show");
+			curButton.addMouseListener(rowHighlighter);
+			curButton.setPreferredSize(defaultDimension);
+			curPanel.add(curButton, new Arrangement(2, 0, 0.08, 1.0));
+			curButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					database.getGUI().showMonthTabForEntry(curProblem.getEntry());
+				}
+			});
+
+			curButton = new JButton("Acknowledge");
+			curButton.addMouseListener(rowHighlighter);
+			curButton.setPreferredSize(defaultDimension);
+			curPanel.add(curButton, new Arrangement(3, 0, 0.1, 1.0));
+			curButton.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					database.acknowledge(curProblem.getProblem());
+				}
+			});
+			*/
+		}
+		// for-else:
+		if (consistencyProblems.size() < 1) {
+			html = "<div>Consistency checks looking good!</div>";
+		}
+
+
+		if ((!tasksShown) && (paymentProblems.size() < 1) && (consistencyProblems.size() < 1)) {
+			html = simplisticHtml;
+			html += "<div>Nothing to be done, have a chill day!</div>";
+		}
+
+		html += "<div class='footer'>&nbsp;</div>";
+
+		return html;
 	}
 
 	@Override
@@ -221,11 +348,6 @@ public class OverviewTab extends Tab {
 			tab.add(curLabel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
 		}
-
-
-		// TODO - display information such as finance days that have last been done (or maybe
-		// even get away from real "finance days", and instead have continuous financing going on,
-		// this here always showing what is now left to do?)
 
 
 		CopyByClickLabel consistencyChecksLabel = AccountingUtils.createSubHeadLabel("Consistency Checks:");

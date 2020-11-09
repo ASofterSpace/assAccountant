@@ -188,6 +188,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				String mainContent = currentlySelectedTab.getHtmlGUI(database, searchFor);
 
+				// remove the "Overview" title when directing to index.htm from the outside
+				if ("overview".equals(tabKind) && locEquiv.contains("index")) {
+					mainContent = mainContent.substring(mainContent.indexOf("</div>") + 6);
+				}
+
 				indexContent = StrUtils.replaceAll(indexContent, "[[CONTENT]]", mainContent);
 
 				locEquiv = "_" + locEquiv;
