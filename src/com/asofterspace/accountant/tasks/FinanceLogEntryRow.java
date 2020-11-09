@@ -4,6 +4,7 @@
  */
 package com.asofterspace.accountant.tasks;
 
+import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.toolbox.accounting.Currency;
@@ -37,6 +38,16 @@ public class FinanceLogEntryRow {
 
 	public Integer getAmount() {
 		return amount;
+	}
+
+	public String createPanelInHtml(Database database) {
+
+		String html = "<div class='line'>";
+		html += AccountingUtils.createLabelHtml(getAccount() + ": ", null, "", "text-align: right; width: 50%;");
+		html += AccountingUtils.createLabelHtml(FinanceUtils.formatMoney(getAmount(), Currency.EUR), null, "", "text-align: right; width: 10%;");
+		html += "</div>";
+
+		return html;
 	}
 
 	public JPanel createPanelOnGUI(Database database) {

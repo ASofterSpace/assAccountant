@@ -59,6 +59,27 @@ public class FinanceLogEntry {
 		return rows;
 	}
 
+	public String createPanelInHtml(Database database) {
+
+		Color textColor = new Color(0, 0, 0);
+
+		String html = "<div class='secondaryTitle'>" + DateUtils.serializeDate(getDate()) + "</div>";
+
+		int totalAmount = 0;
+
+		for (FinanceLogEntryRow row : rows) {
+			totalAmount += row.getAmount();
+			html += row.createPanelInHtml(database);
+		}
+
+		html += "<div class='line'>";
+		html += AccountingUtils.createLabelHtml("Total: ", textColor, "", "text-align: right; width: 50%;");
+		html += AccountingUtils.createLabelHtml(FinanceUtils.formatMoney(totalAmount, Currency.EUR), textColor, "", "text-align: right; width: 10%;");
+		html += "</div>";
+
+		return html;
+	}
+
 	public JPanel createPanelOnGUI(Database database) {
 
 		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();

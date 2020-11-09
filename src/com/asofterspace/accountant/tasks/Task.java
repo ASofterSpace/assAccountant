@@ -517,7 +517,7 @@ public class Task extends GenericTask {
 
 		this.database = database;
 
-		String html = "";
+		String html = "<div class='line'>";
 
 		// TODO - figure out how to do this with html
 		/*
@@ -734,6 +734,8 @@ public class Task extends GenericTask {
 			}
 		});
 		*/
+
+		html += "</div>";
 
 		return html;
 	}

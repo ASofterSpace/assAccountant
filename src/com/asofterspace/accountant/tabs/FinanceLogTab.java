@@ -5,6 +5,7 @@
 package com.asofterspace.accountant.tabs;
 
 import com.asofterspace.accountant.AccountingUtils;
+import com.asofterspace.accountant.AssAccountant;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.tasks.FinanceLogEntry;
@@ -13,6 +14,7 @@ import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.guiImages.ImagePanel;
 import com.asofterspace.toolbox.images.ColorRGB;
+import com.asofterspace.toolbox.images.DefaultImageFile;
 import com.asofterspace.toolbox.images.GraphImage;
 import com.asofterspace.toolbox.images.GraphTimeDataPoint;
 
@@ -40,7 +42,43 @@ public class FinanceLogTab extends Tab {
 
 		// TODO - everything
 
-		String html = "";
+		String html = "<div class='mainTitle'>" + TITLE + "</div>";
+
+
+		List<GraphTimeDataPoint> timeData = new ArrayList<>();
+
+		GraphImage graph = new GraphImage(1000, 600);
+		graph.setForegroundColor(new ColorRGB(120, 40, 220));
+		graph.setBackgroundColor(new ColorRGB(0, 0, 0, 255));
+		graph.setDataColor(new ColorRGB(160, 80, 255));
+		graph.setBaseYmin(0.0);
+
+		html += "<div><img src='finance_log_graph.png' /></div>";
+
+
+		List<FinanceLogEntry> entries = database.getTaskCtrl().getFinanceLogs();
+		boolean foundEntry = false;
+		for (FinanceLogEntry entry : entries) {
+			if (entry.getRows().size() > 0) {
+				html += entry.createPanelInHtml(database);
+
+				foundEntry = true;
+
+				timeData.add(new GraphTimeDataPoint(entry.getDate(), entry.getTotalAmount()));
+			}
+		}
+		// for-else:
+		if (!foundEntry) {
+			html += "<div>No finance logs have been found!</div>";
+		}
+
+
+		graph.setIncludeTodayInTimeData(true);
+		graph.setAbsoluteTimeDataPoints(timeData);
+
+		DefaultImageFile graphFile = new DefaultImageFile(AssAccountant.getWebRoot(), "finance_log_graph.png");
+		graphFile.assign(graph);
+		graphFile.saveTransparently();
 
 		html += "<div class='footer'>&nbsp;</div>";
 
@@ -55,8 +93,6 @@ public class FinanceLogTab extends Tab {
 		}
 
 		int i = 0;
-
-		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
 
 		tab = new JPanel();
 		tab.setBackground(GUI.getBackgroundColor());

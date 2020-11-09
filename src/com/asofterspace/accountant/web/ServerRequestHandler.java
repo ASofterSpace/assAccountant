@@ -110,6 +110,15 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		String result = super.getWhitelistedLocationEquivalent(location);
 
 		if (result == null) {
+
+			if (location.startsWith("/")) {
+				location = location.substring(1);
+			}
+
+			if ("finance_log_graph.png".equals(location)) {
+				return "finance_log_graph.png";
+			}
+
 			if (locationToTabKind(location) != null) {
 				return location;
 			}

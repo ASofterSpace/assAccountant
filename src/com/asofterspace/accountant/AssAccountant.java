@@ -40,6 +40,8 @@ public class AssAccountant {
 	private static TabCtrl tabCtrl;
 	private static TaskCtrl taskCtrl;
 
+	private static Directory webRoot;
+
 
 	/**
 	 * TODO:
@@ -192,7 +194,7 @@ public class AssAccountant {
 
 		Directory dataDir = new Directory(System.getProperty("java.class.path") + "/../" + DATA_DIR);
 		Directory serverDir = new Directory(System.getProperty("java.class.path") + "/../" + SERVER_DIR);
-		Directory webRoot = new Directory(System.getProperty("java.class.path") + "/../" + WEB_ROOT_DIR);
+		webRoot = new Directory(System.getProperty("java.class.path") + "/../" + WEB_ROOT_DIR);
 
 		try {
 
@@ -251,6 +253,10 @@ public class AssAccountant {
 
 	public static TaskCtrl getTaskCtrl() {
 		return taskCtrl;
+	}
+
+	public static Directory getWebRoot() {
+		return webRoot;
 	}
 
 }

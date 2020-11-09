@@ -69,8 +69,10 @@ public class OverviewTab extends Tab {
 		}
 
 		if (tasksShown) {
+			html += "<div class='line'>";
 			html += AccountingUtils.createLabelHtml("Scheduled:", textColor, "", "text-align: left; width: 8%;");
 			html += AccountingUtils.createLabelHtml("Title:", textColor, "", "text-align: left; width: 50%;");
+			html += "</div>";
 		}
 
 		for (GenericTask task : tasks) {
@@ -95,6 +97,8 @@ public class OverviewTab extends Tab {
 		// been set to having come in
 		List<PaymentProblem> paymentProblems = database.getPaymentProblems();
 		for (final PaymentProblem curProblem : paymentProblems) {
+
+			html += "<div class='line'>";
 
 			Color curColor = new Color(148, 148, 0);
 			if (curProblem.isImportant()) {
@@ -126,6 +130,8 @@ public class OverviewTab extends Tab {
 				}
 			});
 			*/
+
+			html += "</div>";
 		}
 		// for-else:
 		if (paymentProblems.size() < 1) {
@@ -137,6 +143,8 @@ public class OverviewTab extends Tab {
 
 		List<ConsistencyProblem> consistencyProblems = database.getConsistencyProblems();
 		for (final ConsistencyProblem curProblem : consistencyProblems) {
+
+			html += "<div class='line'>";
 
 			Color curColor = new Color(148, 148, 0);
 			if (curProblem.isImportant()) {
@@ -181,6 +189,8 @@ public class OverviewTab extends Tab {
 				}
 			});
 			*/
+
+			html += "</div>";
 		}
 		// for-else:
 		if (consistencyProblems.size() < 1) {
