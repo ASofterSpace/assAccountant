@@ -1,5 +1,9 @@
 window.accountant = {
 
+	exportCsvs: function(tab) {
+		alert('Sorry, not yet working!');
+	},
+
 	onResize: function() {
 
 		var retry = false;

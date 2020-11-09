@@ -69,6 +69,19 @@ div#tabList > a.selectedTab {
 	background: rgba(255, 0, 255, 0.25);
 }
 
+div.relContainer {
+	position: relative;
+	height: 0;
+	width: 100%;
+}
+
+span.toprightAction {
+	position: absolute;
+	top: 10pt;
+	right: 10pt;
+	cursor: pointer;
+}
+
 a.sidebar, div.projectbar {
 	position: absolute;
 	right: 10pt;
