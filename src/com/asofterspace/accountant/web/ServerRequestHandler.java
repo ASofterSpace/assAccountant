@@ -259,7 +259,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		return null;
 	}
 
-	private static String tabToLink(Tab tab) {
+	public static String tabToLink(Tab tab) {
 		String result = tab.toString().toLowerCase();
 		result = StrUtils.replaceAll(result, ":", "");
 		result = StrUtils.replaceAll(result, " ", "_");

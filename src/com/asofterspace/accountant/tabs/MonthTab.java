@@ -10,8 +10,10 @@ import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.TimeSpan;
 import com.asofterspace.accountant.timespans.Year;
+import com.asofterspace.accountant.web.ServerRequestHandler;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
+import com.asofterspace.toolbox.io.Directory;
 
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
@@ -33,7 +35,14 @@ public class MonthTab extends TimeSpanTab {
 	@Override
 	public String getHtmlGUI(Database database, String searchFor) {
 
-		String html = "<div class='mainTitle'>" + month.toString() + "</div>";
+		String html = "";
+
+		html += "<div class='relContainer'>";
+		html += "<span class='toprightAction' onclick='window.accountant.exportCsvs(\"" + ServerRequestHandler.tabToLink(this) + "\")'>" +
+				"Export to CSVs</span>";
+		html += "</div>";
+
+		html += "<div class='mainTitle'>" + month.toString() + "</div>";
 
 		html += AccountingUtils.createTimeSpanTabHtml(month, database, searchFor);
 
@@ -87,6 +96,11 @@ public class MonthTab extends TimeSpanTab {
 		AccountingUtils.resetTabSize(tab, parentPanel);
 
 		parentPanel.add(tab);
+	}
+
+	@Override
+	public Directory exportCsvTo(Directory exportDir, Database database) {
+		return AccountingUtils.exportTimeSpanCsvTo(exportDir, database, month, this);
 	}
 
 	@Override

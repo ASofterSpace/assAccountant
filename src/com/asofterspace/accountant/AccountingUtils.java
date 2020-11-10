@@ -7,8 +7,10 @@ package com.asofterspace.accountant;
 import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
+import com.asofterspace.accountant.tabs.Tab;
 import com.asofterspace.accountant.timespans.TimeSpan;
 import com.asofterspace.accountant.timespans.Year;
+import com.asofterspace.accountant.web.ServerRequestHandler;
 import com.asofterspace.accountant.world.Category;
 import com.asofterspace.toolbox.accounting.Currency;
 import com.asofterspace.toolbox.accounting.FinanceUtils;
@@ -16,6 +18,8 @@ import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.images.ColorRGB;
+import com.asofterspace.toolbox.io.CsvFileGerman;
+import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 
@@ -25,6 +29,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.Font;
 import java.awt.GridBagLayout;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -764,4 +769,76 @@ public class AccountingUtils {
 			}
 		};
 	}
+
+	public static Directory exportTimeSpanCsvTo(Directory exportDir, Database database, TimeSpan timeSpan, Tab tab) {
+
+		Directory resultDir = new Directory(exportDir, ServerRequestHandler.tabToLink(tab));
+		resultDir.clear();
+
+
+		List<String> headlineCols = new ArrayList<>();
+		headlineCols.add("Date");
+		headlineCols.add("Title");
+		headlineCols.add("Customer");
+		headlineCols.add("Pre Tax Amount");
+		headlineCols.add("Tax Percent");
+		headlineCols.add("Post Tax Amount");
+		headlineCols.add("Received On");
+
+		CsvFileGerman csvFile = new CsvFileGerman(resultDir, "outgoing.csv");
+		csvFile.setHeadLine(headlineCols);
+
+		List<Outgoing> curOutgoings = timeSpan.getOutgoings();
+		for (Outgoing cur : curOutgoings) {
+			csvFile.appendContent(cur.createCsvLine(database));
+		}
+
+		csvFile.save();
+
+
+		headlineCols = new ArrayList<>();
+		headlineCols.add("Date");
+		headlineCols.add("Title");
+		headlineCols.add("Category");
+		headlineCols.add("Pre Tax Amount");
+		headlineCols.add("Tax Percent");
+		headlineCols.add("Post Tax Amount");
+		headlineCols.add("Paid On");
+
+		csvFile = new CsvFileGerman(resultDir, "incoming.csv");
+		csvFile.setHeadLine(headlineCols);
+
+		List<Incoming> curEntries = timeSpan.getIncomings();
+		for (Incoming cur : curEntries) {
+			csvFile.appendContent(cur.createCsvLine(database));
+		}
+
+		csvFile.save();
+
+
+		csvFile = new CsvFileGerman(resultDir, "donations.csv");
+		csvFile.setHeadLine(headlineCols);
+
+		curEntries = timeSpan.getDonations();
+		for (Incoming cur : curEntries) {
+			csvFile.appendContent(cur.createCsvLine(database));
+		}
+
+		csvFile.save();
+
+
+		csvFile = new CsvFileGerman(resultDir, "personals.csv");
+		csvFile.setHeadLine(headlineCols);
+
+		curEntries = timeSpan.getPersonals();
+		for (Incoming cur : curEntries) {
+			csvFile.appendContent(cur.createCsvLine(database));
+		}
+
+		csvFile.save();
+
+
+		return resultDir;
+	}
+
 }
