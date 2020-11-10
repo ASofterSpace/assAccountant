@@ -10,6 +10,7 @@ import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.tasks.FinanceLogEntry;
 import com.asofterspace.accountant.tasks.Task;
+import com.asofterspace.accountant.web.ServerRequestHandler;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.guiImages.ImagePanel;
@@ -17,6 +18,9 @@ import com.asofterspace.toolbox.images.ColorRGB;
 import com.asofterspace.toolbox.images.DefaultImageFile;
 import com.asofterspace.toolbox.images.GraphImage;
 import com.asofterspace.toolbox.images.GraphTimeDataPoint;
+import com.asofterspace.toolbox.io.CsvFileGerman;
+import com.asofterspace.toolbox.io.Directory;
+import com.asofterspace.toolbox.utils.DateUtils;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -40,7 +44,14 @@ public class FinanceLogTab extends Tab {
 	@Override
 	public String getHtmlGUI(Database database, String searchFor) {
 
-		String html = "<div class='mainTitle'>" + TITLE + "</div>";
+		String html = "";
+
+		html += "<div class='relContainer'>";
+		html += "<span class='toprightAction' onclick='window.accountant.exportCsvs(\"" + ServerRequestHandler.tabToLink(this) + "\")'>" +
+				"Export to CSVs</span>";
+		html += "</div>";
+
+		html += "<div class='mainTitle'>" + TITLE + "</div>";
 
 
 		List<GraphTimeDataPoint> timeData = new ArrayList<>();
@@ -158,6 +169,36 @@ public class FinanceLogTab extends Tab {
 		AccountingUtils.resetTabSize(tab, parentPanel);
 
 		parentPanel.add(tab);
+	}
+
+	@Override
+	public Directory exportCsvTo(Directory exportDir, Database database) {
+
+		Directory resultDir = new Directory(exportDir, ServerRequestHandler.tabToLink(this));
+		resultDir.clear();
+
+
+		List<String> headlineCols = new ArrayList<>();
+		headlineCols.add("Date");
+		headlineCols.add("Total");
+
+		CsvFileGerman csvFile = new CsvFileGerman(resultDir, "finances.csv");
+		csvFile.setHeadLine(headlineCols);
+
+		List<FinanceLogEntry> entries = database.getTaskCtrl().getFinanceLogs();
+
+		for (FinanceLogEntry entry : entries) {
+			if (entry.getRows().size() > 0) {
+				List<String> cur = new ArrayList<>();
+				cur.add(DateUtils.serializeDate(entry.getDate()));
+				cur.add(CsvFileGerman.sanitizeForCsv(entry.getTotalAmount() / 100.0));
+				csvFile.appendContent(cur);
+			}
+		}
+
+		csvFile.save();
+
+		return resultDir;
 	}
 
 	@Override
