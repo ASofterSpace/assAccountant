@@ -127,6 +127,13 @@ public class AccountingUtils {
 		return curPanel;
 	}
 
+	private static List<String> createList(String text, int amount) {
+		List<String> result = new ArrayList<>();
+		result.add(CsvFileGerman.sanitizeForCsv(text));
+		result.add(CsvFileGerman.sanitizeForCsv(amount / 100.0));
+		return result;
+	}
+
 	public static String createOverviewPanelInHtml(String text, int amount) {
 
 		String html = "<div class='line'>";
@@ -154,6 +161,15 @@ public class AccountingUtils {
 		curPanel.add(curLabel, new Arrangement(1, 0, 0.5, 1.0));
 
 		return curPanel;
+	}
+
+	private static List<String> createList(String text1, int amount1, String text2, int amount2) {
+		List<String> result = new ArrayList<>();
+		result.add(CsvFileGerman.sanitizeForCsv(text1));
+		result.add(CsvFileGerman.sanitizeForCsv(amount1 / 100.0));
+		result.add(CsvFileGerman.sanitizeForCsv(text2));
+		result.add(CsvFileGerman.sanitizeForCsv(amount2 / 100.0));
+		return result;
 	}
 
 	public static String createOverviewPanelInHtml(String text1, int amount1, String text2, int amount2) {
@@ -446,6 +462,71 @@ public class AccountingUtils {
 		return i;
 	}
 
+	public static List<List<String>> createOverviewAndTaxInfoCsvData(TimeSpan timeSpan) {
+
+		List<List<String>> result = new ArrayList<>();
+
+		result.add(createList("Total amount earned: ", timeSpan.getOutTotalAfterTax(), "Of that VAT: ", timeSpan.getOutTotalTax()));
+		result.add(createList("Total amount spent: ", timeSpan.getInTotalAfterTax(), "Of that VAT: ", timeSpan.getInTotalTax()));
+		result.add(createList("Total amount donated: ", timeSpan.getDonTotalAfterTax(), "Of that VAT: ", timeSpan.getDonTotalTax()));
+		result.add(createList("Total amount of personal expenses: ", timeSpan.getPersTotalAfterTax(), "Of that VAT: ", timeSpan.getPersTotalTax()));
+
+		if (timeSpan instanceof Year) {
+			Year curYear = (Year) timeSpan;
+			result.add(createList("ROUGHLY expected income tax payment: ", (int) curYear.getExpectedIncomeTax()));
+			result.add(createList("Total amount earned in " + curYear.getNum() + ": ", (int) (timeSpan.getOutTotalBeforeTax() - (timeSpan.getInTotalBeforeTax() + timeSpan.getDonTotalBeforeTax() + timeSpan.getPersTotalBeforeTax() + curYear.getExpectedIncomeTax()))));
+		}
+
+		List<String> subList = new ArrayList<>();
+		subList.add("");
+		result.add(subList);
+		subList = new ArrayList<>();
+		subList.add("-------------- VAT / USt --------------");
+		result.add(subList);
+
+		result.add(createList("Total deductible already paid VAT / Gesamte abziehbare Vorsteuerbeträge: ", timeSpan.getDiscountablePreTax()));
+		result.add(createList("Remaining VAT advance payment / Verbleibende Umsatzsteuer-Vorauszahlung: ", timeSpan.getRemainingVatPayments()));
+		result.add(createList("Actual VAT advance payments made / Umsatzsteuer-Vorauszahlungssoll: ", timeSpan.getVatPrepaymentsPaidTotal()));
+
+		subList = new ArrayList<>();
+		subList.add("");
+		result.add(subList);
+		subList = new ArrayList<>();
+		subList.add("-------------- Income Tax / ESt --------------");
+		result.add(subList);
+
+		int externalSalary = timeSpan.getInTotalBeforeTax(Category.EXTERNAL_SALARY);
+		int internalSalary = timeSpan.getInTotalBeforeTax(Category.INTERNAL_SALARY);
+		int vehicleCosts = timeSpan.getInTotalBeforeTax(Category.VEHICLE);
+		int travelCosts = timeSpan.getInTotalBeforeTax(Category.TRAVEL);
+		int locationCosts = timeSpan.getInTotalBeforeTax(Category.LOCATIONS);
+		int educationCosts = timeSpan.getInTotalBeforeTax(Category.EDUCATION);
+		int advertisementCosts = timeSpan.getInTotalBeforeTax(Category.ADVERTISEMENTS);
+		int infrastructureCosts = timeSpan.getInTotalBeforeTax(Category.INFRASTRUCTURE);
+		int entertainmentCosts = timeSpan.getInTotalBeforeTax(Category.ENTERTAINMENT);
+		int wareCosts = timeSpan.getInTotalBeforeTax(Category.WARES);
+
+		// this does NOT include donations, as we will not get donation amounts from timeSpan.getInTotalBeforeTax() anyway, so we do not want to subtract them from it!
+		// (in general, this is only the sum of non-special categories except other)
+		int categoryTally = externalSalary + internalSalary + vehicleCosts + travelCosts + locationCosts +
+			educationCosts + advertisementCosts + infrastructureCosts + entertainmentCosts + wareCosts;
+
+		int otherCosts = timeSpan.getInTotalBeforeTax() - categoryTally;
+
+		result.add(createList("Total amount spent on items, raw materials etc.: ", wareCosts + otherCosts));
+		result.add(createList("Total external personnel and subcontractor costs: ", externalSalary));
+		result.add(createList("Total internal personnel costs: ", internalSalary));
+		result.add(createList("Total vehicle costs: ", vehicleCosts));
+		result.add(createList("Total travel costs: ", travelCosts));
+		result.add(createList("Total location / building costs: ", locationCosts));
+		result.add(createList("Total education and conference costs: ", educationCosts));
+		result.add(createList("Total amount spent on IT infrastructure: ", infrastructureCosts));
+		result.add(createList("Total advertisement and branded item costs: ", advertisementCosts));
+		result.add(createList("Total entertainment (e.g. restaurant) costs: ", entertainmentCosts));
+
+		return result;
+	}
+
 	public static String createOverviewAndTaxInfoHtml(TimeSpan timeSpan) {
 
 		String html = "";
@@ -463,13 +544,13 @@ public class AccountingUtils {
 			html += AccountingUtils.createOverviewPanelInHtml("Total amount earned in " + curYear.getNum() + ": ", (int) (timeSpan.getOutTotalBeforeTax() - (timeSpan.getInTotalBeforeTax() + timeSpan.getDonTotalBeforeTax() + timeSpan.getPersTotalBeforeTax() + curYear.getExpectedIncomeTax())));
 		}
 
-		html += "<div style='text-align: center;'>-------------- VAT / USt --------------</div>";
+		html += "<div style='text-align: center; padding-top: 5pt;'>-------------- VAT / USt --------------</div>";
 
 		html += AccountingUtils.createOverviewPanelInHtml("Total deductible already paid VAT / Gesamte abziehbare Vorsteuerbeträge: ", timeSpan.getDiscountablePreTax());
 		html += AccountingUtils.createOverviewPanelInHtml("Remaining VAT advance payment / Verbleibende Umsatzsteuer-Vorauszahlung: ", timeSpan.getRemainingVatPayments());
 		html += AccountingUtils.createOverviewPanelInHtml("Actual VAT advance payments made / Umsatzsteuer-Vorauszahlungssoll: ", timeSpan.getVatPrepaymentsPaidTotal());
 
-		html += "<div style='text-align: center;'>-------------- Income Tax / ESt --------------</div>";
+		html += "<div style='text-align: center; padding-top: 5pt;'>-------------- Income Tax / ESt --------------</div>";
 
 		int externalSalary = timeSpan.getInTotalBeforeTax(Category.EXTERNAL_SALARY);
 		int internalSalary = timeSpan.getInTotalBeforeTax(Category.INTERNAL_SALARY);
@@ -833,6 +914,18 @@ public class AccountingUtils {
 		curEntries = timeSpan.getPersonals();
 		for (Incoming cur : curEntries) {
 			csvFile.appendContent(cur.createCsvLine(database));
+		}
+
+		csvFile.save();
+
+
+		csvFile = new CsvFileGerman(resultDir, "tax_info.csv");
+
+		csvFile.clearContent();
+
+		List<List<String>> taxInfos = AccountingUtils.createOverviewAndTaxInfoCsvData(timeSpan);
+		for (List<String> taxInfo : taxInfos) {
+			csvFile.appendContent(taxInfo);
 		}
 
 		csvFile.save();
