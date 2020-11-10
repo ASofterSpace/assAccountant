@@ -16,6 +16,7 @@ import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.images.ColorRGB;
+import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 
 import java.awt.Color;
@@ -121,6 +122,15 @@ public class AccountingUtils {
 		return curPanel;
 	}
 
+	public static String createOverviewPanelInHtml(String text, int amount) {
+
+		String html = "<div class='line'>";
+		html += AccountingUtils.createLabelHtml(text, null, "", "text-align: right; width: 50%;");
+		html += AccountingUtils.createLabelHtml(FinanceUtils.formatMoney(amount, Currency.EUR), null, "", "text-align: left; width: 50%;");
+		html += "</div>";
+		return html;
+	}
+
 	public static JPanel createOverviewPanelOnGUI(String text, int amount) {
 
 		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
@@ -139,6 +149,17 @@ public class AccountingUtils {
 		curPanel.add(curLabel, new Arrangement(1, 0, 0.5, 1.0));
 
 		return curPanel;
+	}
+
+	public static String createOverviewPanelInHtml(String text1, int amount1, String text2, int amount2) {
+
+		String html = "<div class='line'>";
+		html += AccountingUtils.createLabelHtml(text1, null, "", "text-align: right; width: 50%;");
+		html += AccountingUtils.createLabelHtml(FinanceUtils.formatMoney(amount1, Currency.EUR), null, "", "text-align: left; width: 10%;");
+		html += AccountingUtils.createLabelHtml(text2, null, "", "text-align: right; width: 10%;");
+		html += AccountingUtils.createLabelHtml(FinanceUtils.formatMoney(amount2, Currency.EUR), null, "", "text-align: left; width: 30%;");
+		html += "</div>";
+		return html;
 	}
 
 	public static JPanel createOverviewPanelOnGUI(String text1, int amount1, String text2, int amount2) {
@@ -422,9 +443,57 @@ public class AccountingUtils {
 
 	public static String createOverviewAndTaxInfoHtml(TimeSpan timeSpan) {
 
-		// TODO
-
 		String html = "";
+
+		html += "<div class='secondaryTitle'>Overview and Tax Information:</div>";
+
+		html += AccountingUtils.createOverviewPanelInHtml("Total amount earned: ", timeSpan.getOutTotalAfterTax(), "Of that VAT: ", timeSpan.getOutTotalTax());
+		html += AccountingUtils.createOverviewPanelInHtml("Total amount spent: ", timeSpan.getInTotalAfterTax(), "Of that VAT: ", timeSpan.getInTotalTax());
+		html += AccountingUtils.createOverviewPanelInHtml("Total amount donated: ", timeSpan.getDonTotalAfterTax(), "Of that VAT: ", timeSpan.getDonTotalTax());
+		html += AccountingUtils.createOverviewPanelInHtml("Total amount of personal expenses: ", timeSpan.getPersTotalAfterTax(), "Of that VAT: ", timeSpan.getPersTotalTax());
+
+		if (timeSpan instanceof Year) {
+			Year curYear = (Year) timeSpan;
+			html += AccountingUtils.createOverviewPanelInHtml("ROUGHLY expected income tax payment: ", (int) curYear.getExpectedIncomeTax());
+			html += AccountingUtils.createOverviewPanelInHtml("Total amount earned in " + curYear.getNum() + ": ", (int) (timeSpan.getOutTotalBeforeTax() - (timeSpan.getInTotalBeforeTax() + timeSpan.getDonTotalBeforeTax() + timeSpan.getPersTotalBeforeTax() + curYear.getExpectedIncomeTax())));
+		}
+
+		html += "<div style='text-align: center;'>-------------- VAT / USt --------------</div>";
+
+		html += AccountingUtils.createOverviewPanelInHtml("Total deductible already paid VAT / Gesamte abziehbare Vorsteuerbeträge: ", timeSpan.getDiscountablePreTax());
+		html += AccountingUtils.createOverviewPanelInHtml("Remaining VAT advance payment / Verbleibende Umsatzsteuer-Vorauszahlung: ", timeSpan.getRemainingVatPayments());
+		html += AccountingUtils.createOverviewPanelInHtml("Actual VAT advance payments made / Umsatzsteuer-Vorauszahlungssoll: ", timeSpan.getVatPrepaymentsPaidTotal());
+
+		html += "<div style='text-align: center;'>-------------- Income Tax / ESt --------------</div>";
+
+		int externalSalary = timeSpan.getInTotalBeforeTax(Category.EXTERNAL_SALARY);
+		int internalSalary = timeSpan.getInTotalBeforeTax(Category.INTERNAL_SALARY);
+		int vehicleCosts = timeSpan.getInTotalBeforeTax(Category.VEHICLE);
+		int travelCosts = timeSpan.getInTotalBeforeTax(Category.TRAVEL);
+		int locationCosts = timeSpan.getInTotalBeforeTax(Category.LOCATIONS);
+		int educationCosts = timeSpan.getInTotalBeforeTax(Category.EDUCATION);
+		int advertisementCosts = timeSpan.getInTotalBeforeTax(Category.ADVERTISEMENTS);
+		int infrastructureCosts = timeSpan.getInTotalBeforeTax(Category.INFRASTRUCTURE);
+		int entertainmentCosts = timeSpan.getInTotalBeforeTax(Category.ENTERTAINMENT);
+		int wareCosts = timeSpan.getInTotalBeforeTax(Category.WARES);
+
+		// this does NOT include donations, as we will not get donation amounts from timeSpan.getInTotalBeforeTax() anyway, so we do not want to subtract them from it!
+		// (in general, this is only the sum of non-special categories except other)
+		int categoryTally = externalSalary + internalSalary + vehicleCosts + travelCosts + locationCosts +
+			educationCosts + advertisementCosts + infrastructureCosts + entertainmentCosts + wareCosts;
+
+		int otherCosts = timeSpan.getInTotalBeforeTax() - categoryTally;
+
+		html += AccountingUtils.createOverviewPanelInHtml("Total amount spent on items, raw materials etc.: ", wareCosts + otherCosts);
+		html += AccountingUtils.createOverviewPanelInHtml("Total external personnel and subcontractor costs: ", externalSalary);
+		html += AccountingUtils.createOverviewPanelInHtml("Total internal personnel costs: ", internalSalary);
+		html += AccountingUtils.createOverviewPanelInHtml("Total vehicle costs: ", vehicleCosts);
+		html += AccountingUtils.createOverviewPanelInHtml("Total travel costs: ", travelCosts);
+		html += AccountingUtils.createOverviewPanelInHtml("Total location / building costs: ", locationCosts);
+		html += AccountingUtils.createOverviewPanelInHtml("Total education and conference costs: ", educationCosts);
+		html += AccountingUtils.createOverviewPanelInHtml("Total amount spent on IT infrastructure: ", infrastructureCosts);
+		html += AccountingUtils.createOverviewPanelInHtml("Total advertisement and branded item costs: ", advertisementCosts);
+		html += AccountingUtils.createOverviewPanelInHtml("Total entertainment (e.g. restaurant) costs: ", entertainmentCosts);
 
 		return html;
 	}
@@ -557,6 +626,8 @@ public class AccountingUtils {
 		if (text.endsWith(" EUR")) {
 			text = text.substring(0, text.length() - 4) + " €";
 		}
+
+		text = StrUtils.replaceAll(text, " ", "&nbsp;");
 
 		// default color
 		String colStr = "#88AAFF";
