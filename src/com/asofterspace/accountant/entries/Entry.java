@@ -19,6 +19,7 @@ import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.gui.GuiUtils;
+import com.asofterspace.toolbox.io.CsvFileGerman;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.Utils;
@@ -322,6 +323,25 @@ public abstract class Entry {
 			} else {
 				result = new Color(148, 148, 0);
 			}
+		}
+
+		return result;
+	}
+
+	public List<String> createCsvLine(Database database) {
+
+		List<String> result = new ArrayList<>();
+
+		result.add(getDateAsText());
+		result.add(getTitle());
+		result.add(getCategoryOrCustomer());
+		result.add(CsvFileGerman.sanitizeForCsv(getPreTaxAmount() / 100.0));
+		result.add(getTaxPercentAsText());
+		result.add(CsvFileGerman.sanitizeForCsv(getPostTaxAmount() / 100.0));
+		if (getReceived()) {
+			result.add(DateUtils.serializeDate(getReceivedOnDate()));
+		} else {
+			result.add("-");
 		}
 
 		return result;

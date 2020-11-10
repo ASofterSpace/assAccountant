@@ -4,6 +4,7 @@
  */
 package com.asofterspace.accountant.web;
 
+import com.asofterspace.accountant.AssAccountant;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.TabCtrl;
 import com.asofterspace.accountant.tabs.BankStatementTab;
@@ -11,6 +12,7 @@ import com.asofterspace.accountant.tabs.BankStatementYearTab;
 import com.asofterspace.accountant.tabs.MonthTab;
 import com.asofterspace.accountant.tabs.Tab;
 import com.asofterspace.accountant.tabs.YearTab;
+import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.JSON;
@@ -81,8 +83,18 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 			switch (fileLocation) {
 
-				case "/example":
-					answer = new WebServerAnswerInJson(new JSON("{\"foo\": \"bar\"}"));
+				case "/exportCSVs":
+					Directory exportDir = new Directory(AssAccountant.getWebRoot().getParentDirectory(), "export");
+					String tabStr = json.getString("tab");
+					Tab tab = linkToTab(tabStr);
+					if (tab == null) {
+						respond(400);
+						break;
+					}
+					Directory exportedDir = tab.exportCsvTo(exportDir, database);
+					answer = new WebServerAnswerInJson(new JSON(
+						"{\"exportPath\": \"" + StrUtils.replaceAll(exportedDir.getCanonicalDirname(), "\\", "/") + "\"}"));
+					GuiUtils.openFolder(exportedDir);
 					break;
 
 				default:
@@ -261,6 +273,19 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			result = "month_" + result;
 		}
 		return result;
+	}
+
+	private Tab linkToTab(String linkStr) {
+
+		List<Tab> tabs = tabCtrl.getTabs();
+
+		for (Tab tab : tabs) {
+			if (linkStr.equals(tabToLink(tab))) {
+				return tab;
+			}
+		}
+
+		return null;
 	}
 
 }

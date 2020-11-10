@@ -6,13 +6,20 @@ package com.asofterspace.accountant.tabs;
 
 import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.Database;
+import com.asofterspace.accountant.entries.Incoming;
+import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.TimeSpan;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
+import com.asofterspace.toolbox.io.CsvFile;
+import com.asofterspace.toolbox.io.CsvFileGerman;
+import com.asofterspace.toolbox.io.Directory;
 
 import java.awt.GridBagLayout;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JPanel;
 
@@ -90,6 +97,80 @@ public class YearTab extends TimeSpanTab {
 		AccountingUtils.resetTabSize(tab, parentPanel);
 
 		parentPanel.add(tab);
+	}
+
+	@Override
+	public Directory exportCsvTo(Directory exportDir, Database database) {
+
+		TimeSpan timeSpan = year;
+
+		Directory resultDir = new Directory(exportDir, year.toString());
+		resultDir.clear();
+
+
+		List<String> headlineCols = new ArrayList<>();
+		headlineCols.add("Date");
+		headlineCols.add("Title");
+		headlineCols.add("Customer");
+		headlineCols.add("Pre Tax Amount");
+		headlineCols.add("Tax Percent");
+		headlineCols.add("Post Tax Amount");
+		headlineCols.add("Received On");
+
+		CsvFileGerman csvFile = new CsvFileGerman(resultDir, "outgoing.csv");
+		csvFile.setHeadLine(headlineCols);
+
+		List<Outgoing> curOutgoings = timeSpan.getOutgoings();
+		for (Outgoing cur : curOutgoings) {
+			csvFile.appendContent(cur.createCsvLine(database));
+		}
+
+		csvFile.save();
+
+
+		headlineCols = new ArrayList<>();
+		headlineCols.add("Date");
+		headlineCols.add("Title");
+		headlineCols.add("Category");
+		headlineCols.add("Pre Tax Amount");
+		headlineCols.add("Tax Percent");
+		headlineCols.add("Post Tax Amount");
+		headlineCols.add("Paid On");
+
+		csvFile = new CsvFileGerman(resultDir, "incoming.csv");
+		csvFile.setHeadLine(headlineCols);
+
+		List<Incoming> curEntries = timeSpan.getIncomings();
+		for (Incoming cur : curEntries) {
+			csvFile.appendContent(cur.createCsvLine(database));
+		}
+
+		csvFile.save();
+
+
+		csvFile = new CsvFileGerman(resultDir, "donations.csv");
+		csvFile.setHeadLine(headlineCols);
+
+		curEntries = timeSpan.getDonations();
+		for (Incoming cur : curEntries) {
+			csvFile.appendContent(cur.createCsvLine(database));
+		}
+
+		csvFile.save();
+
+
+		csvFile = new CsvFileGerman(resultDir, "personals.csv");
+		csvFile.setHeadLine(headlineCols);
+
+		curEntries = timeSpan.getPersonals();
+		for (Incoming cur : curEntries) {
+			csvFile.appendContent(cur.createCsvLine(database));
+		}
+
+		csvFile.save();
+
+
+		return resultDir;
 	}
 
 	@Override

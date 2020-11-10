@@ -5,6 +5,7 @@
 package com.asofterspace.accountant.tabs;
 
 import com.asofterspace.accountant.Database;
+import com.asofterspace.toolbox.io.Directory;
 
 import javax.swing.JPanel;
 
@@ -18,4 +19,13 @@ public abstract class Tab {
 	public abstract String getHtmlGUI(Database database, String searchFor);
 
 	public abstract int compareTo(Tab tab);
+
+	/**
+	 * Export this tab in one or more CSV files into a folder inside exportDir and return the
+	 * directory entry for that folder
+	 */
+	public Directory exportCsvTo(Directory exportDir, Database database) {
+		// by default, do nothing - as this is optional, and most tabs are not yet able to do this :)
+		return null;
+	}
 }

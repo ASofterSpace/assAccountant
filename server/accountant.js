@@ -1,7 +1,22 @@
 window.accountant = {
 
 	exportCsvs: function(tab) {
-		alert('Sorry, not yet working!');
+		var request = new XMLHttpRequest();
+		request.open("POST", "exportCSVs", true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				alert("Exported to: " + result.exportPath);
+			}
+		}
+
+		var data = {
+			tab: tab,
+		};
+
+		request.send(JSON.stringify(data));
 	},
 
 	onResize: function() {

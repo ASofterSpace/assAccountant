@@ -38,6 +38,7 @@ import
 
 # runtime webserver deployment files
 /deployed
+/export
 
 # pictures
 /server/pics
