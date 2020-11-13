@@ -1205,6 +1205,19 @@ public class Database {
 		return result;
 	}
 
+	public List<Problem> getUnacknowledgedProblems() {
+
+		List<Problem> result = new ArrayList<>();
+
+		for (Problem problem : getProblems()) {
+			if (!acknowledgedProblems.contains(problem.getProblem())) {
+				result.add(problem);
+			}
+		}
+
+		return result;
+	}
+
 	public List<PaymentProblem> getPaymentProblems() {
 
 		List<PaymentProblem> result = new ArrayList<>();
@@ -1226,7 +1239,7 @@ public class Database {
 	/**
 	 * Get all un-acknowledged consistency problems
 	 */
-	public List<ConsistencyProblem> getConsistencyProblems() {
+	public List<ConsistencyProblem> getUnacknowledgedConsistencyProblems() {
 
 		List<ConsistencyProblem> result = new ArrayList<>();
 

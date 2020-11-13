@@ -4,8 +4,10 @@
  */
 package com.asofterspace.accountant.web;
 
+import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.AssAccountant;
 import com.asofterspace.accountant.Database;
+import com.asofterspace.accountant.Problem;
 import com.asofterspace.accountant.TabCtrl;
 import com.asofterspace.accountant.tabs.BankStatementTab;
 import com.asofterspace.accountant.tabs.BankStatementYearTab;
@@ -22,6 +24,7 @@ import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.web.WebServer;
 import com.asofterspace.toolbox.web.WebServerAnswer;
 import com.asofterspace.toolbox.web.WebServerAnswerInJson;
+import com.asofterspace.toolbox.web.WebServerAnswerWithText;
 import com.asofterspace.toolbox.web.WebServerRequestHandler;
 
 import java.io.IOException;
@@ -112,6 +115,27 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 	@Override
 	protected WebServerAnswer answerGet(String location, String[] arguments) {
+
+		if ("/unacknowledged-problems".equals(location)) {
+
+			String html = "";
+
+			List<Problem> problems = database.getUnacknowledgedProblems();
+
+			for (Problem curProblem : problems) {
+				html += "<div class='line'>";
+				html += AccountingUtils.createLabelHtml(curProblem.getProblem(), curProblem.getColor(), "", "text-align: left;");
+				html += "</div>";
+			}
+
+			if ("".equals(html)) {
+				html = "no problems";
+			}
+
+			WebServerAnswerWithText answer = new WebServerAnswerWithText(html);
+			answer.setTextKind("html");
+			return answer;
+		}
 
 		return null;
 	}
@@ -212,11 +236,6 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				String searchFor = "";
 
 				String mainContent = currentlySelectedTab.getHtmlGUI(database, searchFor);
-
-				// remove the "Overview" title when directing to index.htm from the outside
-				if ("overview".equals(tabKind) && locEquiv.contains("index")) {
-					mainContent = mainContent.substring(mainContent.indexOf("</div>") + 6);
-				}
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[CONTENT]]", mainContent);
 

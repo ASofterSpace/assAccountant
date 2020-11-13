@@ -7,14 +7,14 @@ package com.asofterspace.accountant;
 import com.asofterspace.accountant.entries.Entry;
 
 
-public class ConsistencyProblem extends Problem {
+public class PaymentWarning extends PaymentProblem {
 
-	public ConsistencyProblem(String problem, Entry entry) {
+	public PaymentWarning(String problem, Entry entry) {
 		super(problem, entry);
 	}
 
 	@Override
 	public boolean isImportant() {
-		return true;
+		return false;
 	}
 }

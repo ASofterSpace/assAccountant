@@ -42,7 +42,7 @@ public class OverviewTab extends Tab {
 	@Override
 	public String getHtmlGUI(Database database, String searchFor) {
 
-		String html = "<div class='mainTitle'>" + TITLE + "</div>";
+		String html = "";
 
 		Color textColor = new Color(0, 0, 0);
 
@@ -55,8 +55,6 @@ public class OverviewTab extends Tab {
 
 		html += "<div>Well, fuck, there is stuff to do:</div>";
 
-
-		html += "<div class='secondaryTitle'>Outstanding Tasks:</div>";
 
 		List<GenericTask> tasks = database.getTaskCtrl().getTaskInstances();
 
@@ -85,13 +83,7 @@ public class OverviewTab extends Tab {
 				}
 			}
 		}
-		// for-else:
-		if (!tasksShown) {
-			html = "<div>No outstanding tasks!</div>";
-		}
 
-
-		html += "<div class='secondaryTitle'>Unpaid Invoices:</div>";
 
 		// display outgoing invoices which have been sent out more than six weeks ago and not yet
 		// been set to having come in
@@ -100,12 +92,7 @@ public class OverviewTab extends Tab {
 
 			html += "<div class='line'>";
 
-			Color curColor = new Color(148, 148, 0);
-			if (curProblem.isImportant()) {
-				curColor = new Color(196, 0, 0);
-			}
-
-			html += AccountingUtils.createLabelHtml(curProblem.getProblem(), curColor, "", "text-align: left; width: 80%;");
+			html += AccountingUtils.createLabelHtml(curProblem.getProblem(), curProblem.getColor(), "", "text-align: left; width: 80%;");
 
 			// TODO :: add working buttons
 			/*
@@ -133,25 +120,14 @@ public class OverviewTab extends Tab {
 
 			html += "</div>";
 		}
-		// for-else:
-		if (paymentProblems.size() < 1) {
-			html = "<div>No problems!</div>";
-		}
 
 
-		html += "<div class='secondaryTitle'>Consistency Checks:</div>";
-
-		List<ConsistencyProblem> consistencyProblems = database.getConsistencyProblems();
+		List<ConsistencyProblem> consistencyProblems = database.getUnacknowledgedConsistencyProblems();
 		for (final ConsistencyProblem curProblem : consistencyProblems) {
 
 			html += "<div class='line'>";
 
-			Color curColor = new Color(148, 148, 0);
-			if (curProblem.isImportant()) {
-				curColor = new Color(196, 0, 0);
-			}
-
-			html += AccountingUtils.createLabelHtml(curProblem.getProblem(), curColor, "", "text-align: left; width: 80%;");
+			html += AccountingUtils.createLabelHtml(curProblem.getProblem(), curProblem.getColor(), "", "text-align: left; width: 80%;");
 
 			// TODO - add working buttons
 			/*
@@ -191,10 +167,6 @@ public class OverviewTab extends Tab {
 			*/
 
 			html += "</div>";
-		}
-		// for-else:
-		if (consistencyProblems.size() < 1) {
-			html = "<div>Consistency checks looking good!</div>";
 		}
 
 
@@ -364,7 +336,7 @@ public class OverviewTab extends Tab {
 		tab.add(consistencyChecksLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		List<ConsistencyProblem> consistencyProblems = database.getConsistencyProblems();
+		List<ConsistencyProblem> consistencyProblems = database.getUnacknowledgedConsistencyProblems();
 		for (final ConsistencyProblem curProblem : consistencyProblems) {
 
 			curPanel = new JPanel();

@@ -6,6 +6,8 @@ package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.entries.Entry;
 
+import java.awt.Color;
+
 
 public abstract class Problem {
 
@@ -28,5 +30,13 @@ public abstract class Problem {
 	}
 
 	public abstract boolean isImportant();
+
+	public Color getColor() {
+		Color result = new Color(148, 148, 0);
+		if (isImportant()) {
+			result = new Color(196, 0, 0);
+		}
+		return result;
+	}
 
 }

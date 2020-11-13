@@ -13,6 +13,7 @@ public class PaymentProblem extends Problem {
 		super(problem, entry);
 	}
 
+	@Override
 	public boolean isImportant() {
 		return true;
 	}

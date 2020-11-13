@@ -11,7 +11,7 @@ import com.asofterspace.accountant.ConsistencyProblem;
 import com.asofterspace.accountant.ConsistencyWarning;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
-import com.asofterspace.accountant.PaymentProblem;
+import com.asofterspace.accountant.PaymentWarning;
 import com.asofterspace.accountant.Problem;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.toolbox.accounting.Currency;
@@ -547,7 +547,7 @@ public abstract class Entry {
 			if (!getReceived()) {
 				Date sixWeeksAgo = DateUtils.daysInTheFuture(-6*7);
 				if (getDate().before(sixWeeksAgo)) {
-					result.add(new PaymentProblem(
+					result.add(new PaymentWarning(
 						"The " + AccountingUtils.getEntryForLog(this) + " has not yet been paid!",
 						this));
 				}
