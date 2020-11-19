@@ -76,10 +76,10 @@ public class Task extends GenericTask {
 	private Database database;
 
 
-	public Task(String title, Integer scheduledOnDay, List<Integer> scheduledInMonths,
-		List<String> details, List<String> onDone) {
+	public Task(String title, Integer scheduledOnDay, List<String> scheduledOnDaysOfWeek, List<Integer> scheduledInMonths,
+		List<Integer> scheduledInYears, List<String> details, List<String> onDone) {
 
-		super(title, scheduledOnDay, scheduledInMonths, details, onDone);
+		super(title, scheduledOnDay, scheduledOnDaysOfWeek, scheduledInMonths, scheduledInYears, details, onDone);
 
 		this.taskCtrl = AssAccountant.getTaskCtrl();
 	}

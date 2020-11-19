@@ -12,7 +12,6 @@ import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -61,13 +60,21 @@ public class TaskCtrl extends TaskCtrlBase {
 		}
 	}
 
+	@Override
 	public void saveIntoRecord(Record root) {
-		root.set(TASKS, getTasksAsRecord());
-		root.set(TASK_INSTANCES, getTaskInstancesAsRecord());
+		super.saveIntoRecord(root);
 		root.set(FINANCE_LOGS, getFinanceLogsAsRecord());
-		root.set(LAST_TASK_GENERATION, DateUtils.serializeDate(lastTaskGeneration));
 	}
 
+	@Override
+	protected GenericTask createTask(String title, Integer scheduledOnDay, List<String> scheduledOnDaysOfWeek,
+		List<Integer> scheduledInMonths, List<Integer> scheduledInYears, List<String> details, List<String> onDone) {
+
+		return new Task(title, scheduledOnDay, scheduledOnDaysOfWeek, scheduledInMonths,
+			scheduledInYears, details, onDone);
+	}
+
+	@Override
 	protected GenericTask taskFromRecord(Record recordTask) {
 
 		GenericTask task = super.taskFromRecord(recordTask);
@@ -144,31 +151,18 @@ public class TaskCtrl extends TaskCtrlBase {
 		}
 	}
 
+	/**
+	 * Returns true if it worked and an ad hoc task was created, and false otherwise
+	 */
 	public boolean addAdHocTask(String title, String details, String dateStr) {
 
 		Date scheduleDate = DateUtils.parseDate(dateStr);
 
-		if (scheduleDate == null) {
+		GenericTask addedTask = super.addAdHocTask(title, details, scheduleDate);
+
+		if (addedTask == null) {
 			return false;
 		}
-
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(scheduleDate);
-
-		List<String> detailsList = new ArrayList<>();
-		for (String detail : details.split("\n")) {
-			detailsList.add(detail);
-		}
-
-		List<String> onDone = new ArrayList<>();
-
-		// this is an ad-hoc task which is not scheduled ever
-		Integer scheduledOnDay = null;
-		List<Integer> scheduledInMonths = null;
-
-		Task newTask = new Task(title, scheduledOnDay, scheduledInMonths, detailsList, onDone);
-
-		releaseTaskOn(newTask, scheduleDate);
 
 		database.save();
 
