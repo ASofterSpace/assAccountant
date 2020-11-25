@@ -110,7 +110,7 @@ public class TaskCtrl extends TaskCtrlBase {
 	}
 
 	@Override
-	protected Record taskToRecord(GenericTask task) {
+	public Record taskToRecord(GenericTask task) {
 		Record taskRecord = super.taskToRecord(task);
 		if (task instanceof FinanceOverviewTask) {
 			taskRecord.set(KIND, FINANCE_OVERVIEW);

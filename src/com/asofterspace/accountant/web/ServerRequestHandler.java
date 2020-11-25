@@ -14,12 +14,16 @@ import com.asofterspace.accountant.tabs.BankStatementYearTab;
 import com.asofterspace.accountant.tabs.MonthTab;
 import com.asofterspace.accountant.tabs.Tab;
 import com.asofterspace.accountant.tabs.YearTab;
+import com.asofterspace.accountant.tasks.TaskCtrl;
+import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.io.TextFile;
+import com.asofterspace.toolbox.utils.DateUtils;
+import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.web.WebServer;
 import com.asofterspace.toolbox.web.WebServerAnswer;
@@ -29,6 +33,7 @@ import com.asofterspace.toolbox.web.WebServerRequestHandler;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.Date;
 import java.util.List;
 
 
@@ -115,6 +120,51 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 	@Override
 	protected WebServerAnswer answerGet(String location, String[] arguments) {
+
+		if ("/taskInstances".equals(location)) {
+
+			JSON json = new JSON(Record.emptyArray());
+
+			TaskCtrl taskCtrl = database.getTaskCtrl();
+
+			List<GenericTask> taskInstances = taskCtrl.getTaskInstances();
+			Date fromDate = null;
+			Date toDate = null;
+			for (String arg : arguments) {
+				if (arg.contains("=")) {
+					String key = arg.substring(0, arg.indexOf("="));
+					if ("from".equals(key)) {
+						fromDate = DateUtils.parseDate(arg.substring(arg.indexOf("=") + 1));
+					}
+					if ("to".equals(key)) {
+						toDate = DateUtils.parseDate(arg.substring(arg.indexOf("=") + 1));
+					}
+				}
+			}
+			for (GenericTask taskInstance : taskInstances) {
+				if (taskInstance.appliesTo(fromDate, toDate)) {
+					json.append(taskCtrl.taskToRecord(taskInstance));
+				}
+			}
+
+			WebServerAnswerInJson answer = new WebServerAnswerInJson(json);
+			return answer;
+		}
+
+		if ("/tasks".equals(location)) {
+
+			JSON json = new JSON(Record.emptyArray());
+
+			TaskCtrl taskCtrl = database.getTaskCtrl();
+
+			List<GenericTask> tasks = taskCtrl.getTasks();
+			for (GenericTask task : tasks) {
+				json.append(taskCtrl.taskToRecord(task));
+			}
+
+			WebServerAnswerInJson answer = new WebServerAnswerInJson(json);
+			return answer;
+		}
 
 		if ("/unacknowledged-problems".equals(location)) {
 
