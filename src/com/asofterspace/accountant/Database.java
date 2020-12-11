@@ -78,6 +78,10 @@ public class Database {
 
 	private String username;
 
+	private String userLegalName;
+
+	private String location;
+
 
 	public Database(ConfigFile settings) throws JsonParseException {
 
@@ -91,6 +95,10 @@ public class Database {
 		this.port = settingsFile.getInteger("port");
 
 		this.username = settingsFile.getValue("username");
+
+		this.userLegalName = settingsFile.getValue("userLegalName");
+
+		this.location = settingsFile.getValue("location");
 	}
 
 	private Record loadFromFile(ConfigFile fileToLoad) {
@@ -1350,4 +1358,13 @@ public class Database {
 		// we check for backup overflow when we adjusted currentBackup... so may as well save it now :)
 		settingsFile.set(CURRENT_BACKUP_KEY, currentBackup);
 	}
+
+	public String getUserLegalName() {
+		return userLegalName;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
 }

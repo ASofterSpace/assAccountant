@@ -44,8 +44,7 @@ public class Month extends TimeSpan {
 		"September",
 		"October",
 		"November",
-		"December"
-	};
+		"December"};
 
 	private Year year;
 
@@ -117,6 +116,7 @@ public class Month extends TimeSpan {
 		return result;
 	}
 
+	@Override
 	public Year getYear() {
 		return year;
 	}

@@ -436,7 +436,7 @@ public class Task extends GenericTask {
 			if (detail.contains("%[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_" + curTaxAmount + "%]")) {
 				int cur = 0;
 				for (Outgoing entry : timeSpan.getOutgoings()) {
-					if (curTaxAmount == (int) entry.getTaxPercent()) {
+					if (curTaxAmount == entry.getTaxPercent()) {
 						cur += entry.getPreTaxAmount();
 					}
 				}
@@ -462,7 +462,7 @@ public class Task extends GenericTask {
 			if (detail.contains("%[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_" + curTaxAmount + "%_JUST_TAX]")) {
 				int cur = 0;
 				for (Outgoing entry : timeSpan.getOutgoings()) {
-					if (curTaxAmount == (int) entry.getTaxPercent()) {
+					if (curTaxAmount == entry.getTaxPercent()) {
 						cur += entry.getTaxAmount();
 					}
 				}
@@ -489,7 +489,7 @@ public class Task extends GenericTask {
 				int curInc = 0;
 				int curRest = 0;
 				for (Outgoing entry : timeSpan.getOutgoings()) {
-					if (0 == (int) entry.getTaxPercent()) {
+					if (0 == entry.getTaxPercent()) {
 						String curCustomer = entry.getCategoryOrCustomer().toLowerCase().trim();
 						boolean includeThisOne = false;
 						for (String incCustomer : included) {

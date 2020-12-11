@@ -75,11 +75,13 @@ div.relContainer {
 	width: 100%;
 }
 
-span.toprightAction {
+span.toprightAction, a.toprightAction {
 	position: absolute;
 	top: 10pt;
 	right: 10pt;
 	cursor: pointer;
+	text-decoration: none;
+	color: #88AAFF;
 }
 
 a.sidebar, div.projectbar {

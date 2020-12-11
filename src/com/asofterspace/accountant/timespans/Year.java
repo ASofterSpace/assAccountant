@@ -283,6 +283,11 @@ public class Year extends TimeSpan {
 		return result;
 	}
 
+	@Override
+	public Year getYear() {
+		return this;
+	}
+
 	public Database getDatabase() {
 		return database;
 	}

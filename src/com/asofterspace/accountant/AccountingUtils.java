@@ -486,7 +486,7 @@ public class AccountingUtils {
 
 		result.add(createList("Total deductible already paid VAT / Gesamte abziehbare Vorsteuerbeträge: ", timeSpan.getDiscountablePreTax()));
 		result.add(createList("Remaining VAT advance payment / Verbleibende Umsatzsteuer-Vorauszahlung: ", timeSpan.getRemainingVatPayments()));
-		result.add(createList("Actual VAT advance payments made / Umsatzsteuer-Vorauszahlungssoll: ", timeSpan.getVatPrepaymentsPaidTotal()));
+		result.add(createList("Actual VAT advance payments made / An das Finanzamt abgeführte Umsatzsteuer: ", timeSpan.getVatPrepaymentsPaidTotal()));
 
 		subList = new ArrayList<>();
 		subList.add("");
@@ -548,7 +548,7 @@ public class AccountingUtils {
 
 		html += AccountingUtils.createOverviewPanelInHtml("Total deductible already paid VAT / Gesamte abziehbare Vorsteuerbeträge: ", timeSpan.getDiscountablePreTax());
 		html += AccountingUtils.createOverviewPanelInHtml("Remaining VAT advance payment / Verbleibende Umsatzsteuer-Vorauszahlung: ", timeSpan.getRemainingVatPayments());
-		html += AccountingUtils.createOverviewPanelInHtml("Actual VAT advance payments made / Umsatzsteuer-Vorauszahlungssoll: ", timeSpan.getVatPrepaymentsPaidTotal());
+		html += AccountingUtils.createOverviewPanelInHtml("Actual VAT advance payments made / An das Finanzamt abgeführte Umsatzsteuer: ", timeSpan.getVatPrepaymentsPaidTotal());
 
 		html += "<div style='text-align: center; padding-top: 5pt;'>-------------- Income Tax / ESt --------------</div>";
 

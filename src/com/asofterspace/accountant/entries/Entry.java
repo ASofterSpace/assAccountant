@@ -171,9 +171,12 @@ public abstract class Entry {
 		return preTaxAmount != null;
 	}
 
-	public Integer getPreTaxAmount() {
+	public int getPreTaxAmount() {
 		if (!usesPreTaxAmount()) {
 			return FinanceUtils.calcPreTax(postTaxAmount, taxationPercent);
+		}
+		if (preTaxAmount == null) {
+			return 0;
 		}
 		return preTaxAmount;
 	}
@@ -191,9 +194,12 @@ public abstract class Entry {
 		return postTaxAmount != null;
 	}
 
-	public Integer getPostTaxAmount() {
+	public int getPostTaxAmount() {
 		if (usesPreTaxAmount()) {
 			return FinanceUtils.calcPostTax(preTaxAmount, taxationPercent);
+		}
+		if (postTaxAmount == null) {
+			return 0;
 		}
 		return postTaxAmount;
 	}
@@ -215,11 +221,14 @@ public abstract class Entry {
 		this.currency = currency;
 	}
 
-	public Integer getTaxAmount() {
+	public int getTaxAmount() {
 		return getPostTaxAmount() - getPreTaxAmount();
 	}
 
-	public Integer getTaxPercent() {
+	public int getTaxPercent() {
+		if (taxationPercent == null) {
+			return 0;
+		}
 		return taxationPercent;
 	}
 
@@ -569,7 +578,7 @@ public abstract class Entry {
 			}
 		}
 
-		if (getTaxPercent() == null) {
+		if (taxationPercent == null) {
 			result.add(new ConsistencyProblem(
 				"For " + AccountingUtils.getEntryForLog(this) + ", no tax amount has been selected.",
 				this));

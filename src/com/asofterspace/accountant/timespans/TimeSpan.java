@@ -91,4 +91,6 @@ public abstract class TimeSpan {
 	// paid, while the other will adjust itself)
 	public abstract int getVatPrepaymentsPaidTotal();
 
+	public abstract Year getYear();
+
 }

@@ -7,14 +7,19 @@ package com.asofterspace.accountant.web;
 import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.AssAccountant;
 import com.asofterspace.accountant.Database;
+import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.Problem;
 import com.asofterspace.accountant.TabCtrl;
 import com.asofterspace.accountant.tabs.BankStatementTab;
 import com.asofterspace.accountant.tabs.BankStatementYearTab;
 import com.asofterspace.accountant.tabs.MonthTab;
 import com.asofterspace.accountant.tabs.Tab;
+import com.asofterspace.accountant.tabs.TimeSpanTab;
 import com.asofterspace.accountant.tabs.YearTab;
 import com.asofterspace.accountant.tasks.TaskCtrl;
+import com.asofterspace.accountant.timespans.TimeSpan;
+import com.asofterspace.accountant.world.Category;
+import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.io.Directory;
@@ -38,8 +43,6 @@ import java.util.List;
 
 
 public class ServerRequestHandler extends WebServerRequestHandler {
-
-	public final static String MARI_DATABASE_FILE = "../assAccountant/config/database.cnf";
 
 	private Database database;
 
@@ -185,6 +188,243 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			WebServerAnswerWithText answer = new WebServerAnswerWithText(html);
 			answer.setTextKind("html");
 			return answer;
+		}
+
+		/* We are generation a EÜR, which does not contain Privatentnahme or Privateinlage - they need to
+		   be used as Verwendungszweck, but do NOT appear here, and this is the correct way to do it! */
+		if (location.startsWith("/print_pdf_euer_")) {
+			Tab tab = linkToTab(location.substring(16));
+			if (tab != null) {
+				if (tab instanceof TimeSpanTab) {
+					TimeSpanTab tsTab = (TimeSpanTab) tab;
+					StringBuilder html = new StringBuilder();
+					html.append("<html>");
+					html.append("<head>");
+					html.append("<meta charset='utf-8'>");
+					html.append("<style>");
+					html.append("div.entry {");
+					html.append("  padding-bottom: 8pt;");
+					html.append("}");
+					html.append("div.small_above {");
+					html.append("  font-size: 80%;");
+					html.append("}");
+					html.append("span.explanation {");
+					html.append("}");
+					html.append("span.bold, div.bold {");
+					html.append("  font-weight: bold;");
+					html.append("}");
+					html.append("span.right {");
+					html.append("  float: right;");
+					html.append("}");
+					html.append("span.rightish {");
+					html.append("  float: right;");
+					html.append("  padding-right: 125pt;");
+					html.append("}");
+					html.append("div.sub {");
+					html.append("  padding-left: 25pt;");
+					html.append("}");
+					html.append("div.subsub {");
+					html.append("  padding-left: 50pt;");
+					html.append("}");
+					html.append("</style>");
+					html.append("</head>");
+					html.append("<body>");
+					String title = tab.toString();
+					html.append("<div style='font-size:155%'>Einnahmenüberschussrechnung</div>");
+					html.append("<div style='font-size:115%'>Für ");
+					if (tab instanceof YearTab) {
+						html.append("das Kalenderjahr");
+					} else {
+						html.append("den Monat");
+					}
+					html.append(" " + title + "</div>");
+
+					html.append("<div class='bold entry' style='padding-top:25pt;'>Betriebseinnahmen</div>");
+
+					List<Outgoing> outgoings = tsTab.getTimeSpan().getOutgoings();
+					int out0percTax = 0;
+					int out16percTax = 0;
+					int out19percTax = 0;
+					int outOtherTax = 0;
+					int out16percTaxTax = 0;
+					int out19percTaxTax = 0;
+					int outOtherTaxTax = 0;
+					int outTotal = 0;
+					for (Outgoing outgoing : outgoings) {
+						outTotal += outgoing.getPostTaxAmount();
+						switch (outgoing.getTaxPercent()) {
+							case 0:
+								out0percTax += outgoing.getPreTaxAmount();
+								break;
+							case 16:
+								out16percTax += outgoing.getPreTaxAmount();
+								out16percTaxTax += outgoing.getTaxAmount();
+								break;
+							case 19:
+								out19percTax += outgoing.getPreTaxAmount();
+								out19percTaxTax += outgoing.getTaxAmount();
+								break;
+							default:
+								outOtherTax += outgoing.getPreTaxAmount();
+								outOtherTaxTax += outgoing.getTaxAmount();
+								break;
+						}
+					}
+
+					html.append("<div class='entry sub'>Betriebseinnahmen - zum allgemeinen Steuersatz von 19%:<span class='right'>" +
+						FinanceUtils.formatMoneyDE(out19percTax) + " €</span></div>");
+
+					if (out16percTax > 0) {
+						html.append("<div class='entry sub'>Betriebseinnahmen - zum Corona-bedingten Steuersatz von 16%:<span class='right'>" +
+							FinanceUtils.formatMoneyDE(out16percTax) + " €</span></div>");
+					}
+
+					if (outOtherTax > 0) {
+						html.append("<div class='entry sub'>Betriebseinnahmen - zu anderen Steuersätzen:<span class='right'>" +
+							FinanceUtils.formatMoneyDE(outOtherTax) + " €</span></div>");
+					}
+
+					html.append("<div class='entry sub'>Betriebseinnahmen - umsatzsteuerfrei oder nicht steuerbar:<span class='right'>" +
+						FinanceUtils.formatMoneyDE(out0percTax) + " €</span></div>");
+
+					html.append("<div class='entry sub'>Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf Entnahmen:</div>");
+
+					html.append("<div class='entry subsub'>Betriebseinnahmen 19%:<span class='right'>" +
+						FinanceUtils.formatMoneyDE(out19percTaxTax) + " €</span></div>");
+
+					if (out16percTaxTax > 0) {
+						html.append("<div class='entry subsub'>Betriebseinnahmen 16%:<span class='right'>" +
+							FinanceUtils.formatMoneyDE(out16percTaxTax) + " €</span></div>");
+					}
+
+					if (outOtherTaxTax > 0) {
+						html.append("<div class='entry subsub'>Betriebseinnahmen von anderen Steuersätzen:<span class='right'>" +
+							FinanceUtils.formatMoneyDE(outOtherTaxTax) + " €</span></div>");
+					}
+
+					html.append("<div class='bold entry'>Summe der anzusetzenden Betriebseinnahmen:<span class='right bold'>" +
+							FinanceUtils.formatMoneyDE(outTotal) + " €</span></div>");
+
+					if (outTotal != out0percTax + out16percTax + out19percTax + outOtherTax +
+						out16percTaxTax + out19percTaxTax + outOtherTaxTax) {
+
+						html.append("<div class='bold entry'>Es liegt ein Berechnungsfehler vor!</div>");
+					}
+
+					html.append("<div class='bold entry' style='padding-top:25pt;'>Betriebsausgaben</div>");
+
+					TimeSpan timeSpan = tsTab.getTimeSpan();
+
+					int externalSalary = timeSpan.getInTotalBeforeTax(Category.EXTERNAL_SALARY);
+					int internalSalary = timeSpan.getInTotalBeforeTax(Category.INTERNAL_SALARY);
+					int vehicleCosts = timeSpan.getInTotalBeforeTax(Category.VEHICLE);
+					int travelCosts = timeSpan.getInTotalBeforeTax(Category.TRAVEL);
+					int locationCosts = timeSpan.getInTotalBeforeTax(Category.LOCATIONS);
+					int educationCosts = timeSpan.getInTotalBeforeTax(Category.EDUCATION);
+					int advertisementCosts = timeSpan.getInTotalBeforeTax(Category.ADVERTISEMENTS);
+					int infrastructureCosts = timeSpan.getInTotalBeforeTax(Category.INFRASTRUCTURE);
+					int entertainmentCosts = timeSpan.getInTotalBeforeTax(Category.ENTERTAINMENT);
+					int wareCosts = timeSpan.getInTotalBeforeTax(Category.WARES);
+
+					// this does NOT include donations, as we will not get donation amounts from timeSpan.getInTotalBeforeTax() anyway, so we do not want to subtract them from it!
+					// (in general, this is only the sum of non-special categories except other)
+					int categoryTally = externalSalary + internalSalary + vehicleCosts + travelCosts + locationCosts +
+						educationCosts + advertisementCosts + infrastructureCosts + entertainmentCosts + wareCosts;
+
+					int otherCosts = timeSpan.getInTotalBeforeTax() - categoryTally;
+
+					if (wareCosts + otherCosts > 0) {
+						html.append("<div class='entry sub'>Waren, Rohstoffe und Hilfsmittel:<span class='right'>" +
+							FinanceUtils.formatMoneyDE(wareCosts + otherCosts) + " €</span></div>");
+					}
+
+					if (externalSalary > 0) {
+						html.append("<div class='entry sub'>Fremdleistungen und Auftragsarbeiten:<span class='right'>" +
+							FinanceUtils.formatMoneyDE(externalSalary) + " €</span></div>");
+					}
+
+					if (internalSalary > 0) {
+						html.append("<div class='entry sub'>Personalkosten:<span class='right'>" +
+							FinanceUtils.formatMoneyDE(internalSalary) + " €</span></div>");
+					}
+
+					if (vehicleCosts > 0) {
+						html.append("<div class='entry sub'>Fahrzeugkosten und andere Fahrtkosten:</div>");
+
+						html.append("<div class='entry subsub'>Leasingkosten:<span class='rightish'>" +
+							FinanceUtils.formatMoneyDE(vehicleCosts) + " €</span></div>");
+
+						html.append("<div class='entry subsub'>Sonstige tatsächliche Fahrtkosten:<span class='rightish'>" +
+							FinanceUtils.formatMoneyDE(travelCosts) + " €</span></div>");
+
+						html.append("<div class='entry sub'>Summe Fahrzeugkosten und andere Fahrtkosten:<span class='right'>" +
+							FinanceUtils.formatMoneyDE(vehicleCosts + travelCosts) + " €</span></div>");
+					} else {
+						if (travelCosts > 0) {
+							html.append("<div class='entry sub'>Fahrtkosten:<span class='right'>" +
+								FinanceUtils.formatMoneyDE(travelCosts) + " €</span></div>");
+						}
+					}
+
+					if (locationCosts > 0) {
+						html.append("<div class='entry sub'>Raumkosten und sonstige Grundstücksaufwendungen:<span class='right'>" +
+							FinanceUtils.formatMoneyDE(locationCosts) + " €</span></div>");
+					}
+
+					html.append("<div class='entry sub'>Sonstige Betriebsausgaben:</div>");
+
+					if (educationCosts > 0) {
+						html.append("<div class='entry subsub'>Fortbildungskosten:<span class='rightish'>" +
+							FinanceUtils.formatMoneyDE(educationCosts) + " €</span></div>");
+					}
+
+					html.append("<div class='entry subsub'>Laufende EDV-Kosten:<span class='rightish'>" +
+						FinanceUtils.formatMoneyDE(infrastructureCosts) + " €</span></div>");
+
+					if (advertisementCosts + entertainmentCosts > 0) {
+						html.append("<div class='entry subsub'>Werbekosten:<span class='rightish'>" +
+							FinanceUtils.formatMoneyDE(advertisementCosts + entertainmentCosts) + " €</span></div>");
+					}
+
+					html.append("<div class='entry sub'>Summe sonstige Betriebsausgaben:<span class='right'>" +
+						FinanceUtils.formatMoneyDE(educationCosts + infrastructureCosts + advertisementCosts + entertainmentCosts) + " €</span></div>");
+
+					int inTotal = timeSpan.getInTotalBeforeTax();
+
+					html.append("<div class='entry sub'>Abziehbare Vorsteuerbeträge:</div>");
+
+					html.append("<div class='entry subsub'>Manuell ermittelte Vorsteuer:<span class='right'>" +
+						FinanceUtils.formatMoneyDE(timeSpan.getDiscountablePreTax()) + " €</span></div>");
+					inTotal += timeSpan.getDiscountablePreTax();
+
+					html.append("<div class='entry sub'>An das Finanzamt abgeführte Umsatzsteuer:<span class='right'>" +
+						FinanceUtils.formatMoneyDE(timeSpan.getVatPrepaymentsPaidTotal()) + " €</span></div>");
+					inTotal += timeSpan.getVatPrepaymentsPaidTotal();
+
+					html.append("<div class='entry bold'>Summe der anzusetzenden Betriebsausgaben:<span class='right bold'>" +
+						FinanceUtils.formatMoneyDE(inTotal) + " €</span></div>");
+
+					html.append("<div class='bold entry' style='padding-top:25pt;'>Ermittlung des Gewinns</div>");
+
+					html.append("<div class='entry sub'>Summe der Betriebseinnahmen:<span class='right'>" +
+						FinanceUtils.formatMoneyDE(outTotal) + " €</span></div>");
+
+					html.append("<div class='entry sub'>Abzüglich Summe der Betriebsausgaben:<span class='right'>" +
+						FinanceUtils.formatMoneyDE(inTotal) + " €</span></div>");
+
+					html.append("<div class='entry bold'>Gewinn:<span class='right bold'>" +
+						FinanceUtils.formatMoneyDE(outTotal - inTotal) + " €</span></div>");
+
+					html.append("<div style='padding-top:25pt;text-align: right;'><span><img style='width:215pt;' src='/pics/signature.png' /></span></div>");
+					html.append("<span style='float:left;font-size: 115%;'>" + database.getLocation() + ", " + DateUtils.serializeDate(DateUtils.now()) + "</span>");
+					html.append("<div style='text-align: right;padding-right: 85pt;font-size: 115%;'>" + database.getUserLegalName() + "</div>");
+					html.append("</body>");
+					html.append("</html>");
+					WebServerAnswerWithText answer = new WebServerAnswerWithText(html.toString());
+					answer.setTextKind("html");
+					return answer;
+				}
+			}
 		}
 
 		return null;

@@ -35,6 +35,7 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.GridBagLayout;
@@ -44,7 +45,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.swing.AbstractButton;
 import javax.swing.BorderFactory;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -303,10 +303,10 @@ public class GUI extends MainWindow {
 		});
 		edit.add(showSearch);
 
-		AbstractButton addEntry = new MenuItemForMainMenu("Add Entry");
-		addEntry.addActionListener(new ActionListener() {
+		MenuItemForMainMenu addEntry = new MenuItemForMainMenu("Add Entry");
+		addEntry.addMouseListener(new MouseAdapter() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void mouseClicked(MouseEvent e) {
 				// show the add entry GUI
 				if (addEntryGUI == null) {
 					addEntryGUI = new AddEntryGUI(GUI.this, database, null);
@@ -351,10 +351,10 @@ public class GUI extends MainWindow {
 		menu.add(tasksMenu);
 
 		// open the invoice file location on disk
-		AbstractButton openOnDisk = new MenuItemForMainMenu("Open on Disk");
-		openOnDisk.addActionListener(new ActionListener() {
+		MenuItemForMainMenu openOnDisk = new MenuItemForMainMenu("Open on Disk");
+		openOnDisk.addMouseListener(new MouseAdapter() {
 			@Override
-			public void actionPerformed(ActionEvent e) {
+			public void mouseClicked(MouseEvent e) {
 				String diskLocation = configuration.getValue(CONFIG_KEY_INVOICE_LOCATION_ON_DISK);
 				if (diskLocation == null) {
 					GuiUtils.complain("Sorry, the key " +
