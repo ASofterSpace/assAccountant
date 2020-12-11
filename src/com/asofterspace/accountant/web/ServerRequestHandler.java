@@ -17,6 +17,7 @@ import com.asofterspace.accountant.tabs.Tab;
 import com.asofterspace.accountant.tabs.TimeSpanTab;
 import com.asofterspace.accountant.tabs.YearTab;
 import com.asofterspace.accountant.tasks.TaskCtrl;
+import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.TimeSpan;
 import com.asofterspace.accountant.world.Category;
 import com.asofterspace.toolbox.accounting.FinanceUtils;
@@ -191,7 +192,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		}
 
 		/* We are generation a EÜR, which does not contain Privatentnahme or Privateinlage - they need to
-		   be used as Verwendungszweck, but do NOT appear here, and this is the correct way to do it! */
+		   be used as Verwendungszweck, but do NOT appear here, and this is the correct way to do it!
+
+		   Also, our donations are not at all present in the EÜR - and this is perfectly reasonable:
+		   They are actually private expenses, and in the future we should pay them from our private
+		   account rather than from the company account! */
 		if (location.startsWith("/print_pdf_euer_")) {
 			Tab tab = linkToTab(location.substring(16));
 			if (tab != null) {
@@ -233,11 +238,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					html.append("<div style='font-size:155%'>Einnahmenüberschussrechnung</div>");
 					html.append("<div style='font-size:115%'>Für ");
 					if (tab instanceof YearTab) {
-						html.append("das Kalenderjahr");
+						html.append("das Kalenderjahr " + title);
 					} else {
-						html.append("den Monat");
+						html.append("den Monat " + ((Month) tsTab.getTimeSpan()).getMonthName() + " " +
+							tsTab.getTimeSpan().getYear().getNum());
 					}
-					html.append(" " + title + "</div>");
+					html.append("</div>");
 
 					html.append("<div class='bold entry' style='padding-top:25pt;'>Betriebseinnahmen</div>");
 
