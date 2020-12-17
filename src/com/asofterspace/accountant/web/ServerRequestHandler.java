@@ -451,6 +451,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				case "bank_statement_graph.png":
 				case "finance_log_graph.png":
 				case "income_log_graph.png":
+				case "income_log_graph_smoothened.png":
 					return location;
 			}
 

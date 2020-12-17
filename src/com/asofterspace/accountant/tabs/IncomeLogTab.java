@@ -52,13 +52,19 @@ public class IncomeLogTab extends Tab {
 
 		html += "<div class='mainTitle'>" + TITLE + "</div>";
 
-		html += "<div>This shows our total income (sent invoices before any tax) per month.<br>";
+		html += "<div>This shows our total income (sent invoices before any tax) per month, smoothed over three months.<br>";
 		html += "An upwards slope is good, a sideways slope is okay.</div>";
 
 
 		List<GraphTimeDataPoint> timeData = new ArrayList<>();
 
-		GraphImage graph = new GraphImage(1000, 600);
+		GraphImage smoothGraph = new GraphImage(1000, 400);
+		smoothGraph.setForegroundColor(new ColorRGB(120, 40, 220));
+		smoothGraph.setBackgroundColor(new ColorRGB(0, 0, 0, 255));
+		smoothGraph.setDataColor(new ColorRGB(160, 80, 255));
+		smoothGraph.setBaseYmin(0.0);
+
+		GraphImage graph = new GraphImage(1000, 400);
 		graph.setForegroundColor(new ColorRGB(120, 40, 220));
 		graph.setBackgroundColor(new ColorRGB(0, 0, 0, 255));
 		graph.setDataColor(new ColorRGB(160, 80, 255));
@@ -75,8 +81,8 @@ public class IncomeLogTab extends Tab {
 					}
 				}
 				afterHtml += "<div>";
-				afterHtml += "<span style='width: 25%;'>";
-				afterHtml += month.getMonthName() + " " + month.getYear() + ": ";
+				afterHtml += "<span style='width: 50%; display: inline-block; text-align: right;'>";
+				afterHtml += month.getMonthName() + " " + month.getYear() + ":&nbsp;&nbsp;&nbsp;";
 				afterHtml += "</span>";
 				afterHtml += "<span>";
 				afterHtml += FinanceUtils.formatMoney(month.getInTotalAfterTax(), Currency.EUR);
@@ -87,18 +93,36 @@ public class IncomeLogTab extends Tab {
 
 				timeData.add(new GraphTimeDataPoint(month.getEndDate(), month.getInTotalAfterTax()));
 			}
+			afterHtml += "<div>";
+			afterHtml += "&nbsp;";
+			afterHtml += "</div>";
 		}
 
 		// for-else:
 		if (!foundEntry) {
 			html += "<div>No finance logs have been found!</div>";
 		} else {
+			html += "<div><img src='income_log_graph_smoothened.png' /></div>";
+
+			html += "<div>Here is the same data with only minor smoothening:</div>";
+
 			html += "<div><img src='income_log_graph.png' /></div>";
+
+			html += "<div>And finally, there is the original raw data:</div>";
+			html += "<div>&nbsp;</div>";
+
 			html += afterHtml;
+
+			smoothGraph.setIncludeTodayInTimeData(true);
+			smoothGraph.setAbsoluteTimeDataPoints(timeData);
+			smoothGraph.smoothen(68);
+			DefaultImageFile smoothGraphFile = new DefaultImageFile(AssAccountant.getWebRoot(), "income_log_graph_smoothened.png");
+			smoothGraphFile.assign(smoothGraph);
+			smoothGraphFile.saveTransparently();
 
 			graph.setIncludeTodayInTimeData(true);
 			graph.setAbsoluteTimeDataPoints(timeData);
-
+			graph.smoothen(9);
 			DefaultImageFile graphFile = new DefaultImageFile(AssAccountant.getWebRoot(), "income_log_graph.png");
 			graphFile.assign(graph);
 			graphFile.saveTransparently();

@@ -87,6 +87,7 @@ public class FinanceLogTab extends Tab {
 
 			graph.setIncludeTodayInTimeData(true);
 			graph.setAbsoluteTimeDataPoints(timeData);
+			graph.smoothen(9);
 
 			DefaultImageFile graphFile = new DefaultImageFile(AssAccountant.getWebRoot(), "finance_log_graph.png");
 			graphFile.assign(graph);
