@@ -25,37 +25,37 @@ public abstract class TimeSpan {
 	// gets all entries
 	public abstract List<Entry> getEntries();
 
-	// gets all outgoing invoices
-	public abstract List<Outgoing> getOutgoings();
-
-	// gets all incoming invoices not set to categories donation or personal
+	// gets all incoming payments (sent invoices)
 	public abstract List<Incoming> getIncomings();
 
-	// gets all incoming invoices set to category donation
-	public abstract List<Incoming> getDonations();
+	// gets all outgoing payments (received invoices) not set to categories donation or personal
+	public abstract List<Outgoing> getOutgoings();
 
-	// gets all incoming invoices set to category personal
-	public abstract List<Incoming> getPersonals();
+	// gets all outgoing payments (received invoices) set to category donation
+	public abstract List<Outgoing> getDonations();
+
+	// gets all outgoing payments (received invoices) set to category personal
+	public abstract List<Outgoing> getPersonals();
 
 	// before tax means before applying VAT (USt)
-	public abstract int getOutTotalBeforeTax();
-
-	public int getOutTotalTax() {
-		return getOutTotalAfterTax() - getOutTotalBeforeTax();
-	}
-
-	// after tax means after applying VAT (USt)
-	public abstract int getOutTotalAfterTax();
-
 	public abstract int getInTotalBeforeTax();
-
-	public abstract int getInTotalBeforeTax(Category category);
 
 	public int getInTotalTax() {
 		return getInTotalAfterTax() - getInTotalBeforeTax();
 	}
 
+	// after tax means after applying VAT (USt)
 	public abstract int getInTotalAfterTax();
+
+	public abstract int getOutTotalBeforeTax();
+
+	public abstract int getOutTotalBeforeTax(Category category);
+
+	public int getOutTotalTax() {
+		return getOutTotalAfterTax() - getOutTotalBeforeTax();
+	}
+
+	public abstract int getOutTotalAfterTax();
 
 	public abstract int getDonTotalBeforeTax();
 
@@ -75,11 +75,11 @@ public abstract class TimeSpan {
 
 	// pre-paid VAT discountable for own VAT payments
 	public int getDiscountablePreTax() {
-		return getInTotalTax() + getDonTotalTax();
+		return getOutTotalTax() + getDonTotalTax();
 	}
 
 	public int getRemainingVatPayments() {
-		int remainVATpay = getOutTotalTax() - (getInTotalTax() + getDonTotalTax());
+		int remainVATpay = getInTotalTax() - (getOutTotalTax() + getDonTotalTax());
 		if (remainVATpay < 0) {
 			remainVATpay = 0;
 		}
@@ -87,7 +87,7 @@ public abstract class TimeSpan {
 	}
 
 	// actually paid VAT (originally equal to getRemainingVatPayments(), but if after setting
-	// the USt-Voranmeldung some new invoices come in, this will keep track of what was actually
+	// the USt-Voranmeldung some new invoices get received, this will keep track of what was actually
 	// paid, while the other will adjust itself)
 	public abstract int getVatPrepaymentsPaidTotal();
 

@@ -216,39 +216,12 @@ public class AccountingUtils {
 
 		String html = "";
 
-		html += "<div class='secondaryTitle'>Outgoing Invoices - that is, we get paid:</div>";
+		html += "<div class='secondaryTitle'>Incoming Payments - Sent Invoices:</div>";
 
 		int totalBeforeTax = 0;
 		int totalTax = 0;
 		int totalAfterTax = 0;
 
-		List<Outgoing> outgoings = timeSpan.getOutgoings();
-		for (Outgoing cur : outgoings) {
-			if (cur.matches(searchFor)) {
-				html += cur.createPanelHtml(database);
-				totalBeforeTax += cur.getPreTaxAmount();
-				totalAfterTax += cur.getPostTaxAmount();
-			}
-		}
-		totalTax = totalAfterTax - totalBeforeTax;
-
-		if ("".equals(searchFor)) {
-			if ((totalBeforeTax != timeSpan.getOutTotalBeforeTax()) ||
-				(totalTax != timeSpan.getOutTotalTax()) ||
-				(totalAfterTax != timeSpan.getOutTotalAfterTax())) {
-				// TODO - complain in HTML somehow
-				GuiUtils.complain("There was an outgoing calculation mixup! Something is wrong! Cats and dogs! Oh no!");
-			}
-		}
-
-		html += AccountingUtils.createTotalPanelHtml(totalBeforeTax, totalTax, totalAfterTax);
-
-
-		html += "<div class='secondaryTitle'>Incoming Invoices - that is, we have to pay:</div>";
-
-		totalBeforeTax = 0;
-		totalTax = 0;
-		totalAfterTax = 0;
 		List<Incoming> incomings = timeSpan.getIncomings();
 		for (Incoming cur : incomings) {
 			if (cur.matches(searchFor)) {
@@ -271,13 +244,40 @@ public class AccountingUtils {
 		html += AccountingUtils.createTotalPanelHtml(totalBeforeTax, totalTax, totalAfterTax);
 
 
-		html += "<div class='secondaryTitle'>Donations - which we also pay:</div>";
+		html += "<div class='secondaryTitle'>Outgoing Payments - Received Invoices:</div>";
 
 		totalBeforeTax = 0;
 		totalTax = 0;
 		totalAfterTax = 0;
-		List<Incoming> donations = timeSpan.getDonations();
-		for (Incoming cur : donations) {
+		List<Outgoing> outgoings = timeSpan.getOutgoings();
+		for (Outgoing cur : outgoings) {
+			if (cur.matches(searchFor)) {
+				html += cur.createPanelHtml(database);
+				totalBeforeTax += cur.getPreTaxAmount();
+				totalAfterTax += cur.getPostTaxAmount();
+			}
+		}
+		totalTax = totalAfterTax - totalBeforeTax;
+
+		if ("".equals(searchFor)) {
+			if ((totalBeforeTax != timeSpan.getOutTotalBeforeTax()) ||
+				(totalTax != timeSpan.getOutTotalTax()) ||
+				(totalAfterTax != timeSpan.getOutTotalAfterTax())) {
+				// TODO - complain in HTML somehow
+				GuiUtils.complain("There was an outgoing calculation mixup! Something is wrong! Cats and dogs! Oh no!");
+			}
+		}
+
+		html += AccountingUtils.createTotalPanelHtml(totalBeforeTax, totalTax, totalAfterTax);
+
+
+		html += "<div class='secondaryTitle'>Outgoing Donations - Received Donation Invoices:</div>";
+
+		totalBeforeTax = 0;
+		totalTax = 0;
+		totalAfterTax = 0;
+		List<Outgoing> donations = timeSpan.getDonations();
+		for (Outgoing cur : donations) {
 			if (cur.matches(searchFor)) {
 				html += cur.createPanelHtml(database);
 				totalBeforeTax += cur.getPreTaxAmount();
@@ -298,13 +298,13 @@ public class AccountingUtils {
 		html += AccountingUtils.createTotalPanelHtml(totalBeforeTax, totalTax, totalAfterTax);
 
 
-		html += "<div class='secondaryTitle'>Personal Expenses - which we also pay:</div>";
+		html += "<div class='secondaryTitle'>Outgoing Personal Expenses:</div>";
 
 		totalBeforeTax = 0;
 		totalTax = 0;
 		totalAfterTax = 0;
-		List<Incoming> personals = timeSpan.getPersonals();
-		for (Incoming cur : personals) {
+		List<Outgoing> personals = timeSpan.getPersonals();
+		for (Outgoing cur : personals) {
 			if (cur.matches(searchFor)) {
 				html += cur.createPanelHtml(database);
 				totalBeforeTax += cur.getPreTaxAmount();
@@ -330,8 +330,8 @@ public class AccountingUtils {
 
 	public static int createTimeSpanTabMainContent(TimeSpan timeSpan, JPanel tab, int i, Database database, String searchFor) {
 
-		CopyByClickLabel outgoingLabel = AccountingUtils.createSubHeadLabel("Outgoing Invoices - that is, we get paid:");
-		tab.add(outgoingLabel, new Arrangement(0, i, 1.0, 0.0));
+		CopyByClickLabel incomingLabel = AccountingUtils.createSubHeadLabel("Incoming Payments - Sent Invoices:");
+		tab.add(incomingLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
 		JPanel curPanel;
@@ -339,38 +339,6 @@ public class AccountingUtils {
 		int totalBeforeTax = 0;
 		int totalTax = 0;
 		int totalAfterTax = 0;
-		List<Outgoing> outgoings = timeSpan.getOutgoings();
-		for (Outgoing cur : outgoings) {
-			if (cur.matches(searchFor)) {
-				curPanel = cur.createPanelOnGUI(database);
-				tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
-				totalBeforeTax += cur.getPreTaxAmount();
-				totalAfterTax += cur.getPostTaxAmount();
-				i++;
-			}
-		}
-		totalTax = totalAfterTax - totalBeforeTax;
-
-		if ("".equals(searchFor)) {
-			if ((totalBeforeTax != timeSpan.getOutTotalBeforeTax()) ||
-				(totalTax != timeSpan.getOutTotalTax()) ||
-				(totalAfterTax != timeSpan.getOutTotalAfterTax())) {
-				GuiUtils.complain("There was an outgoing calculation mixup! Something is wrong! Cats and dogs! Oh no!");
-			}
-		}
-
-		curPanel = AccountingUtils.createTotalPanelOnGUI(totalBeforeTax, totalTax, totalAfterTax);
-		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
-		i++;
-
-
-		CopyByClickLabel incomingLabel = AccountingUtils.createSubHeadLabel("Incoming Invoices - that is, we have to pay:");
-		tab.add(incomingLabel, new Arrangement(0, i, 1.0, 0.0));
-		i++;
-
-		totalBeforeTax = 0;
-		totalTax = 0;
-		totalAfterTax = 0;
 		List<Incoming> incomings = timeSpan.getIncomings();
 		for (Incoming cur : incomings) {
 			if (cur.matches(searchFor)) {
@@ -396,15 +364,47 @@ public class AccountingUtils {
 		i++;
 
 
-		CopyByClickLabel donationLabel = AccountingUtils.createSubHeadLabel("Donations - which we also pay:");
+		CopyByClickLabel outgoingLabel = AccountingUtils.createSubHeadLabel("Outgoing Payments - Received Invoices:");
+		tab.add(outgoingLabel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		totalBeforeTax = 0;
+		totalTax = 0;
+		totalAfterTax = 0;
+		List<Outgoing> outgoings = timeSpan.getOutgoings();
+		for (Outgoing cur : outgoings) {
+			if (cur.matches(searchFor)) {
+				curPanel = cur.createPanelOnGUI(database);
+				tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+				totalBeforeTax += cur.getPreTaxAmount();
+				totalAfterTax += cur.getPostTaxAmount();
+				i++;
+			}
+		}
+		totalTax = totalAfterTax - totalBeforeTax;
+
+		if ("".equals(searchFor)) {
+			if ((totalBeforeTax != timeSpan.getOutTotalBeforeTax()) ||
+				(totalTax != timeSpan.getOutTotalTax()) ||
+				(totalAfterTax != timeSpan.getOutTotalAfterTax())) {
+				GuiUtils.complain("There was an outgoing calculation mixup! Something is wrong! Cats and dogs! Oh no!");
+			}
+		}
+
+		curPanel = AccountingUtils.createTotalPanelOnGUI(totalBeforeTax, totalTax, totalAfterTax);
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+
+		CopyByClickLabel donationLabel = AccountingUtils.createSubHeadLabel("Outgoing Donations - Received Donation Invoices::");
 		tab.add(donationLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
 		totalBeforeTax = 0;
 		totalTax = 0;
 		totalAfterTax = 0;
-		List<Incoming> donations = timeSpan.getDonations();
-		for (Incoming cur : donations) {
+		List<Outgoing> donations = timeSpan.getDonations();
+		for (Outgoing cur : donations) {
 			if (cur.matches(searchFor)) {
 				curPanel = cur.createPanelOnGUI(database);
 				tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
@@ -428,15 +428,15 @@ public class AccountingUtils {
 		i++;
 
 
-		CopyByClickLabel personalLabel = AccountingUtils.createSubHeadLabel("Personal Expenses - which we also pay:");
+		CopyByClickLabel personalLabel = AccountingUtils.createSubHeadLabel("Outgoing Personal Expenses:");
 		tab.add(personalLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
 		totalBeforeTax = 0;
 		totalTax = 0;
 		totalAfterTax = 0;
-		List<Incoming> personals = timeSpan.getPersonals();
-		for (Incoming cur : personals) {
+		List<Outgoing> personals = timeSpan.getPersonals();
+		for (Outgoing cur : personals) {
 			if (cur.matches(searchFor)) {
 				curPanel = cur.createPanelOnGUI(database);
 				tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
@@ -466,15 +466,15 @@ public class AccountingUtils {
 
 		List<List<String>> result = new ArrayList<>();
 
-		result.add(createList("Total amount earned: ", timeSpan.getOutTotalAfterTax(), "Of that VAT: ", timeSpan.getOutTotalTax()));
-		result.add(createList("Total amount spent: ", timeSpan.getInTotalAfterTax(), "Of that VAT: ", timeSpan.getInTotalTax()));
+		result.add(createList("Total amount earned: ", timeSpan.getInTotalAfterTax(), "Of that VAT: ", timeSpan.getInTotalTax()));
+		result.add(createList("Total amount spent: ", timeSpan.getOutTotalAfterTax(), "Of that VAT: ", timeSpan.getOutTotalTax()));
 		result.add(createList("Total amount donated: ", timeSpan.getDonTotalAfterTax(), "Of that VAT: ", timeSpan.getDonTotalTax()));
 		result.add(createList("Total amount of personal expenses: ", timeSpan.getPersTotalAfterTax(), "Of that VAT: ", timeSpan.getPersTotalTax()));
 
 		if (timeSpan instanceof Year) {
 			Year curYear = (Year) timeSpan;
 			result.add(createList("ROUGHLY expected income tax payment: ", (int) curYear.getExpectedIncomeTax()));
-			result.add(createList("Total amount earned in " + curYear.getNum() + ": ", (int) (timeSpan.getOutTotalBeforeTax() - (timeSpan.getInTotalBeforeTax() + timeSpan.getDonTotalBeforeTax() + timeSpan.getPersTotalBeforeTax() + curYear.getExpectedIncomeTax()))));
+			result.add(createList("Total amount earned in " + curYear.getNum() + ": ", (int) (timeSpan.getInTotalBeforeTax() - (timeSpan.getOutTotalBeforeTax() + timeSpan.getDonTotalBeforeTax() + timeSpan.getPersTotalBeforeTax() + curYear.getExpectedIncomeTax()))));
 		}
 
 		List<String> subList = new ArrayList<>();
@@ -495,23 +495,23 @@ public class AccountingUtils {
 		subList.add("-------------- Income Tax / ESt --------------");
 		result.add(subList);
 
-		int externalSalary = timeSpan.getInTotalBeforeTax(Category.EXTERNAL_SALARY);
-		int internalSalary = timeSpan.getInTotalBeforeTax(Category.INTERNAL_SALARY);
-		int vehicleCosts = timeSpan.getInTotalBeforeTax(Category.VEHICLE);
-		int travelCosts = timeSpan.getInTotalBeforeTax(Category.TRAVEL);
-		int locationCosts = timeSpan.getInTotalBeforeTax(Category.LOCATIONS);
-		int educationCosts = timeSpan.getInTotalBeforeTax(Category.EDUCATION);
-		int advertisementCosts = timeSpan.getInTotalBeforeTax(Category.ADVERTISEMENTS);
-		int infrastructureCosts = timeSpan.getInTotalBeforeTax(Category.INFRASTRUCTURE);
-		int entertainmentCosts = timeSpan.getInTotalBeforeTax(Category.ENTERTAINMENT);
-		int wareCosts = timeSpan.getInTotalBeforeTax(Category.WARES);
+		int externalSalary = timeSpan.getOutTotalBeforeTax(Category.EXTERNAL_SALARY);
+		int internalSalary = timeSpan.getOutTotalBeforeTax(Category.INTERNAL_SALARY);
+		int vehicleCosts = timeSpan.getOutTotalBeforeTax(Category.VEHICLE);
+		int travelCosts = timeSpan.getOutTotalBeforeTax(Category.TRAVEL);
+		int locationCosts = timeSpan.getOutTotalBeforeTax(Category.LOCATIONS);
+		int educationCosts = timeSpan.getOutTotalBeforeTax(Category.EDUCATION);
+		int advertisementCosts = timeSpan.getOutTotalBeforeTax(Category.ADVERTISEMENTS);
+		int infrastructureCosts = timeSpan.getOutTotalBeforeTax(Category.INFRASTRUCTURE);
+		int entertainmentCosts = timeSpan.getOutTotalBeforeTax(Category.ENTERTAINMENT);
+		int wareCosts = timeSpan.getOutTotalBeforeTax(Category.WARES);
 
-		// this does NOT include donations, as we will not get donation amounts from timeSpan.getInTotalBeforeTax() anyway, so we do not want to subtract them from it!
+		// this does NOT include donations, as we will not get donation amounts from timeSpan.getOutTotalBeforeTax() anyway, so we do not want to subtract them from it!
 		// (in general, this is only the sum of non-special categories except other)
 		int categoryTally = externalSalary + internalSalary + vehicleCosts + travelCosts + locationCosts +
 			educationCosts + advertisementCosts + infrastructureCosts + entertainmentCosts + wareCosts;
 
-		int otherCosts = timeSpan.getInTotalBeforeTax() - categoryTally;
+		int otherCosts = timeSpan.getOutTotalBeforeTax() - categoryTally;
 
 		result.add(createList("Total amount spent on items, raw materials etc.: ", wareCosts + otherCosts));
 		result.add(createList("Total external personnel and subcontractor costs: ", externalSalary));
@@ -533,15 +533,15 @@ public class AccountingUtils {
 
 		html += "<div class='secondaryTitle'>Overview and Tax Information:</div>";
 
-		html += AccountingUtils.createOverviewPanelInHtml("Total amount earned: ", timeSpan.getOutTotalAfterTax(), "Of that VAT: ", timeSpan.getOutTotalTax());
-		html += AccountingUtils.createOverviewPanelInHtml("Total amount spent: ", timeSpan.getInTotalAfterTax(), "Of that VAT: ", timeSpan.getInTotalTax());
+		html += AccountingUtils.createOverviewPanelInHtml("Total amount earned: ", timeSpan.getInTotalAfterTax(), "Of that VAT: ", timeSpan.getInTotalTax());
+		html += AccountingUtils.createOverviewPanelInHtml("Total amount spent: ", timeSpan.getOutTotalAfterTax(), "Of that VAT: ", timeSpan.getOutTotalTax());
 		html += AccountingUtils.createOverviewPanelInHtml("Total amount donated: ", timeSpan.getDonTotalAfterTax(), "Of that VAT: ", timeSpan.getDonTotalTax());
 		html += AccountingUtils.createOverviewPanelInHtml("Total amount of personal expenses: ", timeSpan.getPersTotalAfterTax(), "Of that VAT: ", timeSpan.getPersTotalTax());
 
 		if (timeSpan instanceof Year) {
 			Year curYear = (Year) timeSpan;
 			html += AccountingUtils.createOverviewPanelInHtml("ROUGHLY expected income tax payment: ", (int) curYear.getExpectedIncomeTax());
-			html += AccountingUtils.createOverviewPanelInHtml("Total amount earned in " + curYear.getNum() + ": ", (int) (timeSpan.getOutTotalBeforeTax() - (timeSpan.getInTotalBeforeTax() + timeSpan.getDonTotalBeforeTax() + timeSpan.getPersTotalBeforeTax() + curYear.getExpectedIncomeTax())));
+			html += AccountingUtils.createOverviewPanelInHtml("Total amount earned in " + curYear.getNum() + ": ", (int) (timeSpan.getInTotalBeforeTax() - (timeSpan.getOutTotalBeforeTax() + timeSpan.getDonTotalBeforeTax() + timeSpan.getPersTotalBeforeTax() + curYear.getExpectedIncomeTax())));
 		}
 
 		html += "<div style='text-align: center; padding-top: 5pt;'>-------------- VAT / USt --------------</div>";
@@ -552,23 +552,23 @@ public class AccountingUtils {
 
 		html += "<div style='text-align: center; padding-top: 5pt;'>-------------- Income Tax / ESt --------------</div>";
 
-		int externalSalary = timeSpan.getInTotalBeforeTax(Category.EXTERNAL_SALARY);
-		int internalSalary = timeSpan.getInTotalBeforeTax(Category.INTERNAL_SALARY);
-		int vehicleCosts = timeSpan.getInTotalBeforeTax(Category.VEHICLE);
-		int travelCosts = timeSpan.getInTotalBeforeTax(Category.TRAVEL);
-		int locationCosts = timeSpan.getInTotalBeforeTax(Category.LOCATIONS);
-		int educationCosts = timeSpan.getInTotalBeforeTax(Category.EDUCATION);
-		int advertisementCosts = timeSpan.getInTotalBeforeTax(Category.ADVERTISEMENTS);
-		int infrastructureCosts = timeSpan.getInTotalBeforeTax(Category.INFRASTRUCTURE);
-		int entertainmentCosts = timeSpan.getInTotalBeforeTax(Category.ENTERTAINMENT);
-		int wareCosts = timeSpan.getInTotalBeforeTax(Category.WARES);
+		int externalSalary = timeSpan.getOutTotalBeforeTax(Category.EXTERNAL_SALARY);
+		int internalSalary = timeSpan.getOutTotalBeforeTax(Category.INTERNAL_SALARY);
+		int vehicleCosts = timeSpan.getOutTotalBeforeTax(Category.VEHICLE);
+		int travelCosts = timeSpan.getOutTotalBeforeTax(Category.TRAVEL);
+		int locationCosts = timeSpan.getOutTotalBeforeTax(Category.LOCATIONS);
+		int educationCosts = timeSpan.getOutTotalBeforeTax(Category.EDUCATION);
+		int advertisementCosts = timeSpan.getOutTotalBeforeTax(Category.ADVERTISEMENTS);
+		int infrastructureCosts = timeSpan.getOutTotalBeforeTax(Category.INFRASTRUCTURE);
+		int entertainmentCosts = timeSpan.getOutTotalBeforeTax(Category.ENTERTAINMENT);
+		int wareCosts = timeSpan.getOutTotalBeforeTax(Category.WARES);
 
-		// this does NOT include donations, as we will not get donation amounts from timeSpan.getInTotalBeforeTax() anyway, so we do not want to subtract them from it!
+		// this does NOT include donations, as we will not get donation amounts from timeSpan.getOutTotalBeforeTax() anyway, so we do not want to subtract them from it!
 		// (in general, this is only the sum of non-special categories except other)
 		int categoryTally = externalSalary + internalSalary + vehicleCosts + travelCosts + locationCosts +
 			educationCosts + advertisementCosts + infrastructureCosts + entertainmentCosts + wareCosts;
 
-		int otherCosts = timeSpan.getInTotalBeforeTax() - categoryTally;
+		int otherCosts = timeSpan.getOutTotalBeforeTax() - categoryTally;
 
 		html += AccountingUtils.createOverviewPanelInHtml("Total amount spent on items, raw materials etc.: ", wareCosts + otherCosts);
 		html += AccountingUtils.createOverviewPanelInHtml("Total external personnel and subcontractor costs: ", externalSalary);
@@ -590,11 +590,11 @@ public class AccountingUtils {
 		tab.add(taxInfoLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		JPanel curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount earned: ", timeSpan.getOutTotalAfterTax(), "Of that VAT: ", timeSpan.getOutTotalTax());
+		JPanel curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount earned: ", timeSpan.getInTotalAfterTax(), "Of that VAT: ", timeSpan.getInTotalTax());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount spent: ", timeSpan.getInTotalAfterTax(), "Of that VAT: ", timeSpan.getInTotalTax());
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount spent: ", timeSpan.getOutTotalAfterTax(), "Of that VAT: ", timeSpan.getOutTotalTax());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
@@ -614,7 +614,7 @@ public class AccountingUtils {
 			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
 
-			curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount earned in " + curYear.getNum() + ": ", (int) (timeSpan.getOutTotalBeforeTax() - (timeSpan.getInTotalBeforeTax() + timeSpan.getDonTotalBeforeTax() + timeSpan.getPersTotalBeforeTax() + curYear.getExpectedIncomeTax())));
+			curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount earned in " + curYear.getNum() + ": ", (int) (timeSpan.getInTotalBeforeTax() - (timeSpan.getOutTotalBeforeTax() + timeSpan.getDonTotalBeforeTax() + timeSpan.getPersTotalBeforeTax() + curYear.getExpectedIncomeTax())));
 			tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 			i++;
 		}
@@ -641,23 +641,23 @@ public class AccountingUtils {
 		tab.add(sep, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		int externalSalary = timeSpan.getInTotalBeforeTax(Category.EXTERNAL_SALARY);
-		int internalSalary = timeSpan.getInTotalBeforeTax(Category.INTERNAL_SALARY);
-		int vehicleCosts = timeSpan.getInTotalBeforeTax(Category.VEHICLE);
-		int travelCosts = timeSpan.getInTotalBeforeTax(Category.TRAVEL);
-		int locationCosts = timeSpan.getInTotalBeforeTax(Category.LOCATIONS);
-		int educationCosts = timeSpan.getInTotalBeforeTax(Category.EDUCATION);
-		int advertisementCosts = timeSpan.getInTotalBeforeTax(Category.ADVERTISEMENTS);
-		int infrastructureCosts = timeSpan.getInTotalBeforeTax(Category.INFRASTRUCTURE);
-		int entertainmentCosts = timeSpan.getInTotalBeforeTax(Category.ENTERTAINMENT);
-		int wareCosts = timeSpan.getInTotalBeforeTax(Category.WARES);
+		int externalSalary = timeSpan.getOutTotalBeforeTax(Category.EXTERNAL_SALARY);
+		int internalSalary = timeSpan.getOutTotalBeforeTax(Category.INTERNAL_SALARY);
+		int vehicleCosts = timeSpan.getOutTotalBeforeTax(Category.VEHICLE);
+		int travelCosts = timeSpan.getOutTotalBeforeTax(Category.TRAVEL);
+		int locationCosts = timeSpan.getOutTotalBeforeTax(Category.LOCATIONS);
+		int educationCosts = timeSpan.getOutTotalBeforeTax(Category.EDUCATION);
+		int advertisementCosts = timeSpan.getOutTotalBeforeTax(Category.ADVERTISEMENTS);
+		int infrastructureCosts = timeSpan.getOutTotalBeforeTax(Category.INFRASTRUCTURE);
+		int entertainmentCosts = timeSpan.getOutTotalBeforeTax(Category.ENTERTAINMENT);
+		int wareCosts = timeSpan.getOutTotalBeforeTax(Category.WARES);
 
-		// this does NOT include donations, as we will not get donation amounts from timeSpan.getInTotalBeforeTax() anyway, so we do not want to subtract them from it!
+		// this does NOT include donations, as we will not get donation amounts from timeSpan.getOutTotalBeforeTax() anyway, so we do not want to subtract them from it!
 		// (in general, this is only the sum of non-special categories except other)
 		int categoryTally = externalSalary + internalSalary + vehicleCosts + travelCosts + locationCosts +
 			educationCosts + advertisementCosts + infrastructureCosts + entertainmentCosts + wareCosts;
 
-		int otherCosts = timeSpan.getInTotalBeforeTax() - categoryTally;
+		int otherCosts = timeSpan.getOutTotalBeforeTax() - categoryTally;
 
 		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount spent on items, raw materials etc.: ", wareCosts + otherCosts);
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
@@ -779,11 +779,11 @@ public class AccountingUtils {
 
 	public static String getEntryForLog(Entry entry) {
 		String result = "";
-		if (entry instanceof Incoming) {
-			result += "incoming ";
-		}
 		if (entry instanceof Outgoing) {
-			result += "outgoing ";
+			result += "outgoing payment (received invoice) ";
+		}
+		if (entry instanceof Incoming) {
+			result += "incoming payment (sent invoice) ";
 		}
 		result += "'" + entry.getTitle() + "' from " + entry.getDateAsText();
 		return result;
@@ -866,11 +866,11 @@ public class AccountingUtils {
 		headlineCols.add("Post Tax Amount");
 		headlineCols.add("Received On");
 
-		CsvFileGerman csvFile = new CsvFileGerman(resultDir, "outgoing.csv");
+		CsvFileGerman csvFile = new CsvFileGerman(resultDir, "incoming.csv");
 		csvFile.setHeadLine(headlineCols);
 
-		List<Outgoing> curOutgoings = timeSpan.getOutgoings();
-		for (Outgoing cur : curOutgoings) {
+		List<Incoming> curIncomings = timeSpan.getIncomings();
+		for (Incoming cur : curIncomings) {
 			csvFile.appendContent(cur.createCsvLine(database));
 		}
 
@@ -886,11 +886,11 @@ public class AccountingUtils {
 		headlineCols.add("Post Tax Amount");
 		headlineCols.add("Paid On");
 
-		csvFile = new CsvFileGerman(resultDir, "incoming.csv");
+		csvFile = new CsvFileGerman(resultDir, "outgoing.csv");
 		csvFile.setHeadLine(headlineCols);
 
-		List<Incoming> curEntries = timeSpan.getIncomings();
-		for (Incoming cur : curEntries) {
+		List<Outgoing> curEntries = timeSpan.getOutgoings();
+		for (Outgoing cur : curEntries) {
 			csvFile.appendContent(cur.createCsvLine(database));
 		}
 
@@ -901,7 +901,7 @@ public class AccountingUtils {
 		csvFile.setHeadLine(headlineCols);
 
 		curEntries = timeSpan.getDonations();
-		for (Incoming cur : curEntries) {
+		for (Outgoing cur : curEntries) {
 			csvFile.appendContent(cur.createCsvLine(database));
 		}
 
@@ -912,7 +912,7 @@ public class AccountingUtils {
 		csvFile.setHeadLine(headlineCols);
 
 		curEntries = timeSpan.getPersonals();
-		for (Incoming cur : curEntries) {
+		for (Outgoing cur : curEntries) {
 			csvFile.appendContent(cur.createCsvLine(database));
 		}
 

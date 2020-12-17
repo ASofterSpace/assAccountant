@@ -6,8 +6,8 @@ package com.asofterspace.accountant.timespans;
 
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
-import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
+import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.world.Category;
 import com.asofterspace.toolbox.utils.Record;
 
@@ -106,15 +106,6 @@ public class Year extends TimeSpan {
 	}
 
 	@Override
-	public List<Outgoing> getOutgoings() {
-		List<Outgoing> result = new ArrayList<>();
-		for (Month month : getMonths()) {
-			result.addAll(month.getOutgoings());
-		}
-		return result;
-	}
-
-	@Override
 	public List<Incoming> getIncomings() {
 		List<Incoming> result = new ArrayList<>();
 		for (Month month : getMonths()) {
@@ -124,8 +115,17 @@ public class Year extends TimeSpan {
 	}
 
 	@Override
-	public List<Incoming> getDonations() {
-		List<Incoming> result = new ArrayList<>();
+	public List<Outgoing> getOutgoings() {
+		List<Outgoing> result = new ArrayList<>();
+		for (Month month : getMonths()) {
+			result.addAll(month.getOutgoings());
+		}
+		return result;
+	}
+
+	@Override
+	public List<Outgoing> getDonations() {
+		List<Outgoing> result = new ArrayList<>();
 		for (Month month : getMonths()) {
 			result.addAll(month.getDonations());
 		}
@@ -133,28 +133,10 @@ public class Year extends TimeSpan {
 	}
 
 	@Override
-	public List<Incoming> getPersonals() {
-		List<Incoming> result = new ArrayList<>();
+	public List<Outgoing> getPersonals() {
+		List<Outgoing> result = new ArrayList<>();
 		for (Month month : getMonths()) {
 			result.addAll(month.getPersonals());
-		}
-		return result;
-	}
-
-	@Override
-	public int getOutTotalBeforeTax() {
-		int result = 0;
-		for (Month month : months) {
-			result += month.getOutTotalBeforeTax();
-		}
-		return result;
-	}
-
-	@Override
-	public int getOutTotalAfterTax() {
-		int result = 0;
-		for (Month month : months) {
-			result += month.getOutTotalAfterTax();
 		}
 		return result;
 	}
@@ -169,19 +151,37 @@ public class Year extends TimeSpan {
 	}
 
 	@Override
-	public int getInTotalBeforeTax(Category category) {
+	public int getInTotalAfterTax() {
 		int result = 0;
 		for (Month month : months) {
-			result += month.getInTotalBeforeTax(category);
+			result += month.getInTotalAfterTax();
 		}
 		return result;
 	}
 
 	@Override
-	public int getInTotalAfterTax() {
+	public int getOutTotalBeforeTax() {
 		int result = 0;
 		for (Month month : months) {
-			result += month.getInTotalAfterTax();
+			result += month.getOutTotalBeforeTax();
+		}
+		return result;
+	}
+
+	@Override
+	public int getOutTotalBeforeTax(Category category) {
+		int result = 0;
+		for (Month month : months) {
+			result += month.getOutTotalBeforeTax(category);
+		}
+		return result;
+	}
+
+	@Override
+	public int getOutTotalAfterTax() {
+		int result = 0;
+		for (Month month : months) {
+			result += month.getOutTotalAfterTax();
 		}
 		return result;
 	}
@@ -233,7 +233,7 @@ public class Year extends TimeSpan {
 	private long getExpectedIncomeTaxProper() {
 
 		double result = 0;
-		double taxAmount = getOutTotalBeforeTax() - (getInTotalBeforeTax() + getDonTotalBeforeTax() + getPersTotalBeforeTax());
+		double taxAmount = getInTotalBeforeTax() - (getOutTotalBeforeTax() + getDonTotalBeforeTax() + getPersTotalBeforeTax());
 
 		// Freibetrag
 		if (taxAmount <= 916800) {

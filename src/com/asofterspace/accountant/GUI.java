@@ -192,20 +192,20 @@ public class GUI extends MainWindow {
 
 		file.addSeparator();
 
-		JMenuItem bulkImportIn = new JMenuItem("Bulk Import Incoming TSV");
+		JMenuItem bulkImportIn = new JMenuItem("Bulk Import Outgoing TSV");
 		bulkImportIn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				bulkImportIncomings();
+				bulkImportOutgoings();
 			}
 		});
 		file.add(bulkImportIn);
 
-		JMenuItem bulkImportOut = new JMenuItem("Bulk Import Outgoing TSV");
+		JMenuItem bulkImportOut = new JMenuItem("Bulk Import Incoming TSV");
 		bulkImportOut.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				bulkImportOutgoings();
+				bulkImportIncomings();
 			}
 		});
 		file.add(bulkImportOut);
@@ -714,38 +714,12 @@ public class GUI extends MainWindow {
 		}
 	}
 
-	private void bulkImportIncomings() {
-
-		// TODO :: actually, write our own file chooser
-		JFileChooser importFilePicker = new JFileChooser(System.getProperty("java.class.path") + "/..");
-
-		importFilePicker.setDialogTitle("Open a File to Bulk Import Incoming Invoices");
-		importFilePicker.setMultiSelectionEnabled(true);
-
-		int result = importFilePicker.showOpenDialog(mainFrame);
-
-		switch (result) {
-
-			case JFileChooser.APPROVE_OPTION:
-
-				// load the files
-				List<File> files = File.fromJavaFiles(importFilePicker.getSelectedFiles());
-				database.bulkImportIncomings(files);
-
-				break;
-
-			case JFileChooser.CANCEL_OPTION:
-				// cancel was pressed... do nothing!
-				break;
-		}
-	}
-
 	private void bulkImportOutgoings() {
 
 		// TODO :: actually, write our own file chooser
 		JFileChooser importFilePicker = new JFileChooser(System.getProperty("java.class.path") + "/..");
 
-		importFilePicker.setDialogTitle("Open a File to Bulk Import Outgoing Invoices");
+		importFilePicker.setDialogTitle("Open a File to Bulk Import Received Invoices about Outgoing Money");
 		importFilePicker.setMultiSelectionEnabled(true);
 
 		int result = importFilePicker.showOpenDialog(mainFrame);
@@ -757,6 +731,32 @@ public class GUI extends MainWindow {
 				// load the files
 				List<File> files = File.fromJavaFiles(importFilePicker.getSelectedFiles());
 				database.bulkImportOutgoings(files);
+
+				break;
+
+			case JFileChooser.CANCEL_OPTION:
+				// cancel was pressed... do nothing!
+				break;
+		}
+	}
+
+	private void bulkImportIncomings() {
+
+		// TODO :: actually, write our own file chooser
+		JFileChooser importFilePicker = new JFileChooser(System.getProperty("java.class.path") + "/..");
+
+		importFilePicker.setDialogTitle("Open a File to Bulk Import Incoming Sent Invoices about Incoming Money");
+		importFilePicker.setMultiSelectionEnabled(true);
+
+		int result = importFilePicker.showOpenDialog(mainFrame);
+
+		switch (result) {
+
+			case JFileChooser.APPROVE_OPTION:
+
+				// load the files
+				List<File> files = File.fromJavaFiles(importFilePicker.getSelectedFiles());
+				database.bulkImportIncomings(files);
 
 				break;
 

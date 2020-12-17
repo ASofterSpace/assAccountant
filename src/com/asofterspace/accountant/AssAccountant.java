@@ -27,8 +27,8 @@ import javax.swing.SwingUtilities;
 public class AssAccountant {
 
 	public final static String PROGRAM_TITLE = "assAccountant (Mari)";
-	public final static String VERSION_NUMBER = "0.0.1.2(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "5. April 2020 - 8. November 2020";
+	public final static String VERSION_NUMBER = "0.0.1.3(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "5. April 2020 - 17. December 2020";
 
 	public final static String DATA_DIR = "config";
 	public final static String SERVER_DIR = "server";
@@ -47,25 +47,16 @@ public class AssAccountant {
 	 * TODO:
 	 * Export (as menu item), with Export as German CSV and Export as English CSV as sub-items
 	 * make tax a dropdown edit field
-	 * pre-select category based on title
 	 * if we ever have more than 20 Mio € in any field, switch to using long instead of int... :)
 	 * prevent undoing more than 64 steps, or redoing more steps than have been undone...
 	 * if someone clicks on "Open on Disk" and the folder for that particular month (or even year)
 	 *   does not yet exist, automatically create it, including all the subfolders (however, only
 	 *   if a base location was actually specified in the config - not if the settings are just null!)
 	 * also handle timesheets (and automatically base invoices on timesheets)
-	 * add to outgoing invoices a "date paid" which can be null if not yet paid, or a date can be
-	 *   entered for when it was paid
-	 * edit existing entries
-	 * output monthly accounting json that we can save long-term just in case
-	 * output yearly accounting information
-	 * output yearly accounting json
-	 * output information on how to integrate accounting information with other programs
-	 *   (online USt, third party ESt, etc.)
 	 * automatically add years when the current date is later than an existing year
-	 * generate outgoing invoices (as pdfs?) with just a few clicks, and have them logged
-	 *   immediately etc.
-	 * automatically read incoming emails and scan for incoming invoices
+	 * generate incoming money - invoices to be sent (as pdfs?) with just a few clicks, and have them
+	 *   logged immediately etc.
+	 * automatically read outgoing emails and scan for incoming money - sent invoices
 	 */
 	public static void main(String[] args) {
 

@@ -6,7 +6,6 @@ package com.asofterspace.accountant.entries;
 
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.timespans.Month;
-import com.asofterspace.accountant.world.Category;
 import com.asofterspace.toolbox.accounting.Currency;
 import com.asofterspace.toolbox.utils.Record;
 
@@ -14,33 +13,33 @@ import java.util.Date;
 
 
 /**
- * This represents an incoming invoice (so one that we have to pay)
+ * This represents an incoming payment (so an invoice we send, which we get paid for, yay! ^^)
  */
 public class Incoming extends Entry {
 
-	private static final String CATEGORY_KEY = "category";
+	private static final String CUSTOMER_KEY = "customer";
 
-	private Category category;
+	private String customer;
 
 
 	/**
-	 * Create an incoming invoice at runtime
+	 * Create an incoming payment (sent invoice) at runtime
 	 */
 	public Incoming(Integer amount, Currency currency, Integer taxationPercent, Integer postTaxAmount,
-		Date date, String title, String originator, Category category, Month parent) {
+		Date date, String title, String originator, String customer, Month parent) {
 
 		super(amount, currency, taxationPercent, postTaxAmount, date, title, originator, parent);
 
-		this.category = category;
+		this.customer = customer;
 	}
 
 	/**
-	 * Load an incoming invoice from a generic record
+	 * Load an incoming payment (sent invoice) from a generic record
 	 */
 	public Incoming(Record entryRecord, Month parent) {
 		super(entryRecord, parent);
 
-		category = Category.valueOf(entryRecord.getString(CATEGORY_KEY));
+		customer = entryRecord.getString(CUSTOMER_KEY);
 	}
 
 	@Override
@@ -48,24 +47,17 @@ public class Incoming extends Entry {
 
 		Record result = super.toRecord();
 
-		result.set(CATEGORY_KEY, category);
+		result.set(CUSTOMER_KEY, customer);
 
 		return result;
 	}
 
-	public Category getCategory() {
-		return category;
+	public String getCustomer() {
+		return customer;
 	}
 
-	public String getCategoryAsText() {
-		if (category == null) {
-			return "";
-		}
-		return category.getText();
-	}
-
-	public void setCategory(Category category) {
-		this.category = category;
+	public void setCustomer(String customer) {
+		this.customer = customer;
 	}
 
 	@Override
@@ -78,7 +70,7 @@ public class Incoming extends Entry {
 
 	@Override
 	public String getCategoryOrCustomer() {
-		return getCategoryAsText();
+		return getCustomer();
 	}
 
 }

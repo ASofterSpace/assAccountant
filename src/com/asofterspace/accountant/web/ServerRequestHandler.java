@@ -7,7 +7,7 @@ package com.asofterspace.accountant.web;
 import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.AssAccountant;
 import com.asofterspace.accountant.Database;
-import com.asofterspace.accountant.entries.Outgoing;
+import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.Problem;
 import com.asofterspace.accountant.TabCtrl;
 import com.asofterspace.accountant.tabs.BankStatementTab;
@@ -247,7 +247,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 					html.append("<div class='bold entry' style='padding-top:25pt;'>Betriebseinnahmen</div>");
 
-					List<Outgoing> outgoings = tsTab.getTimeSpan().getOutgoings();
+					List<Incoming> incomings = tsTab.getTimeSpan().getIncomings();
 					int out0percTax = 0;
 					int out16percTax = 0;
 					int out19percTax = 0;
@@ -255,24 +255,24 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					int out16percTaxTax = 0;
 					int out19percTaxTax = 0;
 					int outOtherTaxTax = 0;
-					int outTotal = 0;
-					for (Outgoing outgoing : outgoings) {
-						outTotal += outgoing.getPostTaxAmount();
-						switch (outgoing.getTaxPercent()) {
+					int inTotal = 0;
+					for (Incoming incoming : incomings) {
+						inTotal += incoming.getPostTaxAmount();
+						switch (incoming.getTaxPercent()) {
 							case 0:
-								out0percTax += outgoing.getPreTaxAmount();
+								out0percTax += incoming.getPreTaxAmount();
 								break;
 							case 16:
-								out16percTax += outgoing.getPreTaxAmount();
-								out16percTaxTax += outgoing.getTaxAmount();
+								out16percTax += incoming.getPreTaxAmount();
+								out16percTaxTax += incoming.getTaxAmount();
 								break;
 							case 19:
-								out19percTax += outgoing.getPreTaxAmount();
-								out19percTaxTax += outgoing.getTaxAmount();
+								out19percTax += incoming.getPreTaxAmount();
+								out19percTaxTax += incoming.getTaxAmount();
 								break;
 							default:
-								outOtherTax += outgoing.getPreTaxAmount();
-								outOtherTaxTax += outgoing.getTaxAmount();
+								outOtherTax += incoming.getPreTaxAmount();
+								outOtherTaxTax += incoming.getTaxAmount();
 								break;
 						}
 					}
@@ -309,9 +309,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 
 					html.append("<div class='bold entry'>Summe der anzusetzenden Betriebseinnahmen:<span class='right bold'>" +
-							FinanceUtils.formatMoneyDE(outTotal) + " €</span></div>");
+							FinanceUtils.formatMoneyDE(inTotal) + " €</span></div>");
 
-					if (outTotal != out0percTax + out16percTax + out19percTax + outOtherTax +
+					if (inTotal != out0percTax + out16percTax + out19percTax + outOtherTax +
 						out16percTaxTax + out19percTaxTax + outOtherTaxTax) {
 
 						html.append("<div class='bold entry'>Es liegt ein Berechnungsfehler vor!</div>");
@@ -321,23 +321,23 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 					TimeSpan timeSpan = tsTab.getTimeSpan();
 
-					int externalSalary = timeSpan.getInTotalBeforeTax(Category.EXTERNAL_SALARY);
-					int internalSalary = timeSpan.getInTotalBeforeTax(Category.INTERNAL_SALARY);
-					int vehicleCosts = timeSpan.getInTotalBeforeTax(Category.VEHICLE);
-					int travelCosts = timeSpan.getInTotalBeforeTax(Category.TRAVEL);
-					int locationCosts = timeSpan.getInTotalBeforeTax(Category.LOCATIONS);
-					int educationCosts = timeSpan.getInTotalBeforeTax(Category.EDUCATION);
-					int advertisementCosts = timeSpan.getInTotalBeforeTax(Category.ADVERTISEMENTS);
-					int infrastructureCosts = timeSpan.getInTotalBeforeTax(Category.INFRASTRUCTURE);
-					int entertainmentCosts = timeSpan.getInTotalBeforeTax(Category.ENTERTAINMENT);
-					int wareCosts = timeSpan.getInTotalBeforeTax(Category.WARES);
+					int externalSalary = timeSpan.getOutTotalBeforeTax(Category.EXTERNAL_SALARY);
+					int internalSalary = timeSpan.getOutTotalBeforeTax(Category.INTERNAL_SALARY);
+					int vehicleCosts = timeSpan.getOutTotalBeforeTax(Category.VEHICLE);
+					int travelCosts = timeSpan.getOutTotalBeforeTax(Category.TRAVEL);
+					int locationCosts = timeSpan.getOutTotalBeforeTax(Category.LOCATIONS);
+					int educationCosts = timeSpan.getOutTotalBeforeTax(Category.EDUCATION);
+					int advertisementCosts = timeSpan.getOutTotalBeforeTax(Category.ADVERTISEMENTS);
+					int infrastructureCosts = timeSpan.getOutTotalBeforeTax(Category.INFRASTRUCTURE);
+					int entertainmentCosts = timeSpan.getOutTotalBeforeTax(Category.ENTERTAINMENT);
+					int wareCosts = timeSpan.getOutTotalBeforeTax(Category.WARES);
 
-					// this does NOT include donations, as we will not get donation amounts from timeSpan.getInTotalBeforeTax() anyway, so we do not want to subtract them from it!
+					// this does NOT include donations, as we will not get donation amounts from timeSpan.getOutTotalBeforeTax() anyway, so we do not want to subtract them from it!
 					// (in general, this is only the sum of non-special categories except other)
 					int categoryTally = externalSalary + internalSalary + vehicleCosts + travelCosts + locationCosts +
 						educationCosts + advertisementCosts + infrastructureCosts + entertainmentCosts + wareCosts;
 
-					int otherCosts = timeSpan.getInTotalBeforeTax() - categoryTally;
+					int otherCosts = timeSpan.getOutTotalBeforeTax() - categoryTally;
 
 					if (wareCosts + otherCosts > 0) {
 						html.append("<div class='entry sub'>Waren, Rohstoffe und Hilfsmittel:<span class='right'>" +
@@ -395,31 +395,31 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					html.append("<div class='entry sub'>Summe sonstige Betriebsausgaben:<span class='right'>" +
 						FinanceUtils.formatMoneyDE(educationCosts + infrastructureCosts + advertisementCosts + entertainmentCosts) + " €</span></div>");
 
-					int inTotal = timeSpan.getInTotalBeforeTax();
+					int outTotal = timeSpan.getOutTotalBeforeTax();
 
 					html.append("<div class='entry sub'>Abziehbare Vorsteuerbeträge:</div>");
 
 					html.append("<div class='entry subsub'>Manuell ermittelte Vorsteuer:<span class='right'>" +
 						FinanceUtils.formatMoneyDE(timeSpan.getDiscountablePreTax()) + " €</span></div>");
-					inTotal += timeSpan.getDiscountablePreTax();
+					outTotal += timeSpan.getDiscountablePreTax();
 
 					html.append("<div class='entry sub'>An das Finanzamt abgeführte Umsatzsteuer:<span class='right'>" +
 						FinanceUtils.formatMoneyDE(timeSpan.getVatPrepaymentsPaidTotal()) + " €</span></div>");
-					inTotal += timeSpan.getVatPrepaymentsPaidTotal();
+					outTotal += timeSpan.getVatPrepaymentsPaidTotal();
 
 					html.append("<div class='entry bold'>Summe der anzusetzenden Betriebsausgaben:<span class='right bold'>" +
-						FinanceUtils.formatMoneyDE(inTotal) + " €</span></div>");
+						FinanceUtils.formatMoneyDE(outTotal) + " €</span></div>");
 
 					html.append("<div class='bold entry' style='padding-top:25pt;'>Ermittlung des Gewinns</div>");
 
 					html.append("<div class='entry sub'>Summe der Betriebseinnahmen:<span class='right'>" +
-						FinanceUtils.formatMoneyDE(outTotal) + " €</span></div>");
-
-					html.append("<div class='entry sub'>Abzüglich Summe der Betriebsausgaben:<span class='right'>" +
 						FinanceUtils.formatMoneyDE(inTotal) + " €</span></div>");
 
+					html.append("<div class='entry sub'>Abzüglich Summe der Betriebsausgaben:<span class='right'>" +
+						FinanceUtils.formatMoneyDE(outTotal) + " €</span></div>");
+
 					html.append("<div class='entry bold'>Gewinn:<span class='right bold'>" +
-						FinanceUtils.formatMoneyDE(outTotal - inTotal) + " €</span></div>");
+						FinanceUtils.formatMoneyDE(inTotal - outTotal) + " €</span></div>");
 
 					html.append("<div style='padding-top:25pt;text-align: right;'><span><img style='width:215pt;' src='/pics/signature.png' /></span></div>");
 					html.append("<span style='float:left;font-size: 115%;'>" + database.getLocation() + ", " + DateUtils.serializeDate(DateUtils.now()) + "</span>");

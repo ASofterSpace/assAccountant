@@ -6,8 +6,8 @@ package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
-import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
+import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.tabs.TimeSpanTab;
 import com.asofterspace.accountant.timespans.Month;
@@ -56,7 +56,7 @@ public class AddEntryGUI {
 	private JComboBox<String> customer;
 	private JComboBox<String> category;
 	private JComboBox<String> originator;
-	private JRadioButton isIncoming;
+	private JRadioButton isOutgoing;
 	private JTextField dateText;
 	private JTextField titleText;
 	private JTextField amount;
@@ -100,10 +100,10 @@ public class AddEntryGUI {
 		curLabel = new CopyByClickLabel("Kind: ");
 		ButtonGroup inOutGroup = new ButtonGroup();
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.0, 1.0));
-		isIncoming = new JRadioButton("Incoming (we have to pay)");
-		inOutGroup.add(isIncoming);
-		isIncoming.setSelected(true);
-		isIncoming.addItemListener(new ItemListener() {
+		isOutgoing = new JRadioButton("Outgoing (we have to pay)");
+		inOutGroup.add(isOutgoing);
+		isOutgoing.setSelected(true);
+		isOutgoing.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -112,11 +112,11 @@ public class AddEntryGUI {
 				}
 			}
 		});
-		curPanel.add(isIncoming, new Arrangement(1, 0, 1.0, 1.0));
-		final JRadioButton isOutgoing = new JRadioButton("Outgoing (we get paid)");
-		inOutGroup.add(isOutgoing);
-		isOutgoing.setSelected(false);
-		isOutgoing.addItemListener(new ItemListener() {
+		curPanel.add(isOutgoing, new Arrangement(1, 0, 1.0, 1.0));
+		final JRadioButton isIncoming = new JRadioButton("Incoming (we get paid)");
+		inOutGroup.add(isIncoming);
+		isIncoming.setSelected(false);
+		isIncoming.addItemListener(new ItemListener() {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				if (e.getStateChange() == ItemEvent.SELECTED) {
@@ -125,7 +125,7 @@ public class AddEntryGUI {
 				}
 			}
 		});
-		curPanel.add(isOutgoing, new Arrangement(2, 0, 1.0, 1.0));
+		curPanel.add(isIncoming, new Arrangement(2, 0, 1.0, 1.0));
 		dialog.add(curPanel);
 
 		curPanel = new JPanel();
@@ -270,24 +270,24 @@ public class AddEntryGUI {
 		if (editingEntry != null) {
 			dateText.setText(editingEntry.getDateAsText());
 			titleText.setText(editingEntry.getTitle());
-			if (editingEntry instanceof Incoming) {
-				String searchFor = ((Incoming) editingEntry).getCategoryAsText();
+			if (editingEntry instanceof Outgoing) {
+				String searchFor = ((Outgoing) editingEntry).getCategoryAsText();
 				for (int i = 0; i < category.getItemCount(); i++) {
 					if (category.getItemAt(i).equals(searchFor)) {
 						category.setSelectedIndex(i);
 					}
 				}
-				isOutgoing.setSelected(false);
-				isIncoming.setSelected(true);
+				isIncoming.setSelected(false);
+				isOutgoing.setSelected(true);
 			} else {
-				String searchFor = ((Outgoing) editingEntry).getCustomer();
+				String searchFor = ((Incoming) editingEntry).getCustomer();
 				for (int i = 0; i < customer.getItemCount(); i++) {
 					if (customer.getItemAt(i).equals(searchFor)) {
 						customer.setSelectedIndex(i);
 					}
 				}
-				isIncoming.setSelected(false);
-				isOutgoing.setSelected(true);
+				isOutgoing.setSelected(false);
+				isIncoming.setSelected(true);
 			}
 			if (editingEntry.hasPreTaxAmount()) {
 				amount.setText(FinanceUtils.formatMoney(editingEntry.getPreTaxAmount()));
@@ -410,7 +410,7 @@ public class AddEntryGUI {
 	private void addEntry(boolean exitOnSuccess) {
 
 		Object catOrCustomer = customer.getSelectedItem();
-		if (isIncoming.isSelected()) {
+		if (isOutgoing.isSelected()) {
 			catOrCustomer = category.getSelectedItem();
 		}
 
@@ -426,7 +426,7 @@ public class AddEntryGUI {
 		// we add the new entry (no matter if we are editing a new one or editing an existing one)...
 		if (database.addEntry(dateText.getText(), titleText.getText(), catOrCustomer,
 			preTaxAmountStr, Currency.EUR, taxPerc.getText(), postTaxAmountStr,
-			(String) originator.getSelectedItem(), isIncoming.isSelected())) {
+			(String) originator.getSelectedItem(), isOutgoing.isSelected())) {
 
 			// ... and if we are editing an existing one, we delete the existing one
 			// (think about this as the scifi transporter approach to editing ^^)

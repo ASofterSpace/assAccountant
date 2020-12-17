@@ -542,17 +542,17 @@ public abstract class Entry {
 
 		Database database = parent.getDatabase();
 
-		if (this instanceof Incoming) {
-			if (((Incoming) this).getCategory() != database.mapTitleToCategory(getTitle())) {
+		if (this instanceof Outgoing) {
+			if (((Outgoing) this).getCategory() != database.mapTitleToCategory(getTitle())) {
 				result.add(new ConsistencyProblem(
 					"For " + AccountingUtils.getEntryForLog(this) + ", the selected category (" +
-					((Incoming) this).getCategory().getText() + ") differs from the automatically detected one (" +
+					((Outgoing) this).getCategory().getText() + ") differs from the automatically detected one (" +
 					database.mapTitleToCategory(this.getTitle()).getText() + ").",
 					this));
 			}
 		}
 
-		if (this instanceof Outgoing) {
+		if (this instanceof Incoming) {
 			if (!getReceived()) {
 				Date sixWeeksAgo = DateUtils.daysInTheFuture(-6*7);
 				if (getDate().before(sixWeeksAgo)) {

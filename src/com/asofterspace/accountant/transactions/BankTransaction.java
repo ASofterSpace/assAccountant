@@ -8,8 +8,8 @@ import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.AddEntryGUI;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
-import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
+import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.toolbox.accounting.Currency;
@@ -131,9 +131,9 @@ public class BankTransaction {
 			public void actionPerformed(ActionEvent e) {
 				Entry fakeEntry = null;
 				if (amount > 0) {
-					fakeEntry = new Outgoing(null, Currency.EUR, 19, amount, getDate(), getTitle(), "", "", null);
+					fakeEntry = new Incoming(null, Currency.EUR, 19, amount, getDate(), getTitle(), "", "", null);
 				} else {
-					fakeEntry = new Incoming(null, Currency.EUR, 19, -amount, getDate(), getTitle(), "", null, null);
+					fakeEntry = new Outgoing(null, Currency.EUR, 19, -amount, getDate(), getTitle(), "", null, null);
 				}
 				AddEntryGUI addEntryGUI = new AddEntryGUI(database.getGUI(), database, fakeEntry);
 				addEntryGUI.show();
@@ -194,9 +194,9 @@ public class BankTransaction {
 			public void actionPerformed(ActionEvent e) {
 				Entry fakeEntry = null;
 				if (amount > 0) {
-					fakeEntry = new Outgoing(null, Currency.EUR, 19, amount, getDate(), getTitle(), "", "", null);
+					fakeEntry = new Incoming(null, Currency.EUR, 19, amount, getDate(), getTitle(), "", "", null);
 				} else {
-					fakeEntry = new Incoming(null, Currency.EUR, 19, -amount, getDate(), getTitle(), "", null, null);
+					fakeEntry = new Outgoing(null, Currency.EUR, 19, -amount, getDate(), getTitle(), "", null, null);
 				}
 				AddEntryGUI addEntryGUI = new AddEntryGUI(database.getGUI(), database, fakeEntry);
 				addEntryGUI.show();

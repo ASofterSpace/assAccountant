@@ -6,6 +6,7 @@ package com.asofterspace.accountant.entries;
 
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.timespans.Month;
+import com.asofterspace.accountant.world.Category;
 import com.asofterspace.toolbox.accounting.Currency;
 import com.asofterspace.toolbox.utils.Record;
 
@@ -13,33 +14,33 @@ import java.util.Date;
 
 
 /**
- * This represents an outgoing invoice (so one that we get paid for, yay! ^^)
+ * This represents an outgoing payment (so an invoice we receive that we have to pay)
  */
 public class Outgoing extends Entry {
 
-	private static final String CUSTOMER_KEY = "customer";
+	private static final String CATEGORY_KEY = "category";
 
-	private String customer;
+	private Category category;
 
 
 	/**
-	 * Create an outgoing invoice at runtime
+	 * Create an outgoing payment (received invoice) at runtime
 	 */
 	public Outgoing(Integer amount, Currency currency, Integer taxationPercent, Integer postTaxAmount,
-		Date date, String title, String originator, String customer, Month parent) {
+		Date date, String title, String originator, Category category, Month parent) {
 
 		super(amount, currency, taxationPercent, postTaxAmount, date, title, originator, parent);
 
-		this.customer = customer;
+		this.category = category;
 	}
 
 	/**
-	 * Load an outgoing invoice from a generic record
+	 * Load an outgoing payment (received invoice) from a generic record
 	 */
 	public Outgoing(Record entryRecord, Month parent) {
 		super(entryRecord, parent);
 
-		customer = entryRecord.getString(CUSTOMER_KEY);
+		category = Category.valueOf(entryRecord.getString(CATEGORY_KEY));
 	}
 
 	@Override
@@ -47,17 +48,24 @@ public class Outgoing extends Entry {
 
 		Record result = super.toRecord();
 
-		result.set(CUSTOMER_KEY, customer);
+		result.set(CATEGORY_KEY, category);
 
 		return result;
 	}
 
-	public String getCustomer() {
-		return customer;
+	public Category getCategory() {
+		return category;
 	}
 
-	public void setCustomer(String customer) {
-		this.customer = customer;
+	public String getCategoryAsText() {
+		if (category == null) {
+			return "";
+		}
+		return category.getText();
+	}
+
+	public void setCategory(Category category) {
+		this.category = category;
 	}
 
 	@Override
@@ -70,7 +78,7 @@ public class Outgoing extends Entry {
 
 	@Override
 	public String getCategoryOrCustomer() {
-		return getCustomer();
+		return getCategoryAsText();
 	}
 
 }

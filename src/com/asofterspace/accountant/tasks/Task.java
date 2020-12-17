@@ -9,8 +9,8 @@ import com.asofterspace.accountant.AddEntryGUI;
 import com.asofterspace.accountant.AssAccountant;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
-import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
+import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.TimeSpan;
@@ -165,12 +165,12 @@ public class Task extends GenericTask {
 
 			boolean specialRow = false;
 
-			if (detailLine.contains("%[LIST_OUTGOING_UNPAID]")) {
-				List<Outgoing> outgoings = database.getOutgoings();
+			if (detailLine.contains("%[LIST_INCOMING_UNPAID]")) {
+				List<Incoming> incomings = database.getIncomings();
 				int i = 0;
-				for (Outgoing outgoing : outgoings) {
-					if (!outgoing.getReceived()) {
-						JPanel curCurPanel = outgoing.createPanelOnGUI(database);
+				for (Incoming incoming : incomings) {
+					if (!incoming.getReceived()) {
+						JPanel curCurPanel = incoming.createPanelOnGUI(database);
 						curPanel.add(curCurPanel, new Arrangement(0, i, 1.0, 0.0));
 						i++;
 					}
@@ -193,10 +193,10 @@ public class Task extends GenericTask {
 						@Override
 						public void actionPerformed(ActionEvent e) {
 							Entry fakeEntry = null;
-							if ("outgoing".equals(entryData.getString("kind").toLowerCase())) {
-								fakeEntry = new Outgoing(entryData, null);
-							} else {
+							if ("incoming".equals(entryData.getString("kind").toLowerCase())) {
 								fakeEntry = new Incoming(entryData, null);
+							} else {
+								fakeEntry = new Outgoing(entryData, null);
 							}
 							AddEntryGUI addEntryGUI = new AddEntryGUI(database.getGUI(), database, fakeEntry);
 							addEntryGUI.show();
@@ -431,42 +431,42 @@ public class Task extends GenericTask {
 
 		int[] taxAmounts = {0, 5, 7, 16, 19};
 
-		// handle stuff like %[VAT_TOTAL_OUTGOING_PREV_MONTH_TAX_16%]
+		// handle stuff like %[VAT_TOTAL_INCOMING_PREV_MONTH_TAX_16%]
 		for (int curTaxAmount : taxAmounts) {
-			if (detail.contains("%[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_" + curTaxAmount + "%]")) {
+			if (detail.contains("%[VAT_TOTAL_INCOMING_" + timeSpanStr + "_TAX_" + curTaxAmount + "%]")) {
 				int cur = 0;
-				for (Outgoing entry : timeSpan.getOutgoings()) {
+				for (Incoming entry : timeSpan.getIncomings()) {
 					if (curTaxAmount == entry.getTaxPercent()) {
 						cur += entry.getPreTaxAmount();
 					}
 				}
-				detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_" + curTaxAmount + "%\\]",
+				detail = detail.replaceAll("%\\[VAT_TOTAL_INCOMING_" + timeSpanStr + "_TAX_" + curTaxAmount + "%\\]",
 					FinanceUtils.formatMoney(cur, Currency.EUR));
 			}
 		}
 
-		detail = replaceComplexVatInDetails(detail, "VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_0%_", timeSpan);
+		detail = replaceComplexVatInDetails(detail, "VAT_TOTAL_INCOMING_" + timeSpanStr + "_TAX_0%_", timeSpan);
 
-		// handle stuff like %[VAT_TOTAL_OUTGOING_PREV_MONTH_JUST_TAX]
-		if (detail.contains("%[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_JUST_TAX]")) {
+		// handle stuff like %[VAT_TOTAL_INCOMING_PREV_MONTH_JUST_TAX]
+		if (detail.contains("%[VAT_TOTAL_INCOMING_" + timeSpanStr + "_JUST_TAX]")) {
 			int cur = 0;
-			for (Outgoing entry : timeSpan.getOutgoings()) {
+			for (Incoming entry : timeSpan.getIncomings()) {
 				cur += entry.getTaxAmount();
 			}
-			detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_JUST_TAX\\]",
+			detail = detail.replaceAll("%\\[VAT_TOTAL_INCOMING_" + timeSpanStr + "_JUST_TAX\\]",
 				FinanceUtils.formatMoney(cur, Currency.EUR));
 		}
 
-		// handle stuff like %[VAT_TOTAL_OUTGOING_PREV_MONTH_TAX_16%_JUST_TAX]
+		// handle stuff like %[VAT_TOTAL_INCOMING_PREV_MONTH_TAX_16%_JUST_TAX]
 		for (int curTaxAmount : taxAmounts) {
-			if (detail.contains("%[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_" + curTaxAmount + "%_JUST_TAX]")) {
+			if (detail.contains("%[VAT_TOTAL_INCOMING_" + timeSpanStr + "_TAX_" + curTaxAmount + "%_JUST_TAX]")) {
 				int cur = 0;
-				for (Outgoing entry : timeSpan.getOutgoings()) {
+				for (Incoming entry : timeSpan.getIncomings()) {
 					if (curTaxAmount == entry.getTaxPercent()) {
 						cur += entry.getTaxAmount();
 					}
 				}
-				detail = detail.replaceAll("%\\[VAT_TOTAL_OUTGOING_" + timeSpanStr + "_TAX_" + curTaxAmount + "%_JUST_TAX\\]",
+				detail = detail.replaceAll("%\\[VAT_TOTAL_INCOMING_" + timeSpanStr + "_TAX_" + curTaxAmount + "%_JUST_TAX\\]",
 					FinanceUtils.formatMoney(cur, Currency.EUR));
 			}
 		}
@@ -488,7 +488,7 @@ public class Task extends GenericTask {
 				included.add(findInc.substring(0, findInc.indexOf(")")).toLowerCase().trim());
 				int curInc = 0;
 				int curRest = 0;
-				for (Outgoing entry : timeSpan.getOutgoings()) {
+				for (Incoming entry : timeSpan.getIncomings()) {
 					if (0 == entry.getTaxPercent()) {
 						String curCustomer = entry.getCategoryOrCustomer().toLowerCase().trim();
 						boolean includeThisOne = false;

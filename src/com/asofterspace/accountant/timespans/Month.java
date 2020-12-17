@@ -7,8 +7,8 @@ package com.asofterspace.accountant.timespans;
 import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
-import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
+import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.world.Category;
@@ -29,8 +29,8 @@ import java.util.List;
 public class Month extends TimeSpan {
 
 	private final static String MONTH_NUM_KEY = "monthNum";
-	private final static String OUTGOING_KEY = "outgoings";
 	private final static String INCOMING_KEY = "incomings";
+	private final static String OUTGOING_KEY = "outgoings";
 	private final static String VAT_PREPAID_KEY = "vatPrepaymentsPaid";
 	private final static String[] MONTH_NUM_TO_NAME = {
 		"January",
@@ -50,9 +50,9 @@ public class Month extends TimeSpan {
 
 	private int monthNum;
 
-	private List<Outgoing> outgoings;
-
 	private List<Incoming> incomings;
+
+	private List<Outgoing> outgoings;
 
 	private Integer vatPrepaymentsPaidTotal;
 
@@ -66,8 +66,8 @@ public class Month extends TimeSpan {
 
 		this.monthNum = monthNum;
 
-		this.outgoings = new ArrayList<>();
 		this.incomings = new ArrayList<>();
+		this.outgoings = new ArrayList<>();
 	}
 
 	/**
@@ -79,14 +79,14 @@ public class Month extends TimeSpan {
 
 		this.monthNum = monthRecord.getInteger(MONTH_NUM_KEY);
 
-		this.outgoings = new ArrayList<>();
 		this.incomings = new ArrayList<>();
+		this.outgoings = new ArrayList<>();
 
-		for (Record rec : monthRecord.getArray(OUTGOING_KEY)) {
-			outgoings.add(new Outgoing(rec, this));
-		}
 		for (Record rec : monthRecord.getArray(INCOMING_KEY)) {
 			incomings.add(new Incoming(rec, this));
+		}
+		for (Record rec : monthRecord.getArray(OUTGOING_KEY)) {
+			outgoings.add(new Outgoing(rec, this));
 		}
 
 		this.vatPrepaymentsPaidTotal = monthRecord.getInteger(VAT_PREPAID_KEY);
@@ -99,16 +99,16 @@ public class Month extends TimeSpan {
 
 		result.set(MONTH_NUM_KEY, (Integer) monthNum);
 
-		Record outgoingRec = Record.emptyArray();
-		result.set(OUTGOING_KEY, outgoingRec);
 		Record incomingRec = Record.emptyArray();
 		result.set(INCOMING_KEY, incomingRec);
+		Record outgoingRec = Record.emptyArray();
+		result.set(OUTGOING_KEY, outgoingRec);
 
-		for (Outgoing entry : outgoings) {
-			outgoingRec.append(entry.toRecord());
-		}
 		for (Incoming entry : incomings) {
 			incomingRec.append(entry.toRecord());
+		}
+		for (Outgoing entry : outgoings) {
+			outgoingRec.append(entry.toRecord());
 		}
 
 		result.set(VAT_PREPAID_KEY, vatPrepaymentsPaidTotal);
@@ -127,65 +127,65 @@ public class Month extends TimeSpan {
 	}
 
 	@Override
-	public List<Outgoing> getOutgoings() {
-		AccountingUtils.sortEntries(outgoings);
-		return outgoings;
+	public List<Incoming> getIncomings() {
+		AccountingUtils.sortEntries(incomings);
+		return incomings;
 	}
 
 	@Override
 	public List<Entry> getEntries() {
 		List<Entry> result = new ArrayList<>();
-		result.addAll(incomings);
 		result.addAll(outgoings);
+		result.addAll(incomings);
 		return result;
 	}
 
 	@Override
-	public List<Incoming> getIncomings() {
-		AccountingUtils.sortEntries(incomings);
-		List<Incoming> result = new ArrayList<>();
-		for (Incoming incoming : incomings) {
-			if (!incoming.getCategory().isSpecial()) {
-				result.add(incoming);
+	public List<Outgoing> getOutgoings() {
+		AccountingUtils.sortEntries(outgoings);
+		List<Outgoing> result = new ArrayList<>();
+		for (Outgoing outgoing : outgoings) {
+			if (!outgoing.getCategory().isSpecial()) {
+				result.add(outgoing);
 			}
 		}
 		return result;
 	}
 
 	@Override
-	public List<Incoming> getDonations() {
-		AccountingUtils.sortEntries(incomings);
-		List<Incoming> result = new ArrayList<>();
-		for (Incoming incoming : incomings) {
-			if (incoming.getCategory() == Category.DONATION) {
-				result.add(incoming);
+	public List<Outgoing> getDonations() {
+		AccountingUtils.sortEntries(outgoings);
+		List<Outgoing> result = new ArrayList<>();
+		for (Outgoing outgoing : outgoings) {
+			if (outgoing.getCategory() == Category.DONATION) {
+				result.add(outgoing);
 			}
 		}
 		return result;
 	}
 
 	@Override
-	public List<Incoming> getPersonals() {
-		AccountingUtils.sortEntries(incomings);
-		List<Incoming> result = new ArrayList<>();
-		for (Incoming incoming : incomings) {
-			if (incoming.getCategory() == Category.PERSONAL) {
-				result.add(incoming);
+	public List<Outgoing> getPersonals() {
+		AccountingUtils.sortEntries(outgoings);
+		List<Outgoing> result = new ArrayList<>();
+		for (Outgoing outgoing : outgoings) {
+			if (outgoing.getCategory() == Category.PERSONAL) {
+				result.add(outgoing);
 			}
 		}
 		return result;
-	}
-
-	public void removeOutgoing(Outgoing remEntry) {
-		outgoings.remove(remEntry);
 	}
 
 	public void removeIncoming(Incoming remEntry) {
 		incomings.remove(remEntry);
 	}
 
+	public void removeOutgoing(Outgoing remEntry) {
+		outgoings.remove(remEntry);
+	}
+
 	public boolean addEntry(Date date, String title, Object catOrCustomerObj, String amountStr,
-		Currency currency, String taxationPercentStr, String postTaxAmountStr, String originator, boolean isIncoming) {
+		Currency currency, String taxationPercentStr, String postTaxAmountStr, String originator, boolean isOutgoing) {
 
 		Integer amountObj = FinanceUtils.parseMoney(amountStr);
 		Integer postTaxAmountObj = FinanceUtils.parseMoney(postTaxAmountStr);
@@ -206,7 +206,7 @@ public class Month extends TimeSpan {
 
 		String catOrCustomer = catOrCustomerObj.toString();
 
-		if (isIncoming) {
+		if (isOutgoing) {
 
 			Category category = Category.fromString(catOrCustomer);
 
@@ -214,9 +214,9 @@ public class Month extends TimeSpan {
 				return GuiUtils.complain("The text " + catOrCustomer + " could not be parsed as category!");
 			}
 
-			Incoming newIn = new Incoming(amountObj, currency, taxationPercent, postTaxAmountObj,
+			Outgoing newIn = new Outgoing(amountObj, currency, taxationPercent, postTaxAmountObj,
 				date, title, originator, category, this);
-			incomings.add(newIn);
+			outgoings.add(newIn);
 
 		} else {
 
@@ -226,9 +226,9 @@ public class Month extends TimeSpan {
 				return GuiUtils.complain("The text " + catOrCustomer + " should contain a customer!");
 			}
 
-			Outgoing newOut = new Outgoing(amountObj, currency, taxationPercent, postTaxAmountObj,
+			Incoming newOut = new Incoming(amountObj, currency, taxationPercent, postTaxAmountObj,
 				date, title, originator, customer, this);
-			outgoings.add(newOut);
+			incomings.add(newOut);
 		}
 
 		return true;
@@ -239,36 +239,36 @@ public class Month extends TimeSpan {
 	}
 
 	@Override
-	public int getOutTotalBeforeTax() {
+	public int getInTotalBeforeTax() {
 		int result = 0;
-		for (Outgoing cur : outgoings) {
+		for (Incoming cur : incomings) {
 			result += cur.getPreTaxAmount();
 		}
 		return result;
 	}
 
 	@Override
-	public int getOutTotalAfterTax() {
+	public int getInTotalAfterTax() {
 		int result = 0;
-		for (Outgoing cur : outgoings) {
+		for (Incoming cur : incomings) {
 			result += cur.getPostTaxAmount();
 		}
 		return result;
 	}
 
 	@Override
-	public int getInTotalBeforeTax() {
+	public int getOutTotalBeforeTax() {
 		int result = 0;
-		for (Incoming cur : getIncomings()) {
+		for (Outgoing cur : getOutgoings()) {
 			result += cur.getPreTaxAmount();
 		}
 		return result;
 	}
 
 	@Override
-	public int getInTotalBeforeTax(Category category) {
+	public int getOutTotalBeforeTax(Category category) {
 		int result = 0;
-		for (Incoming cur : incomings) {
+		for (Outgoing cur : outgoings) {
 			if (cur.getCategory() == category) {
 				result += cur.getPreTaxAmount();
 			}
@@ -277,9 +277,9 @@ public class Month extends TimeSpan {
 	}
 
 	@Override
-	public int getInTotalAfterTax() {
+	public int getOutTotalAfterTax() {
 		int result = 0;
-		for (Incoming cur : getIncomings()) {
+		for (Outgoing cur : getOutgoings()) {
 			result += cur.getPostTaxAmount();
 		}
 		return result;
@@ -288,7 +288,7 @@ public class Month extends TimeSpan {
 	@Override
 	public int getDonTotalBeforeTax() {
 		int result = 0;
-		for (Incoming cur : getDonations()) {
+		for (Outgoing cur : getDonations()) {
 			result += cur.getPreTaxAmount();
 		}
 		return result;
@@ -297,7 +297,7 @@ public class Month extends TimeSpan {
 	@Override
 	public int getDonTotalAfterTax() {
 		int result = 0;
-		for (Incoming cur : getDonations()) {
+		for (Outgoing cur : getDonations()) {
 			result += cur.getPostTaxAmount();
 		}
 		return result;
@@ -306,7 +306,7 @@ public class Month extends TimeSpan {
 	@Override
 	public int getPersTotalBeforeTax() {
 		int result = 0;
-		for (Incoming cur : getPersonals()) {
+		for (Outgoing cur : getPersonals()) {
 			result += cur.getPreTaxAmount();
 		}
 		return result;
@@ -315,7 +315,7 @@ public class Month extends TimeSpan {
 	@Override
 	public int getPersTotalAfterTax() {
 		int result = 0;
-		for (Incoming cur : getPersonals()) {
+		for (Outgoing cur : getPersonals()) {
 			result += cur.getPostTaxAmount();
 		}
 		return result;

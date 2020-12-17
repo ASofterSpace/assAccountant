@@ -85,8 +85,8 @@ public class OverviewTab extends Tab {
 		}
 
 
-		// display outgoing invoices which have been sent out more than six weeks ago and not yet
-		// been set to having come in
+		// display incoming payments (sent invoices) which have been sent out more than six weeks ago and
+		// not yet been set to having come in
 		List<PaymentProblem> paymentProblems = database.getPaymentProblems();
 		for (final PaymentProblem curProblem : paymentProblems) {
 
@@ -274,12 +274,12 @@ public class OverviewTab extends Tab {
 		}
 
 
-		CopyByClickLabel unpaidInvoicesLabel = AccountingUtils.createSubHeadLabel("Unpaid Invoices:");
+		CopyByClickLabel unpaidInvoicesLabel = AccountingUtils.createSubHeadLabel("Unpaid Sent Invoices:");
 		tab.add(unpaidInvoicesLabel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		// display outgoing invoices which have been sent out more than six weeks ago and not yet
-		// been set to having come in
+		// display incoming payments (sent invoices) which have been sent out more than six weeks ago and
+		// not yet been set to having come in
 		List<PaymentProblem> paymentProblems = database.getPaymentProblems();
 		for (final PaymentProblem curProblem : paymentProblems) {
 

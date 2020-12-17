@@ -120,7 +120,7 @@ public class Database {
 
 		Record root = fileToLoad.getAllContents();
 
-		// years containing months, themselves containing incoming and outgoing entries
+		// years containing months, themselves containing outgoing and incoming entries
 		List<Record> yearRecs = root.getArray(YEARS_KEY);
 		for (Record yearRec : yearRecs) {
 			Year curYear = new Year(yearRec, this);
@@ -138,7 +138,7 @@ public class Database {
 		// only used during bulk import of legacy data
 		potentialCustomers = root.getArrayAsStringList(BULK_IMPORT_CUSTOMERS_KEY);
 
-		// map incoming invoice texts to incoming invoice categories
+		// outgoing money: map received invoice texts to received invoice categories
 		titleToCategoryMapping = new HashMap<>();
 		List<Record> catMappings = root.getArray(CATEGORY_MAPPINGS_KEY);
 		for (Record catMapping : catMappings) {
@@ -206,9 +206,9 @@ public class Database {
 		Set<String> result = new HashSet<>();
 		for (Year year : years) {
 			for (Month month : year.getMonths()) {
-				for (Outgoing outgoing : month.getOutgoings()) {
-					if (outgoing.getCustomer() != null) {
-						result.add(outgoing.getCustomer());
+				for (Incoming incoming : month.getIncomings()) {
+					if (incoming.getCustomer() != null) {
+						result.add(incoming.getCustomer());
 					}
 				}
 			}
@@ -314,7 +314,7 @@ public class Database {
 	}
 
 	public boolean addEntry(String dateStr, String title, Object catOrCustomer, String amount,
-		Currency currency, String taxationPercent, String postTaxAmount, String originator, boolean isIncoming) {
+		Currency currency, String taxationPercent, String postTaxAmount, String originator, boolean isOutgoing) {
 
 		Date date = DateUtils.parseDate(dateStr);
 		if (date == null) {
@@ -329,7 +329,7 @@ public class Database {
 		}
 
 		if (curMonth.addEntry(date, title, catOrCustomer, amount, currency, taxationPercent,
-			postTaxAmount, originator, isIncoming)) {
+			postTaxAmount, originator, isOutgoing)) {
 
 			save();
 
@@ -422,7 +422,7 @@ public class Database {
 		return curMonth;
 	}
 
-	public void bulkImportIncomings(List<File> bulkFiles) {
+	public void bulkImportOutgoings(List<File> bulkFiles) {
 
 		for (File bulkFile : bulkFiles) {
 
@@ -477,7 +477,7 @@ public class Database {
 		return Category.OTHER;
 	}
 
-	public void bulkImportOutgoings(List<File> bulkFiles) {
+	public void bulkImportIncomings(List<File> bulkFiles) {
 
 		for (File bulkFile : bulkFiles) {
 
@@ -1169,18 +1169,18 @@ public class Database {
 		return curAccount;
 	}
 
-	public List<Outgoing> getOutgoings() {
-		List<Outgoing> result = new ArrayList<>();
-		for (Year year : getYears()) {
-			result.addAll(year.getOutgoings());
-		}
-		return result;
-	}
-
 	public List<Incoming> getIncomings() {
 		List<Incoming> result = new ArrayList<>();
 		for (Year year : getYears()) {
 			result.addAll(year.getIncomings());
+		}
+		return result;
+	}
+
+	public List<Outgoing> getOutgoings() {
+		List<Outgoing> result = new ArrayList<>();
+		for (Year year : getYears()) {
+			result.addAll(year.getOutgoings());
 		}
 		return result;
 	}
