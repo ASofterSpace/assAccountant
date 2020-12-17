@@ -447,12 +447,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				location = location.substring(1);
 			}
 
-			if ("bank_statement_graph.png".equals(location)) {
-				return "bank_statement_graph.png";
-			}
-
-			if ("finance_log_graph.png".equals(location)) {
-				return "finance_log_graph.png";
+			switch (location) {
+				case "bank_statement_graph.png":
+				case "finance_log_graph.png":
+				case "income_log_graph.png":
+					return location;
 			}
 
 			if (locationToTabKind(location) != null) {
@@ -564,6 +563,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 		if ("task_log".equals(locEquiv) ||
 			"finance_log".equals(locEquiv) ||
+			"income_log".equals(locEquiv) ||
 			"bank_statements".equals(locEquiv) ||
 			locEquiv.startsWith("year_") ||
 			locEquiv.startsWith("month_") ||

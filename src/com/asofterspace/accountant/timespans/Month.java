@@ -7,14 +7,15 @@ package com.asofterspace.accountant.timespans;
 import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
-import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.entries.Incoming;
+import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.world.Category;
 import com.asofterspace.toolbox.accounting.Currency;
 import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.GuiUtils;
+import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.Utils;
 
@@ -124,6 +125,10 @@ public class Month extends TimeSpan {
 	@Override
 	public int getNum() {
 		return monthNum;
+	}
+
+	public Date getEndDate() {
+		return DateUtils.getLastDateInMonth(getMonthName(), getYear().getNum());
 	}
 
 	@Override

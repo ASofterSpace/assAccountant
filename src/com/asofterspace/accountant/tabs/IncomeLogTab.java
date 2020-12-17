@@ -8,22 +8,21 @@ import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.AssAccountant;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
-import com.asofterspace.accountant.tasks.FinanceLogEntry;
 import com.asofterspace.accountant.tasks.Task;
+import com.asofterspace.accountant.timespans.Month;
+import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.web.ServerRequestHandler;
+import com.asofterspace.toolbox.accounting.Currency;
+import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
-import com.asofterspace.toolbox.gui.CopyByClickLabel;
-import com.asofterspace.toolbox.guiImages.ImagePanel;
 import com.asofterspace.toolbox.images.ColorRGB;
 import com.asofterspace.toolbox.images.DefaultImageFile;
 import com.asofterspace.toolbox.images.GraphImage;
 import com.asofterspace.toolbox.images.GraphTimeDataPoint;
 import com.asofterspace.toolbox.io.CsvFileGerman;
 import com.asofterspace.toolbox.io.Directory;
-import com.asofterspace.toolbox.utils.DateUtils;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,14 +30,14 @@ import java.util.List;
 import javax.swing.JPanel;
 
 
-public class FinanceLogTab extends Tab {
+public class IncomeLogTab extends Tab {
 
-	private static final String TITLE = "Finance Log";
+	private static final String TITLE = "Income Log";
 
 	private JPanel tab;
 
 
-	public FinanceLogTab() {
+	public IncomeLogTab() {
 	}
 
 	@Override
@@ -53,7 +52,7 @@ public class FinanceLogTab extends Tab {
 
 		html += "<div class='mainTitle'>" + TITLE + "</div>";
 
-		html += "<div>This shows the total amount of money on all our accounts, sampled once per month.<br>";
+		html += "<div>This shows our total income (sent invoices before any tax) per month.<br>";
 		html += "An upwards slope is good, a sideways slope is okay.</div>";
 
 
@@ -65,30 +64,42 @@ public class FinanceLogTab extends Tab {
 		graph.setDataColor(new ColorRGB(160, 80, 255));
 		graph.setBaseYmin(0.0);
 
-
-		List<FinanceLogEntry> entries = database.getTaskCtrl().getFinanceLogs();
+		List<Year> years = database.getYears();
 		boolean foundEntry = false;
 		String afterHtml = "";
-		for (FinanceLogEntry entry : entries) {
-			if (entry.getRows().size() > 0) {
-				afterHtml += entry.createPanelInHtml(database);
+		for (Year year : years) {
+			for (Month month : year.getMonths()) {
+				if (year.getNum() == 2018) {
+					if (month.getNum() < 6) {
+						continue;
+					}
+				}
+				afterHtml += "<div>";
+				afterHtml += "<span style='width: 25%;'>";
+				afterHtml += month.getMonthName() + " " + month.getYear() + ": ";
+				afterHtml += "</span>";
+				afterHtml += "<span>";
+				afterHtml += FinanceUtils.formatMoney(month.getInTotalAfterTax(), Currency.EUR);
+				afterHtml += "</span>";
+				afterHtml += "</div>";
 
 				foundEntry = true;
 
-				timeData.add(new GraphTimeDataPoint(entry.getDate(), entry.getTotalAmount()));
+				timeData.add(new GraphTimeDataPoint(month.getEndDate(), month.getInTotalAfterTax()));
 			}
 		}
+
 		// for-else:
 		if (!foundEntry) {
 			html += "<div>No finance logs have been found!</div>";
 		} else {
-			html += "<div><img src='finance_log_graph.png' /></div>";
+			html += "<div><img src='income_log_graph.png' /></div>";
 			html += afterHtml;
 
 			graph.setIncludeTodayInTimeData(true);
 			graph.setAbsoluteTimeDataPoints(timeData);
 
-			DefaultImageFile graphFile = new DefaultImageFile(AssAccountant.getWebRoot(), "finance_log_graph.png");
+			DefaultImageFile graphFile = new DefaultImageFile(AssAccountant.getWebRoot(), "income_log_graph.png");
 			graphFile.assign(graph);
 			graphFile.saveTransparently();
 		}
@@ -101,74 +112,13 @@ public class FinanceLogTab extends Tab {
 	@Override
 	public void createTabOnGUI(final JPanel parentPanel, final Database database, String searchFor) {
 
-		if (tab != null) {
-			destroyTabOnGUI(parentPanel);
-		}
-
-		int i = 0;
-
 		tab = new JPanel();
 		tab.setBackground(GUI.getBackgroundColor());
 		tab.setLayout(new GridBagLayout());
 
-		JPanel topHUD = new JPanel();
-		topHUD.setBackground(GUI.getBackgroundColor());
-		topHUD.setLayout(new GridBagLayout());
-
-		CopyByClickLabel nameLabel = AccountingUtils.createHeadLabel(TITLE);
-		topHUD.add(nameLabel, new Arrangement(0, 0, 1.0, 1.0));
-
-		tab.add(topHUD, new Arrangement(0, i, 1.0, 0.0));
-		i++;
-
-		CopyByClickLabel curLabel;
-		JPanel curPanel;
-
-
-		List<GraphTimeDataPoint> timeData = new ArrayList<>();
-
-		GraphImage graph = new GraphImage();
-		graph.setBackgroundColor(new ColorRGB(GUI.getBackgroundColor()));
-		graph.setDataColor(new ColorRGB(80, 0, 160));
-		graph.setBaseYmin(0.0);
-		ImagePanel graphPanel = new ImagePanel(graph);
-		graphPanel.setMinimumHeight(500);
-		tab.add(graphPanel, new Arrangement(0, i, 1.0, 0.0));
-		i++;
-
-
-		List<FinanceLogEntry> entries = database.getTaskCtrl().getFinanceLogs();
-		boolean foundEntry = false;
-		for (FinanceLogEntry entry : entries) {
-			if (entry.getRows().size() > 0) {
-				curPanel = entry.createPanelOnGUI(database);
-				curPanel.setBackground(GUI.getBackgroundColor());
-				tab.add(curPanel, new Arrangement(0, i, 1.0, 1.0));
-				i++;
-
-				Dimension newSize = new Dimension(parentPanel.getWidth(), curPanel.getMinimumSize().height);
-				curPanel.setPreferredSize(newSize);
-				foundEntry = true;
-
-				timeData.add(new GraphTimeDataPoint(entry.getDate(), entry.getTotalAmount()));
-			}
-		}
-		// for-else:
-		if (!foundEntry) {
-			curLabel = new CopyByClickLabel("No finance logs have been found!");
-			tab.add(curLabel, new Arrangement(0, i, 1.0, 0.0));
-			i++;
-		}
-
-
-		graph.setIncludeTodayInTimeData(true);
-		graph.setAbsoluteTimeDataPoints(timeData);
-
-
 		JPanel footer = new JPanel();
 		footer.setBackground(GUI.getBackgroundColor());
-		tab.add(footer, new Arrangement(0, i, 1.0, 1.0));
-		i++;
+		tab.add(footer, new Arrangement(0, 1, 1.0, 1.0));
 
 		AccountingUtils.resetTabSize(tab, parentPanel);
 
@@ -183,19 +133,24 @@ public class FinanceLogTab extends Tab {
 
 
 		List<String> headlineCols = new ArrayList<>();
-		headlineCols.add("Date");
-		headlineCols.add("Total");
+		headlineCols.add("Month");
+		headlineCols.add("Total Income");
 
 		CsvFileGerman csvFile = new CsvFileGerman(resultDir, "finances.csv");
 		csvFile.setHeadLine(headlineCols);
 
-		List<FinanceLogEntry> entries = database.getTaskCtrl().getFinanceLogs();
-
-		for (FinanceLogEntry entry : entries) {
-			if (entry.getRows().size() > 0) {
+		List<Year> years = database.getYears();
+		String afterHtml = "";
+		for (Year year : years) {
+			for (Month month : year.getMonths()) {
+				if (year.getNum() == 2018) {
+					if (month.getNum() < 6) {
+						continue;
+					}
+				}
 				List<String> cur = new ArrayList<>();
-				cur.add(DateUtils.serializeDate(entry.getDate()));
-				cur.add(CsvFileGerman.sanitizeForCsv(entry.getTotalAmount() / 100.0));
+				cur.add(month.getMonthName() + " " + month.getYear());
+				cur.add(CsvFileGerman.sanitizeForCsv(month.getInTotalAfterTax() / 100.0));
 				csvFile.appendContent(cur);
 			}
 		}
@@ -224,6 +179,9 @@ public class FinanceLogTab extends Tab {
 			return 1;
 		}
 		if (tab instanceof FinanceLogTab) {
+			return 1;
+		}
+		if (tab instanceof IncomeLogTab) {
 			return 0;
 		}
 		return -1;

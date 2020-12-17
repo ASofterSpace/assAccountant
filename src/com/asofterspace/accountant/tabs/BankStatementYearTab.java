@@ -279,6 +279,9 @@ public class BankStatementYearTab extends Tab {
 		if (tab instanceof FinanceLogTab) {
 			return 1;
 		}
+		if (tab instanceof IncomeLogTab) {
+			return 1;
+		}
 		if (tab instanceof BankStatementTab) {
 			return 1;
 		}
