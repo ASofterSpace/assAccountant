@@ -48,6 +48,7 @@ public class Database {
 	private static final String CATEGORY_MAPPINGS_CONTAINS_KEY = "contains";
 	private static final String CATEGORY_MAPPINGS_CATEGORY_KEY = "category";
 	private static final String ACKNOWLEDGEMENTS_KEY = "acknowledgements";
+	private final static String CUSTOMER_TO_SHORT_KEY_MAPPING = "customerToShortKeyMapping";
 	private static final String BANK_ACCOUNTS_KEY = "bankAccounts";
 	private static final String BACKUP_FILE_NAME = "database_backup_";
 	private static final String CURRENT_BACKUP_KEY = "currentBackup";
@@ -73,6 +74,7 @@ public class Database {
 	private List<String> potentialCustomers;
 	private Map<String, Category> titleToCategoryMapping;
 	private List<String> acknowledgedProblems;
+	private Map<String, Object> customerToShortKeyMapping;
 
 	private Integer port;
 
@@ -150,6 +152,8 @@ public class Database {
 
 		// read out acknowledgements
 		acknowledgedProblems = root.getArrayAsStringList(ACKNOWLEDGEMENTS_KEY);
+
+		customerToShortKeyMapping = root.getObjectMap(CUSTOMER_TO_SHORT_KEY_MAPPING);
 
 		return root;
 	}
@@ -1332,6 +1336,8 @@ public class Database {
 
 		root.set(ACKNOWLEDGEMENTS_KEY, acknowledgedProblems);
 
+		root.set(CUSTOMER_TO_SHORT_KEY_MAPPING, customerToShortKeyMapping);
+
 		taskCtrl.saveIntoRecord(root);
 
 		dbFile.setAllContents(root);
@@ -1365,6 +1371,14 @@ public class Database {
 
 	public String getLocation() {
 		return location;
+	}
+
+	public String mapCustomerToShortKey(String customer) {
+
+		if (customerToShortKeyMapping.get(customer) != null) {
+			return customerToShortKeyMapping.get(customer).toString();
+		}
+		return customer.substring(0, 3).toUpperCase();
 	}
 
 }

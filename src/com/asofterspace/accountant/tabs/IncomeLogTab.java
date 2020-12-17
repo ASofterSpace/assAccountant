@@ -7,6 +7,7 @@ package com.asofterspace.accountant.tabs;
 import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.AssAccountant;
 import com.asofterspace.accountant.Database;
+import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.tasks.Task;
 import com.asofterspace.accountant.timespans.Month;
@@ -73,6 +74,7 @@ public class IncomeLogTab extends Tab {
 		List<Year> years = database.getYears();
 		boolean foundEntry = false;
 		String afterHtml = "";
+
 		for (Year year : years) {
 			for (Month month : year.getMonths()) {
 				if (year.getNum() == 2018) {
@@ -80,13 +82,26 @@ public class IncomeLogTab extends Tab {
 						continue;
 					}
 				}
-				afterHtml += "<div>";
-				afterHtml += "<span style='width: 50%; display: inline-block; text-align: right;'>";
+				afterHtml += "<div class='line'>";
+				afterHtml += "<span style='width: 38%; display: inline-block; text-align: right;'>";
 				afterHtml += month.getMonthName() + " " + month.getYear() + ":&nbsp;&nbsp;&nbsp;";
 				afterHtml += "</span>";
-				afterHtml += "<span>";
+				afterHtml += "<span style='width: 20%; display: inline-block;'>";
 				afterHtml += FinanceUtils.formatMoney(month.getInTotalAfterTax(), Currency.EUR);
 				afterHtml += "</span>";
+
+				List<Incoming> incomings = month.getIncomings();
+				String sep = "";
+				if (incomings.size() > 0) {
+					afterHtml += "<span>(";
+					for (Incoming incoming : incomings) {
+						afterHtml += sep;
+						sep = ", ";
+						afterHtml += database.mapCustomerToShortKey(incoming.getCustomer());
+					}
+					afterHtml += ")</span>";
+				}
+
 				afterHtml += "</div>";
 
 				foundEntry = true;
