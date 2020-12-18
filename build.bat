@@ -21,6 +21,7 @@ md io
 md pdf
 md projects
 md utils
+md virtualEmployees
 md web
 
 cd ..\..\..\..
@@ -37,6 +38,7 @@ copy "..\Toolbox-Java\src\com\asofterspace\toolbox\io\*.*" "src\com\asofterspace
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\pdf\*.*" "src\com\asofterspace\toolbox\pdf"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\projects\*.*" "src\com\asofterspace\toolbox\projects"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\utils\*.*" "src\com\asofterspace\toolbox\utils"
+copy "..\Toolbox-Java\src\com\asofterspace\toolbox\virtualEmployees\*.*" "src\com\asofterspace\toolbox\virtualEmployees"
 copy "..\Toolbox-Java\src\com\asofterspace\toolbox\web\*.*" "src\com\asofterspace\toolbox\web"
 
 rd /s /q bin

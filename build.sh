@@ -22,6 +22,7 @@ mkdir io
 mkdir pdf
 mkdir projects
 mkdir utils
+mkdir virtualEmployees
 mkdir web
 
 cd ../../../..
@@ -38,6 +39,7 @@ cp ../Toolbox-Java/src/com/asofterspace/toolbox/io/*.* src/com/asofterspace/tool
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/pdf/*.* src/com/asofterspace/toolbox/pdf
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/projects/*.* src/com/asofterspace/toolbox/projects
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/utils/*.* src/com/asofterspace/toolbox/utils
+cp ../Toolbox-Java/src/com/asofterspace/toolbox/virtualEmployees/*.* src/com/asofterspace/toolbox/virtualEmployees
 cp ../Toolbox-Java/src/com/asofterspace/toolbox/web/*.* src/com/asofterspace/toolbox/web
 
 rm -rf bin

@@ -1,3 +1,4 @@
+
 /**
  * Unlicensed code created by A Softer Space, 2020
  * www.asofterspace.com/licenses/unlicense.txt
@@ -31,6 +32,8 @@ import com.asofterspace.toolbox.io.TextFile;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
 import com.asofterspace.toolbox.utils.StrUtils;
+import com.asofterspace.toolbox.virtualEmployees.SideBarCtrl;
+import com.asofterspace.toolbox.virtualEmployees.SideBarEntry;
 import com.asofterspace.toolbox.web.WebServer;
 import com.asofterspace.toolbox.web.WebServerAnswer;
 import com.asofterspace.toolbox.web.WebServerAnswerInJson;
@@ -503,6 +506,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				TextFile indexBaseFile = new TextFile(webRoot, "index.htm");
 				String indexContent = indexBaseFile.getContent();
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[SIDEBAR]]",
+					SideBarCtrl.getSidebarHtmlStr(SideBarEntry.MARI));
 
 				String tabsHtml = "<div id='tabList'>";
 
