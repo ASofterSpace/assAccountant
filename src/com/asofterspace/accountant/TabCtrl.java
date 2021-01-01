@@ -6,6 +6,7 @@ package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.tabs.BankStatementTab;
 import com.asofterspace.accountant.tabs.BankStatementYearTab;
+import com.asofterspace.accountant.tabs.CalculatorTab;
 import com.asofterspace.accountant.tabs.FinanceLogTab;
 import com.asofterspace.accountant.tabs.IncomeLogTab;
 import com.asofterspace.accountant.tabs.MonthTab;
@@ -30,6 +31,7 @@ public class TabCtrl {
 	private TaskLogTab taskLogTab;
 	private FinanceLogTab financeLogTab;
 	private IncomeLogTab incomeLogTab;
+	private CalculatorTab calculatorTab;
 	private BankStatementTab bankStatementTab;
 
 
@@ -39,6 +41,7 @@ public class TabCtrl {
 		this.taskLogTab = new TaskLogTab();
 		this.financeLogTab = new FinanceLogTab();
 		this.incomeLogTab = new IncomeLogTab();
+		this.calculatorTab = new CalculatorTab();
 		this.bankStatementTab = new BankStatementTab();
 	}
 
@@ -50,6 +53,7 @@ public class TabCtrl {
 		result.add(taskLogTab);
 		result.add(financeLogTab);
 		result.add(incomeLogTab);
+		result.add(calculatorTab);
 		result.add(bankStatementTab);
 
 		List<Year> years = database.getYears();

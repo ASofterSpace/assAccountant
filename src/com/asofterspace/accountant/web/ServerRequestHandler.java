@@ -573,6 +573,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			"finance_log".equals(locEquiv) ||
 			"income_log".equals(locEquiv) ||
 			"bank_statements".equals(locEquiv) ||
+			"calculator".equals(locEquiv) ||
 			locEquiv.startsWith("year_") ||
 			locEquiv.startsWith("month_") ||
 			locEquiv.startsWith("bs_year_")) {

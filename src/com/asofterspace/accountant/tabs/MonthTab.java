@@ -130,6 +130,9 @@ public class MonthTab extends TimeSpanTab {
 		if (tab instanceof IncomeLogTab) {
 			return 1;
 		}
+		if (tab instanceof CalculatorTab) {
+			return 1;
+		}
 		if (tab instanceof BankStatementTab) {
 			return 1;
 		}

@@ -58,6 +58,19 @@ window.accountant = {
 		}
 	},
 
+	copyText: function(textToCopy) {
+
+		var copyEl = document.getElementById("copyInputField");
+
+		if (copyEl) {
+			copyEl.value = textToCopy;
+
+			copyEl.select();
+
+			document.execCommand("copy");
+		}
+	},
+
 }
 
 

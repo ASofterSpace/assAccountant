@@ -28,6 +28,9 @@ public class BankStatementTab extends BankStatementYearTab {
 		if (tab instanceof IncomeLogTab) {
 			return 1;
 		}
+		if (tab instanceof CalculatorTab) {
+			return 1;
+		}
 		if (tab instanceof BankStatementTab) {
 			return 0;
 		}
