@@ -9,8 +9,8 @@ import com.asofterspace.accountant.AddEntryGUI;
 import com.asofterspace.accountant.AssAccountant;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
-import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.entries.Incoming;
+import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.TimeSpan;
@@ -38,6 +38,7 @@ import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -75,6 +76,9 @@ public class Task extends GenericTask {
 	private Color textColor;
 	private Database database;
 
+	// for Mari, ids are completely ephemeral - that is, when Mari is restarted, ids are re-assigned
+	private String id;
+
 
 	public Task(String title, Integer scheduledOnDay, List<String> scheduledOnDaysOfWeek, List<Integer> scheduledInMonths,
 		List<Integer> scheduledInYears, List<String> details, List<String> onDone) {
@@ -88,6 +92,20 @@ public class Task extends GenericTask {
 		super(other);
 
 		this.taskCtrl = AssAccountant.getTaskCtrl();
+	}
+
+	public boolean hasId(String otherId) {
+		if (id == null) {
+			return false;
+		}
+		return id.equals(otherId);
+	}
+
+	public String getId() {
+		if (id == null) {
+			id = "" + UUID.randomUUID();
+		}
+		return id;
 	}
 
 	@Override
@@ -139,6 +157,34 @@ public class Task extends GenericTask {
 		detail = replaceDetailsFor(detail, "YEAR", curYear);
 
 		return detail;
+	}
+
+	/**
+	 * Actually return the instructions as shown to the user, with information replaced with
+	 * actual info
+	 */
+	public String getDetailPanelInHtmlToShowToUser(Database database) {
+
+		StringBuilder html = new StringBuilder();
+
+		String detail = getDetailsToShowToUser(database);
+
+		if (detail == null) {
+			return "";
+		}
+
+		detail = detail.trim();
+
+		String[] detailsAfterReplacement = detail.split("\n");
+
+		for (String detailLine : detailsAfterReplacement) {
+			html.append("<div class='line' onclick='accountant.copyText(\"");
+			html.append(StrUtils.replaceAll(detailLine, "\"", "\" + '\"' + \"") + "\")'>");
+			html.append(detailLine);
+			html.append("</div>");
+		}
+
+		return html.toString();
 	}
 
 	/**
@@ -539,6 +585,9 @@ public class Task extends GenericTask {
 
 		html += AccountingUtils.createLabelHtml(title, textColor, "", "text-align: left; width: " + titleWidth + "%;");
 
+		html += "<span class='button' style='width:8%; float:right;' ";
+		html += "onclick='accountant.showDetails(\"" + getId() + "\")'>Details</span>";
+
 		// TODO add working buttons
 		/*
 		addedLines = new ArrayList<>();
@@ -735,6 +784,9 @@ public class Task extends GenericTask {
 		});
 		*/
 
+		html += "</div>";
+
+		html += "<div id='task-details-" + getId() + "' style='display:none;'>";
 		html += "</div>";
 
 		return html;

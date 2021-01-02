@@ -18,6 +18,7 @@ import com.asofterspace.accountant.tabs.MonthTab;
 import com.asofterspace.accountant.tabs.Tab;
 import com.asofterspace.accountant.tabs.TimeSpanTab;
 import com.asofterspace.accountant.tabs.YearTab;
+import com.asofterspace.accountant.tasks.Task;
 import com.asofterspace.accountant.tasks.TaskCtrl;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.TimeSpan;
@@ -46,6 +47,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 
 public class ServerRequestHandler extends WebServerRequestHandler {
@@ -148,7 +150,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 	}
 
 	@Override
-	protected WebServerAnswer answerGet(String location, String[] arguments) {
+	protected WebServerAnswer answerGet(String location, Map<String, String> arguments) {
 
 		if ("/taskInstances".equals(location)) {
 
@@ -157,19 +159,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			TaskCtrl taskCtrl = database.getTaskCtrl();
 
 			List<GenericTask> taskInstances = taskCtrl.getTaskInstances();
-			Date fromDate = null;
-			Date toDate = null;
-			for (String arg : arguments) {
-				if (arg.contains("=")) {
-					String key = arg.substring(0, arg.indexOf("="));
-					if ("from".equals(key)) {
-						fromDate = DateUtils.parseDate(arg.substring(arg.indexOf("=") + 1));
-					}
-					if ("to".equals(key)) {
-						toDate = DateUtils.parseDate(arg.substring(arg.indexOf("=") + 1));
-					}
-				}
-			}
+			Date fromDate = DateUtils.parseDate(arguments.get("from"));
+			Date toDate = DateUtils.parseDate(arguments.get("to"));
+
 			for (GenericTask taskInstance : taskInstances) {
 				if (taskInstance.appliesTo(fromDate, toDate)) {
 					json.append(taskCtrl.taskToRecord(taskInstance));
@@ -193,6 +185,27 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 			WebServerAnswerInJson answer = new WebServerAnswerInJson(json);
 			return answer;
+		}
+
+		if ("/taskInstance".equals(location)) {
+
+			TaskCtrl taskCtrl = database.getTaskCtrl();
+
+			String id = arguments.get("id");
+
+			List<GenericTask> genericTasks = taskCtrl.getTaskInstances();
+			for (GenericTask genericTask : genericTasks) {
+				if (genericTask instanceof Task) {
+					Task task = (Task) genericTask;
+					if (task.hasId(id)) {
+						JSON json = new JSON(taskCtrl.taskToRecord(task));
+						json.set("success", true);
+						json.set("detailsHtml", task.getDetailPanelInHtmlToShowToUser(database));
+						WebServerAnswerInJson answer = new WebServerAnswerInJson(json);
+						return answer;
+					}
+				}
+			}
 		}
 
 		if ("/unacknowledged-problems".equals(location)) {

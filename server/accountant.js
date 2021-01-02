@@ -79,6 +79,34 @@ window.accountant = {
 		request.send('{"year": ' + year + ', "month": ' + month + '}');
 	},
 
+	showDetails: function(id) {
+
+		var taskDetailsHolder = document.getElementById("task-details-" + id);
+		if (taskDetailsHolder) {
+			if (taskDetailsHolder.style.display == "block") {
+				taskDetailsHolder.style.display = "none";
+			} else {
+				taskDetailsHolder.innerHTML = "Hmmm, let me think for a second...";
+				taskDetailsHolder.style.display = "block";
+
+				var request = new XMLHttpRequest();
+				request.open("GET", "taskInstance?id=" + id, true);
+				request.setRequestHeader("Content-Type", "application/json");
+
+				request.onreadystatechange = function() {
+					if (request.readyState == 4 && request.status == 200) {
+						var result = JSON.parse(request.response);
+						if (result.success) {
+							taskDetailsHolder.innerHTML = result.detailsHtml;
+						}
+					}
+				}
+
+				request.send();
+			}
+		}
+	},
+
 }
 
 

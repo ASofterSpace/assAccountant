@@ -236,8 +236,7 @@ public class AccountingUtils {
 			if ((totalBeforeTax != timeSpan.getInTotalBeforeTax()) ||
 				(totalTax != timeSpan.getInTotalTax()) ||
 				(totalAfterTax != timeSpan.getInTotalAfterTax())) {
-				// TODO - complain in HTML somehow
-				GuiUtils.complain("There was an incoming calculation mixup! Something is wrong! Cats and dogs! Oh no!");
+				System.out.println("There was an incoming calculation mixup! Something is wrong! Cats and dogs! Oh no!");
 			}
 		}
 
@@ -263,8 +262,7 @@ public class AccountingUtils {
 			if ((totalBeforeTax != timeSpan.getOutTotalBeforeTax()) ||
 				(totalTax != timeSpan.getOutTotalTax()) ||
 				(totalAfterTax != timeSpan.getOutTotalAfterTax())) {
-				// TODO - complain in HTML somehow
-				GuiUtils.complain("There was an outgoing calculation mixup! Something is wrong! Cats and dogs! Oh no!");
+				System.out.println("There was an outgoing calculation mixup! Something is wrong! Cats and dogs! Oh no!");
 			}
 		}
 
@@ -290,8 +288,7 @@ public class AccountingUtils {
 			if ((totalBeforeTax != timeSpan.getDonTotalBeforeTax()) ||
 				(totalTax != timeSpan.getDonTotalTax()) ||
 				(totalAfterTax != timeSpan.getDonTotalAfterTax())) {
-				// TODO - complain in HTML somehow
-				GuiUtils.complain("There was a donations calculation mixup! Something is wrong! Cats and dogs! Oh no!");
+				System.out.println("There was a donations calculation mixup! Something is wrong! Cats and dogs! Oh no!");
 			}
 		}
 
@@ -317,8 +314,7 @@ public class AccountingUtils {
 			if ((totalBeforeTax != timeSpan.getPersTotalBeforeTax()) ||
 				(totalTax != timeSpan.getPersTotalTax()) ||
 				(totalAfterTax != timeSpan.getPersTotalAfterTax())) {
-				// TODO - complain in HTML somehow
-				GuiUtils.complain("There was a personals calculation mixup! Something is wrong! Cats and dogs! Oh no!");
+				System.out.println("There was a personals calculation mixup! Something is wrong! Cats and dogs! Oh no!");
 			}
 		}
 
