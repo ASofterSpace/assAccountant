@@ -40,17 +40,17 @@ public class CalculatorTab extends Tab {
 		html += "<div>For generating skyhook invoices, ";
 		html += "it can be helpful to know the multiples of " + baseAmount + " €:</div>";
 		html += "<div>";
-		for (int m = 0; m <= 8*60; m++) {
+		for (int m = 1; m <= 8*60; m++) {
+			String text = FinanceUtils.formatMoney((baseAmount * 100 * m) / 60) + " €";
+			int width = 95 / 5;
+			html += "<div style='display: inline-block; width: " + width + "%; cursor: pointer;' ";
+			html += "class='line' onclick='accountant.copyText(\"" + text + "\")'>";
 			if (m >= 60) {
 				html += (m / 60) + "h ";
 			}
 			html += (m % 60) + "m: ";
-			String text = FinanceUtils.formatMoney((baseAmount * 100 * m) / 60) + " €";
-			html += "<span style='userSelect: all; cursor: pointer;' ";
-			html += "onclick='accountant.copyText(\"" + text + "\")'>";
 			html += text;
-			html += "</span>";
-			html += "<br>";
+			html += "</div>";
 		}
 		html += "</div>";
 
