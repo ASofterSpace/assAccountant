@@ -7,6 +7,7 @@ package com.asofterspace.accountant.web;
 
 import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.AssAccountant;
+import com.asofterspace.accountant.ConfigCtrl;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.Problem;
@@ -40,6 +41,7 @@ import com.asofterspace.toolbox.web.WebServerAnswerInJson;
 import com.asofterspace.toolbox.web.WebServerAnswerWithText;
 import com.asofterspace.toolbox.web.WebServerRequestHandler;
 
+import java.awt.Desktop;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.Date;
@@ -116,6 +118,20 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					answer = new WebServerAnswerInJson(new JSON(
 						"{\"exportPath\": \"" + StrUtils.replaceAll(exportedDir.getCanonicalDirname(), "\\", "/") + "\"}"));
 					GuiUtils.openFolder(exportedDir);
+					break;
+
+				case "/openInOS":
+					String diskLocation = ConfigCtrl.getInvoiceLocation(
+						json.getInteger("year"),
+						json.getInteger("month")
+					);
+					Directory diskLocationFile = new Directory(diskLocation);
+					try {
+						Desktop.getDesktop().open(diskLocationFile.getJavaFile());
+					} catch (IOException ex) {
+						System.out.println("Sorry, the folder " +
+							diskLocationFile.getAbsoluteDirname() + " could not be opened!");
+					}
 					break;
 
 				default:

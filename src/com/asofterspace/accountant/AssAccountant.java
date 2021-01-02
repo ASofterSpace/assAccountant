@@ -226,4 +226,8 @@ public class AssAccountant {
 		return webRoot;
 	}
 
+	public static ConfigFile getConfig() {
+		return config;
+	}
+
 }

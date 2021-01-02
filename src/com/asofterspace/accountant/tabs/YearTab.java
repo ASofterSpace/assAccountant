@@ -5,6 +5,7 @@
 package com.asofterspace.accountant.tabs;
 
 import com.asofterspace.accountant.AccountingUtils;
+import com.asofterspace.accountant.ConfigCtrl;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.TimeSpan;
@@ -36,6 +37,17 @@ public class YearTab extends TimeSpanTab {
 		String html = "";
 
 		html += "<div class='relContainer'>";
+
+		if (ConfigCtrl.invoiceLocationIsSet()) {
+			html += "<span class='topleftAction button' ";
+			html += "onclick='window.accountant.openInOS(" + getYear().getNum() + ", null)'>";
+			html += "Open in OS</span>";
+			String invoiceLocation = ConfigCtrl.getInvoiceLocation(getYear().getNum(), null);
+			html += "<a class='topleftAction button' style='left:76pt;' target='_blank' ";
+			html += "href='localhost:3013/?link=" + invoiceLocation + "'>Open in Browser</span>";
+			html += "</a>";
+		}
+
 		html += "<a class='toprightAction button' style='right:92pt;' target='_blank' href='print_pdf_euer_" +
 			ServerRequestHandler.tabToLink(this) + "'>Print EÜR to PDF</span>";
 		html += "</a>";

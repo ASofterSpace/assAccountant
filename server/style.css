@@ -50,9 +50,16 @@ div.secondaryTitle {
 }
 
 span.toprightAction, a.toprightAction {
+	right: 10pt;
+}
+
+span.topleftAction, a.topleftAction {
+	left: 10pt;
+}
+
+span.toprightAction, a.toprightAction, span.topleftAction, a.topleftAction {
 	position: absolute;
 	top: 10pt;
-	right: 10pt;
 	cursor: pointer;
 	text-decoration: none;
 	color: #88AAFF;

@@ -69,7 +69,6 @@ public class GUI extends MainWindow {
 	private final static String CONFIG_KEY_HEIGHT = "mainFrameHeight";
 	private final static String CONFIG_KEY_LEFT = "mainFrameLeft";
 	private final static String CONFIG_KEY_TOP = "mainFrameTop";
-	private final static String CONFIG_KEY_INVOICE_LOCATION_ON_DISK = "invoiceLocationOnDisk";
 
 	private Database database;
 	private TabCtrl tabCtrl;
@@ -355,10 +354,10 @@ public class GUI extends MainWindow {
 		openOnDisk.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				String diskLocation = configuration.getValue(CONFIG_KEY_INVOICE_LOCATION_ON_DISK);
+				String diskLocation = configuration.getValue(ConfigCtrl.CONFIG_KEY_INVOICE_LOCATION_ON_DISK);
 				if (diskLocation == null) {
 					GuiUtils.complain("Sorry, the key " +
-						CONFIG_KEY_INVOICE_LOCATION_ON_DISK + " in the configuration file " +
+						ConfigCtrl.CONFIG_KEY_INVOICE_LOCATION_ON_DISK + " in the configuration file " +
 						configuration.getAbsoluteFilename() + " has not been set!");
 					return;
 				}
