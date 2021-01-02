@@ -122,12 +122,39 @@ public class Database {
 
 		Record root = fileToLoad.getAllContents();
 
+		// ensure that at least the current year and the year which the next month belongs to
+		// are automatically added (yes, this means that from 1st December on, the next year
+		// is already shown, just containing no data yet - unless we already start adding some)
+		Date today = DateUtils.now();
+		int curYearNum = DateUtils.getYear(today);
+		int yearNextMonthNum = curYearNum;
+		if (DateUtils.getMonth(today) > 11) {
+			yearNextMonthNum++;
+		}
+		boolean encounteredCurYear = false;
+		boolean encounteredYearNextMonth = false;
+
 		// years containing months, themselves containing outgoing and incoming entries
 		List<Record> yearRecs = root.getArray(YEARS_KEY);
 		for (Record yearRec : yearRecs) {
 			Year curYear = new Year(yearRec, this);
 			years.add(curYear);
+
+			if (curYear.getNum() == curYearNum) {
+				encounteredCurYear = true;
+			}
+			if (curYear.getNum() == yearNextMonthNum) {
+				encounteredYearNextMonth = true;
+			}
 		}
+
+		if (!encounteredCurYear) {
+			years.add(new Year(curYearNum, this));
+		}
+		if (!encounteredYearNextMonth) {
+			years.add(new Year(yearNextMonthNum, this));
+		}
+
 		sortYears();
 
 		// bank accounts containing transactions
