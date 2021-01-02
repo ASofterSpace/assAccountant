@@ -38,10 +38,10 @@ public class MonthTab extends TimeSpanTab {
 		String html = "";
 
 		html += "<div class='relContainer'>";
-		html += "<a class='toprightAction' style='right:89pt;' target='_blank' href='print_pdf_euer_" +
+		html += "<a class='toprightAction button' style='right:92pt;' target='_blank' href='print_pdf_euer_" +
 			ServerRequestHandler.tabToLink(this) + "'>Print EÜR to PDF</span>";
 		html += "</a>";
-		html += "<span class='toprightAction' onclick='window.accountant.exportCsvs(\"" + ServerRequestHandler.tabToLink(this) + "\")'>" +
+		html += "<span class='toprightAction button' onclick='window.accountant.exportCsvs(\"" + ServerRequestHandler.tabToLink(this) + "\")'>" +
 				"Export to CSVs</span>";
 		html += "</div>";
 

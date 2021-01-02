@@ -49,6 +49,51 @@ div.secondaryTitle {
 	padding-bottom: 10pt;
 }
 
+span.toprightAction, a.toprightAction {
+	position: absolute;
+	top: 10pt;
+	right: 10pt;
+	cursor: pointer;
+	text-decoration: none;
+	color: #88AAFF;
+}
+
+span.button, a.button {
+	color: #AACCFF;
+	padding: 0pt 4pt;
+	border-radius: 5pt;
+	background: rgba(150, 200, 250, 0.2);
+	cursor: pointer;
+	text-align: center;
+}
+
+span.button.bigger {
+	font-size: 110%;
+}
+
+span.button.highviz {
+	background: rgba(0, 20, 50, 0.8);
+}
+
+div.buttonBar > span.button, div.buttonBar > a.button {
+	padding: 2pt 10pt;
+	border-radius: 5pt;
+	margin: 0pt 10pt;
+}
+
+span.button:hover, a.button:hover {
+	background: rgba(150, 200, 250, 0.5);
+}
+
+span.button.unchecked {
+	background: none;
+	border: 1px solid rgba(150, 200, 250, 0.5);
+}
+
+span.button.checked {
+	background: rgba(150, 200, 250, 0.6);
+}
+
 div.line:hover {
 	background: rgba(255, 0, 255, 0.19);
 }
@@ -73,15 +118,6 @@ div.relContainer {
 	position: relative;
 	height: 0;
 	width: 100%;
-}
-
-span.toprightAction, a.toprightAction {
-	position: absolute;
-	top: 10pt;
-	right: 10pt;
-	cursor: pointer;
-	text-decoration: none;
-	color: #88AAFF;
 }
 
 a.sidebar, div.sidebar, div.projectbar {

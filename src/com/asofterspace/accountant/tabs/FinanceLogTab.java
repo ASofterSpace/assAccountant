@@ -47,7 +47,7 @@ public class FinanceLogTab extends Tab {
 		String html = "";
 
 		html += "<div class='relContainer'>";
-		html += "<span class='toprightAction' onclick='window.accountant.exportCsvs(\"" + ServerRequestHandler.tabToLink(this) + "\")'>" +
+		html += "<span class='toprightAction button' onclick='window.accountant.exportCsvs(\"" + ServerRequestHandler.tabToLink(this) + "\")'>" +
 				"Export to CSVs</span>";
 		html += "</div>";
 
