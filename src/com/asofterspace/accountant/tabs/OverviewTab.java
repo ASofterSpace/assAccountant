@@ -66,12 +66,14 @@ public class OverviewTab extends Tab {
 			}
 		}
 
+		/*
 		if (tasksShown) {
 			html += "<div class='line'>";
 			html += AccountingUtils.createLabelHtml("Scheduled:", textColor, "", "text-align: left; width: 8%;");
 			html += AccountingUtils.createLabelHtml("Title:", textColor, "", "text-align: left; width: 50%;");
 			html += "</div>";
 		}
+		*/
 
 		for (GenericTask task : tasks) {
 			if ((!task.hasBeenDone()) && task.matches(searchFor)) {

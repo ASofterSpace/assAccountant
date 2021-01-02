@@ -22,10 +22,12 @@ import com.asofterspace.toolbox.images.GraphImage;
 import com.asofterspace.toolbox.images.GraphTimeDataPoint;
 import com.asofterspace.toolbox.io.CsvFileGerman;
 import com.asofterspace.toolbox.io.Directory;
+import com.asofterspace.toolbox.utils.DateUtils;
 
 import java.awt.Color;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -75,13 +77,30 @@ public class IncomeLogTab extends Tab {
 		boolean foundEntry = false;
 		String afterHtml = "";
 
+		Date today = DateUtils.now();
+		int curYear = DateUtils.getYear(today);
+		int curMonth = DateUtils.getMonth(today);
+
 		for (Year year : years) {
 			for (Month month : year.getMonths()) {
+
+				// only start showing months starting in June 2018
 				if (year.getNum() == 2018) {
 					if (month.getNum() < 6) {
 						continue;
 					}
 				}
+
+				// do not show months after the current one
+				if (year.getNum() > curYear) {
+					continue;
+				}
+				if (year.getNum() == curYear) {
+					if (month.getNum() > curMonth) {
+						continue;
+					}
+				}
+
 				afterHtml += "<div class='line'>";
 				afterHtml += "<span style='width: 38%; display: inline-block; text-align: right;'>";
 				afterHtml += month.getMonthName() + " " + month.getYear() + ":&nbsp;&nbsp;&nbsp;";
