@@ -103,7 +103,11 @@ public class Database {
 		this.location = settingsFile.getValue("location");
 	}
 
-	private Record loadFromFile(ConfigFile fileToLoad) {
+	/**
+	 * This function (and many others in here) are synchronized, such that when Hugo starts calling via
+	 * the ServerRequestHandler, the results are only served when the database is fully loaded
+	 */
+	private synchronized Record loadFromFile(ConfigFile fileToLoad) {
 
 		this.years = new ArrayList<>();
 
@@ -1200,7 +1204,7 @@ public class Database {
 		return curAccount;
 	}
 
-	public List<Incoming> getIncomings() {
+	public synchronized List<Incoming> getIncomings() {
 		List<Incoming> result = new ArrayList<>();
 		for (Year year : getYears()) {
 			result.addAll(year.getIncomings());
@@ -1208,7 +1212,7 @@ public class Database {
 		return result;
 	}
 
-	public List<Outgoing> getOutgoings() {
+	public synchronized List<Outgoing> getOutgoings() {
 		List<Outgoing> result = new ArrayList<>();
 		for (Year year : getYears()) {
 			result.addAll(year.getOutgoings());
@@ -1216,7 +1220,7 @@ public class Database {
 		return result;
 	}
 
-	public List<Entry> getEntries() {
+	public synchronized List<Entry> getEntries() {
 		List<Entry> result = new ArrayList<>();
 		for (Year year : getYears()) {
 			result.addAll(year.getEntries());
@@ -1224,7 +1228,7 @@ public class Database {
 		return result;
 	}
 
-	public List<Entry> getEntriesOrdered() {
+	public synchronized List<Entry> getEntriesOrdered() {
 		List<Entry> result = new ArrayList<>();
 		for (Year year : getYears()) {
 			result.addAll(year.getEntries());
@@ -1233,7 +1237,7 @@ public class Database {
 		return result;
 	}
 
-	public List<Problem> getProblems() {
+	public synchronized List<Problem> getProblems() {
 
 		List<Problem> result = new ArrayList<>();
 
@@ -1244,7 +1248,7 @@ public class Database {
 		return result;
 	}
 
-	public List<Problem> getUnacknowledgedProblems() {
+	public synchronized List<Problem> getUnacknowledgedProblems() {
 
 		List<Problem> result = new ArrayList<>();
 
@@ -1257,7 +1261,7 @@ public class Database {
 		return result;
 	}
 
-	public List<PaymentProblem> getPaymentProblems() {
+	public synchronized List<PaymentProblem> getPaymentProblems() {
 
 		List<PaymentProblem> result = new ArrayList<>();
 
@@ -1278,7 +1282,7 @@ public class Database {
 	/**
 	 * Get all un-acknowledged consistency problems
 	 */
-	public List<ConsistencyProblem> getUnacknowledgedConsistencyProblems() {
+	public synchronized List<ConsistencyProblem> getUnacknowledgedConsistencyProblems() {
 
 		List<ConsistencyProblem> result = new ArrayList<>();
 
