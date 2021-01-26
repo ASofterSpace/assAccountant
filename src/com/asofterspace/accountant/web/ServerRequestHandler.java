@@ -152,6 +152,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 	@Override
 	protected WebServerAnswer answerGet(String location, Map<String, String> arguments) {
 
+		if (location.equals("/exit")) {
+			System.exit(0);
+		}
+
 		if ("/taskInstances".equals(location)) {
 
 			JSON json = new JSON(Record.emptyArray());
