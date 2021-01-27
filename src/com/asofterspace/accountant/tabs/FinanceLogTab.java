@@ -26,6 +26,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -60,15 +61,17 @@ public class FinanceLogTab extends Tab {
 		List<GraphTimeDataPoint> timeData = new ArrayList<>();
 
 		GraphImage graph = new GraphImage(1000, 600);
-		graph.setForegroundColor(new ColorRGB(120, 40, 220));
-		graph.setBackgroundColor(new ColorRGB(0, 0, 0, 255));
-		graph.setDataColor(new ColorRGB(160, 80, 255));
+		graph.setForegroundColor(new ColorRGB(136, 170, 255));
+		graph.setBackgroundColor(new ColorRGB(0, 0, 0, 0));
+		graph.setDataColor(new ColorRGB(136, 170, 255));
 		graph.setBaseYmin(0.0);
 
 
 		List<FinanceLogEntry> entries = database.getTaskCtrl().getFinanceLogs();
 		boolean foundEntry = false;
 		String afterHtml = "";
+		Date lastDate = null;
+		Integer lastAmount = null;
 		for (FinanceLogEntry entry : entries) {
 			if (entry.getRows().size() > 0) {
 				afterHtml += entry.createPanelInHtml(database);
@@ -76,8 +79,19 @@ public class FinanceLogTab extends Tab {
 				foundEntry = true;
 
 				timeData.add(new GraphTimeDataPoint(entry.getDate(), entry.getTotalAmount()));
+
+				if ((lastDate == null) || lastDate.before(entry.getDate())) {
+					lastDate = entry.getDate();
+					lastAmount = entry.getTotalAmount();
+				}
 			}
 		}
+
+		// let's add some days to the last date and add this as entry, such that we see a bit into the future
+		// (this is necessary because we would otherwise cut off the current state due to smoothening)
+		lastDate = DateUtils.addDays(lastDate, 15);
+		timeData.add(new GraphTimeDataPoint(lastDate, lastAmount));
+
 		// for-else:
 		if (!foundEntry) {
 			html += "<div>No finance logs have been found!</div>";

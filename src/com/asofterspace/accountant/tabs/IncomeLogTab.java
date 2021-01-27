@@ -62,15 +62,15 @@ public class IncomeLogTab extends Tab {
 		List<GraphTimeDataPoint> timeData = new ArrayList<>();
 
 		GraphImage smoothGraph = new GraphImage(1000, 400);
-		smoothGraph.setForegroundColor(new ColorRGB(120, 40, 220));
-		smoothGraph.setBackgroundColor(new ColorRGB(0, 0, 0, 255));
-		smoothGraph.setDataColor(new ColorRGB(160, 80, 255));
+		smoothGraph.setForegroundColor(new ColorRGB(136, 170, 255));
+		smoothGraph.setBackgroundColor(new ColorRGB(0, 0, 0, 0));
+		smoothGraph.setDataColor(new ColorRGB(136, 170, 255));
 		smoothGraph.setBaseYmin(0.0);
 
 		GraphImage graph = new GraphImage(1000, 400);
-		graph.setForegroundColor(new ColorRGB(120, 40, 220));
-		graph.setBackgroundColor(new ColorRGB(0, 0, 0, 255));
-		graph.setDataColor(new ColorRGB(160, 80, 255));
+		graph.setForegroundColor(new ColorRGB(136, 170, 255));
+		graph.setBackgroundColor(new ColorRGB(0, 0, 0, 0));
+		graph.setDataColor(new ColorRGB(136, 170, 255));
 		graph.setBaseYmin(0.0);
 
 		List<Year> years = database.getYears();
