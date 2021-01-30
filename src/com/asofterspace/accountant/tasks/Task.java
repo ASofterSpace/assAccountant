@@ -951,7 +951,9 @@ public class Task extends GenericTask {
 					setDoneLog(taskLog.getText());
 				} else {
 					Task.this.done = true;
-					setDoneDate(new Date());
+					Date now = DateUtils.now();
+					setDoneDate(now);
+					setSetToDoneDateTime(now);
 					String detailsForUser = getDetailsToShowToUser(database);
 					if (detailsForUser == null) {
 						setDoneLog(taskLog.getText());
