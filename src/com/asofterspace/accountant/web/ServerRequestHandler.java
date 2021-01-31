@@ -161,6 +161,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			JSON json = new JSON(Record.emptyArray());
 
 			TaskCtrl taskCtrl = database.getTaskCtrl();
+			taskCtrl.generateNewInstances(DateUtils.now());
 
 			List<GenericTask> taskInstances = taskCtrl.getTaskInstances();
 			Date fromDate = DateUtils.parseDate(arguments.get("from"));
@@ -537,6 +538,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			if (tabKind != null) {
 
 				System.out.println("Answering " + tabKind + " request...");
+
+				TaskCtrl taskCtrl = database.getTaskCtrl();
+				taskCtrl.generateNewInstances(DateUtils.now());
 
 				TextFile indexBaseFile = new TextFile(webRoot, "index.htm");
 				String indexContent = indexBaseFile.getContent();
