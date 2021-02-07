@@ -247,7 +247,14 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					html.append("<meta charset='utf-8'>");
 					html.append("<style>");
 					html.append("div.entry {");
-					html.append("  padding-bottom: 8pt;");
+					html.append("  padding-top: 4pt;");
+					html.append("  padding-bottom: 4pt;");
+					html.append("}");
+					html.append("div.topborder {");
+					html.append("  border-top: 1px solid #111;");
+					html.append("}");
+					html.append("div.bottomborder {");
+					html.append("  border-bottom: 1px solid #111;");
 					html.append("}");
 					html.append("div.small_above {");
 					html.append("  font-size: 80%;");
@@ -298,7 +305,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					int otherColAmount = 6;
 					double otherColsWidth = (100 - colPositionenWidth) / otherColAmount;
 
-					html.append("<div class='bold entry' style='padding-top:25pt;'>");
+					html.append("<div class='bold entry bottomborder' style='padding-top:25pt;'>");
 					html.append("<span style='width: " + colPositionenWidth + "%; display: inline-block;'>");
 					html.append("Positionen");
 					html.append("</span>");
@@ -347,10 +354,39 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					int prevGesamtKosten = 0;
 
 					appendBwaLine(html, "Umsatzerlöse", inPostTaxTotal, gesamtLeistung, gesamtKosten,
-						prevInPostTaxTotal, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth);
+						prevInPostTaxTotal, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Bestandsveränderungen", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Aktivierte Eigenleistung", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Gesamtleistung", inPostTaxTotal, gesamtLeistung, gesamtKosten,
+						prevInPostTaxTotal, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold");
+
+					appendBwaLine(html, "Material-/Wareneinsatz", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Rohertrag", inPostTaxTotal, gesamtLeistung, gesamtKosten,
+						prevInPostTaxTotal, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold");
+
+					appendBwaLine(html, "Sonstige betriebliche Erlöse", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Betrieblicher Rohertrag", inPostTaxTotal, gesamtLeistung, gesamtKosten,
+						prevInPostTaxTotal, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
+
+
+
 
 
 					html.append("<br><br><br><br><br><br>");
+
+
+
+
+
 
 					html.append("<div class='bold entry' style='padding-top:25pt;'>Betriebsausgaben</div>");
 
@@ -885,9 +921,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 	}
 
 	private void appendBwaLine(StringBuilder html, String positionName, int value, int gesamtLeistung, int gesamtKosten,
-		int prevValue, int prevGesamtLeistung, int prevGesamtKosten, double colPositionenWidth, double otherColsWidth) {
+		int prevValue, int prevGesamtLeistung, int prevGesamtKosten, double colPositionenWidth, double otherColsWidth,
+		String divClass) {
 
-		html.append("<div class='entry'>");
+		html.append("<div class='entry " + divClass + "'>");
 		html.append("<span style='width: " + colPositionenWidth + "%; display: inline-block;'>");
 		html.append(positionName);
 		html.append("</span>");
@@ -896,12 +933,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		html.append(" €</span>");
 		html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
 		if (gesamtLeistung > 0) {
-			html.append(StrUtils.leftPadW(StrUtils.doubleToStr((value * 100.0) / gesamtLeistung, 2), 6));
+			html.append(StrUtils.replaceAll(StrUtils.leftPadW(StrUtils.doubleToStr((value * 100.0) / gesamtLeistung, 2), 6), " ", "&nbsp;&nbsp;"));
 		}
 		html.append("</span>");
 		html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
 		if (gesamtKosten > 0) {
-			html.append(StrUtils.leftPadW(StrUtils.doubleToStr((value * 100.0) / gesamtKosten, 2), 6));
+			html.append(StrUtils.replaceAll(StrUtils.leftPadW(StrUtils.doubleToStr((value * 100.0) / gesamtKosten, 2), 6), " ", "&nbsp;&nbsp;"));
 		}
 		html.append("</span>");
 		html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
@@ -909,12 +946,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		html.append(" €</span>");
 		html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
 		if (prevGesamtLeistung > 0) {
-			html.append(StrUtils.leftPadW(StrUtils.doubleToStr((prevValue * 100.0) / prevGesamtLeistung, 2), 6));
+			html.append(StrUtils.replaceAll(StrUtils.leftPadW(StrUtils.doubleToStr((prevValue * 100.0) / prevGesamtLeistung, 2), 6), " ", "&nbsp;&nbsp;"));
 		}
 		html.append("</span>");
 		html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
 		if (prevGesamtKosten > 0) {
-			html.append(StrUtils.leftPadW(StrUtils.doubleToStr((prevValue * 100.0) / prevGesamtKosten, 2), 6));
+			html.append(StrUtils.replaceAll(StrUtils.leftPadW(StrUtils.doubleToStr((prevValue * 100.0) / prevGesamtKosten, 2), 6), " ", "&nbsp;&nbsp;"));
 		}
 		html.append("</span>");
 		html.append("</div>");
