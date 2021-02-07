@@ -289,7 +289,7 @@ public class Year extends TimeSpan {
 	}
 
 	public Year getPreviousYear() {
-		return database.getYearFromNumIfExists(yearNum);
+		return database.getYearFromNumIfExists(yearNum - 1);
 	}
 
 	public Database getDatabase() {

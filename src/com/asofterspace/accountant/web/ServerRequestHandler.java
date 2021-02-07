@@ -285,7 +285,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					String title = tab.toString();
 					String currentTimespanStr = title;
 					String previousTimespanStr = "(kein Zeitraum)";
+					String previous2TimespanStr = "(kein Zeitraum)";
 					List<TimeSpan> prevTimeSpans = new ArrayList<>();
+					List<TimeSpan> prev2TimeSpans = new ArrayList<>();
 					html.append("<div style='font-size:155%'>Betriebswirtschaftliche Auswertung</div>");
 					html.append("<div style='font-size:115%'>Für ");
 					if (tab instanceof YearTab) {
@@ -295,6 +297,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						if (prevYear != null) {
 							prevTimeSpans.add(prevYear);
 							previousTimespanStr = "" + prevYear.getNum();
+							Year prev2Year = prevYear.getPreviousYear();
+							if (prev2Year != null) {
+								prev2TimeSpans.add(prev2Year);
+								previous2TimespanStr = "" + prev2Year.getNum();
+							}
 						}
 					} else {
 						Month curMonth = (Month) tsTab.getTimeSpan();
@@ -302,31 +309,42 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 							tsTab.getTimeSpan().getYear().getNum();
 						html.append("den Monat " + currentTimespanStr);
 
+						// get the same month in the previous year
+						Year prevYear = tsTab.getTimeSpan().getYear().getPreviousYear();
+						if (prevYear != null) {
+							for (Month month : prevYear.getMonths()) {
+								if (month.getNum() == curMonth.getNum()) {
+									prevTimeSpans.add(month);
+									previousTimespanStr = month.getMonthNameDE() + " " + month.getYear().getNum();
+								}
+							}
+						}
+
 						// get January of this year until current month
 						// (except in January, where we compare to all of last year)
 						if (curMonth.getNum() < 1) {
 							// January
-							Year prevYear = tsTab.getTimeSpan().getYear().getPreviousYear();
 							if (prevYear != null) {
-								prevTimeSpans.add(prevYear);
-								previousTimespanStr = "Januar " + prevYear.getNum() + " - Dezember " + prevYear.getNum();
+								prev2TimeSpans.add(prevYear);
+								previous2TimespanStr = "Januar " + prevYear.getNum() + " - Dezember " + prevYear.getNum();
 							}
 						} else {
 							// other months
 							List<Month> allMonths = curMonth.getYear().getMonths();
 							for (Month month : allMonths) {
 								if (month.getNum() <= curMonth.getNum()) {
-									prevTimeSpans.add(month);
+									prev2TimeSpans.add(month);
 								}
 							}
-							previousTimespanStr = "Januar " + curMonth.getYear().getNum() + " - " + currentTimespanStr;
+							previous2TimespanStr = "Januar " + curMonth.getYear().getNum() + " - " + currentTimespanStr;
 						}
 					}
+					html.append(" (Vergleich mit " + previousTimespanStr + " und " + previous2TimespanStr + ")");
 					html.append("</div>");
 
-					double colPositionenWidth = 25;
-					int otherColAmount = 6;
-					double otherColsWidth = (100 - colPositionenWidth) / otherColAmount;
+					double colPositionenWidth = 15;
+					int otherColAmount = 9;
+					double otherColsWidth = (99 - colPositionenWidth) / otherColAmount;
 
 					html.append("<div class='bold entry bottomborder' style='padding-top:25pt;'>");
 					html.append("<span style='width: " + colPositionenWidth + "%; display: inline-block;'>");
@@ -350,7 +368,28 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
 					html.append("% Gesamt-<br>kosten");
 					html.append("</span>");
+					html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+					html.append(previous2TimespanStr);
+					html.append("</span>");
+					html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+					html.append("% Gesamt-<br>leistung");
+					html.append("</span>");
+					html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+					html.append("% Gesamt-<br>kosten");
+					html.append("</span>");
 					html.append("</div>");
+
+					int externalSalary = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.EXTERNAL_SALARY);
+					int internalSalary = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.INTERNAL_SALARY);
+					int vehicleCosts = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.VEHICLE);
+					int travelCosts = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.TRAVEL);
+					int locationCosts = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.LOCATIONS);
+					int educationCosts = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.EDUCATION);
+					int advertisementCosts = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.ADVERTISEMENTS);
+					int infrastructureCosts = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.INFRASTRUCTURE);
+					int entertainmentCosts = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.ENTERTAINMENT);
+					int wareCosts = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.WARES);
+					int outTotalBeforeTax = tsTab.getTimeSpan().getOutTotalBeforeTax();
 
 					List<Incoming> incomings = tsTab.getTimeSpan().getIncomings();
 					int inPreTaxTotal = 0;
@@ -362,43 +401,111 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						inPostTaxTotal += incoming.getPostTaxAmount();
 					}
 
+					int prevExternalSalary = 0;
+					int prevInternalSalary = 0;
+					int prevVehicleCosts = 0;
+					int prevTravelCosts = 0;
+					int prevLocationCosts = 0;
+					int prevEducationCosts = 0;
+					int prevAdvertisementCosts = 0;
+					int prevInfrastructureCosts = 0;
+					int prevEntertainmentCosts = 0;
+					int prevWareCosts = 0;
+					int prevOutTotalBeforeTax = 0;
+
 					int prevInPostTaxTotal = 0;
 					for (TimeSpan prevTimeSpan : prevTimeSpans) {
 						List<Incoming> prevIncomings = prevTimeSpan.getIncomings();
 						for (Incoming incoming : prevIncomings) {
 							prevInPostTaxTotal += incoming.getPostTaxAmount();
 						}
+						prevExternalSalary += prevTimeSpan.getOutTotalBeforeTax(Category.EXTERNAL_SALARY);
+						prevInternalSalary += prevTimeSpan.getOutTotalBeforeTax(Category.INTERNAL_SALARY);
+						prevVehicleCosts += prevTimeSpan.getOutTotalBeforeTax(Category.VEHICLE);
+						prevTravelCosts += prevTimeSpan.getOutTotalBeforeTax(Category.TRAVEL);
+						prevLocationCosts += prevTimeSpan.getOutTotalBeforeTax(Category.LOCATIONS);
+						prevEducationCosts += prevTimeSpan.getOutTotalBeforeTax(Category.EDUCATION);
+						prevAdvertisementCosts += prevTimeSpan.getOutTotalBeforeTax(Category.ADVERTISEMENTS);
+						prevInfrastructureCosts += prevTimeSpan.getOutTotalBeforeTax(Category.INFRASTRUCTURE);
+						prevEntertainmentCosts += prevTimeSpan.getOutTotalBeforeTax(Category.ENTERTAINMENT);
+						prevWareCosts += prevTimeSpan.getOutTotalBeforeTax(Category.WARES);
+						prevOutTotalBeforeTax += prevTimeSpan.getOutTotalBeforeTax();
 					}
 
-					int gesamtLeistung = inPostTaxTotal;
-					int gesamtKosten = 0;
+					int prev2ExternalSalary = 0;
+					int prev2InternalSalary = 0;
+					int prev2VehicleCosts = 0;
+					int prev2TravelCosts = 0;
+					int prev2LocationCosts = 0;
+					int prev2EducationCosts = 0;
+					int prev2AdvertisementCosts = 0;
+					int prev2InfrastructureCosts = 0;
+					int prev2EntertainmentCosts = 0;
+					int prev2WareCosts = 0;
+					int prev2OutTotalBeforeTax = 0;
 
+					int prev2InPostTaxTotal = 0;
+					for (TimeSpan prev2TimeSpan : prev2TimeSpans) {
+						List<Incoming> prev2Incomings = prev2TimeSpan.getIncomings();
+						for (Incoming incoming : prev2Incomings) {
+							prev2InPostTaxTotal += incoming.getPostTaxAmount();
+						}
+						prev2ExternalSalary += prev2TimeSpan.getOutTotalBeforeTax(Category.EXTERNAL_SALARY);
+						prev2InternalSalary += prev2TimeSpan.getOutTotalBeforeTax(Category.INTERNAL_SALARY);
+						prev2VehicleCosts += prev2TimeSpan.getOutTotalBeforeTax(Category.VEHICLE);
+						prev2TravelCosts += prev2TimeSpan.getOutTotalBeforeTax(Category.TRAVEL);
+						prev2LocationCosts += prev2TimeSpan.getOutTotalBeforeTax(Category.LOCATIONS);
+						prev2EducationCosts += prev2TimeSpan.getOutTotalBeforeTax(Category.EDUCATION);
+						prev2AdvertisementCosts += prev2TimeSpan.getOutTotalBeforeTax(Category.ADVERTISEMENTS);
+						prev2InfrastructureCosts += prev2TimeSpan.getOutTotalBeforeTax(Category.INFRASTRUCTURE);
+						prev2EntertainmentCosts += prev2TimeSpan.getOutTotalBeforeTax(Category.ENTERTAINMENT);
+						prev2WareCosts += prev2TimeSpan.getOutTotalBeforeTax(Category.WARES);
+						prev2OutTotalBeforeTax += prev2TimeSpan.getOutTotalBeforeTax();
+					}
+
+					// this does NOT include donations, as we will not get donation amounts from timeSpan.getOutTotalBeforeTax() anyway, so we do not want to subtract them from it!
+					// (in general, this is only the sum of non-special categories except other)
+					int categoryTally = externalSalary + internalSalary + vehicleCosts + travelCosts + locationCosts +
+						educationCosts + advertisementCosts + infrastructureCosts + entertainmentCosts + wareCosts;
+					int otherCosts = outTotalBeforeTax - categoryTally;
+					int gesamtLeistung = inPostTaxTotal;
+					int gesamtKosten = categoryTally + otherCosts;
+
+					int prevCategoryTally = prevExternalSalary + prevInternalSalary + prevVehicleCosts + prevTravelCosts + prevLocationCosts +
+						prevEducationCosts + prevAdvertisementCosts + prevInfrastructureCosts + prevEntertainmentCosts + prevWareCosts;
+					int prevOtherCosts = prevOutTotalBeforeTax - prevCategoryTally;
 					int prevGesamtLeistung = prevInPostTaxTotal;
-					int prevGesamtKosten = 0;
+					int prevGesamtKosten = prevCategoryTally + prevOtherCosts;
+
+					int prev2CategoryTally = prev2ExternalSalary + prev2InternalSalary + prev2VehicleCosts + prev2TravelCosts + prev2LocationCosts +
+						prev2EducationCosts + prev2AdvertisementCosts + prev2InfrastructureCosts + prev2EntertainmentCosts + prev2WareCosts;
+					int prev2OtherCosts = prev2OutTotalBeforeTax - prev2CategoryTally;
+					int prev2GesamtLeistung = prev2InPostTaxTotal;
+					int prev2GesamtKosten = prev2CategoryTally + prev2OtherCosts;
 
 					appendBwaLine(html, "Umsatzerlöse", inPostTaxTotal, gesamtLeistung, gesamtKosten,
-						prevInPostTaxTotal, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						prevInPostTaxTotal, prevGesamtLeistung, prevGesamtKosten, prev2InPostTaxTotal, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Bestandsveränderungen", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Aktivierte Eigenleistung", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Gesamtleistung", inPostTaxTotal, gesamtLeistung, gesamtKosten,
-						prevInPostTaxTotal, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold");
+						prevInPostTaxTotal, prevGesamtLeistung, prevGesamtKosten, prev2InPostTaxTotal, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold");
 
 					appendBwaLine(html, "Material-/Wareneinsatz", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Rohertrag", inPostTaxTotal, gesamtLeistung, gesamtKosten,
-						prevInPostTaxTotal, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold");
+						prevInPostTaxTotal, prevGesamtLeistung, prevGesamtKosten, prev2InPostTaxTotal, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold");
 
 					appendBwaLine(html, "Sonstige betriebliche Erlöse", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Betrieblicher Rohertrag", inPostTaxTotal, gesamtLeistung, gesamtKosten,
-						prevInPostTaxTotal, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
+						prevInPostTaxTotal, prevGesamtLeistung, prevGesamtKosten, prev2InPostTaxTotal, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
 
 
 					html.append("<div class='bold entry' style='padding-top: 8pt;'>");
@@ -408,106 +515,84 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					html.append("</div>");
 
 					appendBwaLine(html, "Personalkosten", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Raumkosten", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Betriebliche Steuern", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Versicherungen/Beiträge", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Besondere Kosten", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Kfz-Kosten", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Werbe-/Reisekosten", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Kosten der Warenabgabe", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Abschreibungen", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Reparatur/Instandhaltung", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Sonstige Kosten", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
-					appendBwaLine(html, "Gesamtkosten", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder");
+					appendBwaLine(html, "Gesamtkosten", gesamtKosten, gesamtLeistung, gesamtKosten,
+						prevGesamtKosten, prevGesamtLeistung, prevGesamtKosten, prev2GesamtKosten, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder");
 
-					appendBwaLine(html, "Betriebsergebnis (EBIT)", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
+					appendBwaLine(html, "Betriebsergebnis (EBIT)", gesamtLeistung - gesamtKosten, gesamtLeistung, gesamtKosten,
+						prevGesamtLeistung - prevGesamtKosten, prevGesamtLeistung, prevGesamtKosten, prev2GesamtLeistung - prev2GesamtKosten, prev2GesamtLeistung, prev2GesamtKosten,
+						colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
 
 					appendBwaLine(html, "Zinsaufwand", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Sonstiger neutraler Aufwand", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Neutraler Aufwand", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold");
 
 					appendBwaLine(html, "Zinserträge", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Sonstige neutrale Erträge", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Neutraler Ertrag", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold");
 
 					/*
 					appendBwaLine(html, "Neutrales Ergebnis", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
 					*/
 
-					appendBwaLine(html, "Ergebnis vor Steuern", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
+					appendBwaLine(html, "Ergebnis vor Steuern", gesamtLeistung - gesamtKosten, gesamtLeistung, gesamtKosten,
+						prevGesamtLeistung - prevGesamtKosten, prevGesamtLeistung, prevGesamtKosten, prev2GesamtLeistung - prev2GesamtKosten, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
 
+					// TODO
 					appendBwaLine(html, "Steuern vom Einkommen und Ertrag", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
+					// TODO
 					appendBwaLine(html, "Vorläufiges Ergebnis", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
+						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
 
 
-
-					html.append("<br><br><br><br><br><br>");
-
-
-
-
-
-
+/*
 					html.append("<div class='bold entry' style='padding-top:25pt;'>Betriebsausgaben</div>");
 
 					TimeSpan timeSpan = tsTab.getTimeSpan();
-
-					int externalSalary = timeSpan.getOutTotalBeforeTax(Category.EXTERNAL_SALARY);
-					int internalSalary = timeSpan.getOutTotalBeforeTax(Category.INTERNAL_SALARY);
-					int vehicleCosts = timeSpan.getOutTotalBeforeTax(Category.VEHICLE);
-					int travelCosts = timeSpan.getOutTotalBeforeTax(Category.TRAVEL);
-					int locationCosts = timeSpan.getOutTotalBeforeTax(Category.LOCATIONS);
-					int educationCosts = timeSpan.getOutTotalBeforeTax(Category.EDUCATION);
-					int advertisementCosts = timeSpan.getOutTotalBeforeTax(Category.ADVERTISEMENTS);
-					int infrastructureCosts = timeSpan.getOutTotalBeforeTax(Category.INFRASTRUCTURE);
-					int entertainmentCosts = timeSpan.getOutTotalBeforeTax(Category.ENTERTAINMENT);
-					int wareCosts = timeSpan.getOutTotalBeforeTax(Category.WARES);
-
-					// this does NOT include donations, as we will not get donation amounts from timeSpan.getOutTotalBeforeTax() anyway, so we do not want to subtract them from it!
-					// (in general, this is only the sum of non-special categories except other)
-					int categoryTally = externalSalary + internalSalary + vehicleCosts + travelCosts + locationCosts +
-						educationCosts + advertisementCosts + infrastructureCosts + entertainmentCosts + wareCosts;
-
-					int otherCosts = timeSpan.getOutTotalBeforeTax() - categoryTally;
 
 					if (wareCosts + otherCosts > 0) {
 						html.append("<div class='entry sub'>Waren, Rohstoffe und Hilfsmittel:<span class='right'>" +
@@ -590,6 +675,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 					html.append("<div class='entry bold'>Gewinn:<span class='right bold'>" +
 						FinanceUtils.formatMoneyDE(inPostTaxTotal - outTotal) + " €</span></div>");
+*/
 
 					html.append("<div style='padding-top:25pt;text-align: right;'><span><img style='width:215pt;' src='/pics/signature.png' /></span></div>");
 					html.append("<span style='float:left;font-size: 115%;'>" + database.getLocation() + ", " + DateUtils.serializeDate(DateUtils.now()) + "</span>");
@@ -1019,40 +1105,61 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		return null;
 	}
 
+	private String adjustPercentageForBwa(double val) {
+		return StrUtils.replaceAll(StrUtils.leftPadW(StrUtils.replaceAll(StrUtils.doubleToStr(val, 2), ".", ","), 6), " ", "&nbsp;&nbsp;");
+	}
+
 	private void appendBwaLine(StringBuilder html, String positionName, int value, int gesamtLeistung, int gesamtKosten,
-		int prevValue, int prevGesamtLeistung, int prevGesamtKosten, double colPositionenWidth, double otherColsWidth,
-		String divClass) {
+		int prevValue, int prevGesamtLeistung, int prevGesamtKosten, int prev2Value, int prev2GesamtLeistung, int prev2GesamtKosten,
+		double colPositionenWidth, double otherColsWidth, String divClass) {
 
 		html.append("<div class='entry " + divClass + "'>");
 		html.append("<span style='width: " + colPositionenWidth + "%; display: inline-block;'>");
 		html.append(positionName);
 		html.append("</span>");
-		html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+
+		html.append("<span style='text-align: right; width: " + otherColsWidth + "%; display: inline-block;'>");
 		html.append(FinanceUtils.formatMoneyDE(value));
 		html.append(" €</span>");
-		html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+		html.append("<span style='text-align: right; width: " + otherColsWidth + "%; display: inline-block;'>");
 		if (gesamtLeistung > 0) {
-			html.append(StrUtils.replaceAll(StrUtils.leftPadW(StrUtils.doubleToStr((value * 100.0) / gesamtLeistung, 2), 6), " ", "&nbsp;&nbsp;"));
+			html.append(adjustPercentageForBwa((value * 100.0) / gesamtLeistung));
 		}
 		html.append("</span>");
-		html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+		html.append("<span style='text-align: right; width: " + otherColsWidth + "%; display: inline-block;'>");
 		if (gesamtKosten > 0) {
-			html.append(StrUtils.replaceAll(StrUtils.leftPadW(StrUtils.doubleToStr((value * 100.0) / gesamtKosten, 2), 6), " ", "&nbsp;&nbsp;"));
+			html.append(adjustPercentageForBwa((value * 100.0) / gesamtKosten));
 		}
 		html.append("</span>");
-		html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+
+		html.append("<span style='text-align: right; width: " + otherColsWidth + "%; display: inline-block;'>");
 		html.append(FinanceUtils.formatMoneyDE(prevValue));
 		html.append(" €</span>");
-		html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+		html.append("<span style='text-align: right; width: " + otherColsWidth + "%; display: inline-block;'>");
 		if (prevGesamtLeistung > 0) {
-			html.append(StrUtils.replaceAll(StrUtils.leftPadW(StrUtils.doubleToStr((prevValue * 100.0) / prevGesamtLeistung, 2), 6), " ", "&nbsp;&nbsp;"));
+			html.append(adjustPercentageForBwa((prev2Value * 100.0) / prevGesamtLeistung));
 		}
 		html.append("</span>");
-		html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+		html.append("<span style='text-align: right; width: " + otherColsWidth + "%; display: inline-block;'>");
 		if (prevGesamtKosten > 0) {
-			html.append(StrUtils.replaceAll(StrUtils.leftPadW(StrUtils.doubleToStr((prevValue * 100.0) / prevGesamtKosten, 2), 6), " ", "&nbsp;&nbsp;"));
+			html.append(adjustPercentageForBwa((prev2Value * 100.0) / prevGesamtKosten));
 		}
 		html.append("</span>");
+
+		html.append("<span style='text-align: right; width: " + otherColsWidth + "%; display: inline-block;'>");
+		html.append(FinanceUtils.formatMoneyDE(prev2Value));
+		html.append(" €</span>");
+		html.append("<span style='text-align: right; width: " + otherColsWidth + "%; display: inline-block;'>");
+		if (prev2GesamtLeistung > 0) {
+			html.append(adjustPercentageForBwa((prev2Value * 100.0) / prev2GesamtLeistung));
+		}
+		html.append("</span>");
+		html.append("<span style='text-align: right; width: " + otherColsWidth + "%; display: inline-block;'>");
+		if (prev2GesamtKosten > 0) {
+			html.append(adjustPercentageForBwa((prev2Value * 100.0) / prev2GesamtKosten));
+		}
+		html.append("</span>");
+
 		html.append("</div>");
 	}
 
