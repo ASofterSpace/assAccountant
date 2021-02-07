@@ -25,6 +25,9 @@ public enum Category {
 	// entertainment expenses include things like restaurant visits for business purposes
 	ENTERTAINMENT("Entertainment Costs", false),
 
+	// insurance costs
+	INSURANCE("Insurances", false),
+
 	// expenses for office rooms, buildings, planets?
 	LOCATIONS("Locations", false),
 

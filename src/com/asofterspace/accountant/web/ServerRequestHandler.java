@@ -8,6 +8,7 @@ package com.asofterspace.accountant.web;
 import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.AssAccountant;
 import com.asofterspace.accountant.ConfigCtrl;
+import com.asofterspace.accountant.data.OutgoingOverviewData;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.Problem;
@@ -379,118 +380,27 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					html.append("</span>");
 					html.append("</div>");
 
-					int externalSalary = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.EXTERNAL_SALARY);
-					int internalSalary = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.INTERNAL_SALARY);
-					int vehicleCosts = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.VEHICLE);
-					int travelCosts = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.TRAVEL);
-					int locationCosts = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.LOCATIONS);
-					int educationCosts = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.EDUCATION);
-					int advertisementCosts = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.ADVERTISEMENTS);
-					int infrastructureCosts = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.INFRASTRUCTURE);
-					int entertainmentCosts = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.ENTERTAINMENT);
-					int wareCosts = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.WARES);
-					int outTotalBeforeTax = tsTab.getTimeSpan().getOutTotalBeforeTax();
-					int overallTax = tsTab.getTimeSpan().getVatPrepaymentsPaidTotal();
+					OutgoingOverviewData ood = new OutgoingOverviewData(tsTab.getTimeSpan());
+					OutgoingOverviewData prevOod = new OutgoingOverviewData(prevTimeSpans);
+					OutgoingOverviewData prev2Ood = new OutgoingOverviewData(prev2TimeSpans);
 
-					List<Incoming> incomings = tsTab.getTimeSpan().getIncomings();
-					int inPreTaxTotal = 0;
-					int inTaxTotal = 0;
-					int inPostTaxTotal = 0;
-					for (Incoming incoming : incomings) {
-						inPreTaxTotal += incoming.getPreTaxAmount();
-						inTaxTotal += incoming.getTaxAmount();
-						inPostTaxTotal += incoming.getPostTaxAmount();
-					}
+					int gesamtLeistung = ood.getInPostTaxTotal();
+					int gesamtKosten = ood.getTotalCosts() - (ood.getInfrastructureCosts() + ood.getWareCosts());
+					int rohertrag = gesamtLeistung - (ood.getInfrastructureCosts() + ood.getWareCosts());
+					int overallTax = ood.getOutVatPrepaymentsPaid();
 
-					int prevExternalSalary = 0;
-					int prevInternalSalary = 0;
-					int prevVehicleCosts = 0;
-					int prevTravelCosts = 0;
-					int prevLocationCosts = 0;
-					int prevEducationCosts = 0;
-					int prevAdvertisementCosts = 0;
-					int prevInfrastructureCosts = 0;
-					int prevEntertainmentCosts = 0;
-					int prevWareCosts = 0;
-					int prevOutTotalBeforeTax = 0;
-					int prevOverallTax = 0;
-					int prevInPostTaxTotal = 0;
-					for (TimeSpan prevTimeSpan : prevTimeSpans) {
-						List<Incoming> prevIncomings = prevTimeSpan.getIncomings();
-						for (Incoming incoming : prevIncomings) {
-							prevInPostTaxTotal += incoming.getPostTaxAmount();
-						}
-						prevExternalSalary += prevTimeSpan.getOutTotalBeforeTax(Category.EXTERNAL_SALARY);
-						prevInternalSalary += prevTimeSpan.getOutTotalBeforeTax(Category.INTERNAL_SALARY);
-						prevVehicleCosts += prevTimeSpan.getOutTotalBeforeTax(Category.VEHICLE);
-						prevTravelCosts += prevTimeSpan.getOutTotalBeforeTax(Category.TRAVEL);
-						prevLocationCosts += prevTimeSpan.getOutTotalBeforeTax(Category.LOCATIONS);
-						prevEducationCosts += prevTimeSpan.getOutTotalBeforeTax(Category.EDUCATION);
-						prevAdvertisementCosts += prevTimeSpan.getOutTotalBeforeTax(Category.ADVERTISEMENTS);
-						prevInfrastructureCosts += prevTimeSpan.getOutTotalBeforeTax(Category.INFRASTRUCTURE);
-						prevEntertainmentCosts += prevTimeSpan.getOutTotalBeforeTax(Category.ENTERTAINMENT);
-						prevWareCosts += prevTimeSpan.getOutTotalBeforeTax(Category.WARES);
-						prevOutTotalBeforeTax += prevTimeSpan.getOutTotalBeforeTax();
-						prevOverallTax += prevTimeSpan.getVatPrepaymentsPaidTotal();
-					}
+					int prevGesamtLeistung = prevOod.getInPostTaxTotal();
+					int prevGesamtKosten = prevOod.getTotalCosts() - (prevOod.getInfrastructureCosts() + prevOod.getWareCosts());
+					int prevRohertrag = prevGesamtLeistung - (prevOod.getInfrastructureCosts() + prevOod.getWareCosts());
+					int prevOverallTax = prevOod.getOutVatPrepaymentsPaid();
 
-					int prev2ExternalSalary = 0;
-					int prev2InternalSalary = 0;
-					int prev2VehicleCosts = 0;
-					int prev2TravelCosts = 0;
-					int prev2LocationCosts = 0;
-					int prev2EducationCosts = 0;
-					int prev2AdvertisementCosts = 0;
-					int prev2InfrastructureCosts = 0;
-					int prev2EntertainmentCosts = 0;
-					int prev2WareCosts = 0;
-					int prev2OutTotalBeforeTax = 0;
-					int prev2OverallTax = 0;
-					int prev2InPostTaxTotal = 0;
-					for (TimeSpan prev2TimeSpan : prev2TimeSpans) {
-						List<Incoming> prev2Incomings = prev2TimeSpan.getIncomings();
-						for (Incoming incoming : prev2Incomings) {
-							prev2InPostTaxTotal += incoming.getPostTaxAmount();
-						}
-						prev2ExternalSalary += prev2TimeSpan.getOutTotalBeforeTax(Category.EXTERNAL_SALARY);
-						prev2InternalSalary += prev2TimeSpan.getOutTotalBeforeTax(Category.INTERNAL_SALARY);
-						prev2VehicleCosts += prev2TimeSpan.getOutTotalBeforeTax(Category.VEHICLE);
-						prev2TravelCosts += prev2TimeSpan.getOutTotalBeforeTax(Category.TRAVEL);
-						prev2LocationCosts += prev2TimeSpan.getOutTotalBeforeTax(Category.LOCATIONS);
-						prev2EducationCosts += prev2TimeSpan.getOutTotalBeforeTax(Category.EDUCATION);
-						prev2AdvertisementCosts += prev2TimeSpan.getOutTotalBeforeTax(Category.ADVERTISEMENTS);
-						prev2InfrastructureCosts += prev2TimeSpan.getOutTotalBeforeTax(Category.INFRASTRUCTURE);
-						prev2EntertainmentCosts += prev2TimeSpan.getOutTotalBeforeTax(Category.ENTERTAINMENT);
-						prev2WareCosts += prev2TimeSpan.getOutTotalBeforeTax(Category.WARES);
-						prev2OutTotalBeforeTax += prev2TimeSpan.getOutTotalBeforeTax();
-						prev2OverallTax += prev2TimeSpan.getVatPrepaymentsPaidTotal();
-					}
+					int prev2GesamtLeistung = prev2Ood.getInPostTaxTotal();
+					int prev2GesamtKosten = prev2Ood.getTotalCosts() - (prev2Ood.getInfrastructureCosts() + prev2Ood.getWareCosts());
+					int prev2Rohertrag = prev2GesamtLeistung - (prev2Ood.getInfrastructureCosts() + prev2Ood.getWareCosts());
+					int prev2OverallTax = prev2Ood.getOutVatPrepaymentsPaid();
 
-					// this does NOT include donations, as we will not get donation amounts from timeSpan.getOutTotalBeforeTax() anyway, so we do not want to subtract them from it!
-					// (in general, this is only the sum of non-special categories except other)
-					int categoryTally = externalSalary + internalSalary + vehicleCosts + travelCosts + locationCosts +
-						educationCosts + advertisementCosts + infrastructureCosts + entertainmentCosts + wareCosts;
-					int otherCosts = outTotalBeforeTax - categoryTally;
-					int gesamtLeistung = inPostTaxTotal;
-					int gesamtKosten = categoryTally + otherCosts - (infrastructureCosts + wareCosts);
-					int rohertrag = gesamtLeistung - (infrastructureCosts + wareCosts);
-
-					int prevCategoryTally = prevExternalSalary + prevInternalSalary + prevVehicleCosts + prevTravelCosts + prevLocationCosts +
-						prevEducationCosts + prevAdvertisementCosts + prevInfrastructureCosts + prevEntertainmentCosts + prevWareCosts;
-					int prevOtherCosts = prevOutTotalBeforeTax - prevCategoryTally;
-					int prevGesamtLeistung = prevInPostTaxTotal;
-					int prevGesamtKosten = prevCategoryTally + prevOtherCosts - (prevInfrastructureCosts + prevWareCosts);
-					int prevRohertrag = prevGesamtLeistung - (prevInfrastructureCosts + prevWareCosts);
-
-					int prev2CategoryTally = prev2ExternalSalary + prev2InternalSalary + prev2VehicleCosts + prev2TravelCosts + prev2LocationCosts +
-						prev2EducationCosts + prev2AdvertisementCosts + prev2InfrastructureCosts + prev2EntertainmentCosts + prev2WareCosts;
-					int prev2OtherCosts = prev2OutTotalBeforeTax - prev2CategoryTally;
-					int prev2GesamtLeistung = prev2InPostTaxTotal;
-					int prev2GesamtKosten = prev2CategoryTally + prev2OtherCosts - (prev2InfrastructureCosts + prev2WareCosts);
-					int prev2Rohertrag = prev2GesamtLeistung - (prev2InfrastructureCosts + prev2WareCosts);
-
-					appendBwaLine(html, "Umsatzerlöse", inPostTaxTotal, gesamtLeistung, gesamtKosten,
-						prevInPostTaxTotal, prevGesamtLeistung, prevGesamtKosten, prev2InPostTaxTotal, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
+					appendBwaLine(html, "Umsatzerlöse", gesamtLeistung, gesamtLeistung, gesamtKosten,
+						prevGesamtLeistung, prevGesamtLeistung, prevGesamtKosten, prev2GesamtLeistung, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Bestandsveränderungen", 0, gesamtLeistung, gesamtKosten,
 						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
@@ -501,8 +411,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					appendBwaLine(html, "Gesamtleistung", gesamtLeistung, gesamtLeistung, gesamtKosten,
 						prevGesamtLeistung, prevGesamtLeistung, prevGesamtKosten, prev2GesamtLeistung, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold");
 
-					appendBwaLine(html, "Material-/Wareneinsatz", infrastructureCosts + wareCosts, gesamtLeistung, gesamtKosten,
-						prevInfrastructureCosts + prevWareCosts, prevGesamtLeistung, prevGesamtKosten, prev2InfrastructureCosts + prev2WareCosts, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
+					appendBwaLine(html, "Material-/Wareneinsatz", ood.getInfrastructureCosts() + ood.getWareCosts(), gesamtLeistung, gesamtKosten,
+						prevOod.getInfrastructureCosts() + prevOod.getWareCosts(), prevGesamtLeistung, prevGesamtKosten, prev2Ood.getInfrastructureCosts() + prev2Ood.getWareCosts(), prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Rohertrag", rohertrag, gesamtLeistung, gesamtKosten,
 						prevRohertrag, prevGesamtLeistung, prevGesamtKosten, prev2Rohertrag, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold");
@@ -520,26 +430,26 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					html.append("</span>");
 					html.append("</div>");
 
-					appendBwaLine(html, "Personalkosten", externalSalary + internalSalary, gesamtLeistung, gesamtKosten,
-						prevExternalSalary + prevInternalSalary, prevGesamtLeistung, prevGesamtKosten, prev2ExternalSalary + prev2InternalSalary, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
+					appendBwaLine(html, "Personalkosten", ood.getExternalSalary() + ood.getInternalSalary(), gesamtLeistung, gesamtKosten,
+						prevOod.getExternalSalary() + prevOod.getInternalSalary(), prevGesamtLeistung, prevGesamtKosten, prev2Ood.getExternalSalary() + prev2Ood.getInternalSalary(), prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
-					appendBwaLine(html, "Raumkosten", locationCosts, gesamtLeistung, gesamtKosten,
-						prevLocationCosts, prevGesamtLeistung, prevGesamtKosten, prev2LocationCosts, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
+					appendBwaLine(html, "Raumkosten", ood.getLocationCosts(), gesamtLeistung, gesamtKosten,
+						prevOod.getLocationCosts(), prevGesamtLeistung, prevGesamtKosten, prev2Ood.getLocationCosts(), prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Betriebliche Steuern", 0, gesamtLeistung, gesamtKosten,
 						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
-					appendBwaLine(html, "Versicherungen/Beiträge", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
+					appendBwaLine(html, "Versicherungen/Beiträge", ood.getInsuranceCosts(), gesamtLeistung, gesamtKosten,
+						prevOod.getInsuranceCosts(), prevGesamtLeistung, prevGesamtKosten, prev2Ood.getInsuranceCosts(), prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Besondere Kosten", 0, gesamtLeistung, gesamtKosten,
 						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
-					appendBwaLine(html, "Kfz-Kosten", vehicleCosts, gesamtLeistung, gesamtKosten,
-						prevVehicleCosts, prevGesamtLeistung, prevGesamtKosten, prev2VehicleCosts, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
+					appendBwaLine(html, "Kfz-Kosten", ood.getVehicleCosts(), gesamtLeistung, gesamtKosten,
+						prevOod.getVehicleCosts(), prevGesamtLeistung, prevGesamtKosten, prev2Ood.getVehicleCosts(), prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
-					appendBwaLine(html, "Werbe-/Reisekosten", advertisementCosts + entertainmentCosts + travelCosts + educationCosts, gesamtLeistung, gesamtKosten,
-						prevAdvertisementCosts + prevEntertainmentCosts + prevTravelCosts + prevEducationCosts, prevGesamtLeistung, prevGesamtKosten, prev2AdvertisementCosts + prev2EntertainmentCosts + prev2TravelCosts + prev2EducationCosts, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
+					appendBwaLine(html, "Werbe-/Reisekosten", ood.getAdvertisementCosts() + ood.getEntertainmentCosts() + ood.getTravelCosts() + ood.getEducationCosts(), gesamtLeistung, gesamtKosten,
+						prevOod.getAdvertisementCosts() + prevOod.getEntertainmentCosts() + prevOod.getTravelCosts() + prevOod.getEducationCosts(), prevGesamtLeistung, prevGesamtKosten, prev2Ood.getAdvertisementCosts() + prev2Ood.getEntertainmentCosts() + prev2Ood.getTravelCosts() + prev2Ood.getEducationCosts(), prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Kosten der Warenabgabe", 0, gesamtLeistung, gesamtKosten,
 						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
@@ -550,8 +460,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					appendBwaLine(html, "Reparatur/Instandhaltung", 0, gesamtLeistung, gesamtKosten,
 						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
-					appendBwaLine(html, "Sonstige Kosten", otherCosts, gesamtLeistung, gesamtKosten,
-						prevOtherCosts, prevGesamtLeistung, prevGesamtKosten, prev2OtherCosts, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
+					appendBwaLine(html, "Sonstige Kosten", ood.getOtherCosts(), gesamtLeistung, gesamtKosten,
+						prevOod.getOtherCosts(), prevGesamtLeistung, prevGesamtKosten, prev2Ood.getOtherCosts(), prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Gesamtkosten", gesamtKosten, gesamtLeistung, gesamtKosten,
 						prevGesamtKosten, prevGesamtLeistung, prevGesamtKosten, prev2GesamtKosten, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder");
