@@ -244,42 +244,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					TimeSpanTab tsTab = (TimeSpanTab) tab;
 					StringBuilder html = new StringBuilder();
 					html.append("<html>");
-					html.append("<head>");
-					html.append("<meta charset='utf-8'>");
-					html.append("<style>");
-					html.append("div.entry {");
-					html.append("  padding-top: 4pt;");
-					html.append("  padding-bottom: 4pt;");
-					html.append("}");
-					html.append("div.topborder {");
-					html.append("  border-top: 1px solid #111;");
-					html.append("}");
-					html.append("div.bottomborder {");
-					html.append("  border-bottom: 1px solid #111;");
-					html.append("}");
-					html.append("div.small_above {");
-					html.append("  font-size: 80%;");
-					html.append("}");
-					html.append("span.explanation {");
-					html.append("}");
-					html.append("span.bold, div.bold {");
-					html.append("  font-weight: bold;");
-					html.append("}");
-					html.append("span.right {");
-					html.append("  float: right;");
-					html.append("}");
-					html.append("span.rightish {");
-					html.append("  float: right;");
-					html.append("  padding-right: 125pt;");
-					html.append("}");
-					html.append("div.sub {");
-					html.append("  padding-left: 25pt;");
-					html.append("}");
-					html.append("div.subsub {");
-					html.append("  padding-left: 50pt;");
-					html.append("}");
-					html.append("</style>");
-					html.append("</head>");
+					appendPdfPageHead(html);
 					html.append("<body>");
 
 					String title = tab.toString();
@@ -288,6 +253,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					String previous2TimespanStr = "(kein Zeitraum)";
 					List<TimeSpan> prevTimeSpans = new ArrayList<>();
 					List<TimeSpan> prev2TimeSpans = new ArrayList<>();
+					html.append("<div class='printIndicator'>Im Querformat zu PDF drucken</div>");
 					html.append("<div style='font-size:155%'>Betriebswirtschaftliche Auswertung</div>");
 					html.append("<div style='font-size:115%'>Für ");
 					if (tab instanceof YearTab) {
@@ -523,38 +489,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					TimeSpanTab tsTab = (TimeSpanTab) tab;
 					StringBuilder html = new StringBuilder();
 					html.append("<html>");
-					html.append("<head>");
-					html.append("<meta charset='utf-8'>");
-					html.append("<style>");
-					html.append("div.entry {");
-					html.append("  padding-bottom: 8pt;");
-					html.append("}");
-					html.append("div.small_above {");
-					html.append("  font-size: 80%;");
-					html.append("}");
-					html.append("span.explanation {");
-					html.append("}");
-					html.append("span.bold, div.bold {");
-					html.append("  font-weight: bold;");
-					html.append("}");
-					html.append("span.right {");
-					html.append("  float: right;");
-					html.append("}");
-					html.append("span.rightish {");
-					html.append("  float: right;");
-					html.append("  padding-right: 125pt;");
-					html.append("}");
-					html.append("div.sub {");
-					html.append("  padding-left: 25pt;");
-					html.append("}");
-					html.append("div.subsub {");
-					html.append("  padding-left: 50pt;");
-					html.append("}");
-					html.append("</style>");
-					html.append("</head>");
+					appendPdfPageHead(html);
 					html.append("<body>");
 
 					String title = tab.toString();
+					html.append("<div class='printIndicator'>Im Hochformat zu PDF drucken</div>");
 					html.append("<div style='font-size:155%'>Einnahmenüberschussrechnung</div>");
 					html.append("<div style='font-size:115%'>Für ");
 					if (tab instanceof YearTab) {
@@ -971,6 +910,58 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		html.append("</span>");
 
 		html.append("</div>");
+	}
+
+	private void appendPdfPageHead(StringBuilder html) {
+		html.append("<head>");
+		html.append("<meta charset='utf-8'>");
+		html.append("<style>");
+		html.append("div.entry {");
+		html.append("  padding-top: 4pt;");
+		html.append("  padding-bottom: 4pt;");
+		html.append("}");
+		html.append("div.topborder {");
+		html.append("  border-top: 1px solid #111;");
+		html.append("}");
+		html.append("div.bottomborder {");
+		html.append("  border-bottom: 1px solid #111;");
+		html.append("}");
+		html.append("div.small_above {");
+		html.append("  font-size: 80%;");
+		html.append("}");
+		html.append("span.explanation {");
+		html.append("}");
+		html.append("span.bold, div.bold {");
+		html.append("  font-weight: bold;");
+		html.append("}");
+		html.append("span.right {");
+		html.append("  float: right;");
+		html.append("}");
+		html.append("span.rightish {");
+		html.append("  float: right;");
+		html.append("  padding-right: 125pt;");
+		html.append("}");
+		html.append("div.sub {");
+		html.append("  padding-left: 25pt;");
+		html.append("}");
+		html.append("div.subsub {");
+		html.append("  padding-left: 50pt;");
+		html.append("}");
+		html.append("div.printIndicator {");
+		html.append("  font-size:185%;");
+		html.append("  position: fixed;");
+		html.append("  text-align: center;");
+		html.append("  width: 100%;");
+		html.append("  padding: 20pt;");
+		html.append("  opacity: 0.8;");
+		html.append("  background: #FFF;");
+		html.append("  visibility: hidden;");
+		html.append("}");
+		html.append("body:hover div.printIndicator {");
+		html.append("  visibility: visible;");
+		html.append("}");
+		html.append("</style>");
+		html.append("</head>");
 	}
 
 }
