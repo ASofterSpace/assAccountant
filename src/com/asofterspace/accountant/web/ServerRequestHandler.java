@@ -390,6 +390,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					int entertainmentCosts = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.ENTERTAINMENT);
 					int wareCosts = tsTab.getTimeSpan().getOutTotalBeforeTax(Category.WARES);
 					int outTotalBeforeTax = tsTab.getTimeSpan().getOutTotalBeforeTax();
+					int overallTax = tsTab.getTimeSpan().getVatPrepaymentsPaidTotal();
 
 					List<Incoming> incomings = tsTab.getTimeSpan().getIncomings();
 					int inPreTaxTotal = 0;
@@ -412,7 +413,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					int prevEntertainmentCosts = 0;
 					int prevWareCosts = 0;
 					int prevOutTotalBeforeTax = 0;
-
+					int prevOverallTax = 0;
 					int prevInPostTaxTotal = 0;
 					for (TimeSpan prevTimeSpan : prevTimeSpans) {
 						List<Incoming> prevIncomings = prevTimeSpan.getIncomings();
@@ -430,6 +431,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						prevEntertainmentCosts += prevTimeSpan.getOutTotalBeforeTax(Category.ENTERTAINMENT);
 						prevWareCosts += prevTimeSpan.getOutTotalBeforeTax(Category.WARES);
 						prevOutTotalBeforeTax += prevTimeSpan.getOutTotalBeforeTax();
+						prevOverallTax += prevTimeSpan.getVatPrepaymentsPaidTotal();
 					}
 
 					int prev2ExternalSalary = 0;
@@ -443,7 +445,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					int prev2EntertainmentCosts = 0;
 					int prev2WareCosts = 0;
 					int prev2OutTotalBeforeTax = 0;
-
+					int prev2OverallTax = 0;
 					int prev2InPostTaxTotal = 0;
 					for (TimeSpan prev2TimeSpan : prev2TimeSpans) {
 						List<Incoming> prev2Incomings = prev2TimeSpan.getIncomings();
@@ -461,6 +463,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						prev2EntertainmentCosts += prev2TimeSpan.getOutTotalBeforeTax(Category.ENTERTAINMENT);
 						prev2WareCosts += prev2TimeSpan.getOutTotalBeforeTax(Category.WARES);
 						prev2OutTotalBeforeTax += prev2TimeSpan.getOutTotalBeforeTax();
+						prev2OverallTax += prev2TimeSpan.getVatPrepaymentsPaidTotal();
 					}
 
 					// this does NOT include donations, as we will not get donation amounts from timeSpan.getOutTotalBeforeTax() anyway, so we do not want to subtract them from it!
@@ -583,13 +586,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					appendBwaLine(html, "Ergebnis vor Steuern", rohertrag - gesamtKosten, gesamtLeistung, gesamtKosten,
 						prevRohertrag - prevGesamtKosten, prevGesamtLeistung, prevGesamtKosten, prev2Rohertrag - prev2GesamtKosten, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
 
-					// TODO
-					appendBwaLine(html, "Steuern vom Einkommen und Ertrag", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
+					appendBwaLine(html, "Steuern vom Einkommen und Ertrag", overallTax, gesamtLeistung, gesamtKosten,
+						prevOverallTax, prevGesamtLeistung, prevGesamtKosten, prev2OverallTax, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
-					// TODO
-					appendBwaLine(html, "Vorläufiges Ergebnis", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
+					appendBwaLine(html, "Vorläufiges Ergebnis", rohertrag - (gesamtKosten + overallTax), gesamtLeistung, gesamtKosten,
+						prevRohertrag - (prevGesamtKosten + prevOverallTax), prevGesamtLeistung, prevGesamtKosten, prev2Rohertrag - (prev2GesamtKosten + prev2OverallTax), prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
 
 
 /*
