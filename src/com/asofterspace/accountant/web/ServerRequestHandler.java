@@ -401,6 +401,82 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						prevInPostTaxTotal, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
 
 
+					html.append("<div class='bold entry' style='padding-top: 8pt;'>");
+					html.append("<span style='width: " + colPositionenWidth + "%; display: inline-block;'>");
+					html.append("Kostenarten:");
+					html.append("</span>");
+					html.append("</div>");
+
+					appendBwaLine(html, "Personalkosten", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Raumkosten", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Betriebliche Steuern", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Versicherungen/Beiträge", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Besondere Kosten", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Kfz-Kosten", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Werbe-/Reisekosten", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Kosten der Warenabgabe", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Abschreibungen", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Reparatur/Instandhaltung", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Sonstige Kosten", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Gesamtkosten", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder");
+
+					appendBwaLine(html, "Betriebsergebnis (EBIT)", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
+
+					appendBwaLine(html, "Zinsaufwand", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Sonstiger neutraler Aufwand", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Neutraler Aufwand", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold");
+
+					appendBwaLine(html, "Zinserträge", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Sonstige neutrale Erträge", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Neutraler Ertrag", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold");
+
+					/*
+					appendBwaLine(html, "Neutrales Ergebnis", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
+					*/
+
+					appendBwaLine(html, "Ergebnis vor Steuern", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
+
+					appendBwaLine(html, "Steuern vom Einkommen und Ertrag", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "");
+
+					appendBwaLine(html, "Vorläufiges Ergebnis", 0, gesamtLeistung, gesamtKosten,
+						0, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
 
 
 
