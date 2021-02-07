@@ -49,7 +49,7 @@ public class YearTab extends TimeSpanTab {
 		}
 
 		html += "<a class='toprightAction button' style='right:92pt;' target='_blank' href='print_pdf_euer_" +
-			ServerRequestHandler.tabToLink(this) + "'>Print EÜR to PDF</span>";
+			ServerRequestHandler.tabToLink(this) + "'>Print EÜR</span>";
 		html += "</a>";
 		html += "<span class='toprightAction button' onclick='window.accountant.exportCsvs(\"" + ServerRequestHandler.tabToLink(this) + "\")'>" +
 				"Export to CSVs</span>";

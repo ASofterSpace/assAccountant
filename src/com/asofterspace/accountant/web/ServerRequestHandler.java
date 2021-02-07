@@ -45,6 +45,7 @@ import com.asofterspace.toolbox.web.WebServerRequestHandler;
 import java.awt.Desktop;
 import java.io.IOException;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -234,7 +235,240 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			return answer;
 		}
 
-		/* We are generation a EÜR, which does not contain Privatentnahme or Privateinlage - they need to
+		/* We are generating a BWA, a Betriebswirtschaftliche Auswertung */
+		if (location.startsWith("/print_pdf_bwa_")) {
+			Tab tab = linkToTab(location.substring(15));
+			if (tab != null) {
+				if (tab instanceof TimeSpanTab) {
+					TimeSpanTab tsTab = (TimeSpanTab) tab;
+					StringBuilder html = new StringBuilder();
+					html.append("<html>");
+					html.append("<head>");
+					html.append("<meta charset='utf-8'>");
+					html.append("<style>");
+					html.append("div.entry {");
+					html.append("  padding-bottom: 8pt;");
+					html.append("}");
+					html.append("div.small_above {");
+					html.append("  font-size: 80%;");
+					html.append("}");
+					html.append("span.explanation {");
+					html.append("}");
+					html.append("span.bold, div.bold {");
+					html.append("  font-weight: bold;");
+					html.append("}");
+					html.append("span.right {");
+					html.append("  float: right;");
+					html.append("}");
+					html.append("span.rightish {");
+					html.append("  float: right;");
+					html.append("  padding-right: 125pt;");
+					html.append("}");
+					html.append("div.sub {");
+					html.append("  padding-left: 25pt;");
+					html.append("}");
+					html.append("div.subsub {");
+					html.append("  padding-left: 50pt;");
+					html.append("}");
+					html.append("</style>");
+					html.append("</head>");
+					html.append("<body>");
+
+					String title = tab.toString();
+					String currentTimespanStr = title;
+					String previousTimespanStr = null;
+					List<TimeSpan> prevTimeSpans = new ArrayList<>();
+					html.append("<div style='font-size:155%'>Betriebswirtschaftliche Auswertung</div>");
+					html.append("<div style='font-size:115%'>Für ");
+					if (tab instanceof YearTab) {
+						html.append("das Kalenderjahr " + title);
+						// get the previous year
+						// TODO
+					} else {
+						currentTimespanStr = ((Month) tsTab.getTimeSpan()).getMonthNameDE() + " " +
+							tsTab.getTimeSpan().getYear().getNum();
+						html.append("den Monat " + currentTimespanStr);
+						// get January of this year until current month
+						// (except in January, where we compare to all of last year)
+						// TODO
+					}
+					html.append("</div>");
+
+					double colPositionenWidth = 25;
+					int otherColAmount = 6;
+					double otherColsWidth = (100 - colPositionenWidth) / otherColAmount;
+
+					html.append("<div class='bold entry' style='padding-top:25pt;'>");
+					html.append("<span style='width: " + colPositionenWidth + "%; display: inline-block;'>");
+					html.append("Positionen");
+					html.append("</span>");
+					html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+					html.append(currentTimespanStr);
+					html.append("</span>");
+					html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+					html.append("% Gesamt-<br>leistung");
+					html.append("</span>");
+					html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+					html.append("% Gesamt-<br>kosten");
+					html.append("</span>");
+					html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+					html.append(previousTimespanStr);
+					html.append("</span>");
+					html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+					html.append("% Gesamt-<br>leistung");
+					html.append("</span>");
+					html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+					html.append("% Gesamt-<br>kosten");
+					html.append("</span>");
+					html.append("</div>");
+
+					List<Incoming> incomings = tsTab.getTimeSpan().getIncomings();
+					int inPreTaxTotal = 0;
+					int inTaxTotal = 0;
+					int inPostTaxTotal = 0;
+					for (Incoming incoming : incomings) {
+						inPreTaxTotal += incoming.getPreTaxAmount();
+						inTaxTotal += incoming.getTaxAmount();
+						inPostTaxTotal += incoming.getPostTaxAmount();
+					}
+
+					int prevInPostTaxTotal = 0;
+					for (TimeSpan prevTimeSpan : prevTimeSpans) {
+						List<Incoming> prevIncomings = prevTimeSpan.getIncomings();
+						for (Incoming incoming : prevIncomings) {
+							prevInPostTaxTotal += incoming.getPostTaxAmount();
+						}
+					}
+
+					int gesamtLeistung = inPostTaxTotal;
+					int gesamtKosten = 0;
+
+					int prevGesamtLeistung = prevInPostTaxTotal;
+					int prevGesamtKosten = 0;
+
+					appendBwaLine(html, "Umsatzerlöse", inPostTaxTotal, gesamtLeistung, gesamtKosten,
+						prevInPostTaxTotal, prevGesamtLeistung, prevGesamtKosten, colPositionenWidth, otherColsWidth);
+
+
+					html.append("<br><br><br><br><br><br>");
+
+					html.append("<div class='bold entry' style='padding-top:25pt;'>Betriebsausgaben</div>");
+
+					TimeSpan timeSpan = tsTab.getTimeSpan();
+
+					int externalSalary = timeSpan.getOutTotalBeforeTax(Category.EXTERNAL_SALARY);
+					int internalSalary = timeSpan.getOutTotalBeforeTax(Category.INTERNAL_SALARY);
+					int vehicleCosts = timeSpan.getOutTotalBeforeTax(Category.VEHICLE);
+					int travelCosts = timeSpan.getOutTotalBeforeTax(Category.TRAVEL);
+					int locationCosts = timeSpan.getOutTotalBeforeTax(Category.LOCATIONS);
+					int educationCosts = timeSpan.getOutTotalBeforeTax(Category.EDUCATION);
+					int advertisementCosts = timeSpan.getOutTotalBeforeTax(Category.ADVERTISEMENTS);
+					int infrastructureCosts = timeSpan.getOutTotalBeforeTax(Category.INFRASTRUCTURE);
+					int entertainmentCosts = timeSpan.getOutTotalBeforeTax(Category.ENTERTAINMENT);
+					int wareCosts = timeSpan.getOutTotalBeforeTax(Category.WARES);
+
+					// this does NOT include donations, as we will not get donation amounts from timeSpan.getOutTotalBeforeTax() anyway, so we do not want to subtract them from it!
+					// (in general, this is only the sum of non-special categories except other)
+					int categoryTally = externalSalary + internalSalary + vehicleCosts + travelCosts + locationCosts +
+						educationCosts + advertisementCosts + infrastructureCosts + entertainmentCosts + wareCosts;
+
+					int otherCosts = timeSpan.getOutTotalBeforeTax() - categoryTally;
+
+					if (wareCosts + otherCosts > 0) {
+						html.append("<div class='entry sub'>Waren, Rohstoffe und Hilfsmittel:<span class='right'>" +
+							FinanceUtils.formatMoneyDE(wareCosts + otherCosts) + " €</span></div>");
+					}
+
+					if (externalSalary > 0) {
+						html.append("<div class='entry sub'>Fremdleistungen und Auftragsarbeiten:<span class='right'>" +
+							FinanceUtils.formatMoneyDE(externalSalary) + " €</span></div>");
+					}
+
+					if (internalSalary > 0) {
+						html.append("<div class='entry sub'>Personalkosten:<span class='right'>" +
+							FinanceUtils.formatMoneyDE(internalSalary) + " €</span></div>");
+					}
+
+					if (vehicleCosts > 0) {
+						html.append("<div class='entry sub'>Fahrzeugkosten und andere Fahrtkosten:</div>");
+
+						html.append("<div class='entry subsub'>Leasingkosten:<span class='rightish'>" +
+							FinanceUtils.formatMoneyDE(vehicleCosts) + " €</span></div>");
+
+						html.append("<div class='entry subsub'>Sonstige tatsächliche Fahrtkosten:<span class='rightish'>" +
+							FinanceUtils.formatMoneyDE(travelCosts) + " €</span></div>");
+
+						html.append("<div class='entry sub'>Summe Fahrzeugkosten und andere Fahrtkosten:<span class='right'>" +
+							FinanceUtils.formatMoneyDE(vehicleCosts + travelCosts) + " €</span></div>");
+					} else {
+						if (travelCosts > 0) {
+							html.append("<div class='entry sub'>Fahrtkosten:<span class='right'>" +
+								FinanceUtils.formatMoneyDE(travelCosts) + " €</span></div>");
+						}
+					}
+
+					if (locationCosts > 0) {
+						html.append("<div class='entry sub'>Raumkosten und sonstige Grundstücksaufwendungen:<span class='right'>" +
+							FinanceUtils.formatMoneyDE(locationCosts) + " €</span></div>");
+					}
+
+					html.append("<div class='entry sub'>Sonstige Betriebsausgaben:</div>");
+
+					if (educationCosts > 0) {
+						html.append("<div class='entry subsub'>Fortbildungskosten:<span class='rightish'>" +
+							FinanceUtils.formatMoneyDE(educationCosts) + " €</span></div>");
+					}
+
+					html.append("<div class='entry subsub'>Laufende EDV-Kosten:<span class='rightish'>" +
+						FinanceUtils.formatMoneyDE(infrastructureCosts) + " €</span></div>");
+
+					if (advertisementCosts + entertainmentCosts > 0) {
+						html.append("<div class='entry subsub'>Werbekosten:<span class='rightish'>" +
+							FinanceUtils.formatMoneyDE(advertisementCosts + entertainmentCosts) + " €</span></div>");
+					}
+
+					html.append("<div class='entry sub'>Summe sonstige Betriebsausgaben:<span class='right'>" +
+						FinanceUtils.formatMoneyDE(educationCosts + infrastructureCosts + advertisementCosts + entertainmentCosts) + " €</span></div>");
+
+					int outTotal = timeSpan.getOutTotalBeforeTax();
+
+					html.append("<div class='entry sub'>Abziehbare Vorsteuerbeträge:</div>");
+
+					html.append("<div class='entry subsub'>Manuell ermittelte Vorsteuer:<span class='right'>" +
+						FinanceUtils.formatMoneyDE(timeSpan.getDiscountablePreTax()) + " €</span></div>");
+					outTotal += timeSpan.getDiscountablePreTax();
+
+					html.append("<div class='entry sub'>An das Finanzamt abgeführte Umsatzsteuer:<span class='right'>" +
+						FinanceUtils.formatMoneyDE(timeSpan.getVatPrepaymentsPaidTotal()) + " €</span></div>");
+					outTotal += timeSpan.getVatPrepaymentsPaidTotal();
+
+					html.append("<div class='entry bold'>Summe der anzusetzenden Betriebsausgaben:<span class='right bold'>" +
+						FinanceUtils.formatMoneyDE(outTotal) + " €</span></div>");
+
+					html.append("<div class='bold entry' style='padding-top:25pt;'>Ermittlung des Gewinns</div>");
+
+					html.append("<div class='entry sub'>Summe der Betriebseinnahmen:<span class='right'>" +
+						FinanceUtils.formatMoneyDE(inPostTaxTotal) + " €</span></div>");
+
+					html.append("<div class='entry sub'>Abzüglich Summe der Betriebsausgaben:<span class='right'>" +
+						FinanceUtils.formatMoneyDE(outTotal) + " €</span></div>");
+
+					html.append("<div class='entry bold'>Gewinn:<span class='right bold'>" +
+						FinanceUtils.formatMoneyDE(inPostTaxTotal - outTotal) + " €</span></div>");
+
+					html.append("<div style='padding-top:25pt;text-align: right;'><span><img style='width:215pt;' src='/pics/signature.png' /></span></div>");
+					html.append("<span style='float:left;font-size: 115%;'>" + database.getLocation() + ", " + DateUtils.serializeDate(DateUtils.now()) + "</span>");
+					html.append("<div style='text-align: right;padding-right: 85pt;font-size: 115%;'>" + database.getUserLegalName() + "</div>");
+					html.append("</body>");
+					html.append("</html>");
+					WebServerAnswerWithText answer = new WebServerAnswerWithText(html.toString());
+					answer.setTextKind("html");
+					return answer;
+				}
+			}
+		}
+
+		/* We are generating a EÜR, which does not contain Privatentnahme or Privateinlage - they need to
 		   be used as Verwendungszweck, but do NOT appear here, and this is the correct way to do it!
 
 		   Also, our donations are not at all present in the EÜR - and this is perfectly reasonable:
@@ -277,13 +511,14 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					html.append("</style>");
 					html.append("</head>");
 					html.append("<body>");
+
 					String title = tab.toString();
 					html.append("<div style='font-size:155%'>Einnahmenüberschussrechnung</div>");
 					html.append("<div style='font-size:115%'>Für ");
 					if (tab instanceof YearTab) {
 						html.append("das Kalenderjahr " + title);
 					} else {
-						html.append("den Monat " + ((Month) tsTab.getTimeSpan()).getMonthName() + " " +
+						html.append("den Monat " + ((Month) tsTab.getTimeSpan()).getMonthNameDE() + " " +
 							tsTab.getTimeSpan().getYear().getNum());
 					}
 					html.append("</div>");
@@ -291,71 +526,71 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					html.append("<div class='bold entry' style='padding-top:25pt;'>Betriebseinnahmen</div>");
 
 					List<Incoming> incomings = tsTab.getTimeSpan().getIncomings();
-					int out0percTax = 0;
-					int out16percTax = 0;
-					int out19percTax = 0;
-					int outOtherTax = 0;
-					int out16percTaxTax = 0;
-					int out19percTaxTax = 0;
-					int outOtherTaxTax = 0;
+					int in0percTax = 0;
+					int in16percTax = 0;
+					int in19percTax = 0;
+					int inOtherTax = 0;
+					int in16percTaxTax = 0;
+					int in19percTaxTax = 0;
+					int inOtherTaxTax = 0;
 					int inTotal = 0;
 					for (Incoming incoming : incomings) {
 						inTotal += incoming.getPostTaxAmount();
 						switch (incoming.getTaxPercent()) {
 							case 0:
-								out0percTax += incoming.getPreTaxAmount();
+								in0percTax += incoming.getPreTaxAmount();
 								break;
 							case 16:
-								out16percTax += incoming.getPreTaxAmount();
-								out16percTaxTax += incoming.getTaxAmount();
+								in16percTax += incoming.getPreTaxAmount();
+								in16percTaxTax += incoming.getTaxAmount();
 								break;
 							case 19:
-								out19percTax += incoming.getPreTaxAmount();
-								out19percTaxTax += incoming.getTaxAmount();
+								in19percTax += incoming.getPreTaxAmount();
+								in19percTaxTax += incoming.getTaxAmount();
 								break;
 							default:
-								outOtherTax += incoming.getPreTaxAmount();
-								outOtherTaxTax += incoming.getTaxAmount();
+								inOtherTax += incoming.getPreTaxAmount();
+								inOtherTaxTax += incoming.getTaxAmount();
 								break;
 						}
 					}
 
 					html.append("<div class='entry sub'>Betriebseinnahmen - zum allgemeinen Steuersatz von 19%:<span class='right'>" +
-						FinanceUtils.formatMoneyDE(out19percTax) + " €</span></div>");
+						FinanceUtils.formatMoneyDE(in19percTax) + " €</span></div>");
 
-					if (out16percTax > 0) {
+					if (in16percTax > 0) {
 						html.append("<div class='entry sub'>Betriebseinnahmen - zum Corona-bedingten Steuersatz von 16%:<span class='right'>" +
-							FinanceUtils.formatMoneyDE(out16percTax) + " €</span></div>");
+							FinanceUtils.formatMoneyDE(in16percTax) + " €</span></div>");
 					}
 
-					if (outOtherTax > 0) {
+					if (inOtherTax > 0) {
 						html.append("<div class='entry sub'>Betriebseinnahmen - zu anderen Steuersätzen:<span class='right'>" +
-							FinanceUtils.formatMoneyDE(outOtherTax) + " €</span></div>");
+							FinanceUtils.formatMoneyDE(inOtherTax) + " €</span></div>");
 					}
 
 					html.append("<div class='entry sub'>Betriebseinnahmen - umsatzsteuerfrei oder nicht steuerbar:<span class='right'>" +
-						FinanceUtils.formatMoneyDE(out0percTax) + " €</span></div>");
+						FinanceUtils.formatMoneyDE(in0percTax) + " €</span></div>");
 
 					html.append("<div class='entry sub'>Vereinnahmte Umsatzsteuer sowie Umsatzsteuer auf Entnahmen:</div>");
 
 					html.append("<div class='entry subsub'>Betriebseinnahmen 19%:<span class='right'>" +
-						FinanceUtils.formatMoneyDE(out19percTaxTax) + " €</span></div>");
+						FinanceUtils.formatMoneyDE(in19percTaxTax) + " €</span></div>");
 
-					if (out16percTaxTax > 0) {
+					if (in16percTaxTax > 0) {
 						html.append("<div class='entry subsub'>Betriebseinnahmen 16%:<span class='right'>" +
-							FinanceUtils.formatMoneyDE(out16percTaxTax) + " €</span></div>");
+							FinanceUtils.formatMoneyDE(in16percTaxTax) + " €</span></div>");
 					}
 
-					if (outOtherTaxTax > 0) {
+					if (inOtherTaxTax > 0) {
 						html.append("<div class='entry subsub'>Betriebseinnahmen von anderen Steuersätzen:<span class='right'>" +
-							FinanceUtils.formatMoneyDE(outOtherTaxTax) + " €</span></div>");
+							FinanceUtils.formatMoneyDE(inOtherTaxTax) + " €</span></div>");
 					}
 
 					html.append("<div class='bold entry'>Summe der anzusetzenden Betriebseinnahmen:<span class='right bold'>" +
 							FinanceUtils.formatMoneyDE(inTotal) + " €</span></div>");
 
-					if (inTotal != out0percTax + out16percTax + out19percTax + outOtherTax +
-						out16percTaxTax + out19percTaxTax + outOtherTaxTax) {
+					if (inTotal != in0percTax + in16percTax + in19percTax + inOtherTax +
+						in16percTaxTax + in19percTaxTax + inOtherTaxTax) {
 
 						html.append("<div class='bold entry'>Es liegt ein Berechnungsfehler vor!</div>");
 					}
@@ -647,6 +882,42 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		}
 
 		return null;
+	}
+
+	private void appendBwaLine(StringBuilder html, String positionName, int value, int gesamtLeistung, int gesamtKosten,
+		int prevValue, int prevGesamtLeistung, int prevGesamtKosten, double colPositionenWidth, double otherColsWidth) {
+
+		html.append("<div class='entry'>");
+		html.append("<span style='width: " + colPositionenWidth + "%; display: inline-block;'>");
+		html.append(positionName);
+		html.append("</span>");
+		html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+		html.append(FinanceUtils.formatMoneyDE(value));
+		html.append(" €</span>");
+		html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+		if (gesamtLeistung > 0) {
+			html.append(StrUtils.leftPadW(StrUtils.doubleToStr((value * 100.0) / gesamtLeistung, 2), 6));
+		}
+		html.append("</span>");
+		html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+		if (gesamtKosten > 0) {
+			html.append(StrUtils.leftPadW(StrUtils.doubleToStr((value * 100.0) / gesamtKosten, 2), 6));
+		}
+		html.append("</span>");
+		html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+		html.append(FinanceUtils.formatMoneyDE(prevValue));
+		html.append(" €</span>");
+		html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+		if (prevGesamtLeistung > 0) {
+			html.append(StrUtils.leftPadW(StrUtils.doubleToStr((prevValue * 100.0) / prevGesamtLeistung, 2), 6));
+		}
+		html.append("</span>");
+		html.append("<span style='text-align: center; width: " + otherColsWidth + "%; display: inline-block;'>");
+		if (prevGesamtKosten > 0) {
+			html.append(StrUtils.leftPadW(StrUtils.doubleToStr((prevValue * 100.0) / prevGesamtKosten, 2), 6));
+		}
+		html.append("</span>");
+		html.append("</div>");
 	}
 
 }

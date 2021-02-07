@@ -46,6 +46,19 @@ public class Month extends TimeSpan {
 		"October",
 		"November",
 		"December"};
+	private final static String[] MONTH_NUM_TO_NAME_DE = {
+		"Januar",
+		"Februar",
+		"März",
+		"April",
+		"Mai",
+		"Juni",
+		"Juli",
+		"August",
+		"September",
+		"Oktober",
+		"November",
+		"Dezember"};
 
 	private Year year;
 
@@ -241,6 +254,10 @@ public class Month extends TimeSpan {
 
 	public String getMonthName() {
 		return MONTH_NUM_TO_NAME[monthNum];
+	}
+
+	public String getMonthNameDE() {
+		return MONTH_NUM_TO_NAME_DE[monthNum];
 	}
 
 	@Override
