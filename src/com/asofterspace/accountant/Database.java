@@ -382,6 +382,17 @@ public class Database {
 		return getYearFromEntryDate(date, -1);
 	}
 
+	public Year getYearFromNumIfExists(int yearNum) {
+
+		for (Year year : years) {
+			if (year.getNum() == yearNum) {
+				return year;
+			}
+		}
+
+		return null;
+	}
+
 	private Year getYearFromEntryDate(Date date, int offset) {
 
 		Calendar calendar = Calendar.getInstance();

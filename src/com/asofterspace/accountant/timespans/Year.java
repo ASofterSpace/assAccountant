@@ -6,8 +6,8 @@ package com.asofterspace.accountant.timespans;
 
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
-import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.entries.Incoming;
+import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.world.Category;
 import com.asofterspace.toolbox.utils.Record;
 
@@ -286,6 +286,10 @@ public class Year extends TimeSpan {
 	@Override
 	public Year getYear() {
 		return this;
+	}
+
+	public Year getPreviousYear() {
+		return database.getYearFromNumIfExists(yearNum);
 	}
 
 	public Database getDatabase() {

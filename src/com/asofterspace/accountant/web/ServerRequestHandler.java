@@ -22,6 +22,7 @@ import com.asofterspace.accountant.tasks.Task;
 import com.asofterspace.accountant.tasks.TaskCtrl;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.TimeSpan;
+import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.world.Category;
 import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.calendar.GenericTask;
@@ -283,21 +284,43 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 					String title = tab.toString();
 					String currentTimespanStr = title;
-					String previousTimespanStr = null;
+					String previousTimespanStr = "(kein Zeitraum)";
 					List<TimeSpan> prevTimeSpans = new ArrayList<>();
 					html.append("<div style='font-size:155%'>Betriebswirtschaftliche Auswertung</div>");
 					html.append("<div style='font-size:115%'>Für ");
 					if (tab instanceof YearTab) {
 						html.append("das Kalenderjahr " + title);
 						// get the previous year
-						// TODO
+						Year prevYear = tsTab.getTimeSpan().getYear().getPreviousYear();
+						if (prevYear != null) {
+							prevTimeSpans.add(prevYear);
+							previousTimespanStr = "" + prevYear.getNum();
+						}
 					} else {
-						currentTimespanStr = ((Month) tsTab.getTimeSpan()).getMonthNameDE() + " " +
+						Month curMonth = (Month) tsTab.getTimeSpan();
+						currentTimespanStr = curMonth.getMonthNameDE() + " " +
 							tsTab.getTimeSpan().getYear().getNum();
 						html.append("den Monat " + currentTimespanStr);
+
 						// get January of this year until current month
 						// (except in January, where we compare to all of last year)
-						// TODO
+						if (curMonth.getNum() < 1) {
+							// January
+							Year prevYear = tsTab.getTimeSpan().getYear().getPreviousYear();
+							if (prevYear != null) {
+								prevTimeSpans.add(prevYear);
+								previousTimespanStr = "Januar " + prevYear.getNum() + " - Dezember " + prevYear.getNum();
+							}
+						} else {
+							// other months
+							List<Month> allMonths = curMonth.getYear().getMonths();
+							for (Month month : allMonths) {
+								if (month.getNum() <= curMonth.getNum()) {
+									prevTimeSpans.add(month);
+								}
+							}
+							previousTimespanStr = "Januar " + curMonth.getYear().getNum() + " - " + currentTimespanStr;
+						}
 					}
 					html.append("</div>");
 
