@@ -578,11 +578,6 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					appendBwaLine(html, "Neutraler Ertrag", 0, gesamtLeistung, gesamtKosten,
 						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold");
 
-					/*
-					appendBwaLine(html, "Neutrales Ergebnis", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
-					*/
-
 					appendBwaLine(html, "Ergebnis vor Steuern", rohertrag - gesamtKosten, gesamtLeistung, gesamtKosten,
 						prevRohertrag - prevGesamtKosten, prevGesamtLeistung, prevGesamtKosten, prev2Rohertrag - prev2GesamtKosten, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
 
@@ -592,94 +587,6 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					appendBwaLine(html, "Vorläufiges Ergebnis", rohertrag - (gesamtKosten + overallTax), gesamtLeistung, gesamtKosten,
 						prevRohertrag - (prevGesamtKosten + prevOverallTax), prevGesamtLeistung, prevGesamtKosten, prev2Rohertrag - (prev2GesamtKosten + prev2OverallTax), prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
 
-
-/*
-					html.append("<div class='bold entry' style='padding-top:25pt;'>Betriebsausgaben</div>");
-
-					TimeSpan timeSpan = tsTab.getTimeSpan();
-
-					if (wareCosts + otherCosts > 0) {
-						html.append("<div class='entry sub'>Waren, Rohstoffe und Hilfsmittel:<span class='right'>" +
-							FinanceUtils.formatMoneyDE(wareCosts + otherCosts) + " €</span></div>");
-					}
-
-					if (externalSalary > 0) {
-						html.append("<div class='entry sub'>Fremdleistungen und Auftragsarbeiten:<span class='right'>" +
-							FinanceUtils.formatMoneyDE(externalSalary) + " €</span></div>");
-					}
-
-					if (internalSalary > 0) {
-						html.append("<div class='entry sub'>Personalkosten:<span class='right'>" +
-							FinanceUtils.formatMoneyDE(internalSalary) + " €</span></div>");
-					}
-
-					if (vehicleCosts > 0) {
-						html.append("<div class='entry sub'>Fahrzeugkosten und andere Fahrtkosten:</div>");
-
-						html.append("<div class='entry subsub'>Leasingkosten:<span class='rightish'>" +
-							FinanceUtils.formatMoneyDE(vehicleCosts) + " €</span></div>");
-
-						html.append("<div class='entry subsub'>Sonstige tatsächliche Fahrtkosten:<span class='rightish'>" +
-							FinanceUtils.formatMoneyDE(travelCosts) + " €</span></div>");
-
-						html.append("<div class='entry sub'>Summe Fahrzeugkosten und andere Fahrtkosten:<span class='right'>" +
-							FinanceUtils.formatMoneyDE(vehicleCosts + travelCosts) + " €</span></div>");
-					} else {
-						if (travelCosts > 0) {
-							html.append("<div class='entry sub'>Fahrtkosten:<span class='right'>" +
-								FinanceUtils.formatMoneyDE(travelCosts) + " €</span></div>");
-						}
-					}
-
-					if (locationCosts > 0) {
-						html.append("<div class='entry sub'>Raumkosten und sonstige Grundstücksaufwendungen:<span class='right'>" +
-							FinanceUtils.formatMoneyDE(locationCosts) + " €</span></div>");
-					}
-
-					html.append("<div class='entry sub'>Sonstige Betriebsausgaben:</div>");
-
-					if (educationCosts > 0) {
-						html.append("<div class='entry subsub'>Fortbildungskosten:<span class='rightish'>" +
-							FinanceUtils.formatMoneyDE(educationCosts) + " €</span></div>");
-					}
-
-					html.append("<div class='entry subsub'>Laufende EDV-Kosten:<span class='rightish'>" +
-						FinanceUtils.formatMoneyDE(infrastructureCosts) + " €</span></div>");
-
-					if (advertisementCosts + entertainmentCosts > 0) {
-						html.append("<div class='entry subsub'>Werbekosten:<span class='rightish'>" +
-							FinanceUtils.formatMoneyDE(advertisementCosts + entertainmentCosts) + " €</span></div>");
-					}
-
-					html.append("<div class='entry sub'>Summe sonstige Betriebsausgaben:<span class='right'>" +
-						FinanceUtils.formatMoneyDE(educationCosts + infrastructureCosts + advertisementCosts + entertainmentCosts) + " €</span></div>");
-
-					int outTotal = timeSpan.getOutTotalBeforeTax();
-
-					html.append("<div class='entry sub'>Abziehbare Vorsteuerbeträge:</div>");
-
-					html.append("<div class='entry subsub'>Manuell ermittelte Vorsteuer:<span class='right'>" +
-						FinanceUtils.formatMoneyDE(timeSpan.getDiscountablePreTax()) + " €</span></div>");
-					outTotal += timeSpan.getDiscountablePreTax();
-
-					html.append("<div class='entry sub'>An das Finanzamt abgeführte Umsatzsteuer:<span class='right'>" +
-						FinanceUtils.formatMoneyDE(timeSpan.getVatPrepaymentsPaidTotal()) + " €</span></div>");
-					outTotal += timeSpan.getVatPrepaymentsPaidTotal();
-
-					html.append("<div class='entry bold'>Summe der anzusetzenden Betriebsausgaben:<span class='right bold'>" +
-						FinanceUtils.formatMoneyDE(outTotal) + " €</span></div>");
-
-					html.append("<div class='bold entry' style='padding-top:25pt;'>Ermittlung des Gewinns</div>");
-
-					html.append("<div class='entry sub'>Summe der Betriebseinnahmen:<span class='right'>" +
-						FinanceUtils.formatMoneyDE(inPostTaxTotal) + " €</span></div>");
-
-					html.append("<div class='entry sub'>Abzüglich Summe der Betriebsausgaben:<span class='right'>" +
-						FinanceUtils.formatMoneyDE(outTotal) + " €</span></div>");
-
-					html.append("<div class='entry bold'>Gewinn:<span class='right bold'>" +
-						FinanceUtils.formatMoneyDE(inPostTaxTotal - outTotal) + " €</span></div>");
-*/
 
 					html.append("<div style='padding-top:25pt;text-align: right;'><span><img style='width:215pt;' src='/pics/signature.png' /></span></div>");
 					html.append("<span style='float:left;font-size: 115%;'>" + database.getLocation() + ", " + DateUtils.serializeDate(DateUtils.now()) + "</span>");
