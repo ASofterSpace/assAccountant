@@ -24,7 +24,6 @@ import com.asofterspace.accountant.tasks.TaskCtrl;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.TimeSpan;
 import com.asofterspace.accountant.timespans.Year;
-import com.asofterspace.accountant.world.Category;
 import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.gui.GuiUtils;
@@ -430,8 +429,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					html.append("</span>");
 					html.append("</div>");
 
-					appendBwaLine(html, "Personalkosten", ood.getExternalSalary() + ood.getInternalSalary(), gesamtLeistung, gesamtKosten,
-						prevOod.getExternalSalary() + prevOod.getInternalSalary(), prevGesamtLeistung, prevGesamtKosten, prev2Ood.getExternalSalary() + prev2Ood.getInternalSalary(), prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
+					appendBwaLine(html, "Personalkosten", ood.getInternalSalary(), gesamtLeistung, gesamtKosten,
+						prevOod.getInternalSalary(), prevGesamtLeistung, prevGesamtKosten, prev2Ood.getInternalSalary(), prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Raumkosten", ood.getLocationCosts(), gesamtLeistung, gesamtKosten,
 						prevOod.getLocationCosts(), prevGesamtLeistung, prevGesamtKosten, prev2Ood.getLocationCosts(), prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
@@ -460,8 +459,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					appendBwaLine(html, "Reparatur/Instandhaltung", 0, gesamtLeistung, gesamtKosten,
 						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
-					appendBwaLine(html, "Sonstige Kosten", ood.getOtherCosts(), gesamtLeistung, gesamtKosten,
-						prevOod.getOtherCosts(), prevGesamtLeistung, prevGesamtKosten, prev2Ood.getOtherCosts(), prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
+					// Fremdleistungen und Auftragsarbeiten booked as part of other costs
+					appendBwaLine(html, "Sonstige Kosten", ood.getOtherCosts() + ood.getExternalSalary(), gesamtLeistung, gesamtKosten,
+						prevOod.getOtherCosts() + prevOod.getExternalSalary(), prevGesamtLeistung, prevGesamtKosten, prev2Ood.getOtherCosts() + prev2Ood.getExternalSalary(), prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Gesamtkosten", gesamtKosten, gesamtLeistung, gesamtKosten,
 						prevGesamtKosten, prevGesamtLeistung, prevGesamtKosten, prev2GesamtKosten, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder");
@@ -641,79 +641,68 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 					TimeSpan timeSpan = tsTab.getTimeSpan();
 
-					int externalSalary = timeSpan.getOutTotalBeforeTax(Category.EXTERNAL_SALARY);
-					int internalSalary = timeSpan.getOutTotalBeforeTax(Category.INTERNAL_SALARY);
-					int vehicleCosts = timeSpan.getOutTotalBeforeTax(Category.VEHICLE);
-					int travelCosts = timeSpan.getOutTotalBeforeTax(Category.TRAVEL);
-					int locationCosts = timeSpan.getOutTotalBeforeTax(Category.LOCATIONS);
-					int educationCosts = timeSpan.getOutTotalBeforeTax(Category.EDUCATION);
-					int advertisementCosts = timeSpan.getOutTotalBeforeTax(Category.ADVERTISEMENTS);
-					int infrastructureCosts = timeSpan.getOutTotalBeforeTax(Category.INFRASTRUCTURE);
-					int entertainmentCosts = timeSpan.getOutTotalBeforeTax(Category.ENTERTAINMENT);
-					int wareCosts = timeSpan.getOutTotalBeforeTax(Category.WARES);
+					OutgoingOverviewData ood = new OutgoingOverviewData(timeSpan);
 
-					// this does NOT include donations, as we will not get donation amounts from timeSpan.getOutTotalBeforeTax() anyway, so we do not want to subtract them from it!
-					// (in general, this is only the sum of non-special categories except other)
-					int categoryTally = externalSalary + internalSalary + vehicleCosts + travelCosts + locationCosts +
-						educationCosts + advertisementCosts + infrastructureCosts + entertainmentCosts + wareCosts;
-
-					int otherCosts = timeSpan.getOutTotalBeforeTax() - categoryTally;
-
-					if (wareCosts + otherCosts > 0) {
+					if (ood.getWareCosts() + ood.getOtherCosts() > 0) {
 						html.append("<div class='entry sub'>Waren, Rohstoffe und Hilfsmittel:<span class='right'>" +
-							FinanceUtils.formatMoneyDE(wareCosts + otherCosts) + " €</span></div>");
+							FinanceUtils.formatMoneyDE(ood.getWareCosts() + ood.getOtherCosts()) + " €</span></div>");
 					}
 
-					if (externalSalary > 0) {
+					if (ood.getExternalSalary() > 0) {
 						html.append("<div class='entry sub'>Fremdleistungen und Auftragsarbeiten:<span class='right'>" +
-							FinanceUtils.formatMoneyDE(externalSalary) + " €</span></div>");
+							FinanceUtils.formatMoneyDE(ood.getExternalSalary()) + " €</span></div>");
 					}
 
-					if (internalSalary > 0) {
+					if (ood.getInternalSalary() > 0) {
 						html.append("<div class='entry sub'>Personalkosten:<span class='right'>" +
-							FinanceUtils.formatMoneyDE(internalSalary) + " €</span></div>");
+							FinanceUtils.formatMoneyDE(ood.getInternalSalary()) + " €</span></div>");
 					}
 
-					if (vehicleCosts > 0) {
+					if (ood.getInsuranceCosts() > 0) {
+						html.append("<div class='entry sub'>Versicherungskosten:<span class='right'>" +
+							FinanceUtils.formatMoneyDE(ood.getInsuranceCosts()) + " €</span></div>");
+					}
+
+					if (ood.getVehicleCosts() > 0) {
 						html.append("<div class='entry sub'>Fahrzeugkosten und andere Fahrtkosten:</div>");
 
 						html.append("<div class='entry subsub'>Leasingkosten:<span class='rightish'>" +
-							FinanceUtils.formatMoneyDE(vehicleCosts) + " €</span></div>");
+							FinanceUtils.formatMoneyDE(ood.getVehicleCosts()) + " €</span></div>");
 
 						html.append("<div class='entry subsub'>Sonstige tatsächliche Fahrtkosten:<span class='rightish'>" +
-							FinanceUtils.formatMoneyDE(travelCosts) + " €</span></div>");
+							FinanceUtils.formatMoneyDE(ood.getTravelCosts()) + " €</span></div>");
 
 						html.append("<div class='entry sub'>Summe Fahrzeugkosten und andere Fahrtkosten:<span class='right'>" +
-							FinanceUtils.formatMoneyDE(vehicleCosts + travelCosts) + " €</span></div>");
+							FinanceUtils.formatMoneyDE(ood.getVehicleCosts() + ood.getTravelCosts()) + " €</span></div>");
 					} else {
-						if (travelCosts > 0) {
+						if (ood.getTravelCosts() > 0) {
 							html.append("<div class='entry sub'>Fahrtkosten:<span class='right'>" +
-								FinanceUtils.formatMoneyDE(travelCosts) + " €</span></div>");
+								FinanceUtils.formatMoneyDE(ood.getTravelCosts()) + " €</span></div>");
 						}
 					}
 
-					if (locationCosts > 0) {
+					if (ood.getLocationCosts() > 0) {
 						html.append("<div class='entry sub'>Raumkosten und sonstige Grundstücksaufwendungen:<span class='right'>" +
-							FinanceUtils.formatMoneyDE(locationCosts) + " €</span></div>");
+							FinanceUtils.formatMoneyDE(ood.getLocationCosts()) + " €</span></div>");
 					}
 
 					html.append("<div class='entry sub'>Sonstige Betriebsausgaben:</div>");
 
-					if (educationCosts > 0) {
+					if (ood.getEducationCosts() > 0) {
 						html.append("<div class='entry subsub'>Fortbildungskosten:<span class='rightish'>" +
-							FinanceUtils.formatMoneyDE(educationCosts) + " €</span></div>");
+							FinanceUtils.formatMoneyDE(ood.getEducationCosts()) + " €</span></div>");
 					}
 
 					html.append("<div class='entry subsub'>Laufende EDV-Kosten:<span class='rightish'>" +
-						FinanceUtils.formatMoneyDE(infrastructureCosts) + " €</span></div>");
+						FinanceUtils.formatMoneyDE(ood.getInfrastructureCosts()) + " €</span></div>");
 
-					if (advertisementCosts + entertainmentCosts > 0) {
+					if (ood.getAdvertisementCosts() + ood.getEntertainmentCosts() > 0) {
 						html.append("<div class='entry subsub'>Werbekosten:<span class='rightish'>" +
-							FinanceUtils.formatMoneyDE(advertisementCosts + entertainmentCosts) + " €</span></div>");
+							FinanceUtils.formatMoneyDE(ood.getAdvertisementCosts() + ood.getEntertainmentCosts()) + " €</span></div>");
 					}
 
 					html.append("<div class='entry sub'>Summe sonstige Betriebsausgaben:<span class='right'>" +
-						FinanceUtils.formatMoneyDE(educationCosts + infrastructureCosts + advertisementCosts + entertainmentCosts) + " €</span></div>");
+						FinanceUtils.formatMoneyDE(ood.getEducationCosts() + ood.getInfrastructureCosts() + ood.getAdvertisementCosts() + ood.getEntertainmentCosts()) + " €</span></div>");
 
 					int outTotal = timeSpan.getOutTotalBeforeTax();
 

@@ -4,6 +4,7 @@
  */
 package com.asofterspace.accountant;
 
+import com.asofterspace.accountant.data.OutgoingOverviewData;
 import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
@@ -11,7 +12,6 @@ import com.asofterspace.accountant.tabs.Tab;
 import com.asofterspace.accountant.timespans.TimeSpan;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.web.ServerRequestHandler;
-import com.asofterspace.accountant.world.Category;
 import com.asofterspace.toolbox.accounting.Currency;
 import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
@@ -491,34 +491,19 @@ public class AccountingUtils {
 		subList.add("-------------- Income Tax / ESt --------------");
 		result.add(subList);
 
-		int externalSalary = timeSpan.getOutTotalBeforeTax(Category.EXTERNAL_SALARY);
-		int internalSalary = timeSpan.getOutTotalBeforeTax(Category.INTERNAL_SALARY);
-		int vehicleCosts = timeSpan.getOutTotalBeforeTax(Category.VEHICLE);
-		int travelCosts = timeSpan.getOutTotalBeforeTax(Category.TRAVEL);
-		int locationCosts = timeSpan.getOutTotalBeforeTax(Category.LOCATIONS);
-		int educationCosts = timeSpan.getOutTotalBeforeTax(Category.EDUCATION);
-		int advertisementCosts = timeSpan.getOutTotalBeforeTax(Category.ADVERTISEMENTS);
-		int infrastructureCosts = timeSpan.getOutTotalBeforeTax(Category.INFRASTRUCTURE);
-		int entertainmentCosts = timeSpan.getOutTotalBeforeTax(Category.ENTERTAINMENT);
-		int wareCosts = timeSpan.getOutTotalBeforeTax(Category.WARES);
+		OutgoingOverviewData ood = new OutgoingOverviewData(timeSpan);
 
-		// this does NOT include donations, as we will not get donation amounts from timeSpan.getOutTotalBeforeTax() anyway, so we do not want to subtract them from it!
-		// (in general, this is only the sum of non-special categories except other)
-		int categoryTally = externalSalary + internalSalary + vehicleCosts + travelCosts + locationCosts +
-			educationCosts + advertisementCosts + infrastructureCosts + entertainmentCosts + wareCosts;
-
-		int otherCosts = timeSpan.getOutTotalBeforeTax() - categoryTally;
-
-		result.add(createList("Total amount spent on items, raw materials etc.: ", wareCosts + otherCosts));
-		result.add(createList("Total external personnel and subcontractor costs: ", externalSalary));
-		result.add(createList("Total internal personnel costs: ", internalSalary));
-		result.add(createList("Total vehicle costs: ", vehicleCosts));
-		result.add(createList("Total travel costs: ", travelCosts));
-		result.add(createList("Total location / building costs: ", locationCosts));
-		result.add(createList("Total education and conference costs: ", educationCosts));
-		result.add(createList("Total amount spent on IT infrastructure: ", infrastructureCosts));
-		result.add(createList("Total advertisement and branded item costs: ", advertisementCosts));
-		result.add(createList("Total entertainment (e.g. restaurant) costs: ", entertainmentCosts));
+		result.add(createList("Total amount spent on items, raw materials etc.: ", ood.getWareCosts() + ood.getOtherCosts()));
+		result.add(createList("Total external personnel and subcontractor costs: ", ood.getExternalSalary()));
+		result.add(createList("Total internal personnel costs: ", ood.getInternalSalary()));
+		result.add(createList("Total insurance costs: ", ood.getInsuranceCosts()));
+		result.add(createList("Total vehicle costs: ", ood.getVehicleCosts()));
+		result.add(createList("Total travel costs: ", ood.getTravelCosts()));
+		result.add(createList("Total location / building costs: ", ood.getLocationCosts()));
+		result.add(createList("Total education and conference costs: ", ood.getEducationCosts()));
+		result.add(createList("Total amount spent on IT infrastructure: ", ood.getInfrastructureCosts()));
+		result.add(createList("Total advertisement and branded item costs: ", ood.getAdvertisementCosts()));
+		result.add(createList("Total entertainment (e.g. restaurant) costs: ", ood.getEntertainmentCosts()));
 
 		return result;
 	}
@@ -548,34 +533,19 @@ public class AccountingUtils {
 
 		html += "<div style='text-align: center; padding-top: 5pt;'>-------------- Income Tax / ESt --------------</div>";
 
-		int externalSalary = timeSpan.getOutTotalBeforeTax(Category.EXTERNAL_SALARY);
-		int internalSalary = timeSpan.getOutTotalBeforeTax(Category.INTERNAL_SALARY);
-		int vehicleCosts = timeSpan.getOutTotalBeforeTax(Category.VEHICLE);
-		int travelCosts = timeSpan.getOutTotalBeforeTax(Category.TRAVEL);
-		int locationCosts = timeSpan.getOutTotalBeforeTax(Category.LOCATIONS);
-		int educationCosts = timeSpan.getOutTotalBeforeTax(Category.EDUCATION);
-		int advertisementCosts = timeSpan.getOutTotalBeforeTax(Category.ADVERTISEMENTS);
-		int infrastructureCosts = timeSpan.getOutTotalBeforeTax(Category.INFRASTRUCTURE);
-		int entertainmentCosts = timeSpan.getOutTotalBeforeTax(Category.ENTERTAINMENT);
-		int wareCosts = timeSpan.getOutTotalBeforeTax(Category.WARES);
+		OutgoingOverviewData ood = new OutgoingOverviewData(timeSpan);
 
-		// this does NOT include donations, as we will not get donation amounts from timeSpan.getOutTotalBeforeTax() anyway, so we do not want to subtract them from it!
-		// (in general, this is only the sum of non-special categories except other)
-		int categoryTally = externalSalary + internalSalary + vehicleCosts + travelCosts + locationCosts +
-			educationCosts + advertisementCosts + infrastructureCosts + entertainmentCosts + wareCosts;
-
-		int otherCosts = timeSpan.getOutTotalBeforeTax() - categoryTally;
-
-		html += AccountingUtils.createOverviewPanelInHtml("Total amount spent on items, raw materials etc.: ", wareCosts + otherCosts);
-		html += AccountingUtils.createOverviewPanelInHtml("Total external personnel and subcontractor costs: ", externalSalary);
-		html += AccountingUtils.createOverviewPanelInHtml("Total internal personnel costs: ", internalSalary);
-		html += AccountingUtils.createOverviewPanelInHtml("Total vehicle costs: ", vehicleCosts);
-		html += AccountingUtils.createOverviewPanelInHtml("Total travel costs: ", travelCosts);
-		html += AccountingUtils.createOverviewPanelInHtml("Total location / building costs: ", locationCosts);
-		html += AccountingUtils.createOverviewPanelInHtml("Total education and conference costs: ", educationCosts);
-		html += AccountingUtils.createOverviewPanelInHtml("Total amount spent on IT infrastructure: ", infrastructureCosts);
-		html += AccountingUtils.createOverviewPanelInHtml("Total advertisement and branded item costs: ", advertisementCosts);
-		html += AccountingUtils.createOverviewPanelInHtml("Total entertainment (e.g. restaurant) costs: ", entertainmentCosts);
+		html += AccountingUtils.createOverviewPanelInHtml("Total amount spent on items, raw materials etc.: ", ood.getWareCosts() + ood.getOtherCosts());
+		html += AccountingUtils.createOverviewPanelInHtml("Total external personnel and subcontractor costs: ", ood.getExternalSalary());
+		html += AccountingUtils.createOverviewPanelInHtml("Total internal personnel costs: ", ood.getInternalSalary());
+		html += AccountingUtils.createOverviewPanelInHtml("Total insurance costs: ", ood.getInsuranceCosts());
+		html += AccountingUtils.createOverviewPanelInHtml("Total vehicle costs: ", ood.getVehicleCosts());
+		html += AccountingUtils.createOverviewPanelInHtml("Total travel costs: ", ood.getTravelCosts());
+		html += AccountingUtils.createOverviewPanelInHtml("Total location / building costs: ", ood.getLocationCosts());
+		html += AccountingUtils.createOverviewPanelInHtml("Total education and conference costs: ", ood.getEducationCosts());
+		html += AccountingUtils.createOverviewPanelInHtml("Total amount spent on IT infrastructure: ", ood.getInfrastructureCosts());
+		html += AccountingUtils.createOverviewPanelInHtml("Total advertisement and branded item costs: ", ood.getAdvertisementCosts());
+		html += AccountingUtils.createOverviewPanelInHtml("Total entertainment (e.g. restaurant) costs: ", ood.getEntertainmentCosts());
 
 		return html;
 	}
@@ -637,61 +607,49 @@ public class AccountingUtils {
 		tab.add(sep, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		int externalSalary = timeSpan.getOutTotalBeforeTax(Category.EXTERNAL_SALARY);
-		int internalSalary = timeSpan.getOutTotalBeforeTax(Category.INTERNAL_SALARY);
-		int vehicleCosts = timeSpan.getOutTotalBeforeTax(Category.VEHICLE);
-		int travelCosts = timeSpan.getOutTotalBeforeTax(Category.TRAVEL);
-		int locationCosts = timeSpan.getOutTotalBeforeTax(Category.LOCATIONS);
-		int educationCosts = timeSpan.getOutTotalBeforeTax(Category.EDUCATION);
-		int advertisementCosts = timeSpan.getOutTotalBeforeTax(Category.ADVERTISEMENTS);
-		int infrastructureCosts = timeSpan.getOutTotalBeforeTax(Category.INFRASTRUCTURE);
-		int entertainmentCosts = timeSpan.getOutTotalBeforeTax(Category.ENTERTAINMENT);
-		int wareCosts = timeSpan.getOutTotalBeforeTax(Category.WARES);
+		OutgoingOverviewData ood = new OutgoingOverviewData(timeSpan);
 
-		// this does NOT include donations, as we will not get donation amounts from timeSpan.getOutTotalBeforeTax() anyway, so we do not want to subtract them from it!
-		// (in general, this is only the sum of non-special categories except other)
-		int categoryTally = externalSalary + internalSalary + vehicleCosts + travelCosts + locationCosts +
-			educationCosts + advertisementCosts + infrastructureCosts + entertainmentCosts + wareCosts;
-
-		int otherCosts = timeSpan.getOutTotalBeforeTax() - categoryTally;
-
-		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount spent on items, raw materials etc.: ", wareCosts + otherCosts);
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount spent on items, raw materials etc.: ", ood.getWareCosts() + ood.getOtherCosts());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total external personnel and subcontractor costs: ", externalSalary);
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total external personnel and subcontractor costs: ", ood.getExternalSalary());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total internal personnel costs: ", internalSalary);
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total internal personnel costs: ", ood.getInternalSalary());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total vehicle costs: ", vehicleCosts);
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total insurance costs: ", ood.getInsuranceCosts());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total travel costs: ", travelCosts);
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total vehicle costs: ", ood.getVehicleCosts());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total location / building costs: ", locationCosts);
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total travel costs: ", ood.getTravelCosts());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total education and conference costs: ", educationCosts);
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total location / building costs: ", ood.getLocationCosts());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount spent on IT infrastructure: ", infrastructureCosts);
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total education and conference costs: ", ood.getEducationCosts());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total advertisement and branded item costs: ", advertisementCosts);
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total amount spent on IT infrastructure: ", ood.getInfrastructureCosts());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
-		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total entertainment (e.g. restaurant) costs: ", entertainmentCosts);
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total advertisement and branded item costs: ", ood.getAdvertisementCosts());
+		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
+		i++;
+
+		curPanel = AccountingUtils.createOverviewPanelOnGUI("Total entertainment (e.g. restaurant) costs: ", ood.getEntertainmentCosts());
 		tab.add(curPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
 
