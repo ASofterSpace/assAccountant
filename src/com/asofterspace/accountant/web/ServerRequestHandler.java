@@ -468,20 +468,20 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					int categoryTally = externalSalary + internalSalary + vehicleCosts + travelCosts + locationCosts +
 						educationCosts + advertisementCosts + infrastructureCosts + entertainmentCosts + wareCosts;
 					int otherCosts = outTotalBeforeTax - categoryTally;
-					int gesamtLeistung = inPostTaxTotal;
-					int gesamtKosten = categoryTally + otherCosts;
+					int gesamtLeistung = inPostTaxTotal - (infrastructureCosts + wareCosts);
+					int gesamtKosten = categoryTally + otherCosts - (infrastructureCosts + wareCosts);
 
 					int prevCategoryTally = prevExternalSalary + prevInternalSalary + prevVehicleCosts + prevTravelCosts + prevLocationCosts +
 						prevEducationCosts + prevAdvertisementCosts + prevInfrastructureCosts + prevEntertainmentCosts + prevWareCosts;
 					int prevOtherCosts = prevOutTotalBeforeTax - prevCategoryTally;
-					int prevGesamtLeistung = prevInPostTaxTotal;
-					int prevGesamtKosten = prevCategoryTally + prevOtherCosts;
+					int prevGesamtLeistung = prevInPostTaxTotal - (prevInfrastructureCosts + prevWareCosts);
+					int prevGesamtKosten = prevCategoryTally + prevOtherCosts - (prevInfrastructureCosts + prevWareCosts);
 
 					int prev2CategoryTally = prev2ExternalSalary + prev2InternalSalary + prev2VehicleCosts + prev2TravelCosts + prev2LocationCosts +
 						prev2EducationCosts + prev2AdvertisementCosts + prev2InfrastructureCosts + prev2EntertainmentCosts + prev2WareCosts;
 					int prev2OtherCosts = prev2OutTotalBeforeTax - prev2CategoryTally;
-					int prev2GesamtLeistung = prev2InPostTaxTotal;
-					int prev2GesamtKosten = prev2CategoryTally + prev2OtherCosts;
+					int prev2GesamtLeistung = prev2InPostTaxTotal - (prev2InfrastructureCosts + prev2WareCosts);
+					int prev2GesamtKosten = prev2CategoryTally + prev2OtherCosts - (prev2InfrastructureCosts + prev2WareCosts);
 
 					appendBwaLine(html, "Umsatzerlöse", inPostTaxTotal, gesamtLeistung, gesamtKosten,
 						prevInPostTaxTotal, prevGesamtLeistung, prevGesamtKosten, prev2InPostTaxTotal, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
@@ -495,17 +495,17 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					appendBwaLine(html, "Gesamtleistung", inPostTaxTotal, gesamtLeistung, gesamtKosten,
 						prevInPostTaxTotal, prevGesamtLeistung, prevGesamtKosten, prev2InPostTaxTotal, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold");
 
-					appendBwaLine(html, "Material-/Wareneinsatz", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
+					appendBwaLine(html, "Material-/Wareneinsatz", infrastructureCosts + wareCosts, gesamtLeistung, gesamtKosten,
+						prevInfrastructureCosts + prevWareCosts, prevGesamtLeistung, prevGesamtKosten, prev2InfrastructureCosts + prev2WareCosts, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
-					appendBwaLine(html, "Rohertrag", inPostTaxTotal, gesamtLeistung, gesamtKosten,
-						prevInPostTaxTotal, prevGesamtLeistung, prevGesamtKosten, prev2InPostTaxTotal, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold");
+					appendBwaLine(html, "Rohertrag", gesamtLeistung, gesamtLeistung, gesamtKosten,
+						prevGesamtLeistung, prevGesamtLeistung, prevGesamtKosten, prev2GesamtLeistung, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold");
 
 					appendBwaLine(html, "Sonstige betriebliche Erlöse", 0, gesamtLeistung, gesamtKosten,
 						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
-					appendBwaLine(html, "Betrieblicher Rohertrag", inPostTaxTotal, gesamtLeistung, gesamtKosten,
-						prevInPostTaxTotal, prevGesamtLeistung, prevGesamtKosten, prev2InPostTaxTotal, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
+					appendBwaLine(html, "Betrieblicher Rohertrag", gesamtLeistung, gesamtLeistung, gesamtKosten,
+						prevGesamtLeistung, prevGesamtLeistung, prevGesamtKosten, prev2GesamtLeistung, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder bottomborder");
 
 
 					html.append("<div class='bold entry' style='padding-top: 8pt;'>");
@@ -514,11 +514,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					html.append("</span>");
 					html.append("</div>");
 
-					appendBwaLine(html, "Personalkosten", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
+					appendBwaLine(html, "Personalkosten", externalSalary + internalSalary, gesamtLeistung, gesamtKosten,
+						prevExternalSalary + prevInternalSalary, prevGesamtLeistung, prevGesamtKosten, prev2ExternalSalary + prev2InternalSalary, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
-					appendBwaLine(html, "Raumkosten", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
+					appendBwaLine(html, "Raumkosten", locationCosts, gesamtLeistung, gesamtKosten,
+						prevLocationCosts, prevGesamtLeistung, prevGesamtKosten, prev2LocationCosts, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Betriebliche Steuern", 0, gesamtLeistung, gesamtKosten,
 						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
@@ -529,11 +529,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					appendBwaLine(html, "Besondere Kosten", 0, gesamtLeistung, gesamtKosten,
 						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
-					appendBwaLine(html, "Kfz-Kosten", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
+					appendBwaLine(html, "Kfz-Kosten", vehicleCosts, gesamtLeistung, gesamtKosten,
+						prevVehicleCosts, prevGesamtLeistung, prevGesamtKosten, prev2VehicleCosts, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
-					appendBwaLine(html, "Werbe-/Reisekosten", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
+					appendBwaLine(html, "Werbe-/Reisekosten", advertisementCosts + entertainmentCosts + travelCosts + educationCosts, gesamtLeistung, gesamtKosten,
+						prevAdvertisementCosts + prevEntertainmentCosts + prevTravelCosts + prevEducationCosts, prevGesamtLeistung, prevGesamtKosten, prev2AdvertisementCosts + prev2EntertainmentCosts + prev2TravelCosts + prev2EducationCosts, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Kosten der Warenabgabe", 0, gesamtLeistung, gesamtKosten,
 						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
@@ -544,8 +544,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					appendBwaLine(html, "Reparatur/Instandhaltung", 0, gesamtLeistung, gesamtKosten,
 						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
-					appendBwaLine(html, "Sonstige Kosten", 0, gesamtLeistung, gesamtKosten,
-						0, prevGesamtLeistung, prevGesamtKosten, 0, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
+					appendBwaLine(html, "Sonstige Kosten", otherCosts, gesamtLeistung, gesamtKosten,
+						prevOtherCosts, prevGesamtLeistung, prevGesamtKosten, prev2OtherCosts, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
 
 					appendBwaLine(html, "Gesamtkosten", gesamtKosten, gesamtLeistung, gesamtKosten,
 						prevGesamtKosten, prevGesamtLeistung, prevGesamtKosten, prev2GesamtKosten, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "bold topborder");
@@ -1137,12 +1137,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		html.append(" €</span>");
 		html.append("<span style='text-align: right; width: " + otherColsWidth + "%; display: inline-block;'>");
 		if (prevGesamtLeistung > 0) {
-			html.append(adjustPercentageForBwa((prev2Value * 100.0) / prevGesamtLeistung));
+			html.append(adjustPercentageForBwa((prevValue * 100.0) / prevGesamtLeistung));
 		}
 		html.append("</span>");
 		html.append("<span style='text-align: right; width: " + otherColsWidth + "%; display: inline-block;'>");
 		if (prevGesamtKosten > 0) {
-			html.append(adjustPercentageForBwa((prev2Value * 100.0) / prevGesamtKosten));
+			html.append(adjustPercentageForBwa((prevValue * 100.0) / prevGesamtKosten));
 		}
 		html.append("</span>");
 
