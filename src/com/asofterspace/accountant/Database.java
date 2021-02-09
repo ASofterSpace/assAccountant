@@ -42,6 +42,10 @@ import java.util.Set;
 
 public class Database {
 
+	private final static String MONTHLY_OUTGOING = "monthlyOutgoing";
+
+	private final static String MONTHLY_INCOMING = "monthlyIncoming";
+
 	private static final String YEARS_KEY = "years";
 	private static final String BULK_IMPORT_CUSTOMERS_KEY = "bulkImportCustomers";
 	private static final String CATEGORY_MAPPINGS_KEY = "categoryMappings";
@@ -75,6 +79,9 @@ public class Database {
 	private Map<String, Category> titleToCategoryMapping;
 	private List<String> acknowledgedProblems;
 	private Map<String, Object> customerToShortKeyMapping;
+
+	private List<Record> monthlyIncoming;
+	private List<Record> monthlyOutgoing;
 
 	private Integer port;
 
@@ -185,6 +192,9 @@ public class Database {
 		acknowledgedProblems = root.getArrayAsStringList(ACKNOWLEDGEMENTS_KEY);
 
 		customerToShortKeyMapping = root.getObjectMap(CUSTOMER_TO_SHORT_KEY_MAPPING);
+
+		monthlyIncoming = root.getArray(MONTHLY_INCOMING);
+		monthlyOutgoing = root.getArray(MONTHLY_OUTGOING);
 
 		return root;
 	}
@@ -1380,6 +1390,9 @@ public class Database {
 
 		root.set(CUSTOMER_TO_SHORT_KEY_MAPPING, customerToShortKeyMapping);
 
+		root.set(MONTHLY_INCOMING, monthlyIncoming);
+		root.set(MONTHLY_OUTGOING, monthlyOutgoing);
+
 		taskCtrl.saveIntoRecord(root);
 
 		dbFile.setAllContents(root);
@@ -1421,6 +1434,14 @@ public class Database {
 			return customerToShortKeyMapping.get(customer).toString();
 		}
 		return customer.substring(0, 3).toUpperCase();
+	}
+
+	public List<Record> getMonthlyIncoming() {
+		return monthlyIncoming;
+	}
+
+	public List<Record> getMonthlyOutgoing() {
+		return monthlyOutgoing;
 	}
 
 }

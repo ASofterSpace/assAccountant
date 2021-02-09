@@ -13,9 +13,11 @@ import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.PaymentProblem;
 import com.asofterspace.accountant.tasks.Task;
+import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
+import com.asofterspace.toolbox.utils.Record;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -176,6 +178,52 @@ public class OverviewTab extends Tab {
 			html = simplisticHtml;
 			html += "<div>Nothing to be done, have a chill day!</div>";
 		}
+
+		html += "<div style='padding-top: 25pt;'>";
+
+		html += "<div>";
+		html += "Here is the monthly finance flow, btw. - we want there to be more on the left than on the right, you know? ;)";
+		html += "</div>";
+
+		html += "<div style='padding-top: 15pt;'>";
+		int totalIn = 0;
+		String LEFT_DIV_HTML = "<div style='display: inline-block; float: left; width: 49%; text-align: right;'>";
+		html += LEFT_DIV_HTML;
+		List<Record> monthlyIncoming = database.getMonthlyIncoming();
+		for (Record rec : monthlyIncoming) {
+			html += "<div class='line'>";
+			html += rec.getString("title") + ": " + FinanceUtils.formatMoney(rec.getInteger("amount")) + " €";
+			totalIn += rec.getInteger("amount");
+			html += "</div>";
+		}
+		html += "</div>";
+		int totalOut = 0;
+		String RIGHT_DIV_HTML = "<div style='display: inline-block; padding-left: 1%; width: 49%; text-align: left;'>";
+		html += RIGHT_DIV_HTML;
+		List<Record> monthlyOutgoing = database.getMonthlyOutgoing();
+		for (Record rec : monthlyOutgoing) {
+			html += "<div class='line'>";
+			html += rec.getString("title") + ": " + FinanceUtils.formatMoney(rec.getInteger("amount")) + " €";
+			totalOut += rec.getInteger("amount");
+			html += "</div>";
+		}
+		html += "</div>";
+		html += "</div>";
+
+		html += "<div>";
+		html += LEFT_DIV_HTML;
+		html += "<div class='line'>";
+		html += "Total: " + FinanceUtils.formatMoney(totalIn) + " €";
+		html += "</div>";
+		html += "</div>";
+		html += RIGHT_DIV_HTML;
+		html += "<div class='line'>";
+		html += "Total: " + FinanceUtils.formatMoney(totalOut) + " €";
+		html += "</div>";
+		html += "</div>";
+		html += "</div>";
+
+		html += "</div>";
 
 		html += "<div class='footer'>&nbsp;</div>";
 
