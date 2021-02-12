@@ -472,14 +472,8 @@ public class OverviewTab extends Tab {
 	}
 
 	@Override
-	public int compareTo(Tab tab) {
-		if (tab == null) {
-			return 1;
-		}
-		if (tab instanceof OverviewTab) {
-			return 0;
-		}
-		return -1;
+	public int getComparisonOrder() {
+		return (10000 * 100) + 10000;
 	}
 
 	@Override

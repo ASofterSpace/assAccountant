@@ -18,7 +18,17 @@ public abstract class Tab {
 
 	public abstract String getHtmlGUI(Database database, String searchFor);
 
-	public abstract int compareTo(Tab tab);
+	/**
+	 * Get the comparison order; higher numbers are sorted further towards the top!
+	 */
+	public abstract int getComparisonOrder();
+
+	public int compareTo(Tab tab) {
+		if (tab == null) {
+			return 1;
+		}
+		return tab.getComparisonOrder() - getComparisonOrder();
+	}
 
 	/**
 	 * Export this tab in one or more CSV files into a folder inside exportDir and return the

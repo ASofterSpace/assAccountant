@@ -7,7 +7,6 @@ package com.asofterspace.accountant.tabs;
 import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
-import com.asofterspace.accountant.tasks.Task;
 import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 
@@ -83,26 +82,8 @@ public class CalculatorTab extends Tab {
 	}
 
 	@Override
-	public int compareTo(Tab tab) {
-		if (tab == null) {
-			return 1;
-		}
-		if (tab instanceof OverviewTab) {
-			return 1;
-		}
-		if (tab instanceof TaskLogTab) {
-			return 1;
-		}
-		if (tab instanceof FinanceLogTab) {
-			return 1;
-		}
-		if (tab instanceof IncomeLogTab) {
-			return 1;
-		}
-		if (tab instanceof CalculatorTab) {
-			return 0;
-		}
-		return -1;
+	public int getComparisonOrder() {
+		return (10000 * 100) + 2000;
 	}
 
 	@Override

@@ -185,17 +185,8 @@ public class TaskLogTab extends Tab {
 	}
 
 	@Override
-	public int compareTo(Tab tab) {
-		if (tab == null) {
-			return 1;
-		}
-		if (tab instanceof OverviewTab) {
-			return 1;
-		}
-		if (tab instanceof TaskLogTab) {
-			return 0;
-		}
-		return -1;
+	public int getComparisonOrder() {
+		return (10000 * 100) + 5000;
 	}
 
 	@Override

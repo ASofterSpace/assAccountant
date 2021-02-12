@@ -9,7 +9,6 @@ import com.asofterspace.accountant.AssAccountant;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.GUI;
-import com.asofterspace.accountant.tasks.Task;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.web.ServerRequestHandler;
@@ -226,23 +225,8 @@ public class IncomeLogTab extends Tab {
 	}
 
 	@Override
-	public int compareTo(Tab tab) {
-		if (tab == null) {
-			return 1;
-		}
-		if (tab instanceof OverviewTab) {
-			return 1;
-		}
-		if (tab instanceof TaskLogTab) {
-			return 1;
-		}
-		if (tab instanceof FinanceLogTab) {
-			return 1;
-		}
-		if (tab instanceof IncomeLogTab) {
-			return 0;
-		}
-		return -1;
+	public int getComparisonOrder() {
+		return (10000 * 100) + 3000;
 	}
 
 	@Override

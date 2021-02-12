@@ -12,29 +12,8 @@ public class BankStatementTab extends BankStatementYearTab {
 	}
 
 	@Override
-	public int compareTo(Tab tab) {
-		if (tab == null) {
-			return 1;
-		}
-		if (tab instanceof OverviewTab) {
-			return 1;
-		}
-		if (tab instanceof TaskLogTab) {
-			return 1;
-		}
-		if (tab instanceof FinanceLogTab) {
-			return 1;
-		}
-		if (tab instanceof IncomeLogTab) {
-			return 1;
-		}
-		if (tab instanceof CalculatorTab) {
-			return 1;
-		}
-		if (tab instanceof BankStatementTab) {
-			return 0;
-		}
-		return -1;
+	public int getComparisonOrder() {
+		return (10000 * 100) + 1000;
 	}
 
 }

@@ -125,39 +125,8 @@ public class YearTab extends TimeSpanTab {
 	}
 
 	@Override
-	public int compareTo(Tab tab) {
-		if (tab == null) {
-			return -1;
-		}
-		if (tab instanceof OverviewTab) {
-			return 1;
-		}
-		if (tab instanceof TaskLogTab) {
-			return 1;
-		}
-		if (tab instanceof FinanceLogTab) {
-			return 1;
-		}
-		if (tab instanceof IncomeLogTab) {
-			return 1;
-		}
-		if (tab instanceof CalculatorTab) {
-			return 1;
-		}
-		if (tab instanceof BankStatementTab) {
-			return 1;
-		}
-		if (tab instanceof BankStatementYearTab) {
-			int result = ((BankStatementYearTab) tab).getYear().getNum() - getYear().getNum();
-			if (result == 0) {
-				return -1;
-			}
-			return result;
-		}
-		if (tab instanceof TimeSpanTab) {
-			return ((TimeSpanTab) tab).getYear().getNum() - year.getNum();
-		}
-		return -1;
+	public int getComparisonOrder() {
+		return (getYear().getNum() * 100) + 50;
 	}
 
 	@Override

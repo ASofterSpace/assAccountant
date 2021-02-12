@@ -8,7 +8,6 @@ import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.AssAccountant;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
-import com.asofterspace.accountant.tasks.Task;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.transactions.BankAccount;
 import com.asofterspace.accountant.transactions.BankTransaction;
@@ -61,9 +60,9 @@ public class BankStatementYearTab extends Tab {
 		List<GraphTimeDataPoint> timeData = new ArrayList<>();
 
 		GraphImage graph = new GraphImage(1000, 600);
-		graph.setForegroundColor(new ColorRGB(120, 40, 220));
-		graph.setBackgroundColor(new ColorRGB(0, 0, 0, 255));
-		graph.setDataColor(new ColorRGB(160, 80, 255));
+		graph.setForegroundColor(new ColorRGB(136, 170, 255));
+		graph.setBackgroundColor(new ColorRGB(0, 0, 0, 0));
+		graph.setDataColor(new ColorRGB(136, 170, 255));
 		graph.setBaseYmin(0.0);
 
 		html += "<div><img src='bank_statement_graph.png' /></div>";
@@ -266,50 +265,8 @@ public class BankStatementYearTab extends Tab {
 	}
 
 	@Override
-	public int compareTo(Tab tab) {
-		if (tab == null) {
-			return -1;
-		}
-		if (tab instanceof OverviewTab) {
-			return 1;
-		}
-		if (tab instanceof TaskLogTab) {
-			return 1;
-		}
-		if (tab instanceof FinanceLogTab) {
-			return 1;
-		}
-		if (tab instanceof IncomeLogTab) {
-			return 1;
-		}
-		if (tab instanceof CalculatorTab) {
-			return 1;
-		}
-		if (tab instanceof BankStatementTab) {
-			return 1;
-		}
-		if (tab instanceof BankStatementYearTab) {
-			int result = ((BankStatementYearTab) tab).getYear().getNum() - getYear().getNum();
-			if (result == 0) {
-				return 0;
-			}
-			return result;
-		}
-		if (tab instanceof MonthTab) {
-			int result = ((MonthTab) tab).getYear().getNum() - getYear().getNum();
-			if (result == 0) {
-				return 1;
-			}
-			return result;
-		}
-		if (tab instanceof YearTab) {
-			int result = ((YearTab) tab).getYear().getNum() - getYear().getNum();
-			if (result == 0) {
-				return 1;
-			}
-			return result;
-		}
-		return -1;
+	public int getComparisonOrder() {
+		return getYear().getNum() * 100;
 	}
 
 	public Year getYear() {

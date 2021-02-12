@@ -129,50 +129,8 @@ public class MonthTab extends TimeSpanTab {
 	}
 
 	@Override
-	public int compareTo(Tab tab) {
-		if (tab == null) {
-			return -1;
-		}
-		if (tab instanceof OverviewTab) {
-			return 1;
-		}
-		if (tab instanceof TaskLogTab) {
-			return 1;
-		}
-		if (tab instanceof FinanceLogTab) {
-			return 1;
-		}
-		if (tab instanceof IncomeLogTab) {
-			return 1;
-		}
-		if (tab instanceof CalculatorTab) {
-			return 1;
-		}
-		if (tab instanceof BankStatementTab) {
-			return 1;
-		}
-		if (tab instanceof BankStatementYearTab) {
-			int result = ((BankStatementYearTab) tab).getYear().getNum() - getYear().getNum();
-			if (result == 0) {
-				return -1;
-			}
-			return result;
-		}
-		if (tab instanceof MonthTab) {
-			int result = ((MonthTab) tab).getYear().getNum() - getYear().getNum();
-			if (result == 0) {
-				return ((MonthTab) tab).getMonth().getNum() - month.getNum();
-			}
-			return result;
-		}
-		if (tab instanceof YearTab) {
-			int result = ((YearTab) tab).getYear().getNum() - getYear().getNum();
-			if (result == 0) {
-				return 1;
-			}
-			return result;
-		}
-		return -1;
+	public int getComparisonOrder() {
+		return (getYear().getNum() * 100) + 10 + month.getNum();
 	}
 
 	public Month getMonth() {
