@@ -26,6 +26,7 @@ import com.asofterspace.toolbox.pdf.PdfFile;
 import com.asofterspace.toolbox.pdf.PdfObject;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
+import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 
 import java.util.ArrayList;
@@ -56,6 +57,7 @@ public class Database {
 	private static final String BANK_ACCOUNTS_KEY = "bankAccounts";
 	private static final String BACKUP_FILE_NAME = "database_backup_";
 	private static final String CURRENT_BACKUP_KEY = "currentBackup";
+	private static final String INCOME_TAXES_KEY = "incomeTaxes";
 
 	private static int BACKUP_MAX = 64;
 
@@ -90,6 +92,8 @@ public class Database {
 	private String userLegalName;
 
 	private String location;
+
+	private Record root;
 
 
 	public Database(ConfigFile settings) throws JsonParseException {
@@ -131,7 +135,7 @@ public class Database {
 			}
 		}
 
-		Record root = fileToLoad.getAllContents();
+		root = fileToLoad.getAllContents();
 
 		// ensure that at least the current year and the year which the next month belongs to
 		// are automatically added (yes, this means that from 1st December on, the next year
@@ -1357,7 +1361,6 @@ public class Database {
 
 	public void save() {
 
-		Record root = Record.emptyObject();
 		Record yearRec = Record.emptyArray();
 		root.set(YEARS_KEY, yearRec);
 
@@ -1442,6 +1445,17 @@ public class Database {
 
 	public List<Record> getMonthlyOutgoing() {
 		return monthlyOutgoing;
+	}
+
+	public Map<Integer, Integer> getIncomeTaxes() {
+		Map<String, Record> incomeTaxMap = root.getValueMap(INCOME_TAXES_KEY);
+		Map<Integer, Integer> result = new HashMap<>();
+		for (Map.Entry<String, Record> entry : incomeTaxMap.entrySet()) {
+			String key = entry.getKey();
+			Record rec = entry.getValue();
+			result.put(StrUtils.strToInt(key), rec.asInteger());
+		}
+		return result;
 	}
 
 }

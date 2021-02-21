@@ -33,7 +33,7 @@ public class CalculatorTab extends Tab {
 
 		html += "<div class='mainTitle'>" + TITLE + "</div>";
 
-		int baseAmount = 23;
+		int baseAmount = 30;
 
 		html += "<div style='padding-bottom:10pt;'>I can help you with some calculations. :)</div>";
 		html += "<div>For generating skyhook invoices, ";

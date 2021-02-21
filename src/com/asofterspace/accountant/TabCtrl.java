@@ -13,6 +13,7 @@ import com.asofterspace.accountant.tabs.MonthTab;
 import com.asofterspace.accountant.tabs.OverviewTab;
 import com.asofterspace.accountant.tabs.Tab;
 import com.asofterspace.accountant.tabs.TaskLogTab;
+import com.asofterspace.accountant.tabs.TaxTab;
 import com.asofterspace.accountant.tabs.YearTab;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
@@ -31,6 +32,7 @@ public class TabCtrl {
 	private TaskLogTab taskLogTab;
 	private FinanceLogTab financeLogTab;
 	private IncomeLogTab incomeLogTab;
+	private TaxTab taxTab;
 	private CalculatorTab calculatorTab;
 	private BankStatementTab bankStatementTab;
 
@@ -41,6 +43,7 @@ public class TabCtrl {
 		this.taskLogTab = new TaskLogTab();
 		this.financeLogTab = new FinanceLogTab();
 		this.incomeLogTab = new IncomeLogTab();
+		this.taxTab = new TaxTab();
 		this.calculatorTab = new CalculatorTab();
 		this.bankStatementTab = new BankStatementTab();
 	}
@@ -53,6 +56,7 @@ public class TabCtrl {
 		result.add(taskLogTab);
 		result.add(financeLogTab);
 		result.add(incomeLogTab);
+		result.add(taxTab);
 		result.add(calculatorTab);
 		result.add(bankStatementTab);
 
