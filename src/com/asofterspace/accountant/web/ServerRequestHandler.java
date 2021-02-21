@@ -352,17 +352,23 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					int gesamtLeistung = ood.getInPostTaxTotal();
 					int gesamtKosten = ood.getTotalCosts() - (ood.getInfrastructureCosts() + ood.getWareCosts());
 					int rohertrag = gesamtLeistung - (ood.getInfrastructureCosts() + ood.getWareCosts());
-					int overallTax = ood.getOutVatPrepaymentsPaid();
+					int overallTax = ood.getOutVatPrepaymentsPaid() + getIncomeTax(tsTab.getTimeSpan());
 
 					int prevGesamtLeistung = prevOod.getInPostTaxTotal();
 					int prevGesamtKosten = prevOod.getTotalCosts() - (prevOod.getInfrastructureCosts() + prevOod.getWareCosts());
 					int prevRohertrag = prevGesamtLeistung - (prevOod.getInfrastructureCosts() + prevOod.getWareCosts());
 					int prevOverallTax = prevOod.getOutVatPrepaymentsPaid();
+					for (TimeSpan ts : prevTimeSpans) {
+						prevOverallTax += getIncomeTax(ts);
+					}
 
 					int prev2GesamtLeistung = prev2Ood.getInPostTaxTotal();
 					int prev2GesamtKosten = prev2Ood.getTotalCosts() - (prev2Ood.getInfrastructureCosts() + prev2Ood.getWareCosts());
 					int prev2Rohertrag = prev2GesamtLeistung - (prev2Ood.getInfrastructureCosts() + prev2Ood.getWareCosts());
 					int prev2OverallTax = prev2Ood.getOutVatPrepaymentsPaid();
+					for (TimeSpan ts : prev2TimeSpans) {
+						prev2OverallTax += getIncomeTax(ts);
+					}
 
 					appendBwaLine(html, "Umsatzerlöse", gesamtLeistung, gesamtLeistung, gesamtKosten,
 						prevGesamtLeistung, prevGesamtLeistung, prevGesamtKosten, prev2GesamtLeistung, prev2GesamtLeistung, prev2GesamtKosten, colPositionenWidth, otherColsWidth, "");
@@ -963,6 +969,27 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		html.append("}");
 		html.append("</style>");
 		html.append("</head>");
+	}
+
+	private int getIncomeTax(TimeSpan ts) {
+
+		Integer result = null;
+
+		if (ts instanceof Year) {
+			result = database.getIncomeTaxes().get(ts.getNum());
+
+		} else if (ts instanceof Month) {
+			result = database.getIncomeTaxes().get(ts.getYear().getNum());
+			if (result != null) {
+				result = result / 12;
+			}
+		}
+
+		if (result == null) {
+			return 0;
+		}
+
+		return result;
 	}
 
 }
