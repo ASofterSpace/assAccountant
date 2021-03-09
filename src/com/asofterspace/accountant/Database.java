@@ -7,6 +7,7 @@ package com.asofterspace.accountant;
 import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
+import com.asofterspace.accountant.loans.Loan;
 import com.asofterspace.accountant.tasks.TaskCtrl;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
@@ -44,9 +45,7 @@ import java.util.Set;
 public class Database {
 
 	private final static String MONTHLY_OUTGOING = "monthlyOutgoing";
-
 	private final static String MONTHLY_INCOMING = "monthlyIncoming";
-
 	private static final String YEARS_KEY = "years";
 	private static final String BULK_IMPORT_CUSTOMERS_KEY = "bulkImportCustomers";
 	private static final String CATEGORY_MAPPINGS_KEY = "categoryMappings";
@@ -58,6 +57,7 @@ public class Database {
 	private static final String BACKUP_FILE_NAME = "database_backup_";
 	private static final String CURRENT_BACKUP_KEY = "currentBackup";
 	private static final String INCOME_TAXES_KEY = "incomeTaxes";
+	private static final String LOANS_KEY = "loans";
 
 	private static int BACKUP_MAX = 64;
 
@@ -92,6 +92,8 @@ public class Database {
 	private String userLegalName;
 
 	private String location;
+
+	private List<Loan> loans;
 
 	private Record root;
 
@@ -199,6 +201,12 @@ public class Database {
 
 		monthlyIncoming = root.getArray(MONTHLY_INCOMING);
 		monthlyOutgoing = root.getArray(MONTHLY_OUTGOING);
+
+		List<Record> loanRecs = root.getArray(LOANS_KEY);
+		loans = new ArrayList<>();
+		for (Record loanRec : loanRecs) {
+			loans.add(new Loan(loanRec));
+		}
 
 		return root;
 	}
@@ -1396,6 +1404,8 @@ public class Database {
 		root.set(MONTHLY_INCOMING, monthlyIncoming);
 		root.set(MONTHLY_OUTGOING, monthlyOutgoing);
 
+		root.set(LOANS_KEY, loans);
+
 		taskCtrl.saveIntoRecord(root);
 
 		dbFile.setAllContents(root);
@@ -1456,6 +1466,14 @@ public class Database {
 			result.put(StrUtils.strToInt(key), rec.asInteger());
 		}
 		return result;
+	}
+
+	public List<Loan> getLoans() {
+		return loans;
+	}
+
+	public void setLoans(List<Loan> loans) {
+		this.loans = loans;
 	}
 
 }
