@@ -43,17 +43,31 @@ public class LoanTab extends Tab {
 		html.append("<div>We have " + loanAmount + " loan" + (loanAmount == 1 ? "" : "s") + (loanAmount == 0 ? "." : ":") + "</div>");
 
 		for (Loan loan : loans) {
-			html.append("<div class='line' style='margin-top: 15pt;'>");
+			html.append("<div class='line' style='margin-top: 15pt; font-weight: bold;'>");
 			html.append(loan.getName() + " (" + FinanceUtils.formatMoney(loan.getAmount()) + " €)");
 			html.append("</div>");
+			if (loan.getDetails() != null) {
+				html.append("<div class='line' style='font-style: italic;'>");
+				html.append(loan.getDetails());
+				html.append("</div>");
+			}
+
+			int amountPaid = 0;
 
 			for (Payment payment : loan.getPayments()) {
-				html.append("<div class='line'>");
+				html.append("<div class='line' style='padding-left: 9pt;'>");
 				html.append(DateUtils.serializeDate(payment.getDate()));
 				html.append(" ");
 				html.append(FinanceUtils.formatMoney(payment.getAmount()) + " €");
 				html.append("</div>");
+
+				amountPaid += payment.getAmount();
 			}
+
+			html.append("<div class='line'>");
+			html.append("Total paid so far: ");
+			html.append(FinanceUtils.formatMoney(amountPaid) + " €");
+			html.append("</div>");
 		}
 
 		html.append("<div class='footer'>&nbsp;</div>");

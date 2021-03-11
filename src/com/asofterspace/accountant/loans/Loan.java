@@ -20,9 +20,13 @@ public class Loan implements Recordable {
 
 	private final static String AMOUNT = "amount";
 
+	private final static String DETAILS = "details";
+
 	private final static String NAME = "name";
 
 	private String name;
+
+	private String details;
 
 	private int amount;
 
@@ -37,6 +41,7 @@ public class Loan implements Recordable {
 
 	public Loan(Record rec) {
 		this.name = rec.getString(NAME);
+		this.details = rec.getString(DETAILS);
 		this.amount = rec.getInteger(AMOUNT, 0);
 		this.createdOn = rec.getDate(CREATED_ON);
 		this.payments = new ArrayList<>();
@@ -52,6 +57,14 @@ public class Loan implements Recordable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getDetails() {
+		return details;
+	}
+
+	public void setDetails(String details) {
+		this.details = details;
 	}
 
 	public int getAmount() {
@@ -82,6 +95,7 @@ public class Loan implements Recordable {
 	public Record toRecord() {
 		Record rec = Record.emptyObject();
 		rec.set(NAME, name);
+		rec.set(DETAILS, details);
 		rec.set(AMOUNT, amount);
 		rec.set(CREATED_ON, createdOn);
 		rec.set(PAYMENTS, payments);
