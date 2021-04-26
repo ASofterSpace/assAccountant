@@ -149,7 +149,11 @@ public class IncomeLogTab extends Tab {
 			afterHtml += "Average over " + averageMonths + " months in " + year + ":&nbsp;&nbsp;&nbsp;";
 			afterHtml += "</span>";
 			afterHtml += "<span style='width: 20%; display: inline-block;'>";
-			afterHtml += FinanceUtils.formatMoney(averageSum / averageMonths, Currency.EUR);
+			int average = 0;
+			if (averageMonths > 0) {
+				average = averageSum / averageMonths;
+			}
+			afterHtml += FinanceUtils.formatMoney(average, Currency.EUR);
 			afterHtml += "</span>";
 			afterHtml += "<span>(";
 			String sep = "";
