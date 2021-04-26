@@ -39,17 +39,20 @@ public class TaxTab extends Tab {
 
 		// width of one cell
 		int cw = 20;
+		int cw2 = 25;
 
 		html += "<div class='line'>";
 		html += "<div>";
-		html += "<div style='width: " + cw + "%; display: inline-block; text-align: center;'></div>";
+		html += "<div style='width: " + cw + "%; display: inline-block; text-align: right;'></div>";
 		html += "<div style='width: " + cw + "%; display: inline-block; text-align: center;'>VAT /</div>";
-		html += "<div style='width: " + cw + "%; display: inline-block; text-align: center;'>Expected Income Tax /</div>";
+		html += "<div style='width: " + cw2 + "%; display: inline-block; text-align: center;'>Expected Income Tax /</div>";
+		html += "<div style='width: " + cw2 + "%; display: inline-block; text-align: center;'>Actual Income Tax /</div>";
 		html += "</div>";
 		html += "<div>";
-		html += "<div style='width: " + cw + "%; display: inline-block; text-align: center;'></div>";
+		html += "<div style='width: " + cw + "%; display: inline-block; text-align: right;'>Year:</div>";
 		html += "<div style='width: " + cw + "%; display: inline-block; text-align: center;'>Umsatzsteuer:</div>";
-		html += "<div style='width: " + cw + "%; display: inline-block; text-align: center;'>Erwartete Einkommenssteuer:</div>";
+		html += "<div style='width: " + cw2 + "%; display: inline-block; text-align: center;'>Erwartete Einkommenssteuer:</div>";
+		html += "<div style='width: " + cw2 + "%; display: inline-block; text-align: center;'>Tatsächliche Einkommenssteuer:</div>";
 		html += "</div>";
 		html += "</div>";
 
@@ -59,8 +62,8 @@ public class TaxTab extends Tab {
 			html += "<div class='line'>";
 			html += "<div style='width: " + cw + "%; display: inline-block; text-align: right;'>" + year + "</div>";
 			html += "<div style='width: " + cw + "%; display: inline-block; text-align: right;'>" + FinanceUtils.formatMoney(year.getInTotalTax()) + " €</div>";
-			html += "<div style='width: " + cw + "%; display: inline-block; text-align: right;'>" + FinanceUtils.formatMoney((int) year.getExpectedIncomeTax()) + " €</div>";
-			html += "<div style='width: " + cw + "%; display: inline-block; text-align: right;'>";
+			html += "<div style='width: " + cw2 + "%; display: inline-block; text-align: right;'>" + FinanceUtils.formatMoney((int) year.getExpectedIncomeTax()) + " €</div>";
+			html += "<div style='width: " + cw2 + "%; display: inline-block; text-align: right;'>";
 			Integer actualIncomeTax = incomeTaxes.get(year.getNum());
 			if (actualIncomeTax == null) {
 				html += "(unknown)";

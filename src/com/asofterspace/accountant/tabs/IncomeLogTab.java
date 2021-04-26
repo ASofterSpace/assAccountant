@@ -27,6 +27,7 @@ import java.awt.Color;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.JPanel;
@@ -79,8 +80,14 @@ public class IncomeLogTab extends Tab {
 		Date today = DateUtils.now();
 		int curYear = DateUtils.getYear(today);
 		int curMonth = DateUtils.getMonth(today);
+		boolean veryFirstLine = true;
 
 		for (Year year : years) {
+
+			int averageSum = 0;
+			int averageMonths = 0;
+			HashSet<String> keysThisYear = new HashSet<>();
+
 			for (Month month : year.getMonths()) {
 
 				// only start showing months starting in June 2018
@@ -100,6 +107,13 @@ public class IncomeLogTab extends Tab {
 					}
 				}
 
+				// ignore the very first line, which is the current month, in the monthly average calculation
+				if (!veryFirstLine) {
+					averageMonths++;
+					averageSum += month.getInTotalAfterTax();
+				}
+				veryFirstLine = false;
+
 				afterHtml += "<div class='line'>";
 				afterHtml += "<span style='width: 38%; display: inline-block; text-align: right;'>";
 				afterHtml += month.getMonthName() + " " + month.getYear() + ":&nbsp;&nbsp;&nbsp;";
@@ -115,7 +129,9 @@ public class IncomeLogTab extends Tab {
 					for (Incoming incoming : incomings) {
 						afterHtml += sep;
 						sep = ", ";
-						afterHtml += database.mapCustomerToShortKey(incoming.getCustomer());
+						String key = database.mapCustomerToShortKey(incoming.getCustomer());
+						keysThisYear.add(key);
+						afterHtml += key;
 					}
 					afterHtml += ")</span>";
 				}
@@ -126,6 +142,25 @@ public class IncomeLogTab extends Tab {
 
 				timeData.add(new GraphTimeDataPoint(month.getEndDate(), month.getInTotalAfterTax()));
 			}
+
+			// monthly average for the year
+			afterHtml += "<div class='line'>";
+			afterHtml += "<span style='width: 38%; display: inline-block; text-align: right;'>";
+			afterHtml += "Average over " + averageMonths + " months in " + year + ":&nbsp;&nbsp;&nbsp;";
+			afterHtml += "</span>";
+			afterHtml += "<span style='width: 20%; display: inline-block;'>";
+			afterHtml += FinanceUtils.formatMoney(averageSum / averageMonths, Currency.EUR);
+			afterHtml += "</span>";
+			afterHtml += "<span>(";
+			String sep = "";
+			for (String key : keysThisYear) {
+				afterHtml += sep;
+				sep = ", ";
+				afterHtml += key;
+			}
+			afterHtml += ")</span>";
+			afterHtml += "</div>";
+
 			afterHtml += "<div>";
 			afterHtml += "&nbsp;";
 			afterHtml += "</div>";

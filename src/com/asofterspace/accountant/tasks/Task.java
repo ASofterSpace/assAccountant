@@ -331,7 +331,9 @@ public class Task extends GenericTask {
 							if (!localName.endsWith(".pdf")) {
 								continue;
 							}
-							if (!(localName.startsWith("Kontoauszug_1011709415_") || localName.startsWith("Kreditkartenabrechnung_4748xxxxxxxx7849_"))) {
+							if (!(localName.startsWith("Kontoauszug_1011709415_") ||
+								  localName.startsWith("Kreditkartenabrechnung_4748xxxxxxxx7849_") ||
+								  localName.startsWith("Depotauszug_vom_"))) {
 								continue;
 							}
 							anyBankFiles.add(file);
