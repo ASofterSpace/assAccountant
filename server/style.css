@@ -22,6 +22,10 @@ img.avatar {
 	border-radius: 20pt;
 }
 
+img.avatar:hover {
+	filter: brightness(135%);
+}
+
 div#tabList, div#mainContent {
 	overflow-y: scroll;
 	overflow-x: hidden;
