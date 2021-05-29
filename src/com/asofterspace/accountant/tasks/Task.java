@@ -462,19 +462,19 @@ public class Task extends GenericTask {
 		// USt Vorauszahlungssoll:
 		if (detail.contains("%[TOTAL_PAID_VAT_PREPAYMENTS_" + timeSpanStr + "]")) {
 			detail = detail.replaceAll("%\\[TOTAL_PAID_VAT_PREPAYMENTS_" + timeSpanStr + "\\]",
-				FinanceUtils.formatMoney(timeSpan.getVatPrepaymentsPaidTotal(), Currency.EUR));
+				database.formatMoney(timeSpan.getVatPrepaymentsPaidTotal(), Currency.EUR));
 		}
 
 		// Total deductible already paid VAT / USt Gesamte abziehbare Vorsteuerbeträge:
 		if (detail.contains("%[VAT_TOTAL_DISCOUNTABLE_PRETAX_" + timeSpanStr + "]")) {
 			detail = detail.replaceAll("%\\[VAT_TOTAL_DISCOUNTABLE_PRETAX_" + timeSpanStr + "\\]",
-				FinanceUtils.formatMoney(timeSpan.getDiscountablePreTax(), Currency.EUR));
+				database.formatMoney(timeSpan.getDiscountablePreTax(), Currency.EUR));
 		}
 
 		// Remaining VAT advance payment / Verbleibende Umsatzsteuer-Vorauszahlung:
 		if (detail.contains("%[VAT_TOTAL_REMAINING_TAX_" + timeSpanStr + "]")) {
 			detail = detail.replaceAll("%\\[VAT_TOTAL_REMAINING_TAX_" + timeSpanStr + "\\]",
-				FinanceUtils.formatMoney(timeSpan.getRemainingVatPayments(), Currency.EUR));
+				database.formatMoney(timeSpan.getRemainingVatPayments(), Currency.EUR));
 		}
 
 		int[] taxAmounts = {0, 5, 7, 16, 19};
@@ -489,7 +489,7 @@ public class Task extends GenericTask {
 					}
 				}
 				detail = detail.replaceAll("%\\[VAT_TOTAL_INCOMING_" + timeSpanStr + "_TAX_" + curTaxAmount + "%\\]",
-					FinanceUtils.formatMoney(cur, Currency.EUR));
+					database.formatMoney(cur, Currency.EUR));
 			}
 		}
 
@@ -502,7 +502,7 @@ public class Task extends GenericTask {
 				cur += entry.getTaxAmount();
 			}
 			detail = detail.replaceAll("%\\[VAT_TOTAL_INCOMING_" + timeSpanStr + "_JUST_TAX\\]",
-				FinanceUtils.formatMoney(cur, Currency.EUR));
+				database.formatMoney(cur, Currency.EUR));
 		}
 
 		// handle stuff like %[VAT_TOTAL_INCOMING_PREV_MONTH_TAX_16%_JUST_TAX]
@@ -515,7 +515,7 @@ public class Task extends GenericTask {
 					}
 				}
 				detail = detail.replaceAll("%\\[VAT_TOTAL_INCOMING_" + timeSpanStr + "_TAX_" + curTaxAmount + "%_JUST_TAX\\]",
-					FinanceUtils.formatMoney(cur, Currency.EUR));
+					database.formatMoney(cur, Currency.EUR));
 			}
 		}
 
@@ -553,9 +553,9 @@ public class Task extends GenericTask {
 					}
 				}
 				detail = detail.replaceAll("%\\[" + complexKey + "\\(.*\\)\\]",
-					FinanceUtils.formatMoney(curInc, Currency.EUR));
+					database.formatMoney(curInc, Currency.EUR));
 				detail = detail.replaceAll("%\\[" + complexKey + "REST\\]",
-					FinanceUtils.formatMoney(curRest, Currency.EUR));
+					database.formatMoney(curRest, Currency.EUR));
 			}
 		}
 		return detail;
@@ -636,7 +636,7 @@ public class Task extends GenericTask {
 						for (FinanceLogEntryRow row : entry.getRows()) {
 							finLogText.append(row.getAccount());
 							finLogText.append(": ");
-							finLogText.append(FinanceUtils.formatMoney(row.getAmount(), Currency.EUR));
+							finLogText.append(database.formatMoney(row.getAmount(), Currency.EUR));
 							finLogText.append("\n");
 						}
 					}
@@ -732,7 +732,7 @@ public class Task extends GenericTask {
 							wroteARow = true;
 							if (lineSplit.length > 2) {
 								GuiUtils.complain("The line '" + line + "' contained more than one : sign!\n" +
-									"It was parsed as " + lineSplit[0] + ": " + FinanceUtils.formatMoney(amount,
+									"It was parsed as " + lineSplit[0] + ": " + database.formatMoney(amount,
 									Currency.EUR));
 							}
 						}
@@ -888,7 +888,7 @@ public class Task extends GenericTask {
 						for (FinanceLogEntryRow row : entry.getRows()) {
 							finLogText.append(row.getAccount());
 							finLogText.append(": ");
-							finLogText.append(FinanceUtils.formatMoney(row.getAmount(), Currency.EUR));
+							finLogText.append(database.formatMoney(row.getAmount(), Currency.EUR));
 							finLogText.append("\n");
 						}
 					}
@@ -986,7 +986,7 @@ public class Task extends GenericTask {
 							wroteARow = true;
 							if (lineSplit.length > 2) {
 								GuiUtils.complain("The line '" + line + "' contained more than one : sign!\n" +
-									"It was parsed as " + lineSplit[0] + ": " + FinanceUtils.formatMoney(amount,
+									"It was parsed as " + lineSplit[0] + ": " + database.formatMoney(amount,
 									Currency.EUR));
 							}
 						}

@@ -23,8 +23,8 @@ import javax.swing.SwingUtilities;
 public class AssAccountant {
 
 	public final static String PROGRAM_TITLE = "assAccountant (Mari)";
-	public final static String VERSION_NUMBER = "0.0.2.4(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "5. April 2020 - 26. April 2021";
+	public final static String VERSION_NUMBER = "0.0.2.5(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "5. April 2020 - 29. May 2021";
 
 	public final static String DATA_DIR = "config";
 	public final static String SERVER_DIR = "server";
@@ -90,6 +90,7 @@ public class AssAccountant {
 		try {
 			// load database
 			database = new Database(config);
+			AccountingUtils.setDatabase(database);
 		} catch (JsonParseException e) {
 			System.err.println("Loading the database failed:");
 			System.err.println(e);

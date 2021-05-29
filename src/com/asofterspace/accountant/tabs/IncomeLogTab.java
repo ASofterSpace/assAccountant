@@ -13,7 +13,6 @@ import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.web.ServerRequestHandler;
 import com.asofterspace.toolbox.accounting.Currency;
-import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.images.ColorRGB;
 import com.asofterspace.toolbox.images.DefaultImageFile;
@@ -119,7 +118,7 @@ public class IncomeLogTab extends Tab {
 				afterHtml += month.getMonthName() + " " + month.getYear() + ":&nbsp;&nbsp;&nbsp;";
 				afterHtml += "</span>";
 				afterHtml += "<span style='width: 20%; display: inline-block;'>";
-				afterHtml += FinanceUtils.formatMoney(month.getInTotalAfterTax(), Currency.EUR);
+				afterHtml += database.formatMoney(month.getInTotalAfterTax(), Currency.EUR);
 				afterHtml += "</span>";
 
 				List<Incoming> incomings = month.getIncomings();
@@ -153,7 +152,7 @@ public class IncomeLogTab extends Tab {
 			if (averageMonths > 0) {
 				average = averageSum / averageMonths;
 			}
-			afterHtml += FinanceUtils.formatMoney(average, Currency.EUR);
+			afterHtml += database.formatMoney(average, Currency.EUR);
 			afterHtml += "</span>";
 			afterHtml += "<span>(";
 			String sep = "";

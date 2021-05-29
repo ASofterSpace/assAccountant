@@ -7,7 +7,6 @@ package com.asofterspace.accountant.tabs;
 import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
-import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 
 import java.awt.Color;
@@ -40,7 +39,7 @@ public class CalculatorTab extends Tab {
 		html += "it can be helpful to know the multiples of " + baseAmount + " €:</div>";
 		html += "<div>";
 		for (int m = 1; m <= 8*60; m++) {
-			String text = FinanceUtils.formatMoney((baseAmount * 100 * m) / 60) + " €";
+			String text = database.formatMoney((baseAmount * 100 * m) / 60) + " €";
 			int width = 95 / 5;
 			html += "<div style='display: inline-block; width: " + width + "%; cursor: pointer;' ";
 			html += "class='line' onclick='accountant.copyText(\"" + text + "\")'>";

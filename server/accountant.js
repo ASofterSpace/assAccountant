@@ -19,6 +19,16 @@ window.accountant = {
 		request.send(JSON.stringify(data));
 	},
 
+	changeFormat: function() {
+		// reload the page with changed format
+		if (window.currentFormat == "EN") {
+			window.currentFormat = "DE";
+		} else {
+			window.currentFormat = "EN";
+		}
+		window.location.href = window.location.origin + window.location.pathname + "?format=" + window.currentFormat;
+	},
+
 	onResize: function() {
 
 		var retry = false;

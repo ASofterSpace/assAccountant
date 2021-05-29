@@ -57,13 +57,26 @@ span.toprightAction, a.toprightAction {
 	right: 10pt;
 }
 
-span.topleftAction, a.topleftAction {
+/* the bottomrightAction buttons are located outside of the content div, so they need to be offset against the right HUD */
+span.bottomrightAction, a.bottomrightAction {
+	right: 85pt;
+}
+
+span.topleftAction, a.topleftAction, span.bottomleftAction, a.bottomleftAction {
 	left: 10pt;
 }
 
 span.toprightAction, a.toprightAction, span.topleftAction, a.topleftAction {
-	position: absolute;
 	top: 10pt;
+}
+
+span.bottomrightAction, a.bottomrightAction, span.bottomleftAction, a.bottomleftAction {
+	bottom: 10pt;
+}
+
+span.toprightAction, a.toprightAction, span.topleftAction, a.topleftAction,
+span.bottomrightAction, a.bottomrightAction, span.bottomleftAction, a.bottomleftAction {
+	position: absolute;
 	cursor: pointer;
 	text-decoration: none;
 	color: #88AAFF;

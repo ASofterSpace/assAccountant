@@ -6,8 +6,8 @@ package com.asofterspace.accountant;
 
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
-import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.entries.Incoming;
+import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.tabs.TimeSpanTab;
 import com.asofterspace.accountant.timespans.Month;
@@ -290,13 +290,13 @@ public class AddEntryGUI {
 				isIncoming.setSelected(true);
 			}
 			if (editingEntry.hasPreTaxAmount()) {
-				amount.setText(FinanceUtils.formatMoney(editingEntry.getPreTaxAmount()));
+				amount.setText(database.formatMoney(editingEntry.getPreTaxAmount()));
 			} else {
 				amount.setText("");
 			}
 			taxPerc.setText(""+editingEntry.getTaxPercent());
 			if (editingEntry.hasPostTaxAmount()) {
-				amountPostTax.setText(FinanceUtils.formatMoney(editingEntry.getPostTaxAmount()));
+				amountPostTax.setText(database.formatMoney(editingEntry.getPostTaxAmount()));
 			} else {
 				amountPostTax.setText("");
 			}
@@ -374,12 +374,12 @@ public class AddEntryGUI {
 				Integer amountPostTaxInt = FinanceUtils.calcPostTax(amountPreTaxInt, amountTaxInt);
 				String target = "";
 				if (amountPostTaxInt != null) {
-					target = FinanceUtils.formatMoney(amountPostTaxInt);
+					target = database.formatMoney(amountPostTaxInt);
 				}
 				if (!target.equals(amountPostTax.getText())) {
 					amountPostTax.setText(target);
 				}
-				taxLabel.setText(" % (" + FinanceUtils.formatMoney(amountPostTaxInt - amountPreTaxInt) + " €)");
+				taxLabel.setText(" % (" + database.formatMoney(amountPostTaxInt - amountPreTaxInt) + " €)");
 			}
 		} else {
 			if (!amount.isFocusOwner()) {
@@ -388,12 +388,12 @@ public class AddEntryGUI {
 				Integer amountPreTaxInt = FinanceUtils.calcPreTax(amountPostTaxInt, amountTaxInt);
 				String target = "";
 				if (amountPreTaxInt != null) {
-					target = FinanceUtils.formatMoney(amountPreTaxInt);
+					target = database.formatMoney(amountPreTaxInt);
 				}
 				if (!target.equals(amount.getText())) {
 					amount.setText(target);
 				}
-				taxLabel.setText(" % (" + FinanceUtils.formatMoney(amountPostTaxInt - amountPreTaxInt) + " €)");
+				taxLabel.setText(" % (" + database.formatMoney(amountPostTaxInt - amountPreTaxInt) + " €)");
 			}
 		}
 

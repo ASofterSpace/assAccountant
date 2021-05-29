@@ -13,7 +13,6 @@ import com.asofterspace.accountant.timespans.TimeSpan;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.web.ServerRequestHandler;
 import com.asofterspace.toolbox.accounting.Currency;
-import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.gui.GuiUtils;
@@ -40,6 +39,9 @@ import javax.swing.JPanel;
 
 public class AccountingUtils {
 
+	private static Database database;
+
+
 	public static String createTotalPanelHtml(int totalBeforeTax, int totalTax, int totalAfterTax) {
 
 		String html = "";
@@ -52,9 +54,9 @@ public class AccountingUtils {
 		html += "<span style='width: 51%'>&nbsp;</span>";
 
 		html += AccountingUtils.createLabelHtml("Total:", textColor, tooltip, "text-align: right; width: 5%;");
-		html += AccountingUtils.createLabelHtml(FinanceUtils.formatMoney(totalBeforeTax, Currency.EUR), textColor, tooltip, "text-align: right; width: 10%;");
-		html += AccountingUtils.createLabelHtml(FinanceUtils.formatMoney(totalTax, Currency.EUR), textColor, tooltip, "text-align: right; width: 10%;");
-		html += AccountingUtils.createLabelHtml(FinanceUtils.formatMoney(totalAfterTax, Currency.EUR), textColor, tooltip, "text-align: right; width: 10%;");
+		html += AccountingUtils.createLabelHtml(database.formatMoney(totalBeforeTax, Currency.EUR), textColor, tooltip, "text-align: right; width: 10%;");
+		html += AccountingUtils.createLabelHtml(database.formatMoney(totalTax, Currency.EUR), textColor, tooltip, "text-align: right; width: 10%;");
+		html += AccountingUtils.createLabelHtml(database.formatMoney(totalAfterTax, Currency.EUR), textColor, tooltip, "text-align: right; width: 10%;");
 
 		html += "</div>";
 
@@ -89,17 +91,17 @@ public class AccountingUtils {
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(3, 0, 0.5, 1.0));
 
-		curLabel = new JLabel(FinanceUtils.formatMoney(totalBeforeTax, Currency.EUR));
+		curLabel = new JLabel(database.formatMoney(totalBeforeTax, Currency.EUR));
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(4, 0, 0.1, 1.0));
 
-		curLabel = new JLabel(FinanceUtils.formatMoney(totalTax, Currency.EUR));
+		curLabel = new JLabel(database.formatMoney(totalTax, Currency.EUR));
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(5, 0, 0.1, 1.0));
 
-		curLabel = new JLabel(FinanceUtils.formatMoney(totalAfterTax, Currency.EUR));
+		curLabel = new JLabel(database.formatMoney(totalAfterTax, Currency.EUR));
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(6, 0, 0.1, 1.0));
@@ -138,7 +140,7 @@ public class AccountingUtils {
 
 		String html = "<div class='line'>";
 		html += AccountingUtils.createLabelHtml(text, null, "", "text-align: right; width: 50%;");
-		html += AccountingUtils.createLabelHtml(FinanceUtils.formatMoney(amount, Currency.EUR), null, "", "text-align: left; width: 50%;");
+		html += AccountingUtils.createLabelHtml(database.formatMoney(amount, Currency.EUR), null, "", "text-align: left; width: 50%;");
 		html += "</div>";
 		return html;
 	}
@@ -156,7 +158,7 @@ public class AccountingUtils {
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.5, 1.0));
 
-		curLabel = new CopyByClickLabel(FinanceUtils.formatMoney(amount, Currency.EUR));
+		curLabel = new CopyByClickLabel(database.formatMoney(amount, Currency.EUR));
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(1, 0, 0.5, 1.0));
 
@@ -176,9 +178,9 @@ public class AccountingUtils {
 
 		String html = "<div class='line'>";
 		html += AccountingUtils.createLabelHtml(text1, null, "", "text-align: right; width: 50%;");
-		html += AccountingUtils.createLabelHtml(FinanceUtils.formatMoney(amount1, Currency.EUR), null, "", "text-align: left; width: 10%;");
+		html += AccountingUtils.createLabelHtml(database.formatMoney(amount1, Currency.EUR), null, "", "text-align: left; width: 10%;");
 		html += AccountingUtils.createLabelHtml(text2, null, "", "text-align: right; width: 10%;");
-		html += AccountingUtils.createLabelHtml(FinanceUtils.formatMoney(amount2, Currency.EUR), null, "", "text-align: left; width: 30%;");
+		html += AccountingUtils.createLabelHtml(database.formatMoney(amount2, Currency.EUR), null, "", "text-align: left; width: 30%;");
 		html += "</div>";
 		return html;
 	}
@@ -196,7 +198,7 @@ public class AccountingUtils {
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.5, 1.0));
 
-		curLabel = new CopyByClickLabel(FinanceUtils.formatMoney(amount1, Currency.EUR));
+		curLabel = new CopyByClickLabel(database.formatMoney(amount1, Currency.EUR));
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(1, 0, 0.1, 1.0));
 
@@ -205,7 +207,7 @@ public class AccountingUtils {
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(2, 0, 0.1, 1.0));
 
-		curLabel = new CopyByClickLabel(FinanceUtils.formatMoney(amount2, Currency.EUR));
+		curLabel = new CopyByClickLabel(database.formatMoney(amount2, Currency.EUR));
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(3, 0, 0.3, 1.0));
 
@@ -886,6 +888,14 @@ public class AccountingUtils {
 
 
 		return resultDir;
+	}
+
+	public static void setDatabase(Database databaseArg) {
+		database = databaseArg;
+	}
+
+	public static Database getDatabase() {
+		return database;
 	}
 
 }

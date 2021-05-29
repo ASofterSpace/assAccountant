@@ -13,7 +13,6 @@ import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.PaymentProblem;
 import com.asofterspace.accountant.tasks.Task;
-import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
@@ -192,7 +191,7 @@ public class OverviewTab extends Tab {
 		List<Record> monthlyIncoming = database.getMonthlyIncoming();
 		for (Record rec : monthlyIncoming) {
 			html += "<div class='line'>";
-			html += rec.getString("title") + ": " + FinanceUtils.formatMoney(rec.getInteger("amount")) + " €";
+			html += rec.getString("title") + ": " + database.formatMoney(rec.getInteger("amount")) + " €";
 			totalIn += rec.getInteger("amount");
 			html += "</div>";
 		}
@@ -203,7 +202,7 @@ public class OverviewTab extends Tab {
 		List<Record> monthlyOutgoing = database.getMonthlyOutgoing();
 		for (Record rec : monthlyOutgoing) {
 			html += "<div class='line'>";
-			html += rec.getString("title") + ": " + FinanceUtils.formatMoney(rec.getInteger("amount")) + " €";
+			html += rec.getString("title") + ": " + database.formatMoney(rec.getInteger("amount")) + " €";
 			totalOut += rec.getInteger("amount");
 			html += "</div>";
 		}
@@ -213,12 +212,12 @@ public class OverviewTab extends Tab {
 		html += "<div>";
 		html += LEFT_DIV_HTML;
 		html += "<div class='line'>";
-		html += "Total: " + FinanceUtils.formatMoney(totalIn) + " €";
+		html += "Total: " + database.formatMoney(totalIn) + " €";
 		html += "</div>";
 		html += "</div>";
 		html += RIGHT_DIV_HTML;
 		html += "<div class='line'>";
-		html += "Total: " + FinanceUtils.formatMoney(totalOut) + " €";
+		html += "Total: " + database.formatMoney(totalOut) + " €";
 		html += "</div>";
 		html += "</div>";
 		html += "</div>";

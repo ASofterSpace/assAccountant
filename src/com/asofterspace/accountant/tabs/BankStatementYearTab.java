@@ -12,7 +12,6 @@ import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.transactions.BankAccount;
 import com.asofterspace.accountant.transactions.BankTransaction;
 import com.asofterspace.toolbox.accounting.Currency;
-import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.guiImages.ImagePanel;
@@ -89,7 +88,7 @@ public class BankStatementYearTab extends Tab {
 				html += "<div class='line'>";
 
 				html += AccountingUtils.createLabelHtml("Total, assuming +/- 0 at the top:", textColor, "", "text-align: right; width: 80%;");
-				html += AccountingUtils.createLabelHtml(FinanceUtils.formatMoney(total, Currency.EUR), textColor, "", "text-align: right; width: 10%;");
+				html += AccountingUtils.createLabelHtml(database.formatMoney(total, Currency.EUR), textColor, "", "text-align: right; width: 10%;");
 
 				html += "</div>";
 
@@ -203,7 +202,7 @@ public class BankStatementYearTab extends Tab {
 				curLabel.setHorizontalAlignment(JLabel.RIGHT);
 				curPanel.add(curLabel, new Arrangement(1, 0, 0.7, 0.0));
 
-				curLabel = new CopyByClickLabel(FinanceUtils.formatMoney(total, Currency.EUR));
+				curLabel = new CopyByClickLabel(database.formatMoney(total, Currency.EUR));
 				curLabel.setHorizontalAlignment(JLabel.RIGHT);
 				curLabel.setPreferredSize(defaultDimension);
 				curPanel.add(curLabel, new Arrangement(2, 0, 0.1, 0.0));

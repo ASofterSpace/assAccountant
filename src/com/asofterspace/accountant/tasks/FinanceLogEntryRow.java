@@ -8,7 +8,6 @@ import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.toolbox.accounting.Currency;
-import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 
@@ -44,7 +43,7 @@ public class FinanceLogEntryRow {
 
 		String html = "<div class='line'>";
 		html += AccountingUtils.createLabelHtml(getAccount() + ": ", null, "", "text-align: right; width: 50%;");
-		html += AccountingUtils.createLabelHtml(FinanceUtils.formatMoney(getAmount(), Currency.EUR), null, "", "text-align: right; width: 10%;");
+		html += AccountingUtils.createLabelHtml(database.formatMoney(getAmount(), Currency.EUR), null, "", "text-align: right; width: 10%;");
 		html += "</div>";
 
 		return html;
@@ -63,7 +62,7 @@ public class FinanceLogEntryRow {
 		curLabel.setPreferredSize(defaultDimension);
 		curPanel.add(curLabel, new Arrangement(0, 0, 0.5, 1.0));
 
-		curLabel = new CopyByClickLabel(FinanceUtils.formatMoney(getAmount(), Currency.EUR));
+		curLabel = new CopyByClickLabel(database.formatMoney(getAmount(), Currency.EUR));
 		curLabel.setPreferredSize(defaultDimension);
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curPanel.add(curLabel, new Arrangement(1, 0, 0.1, 1.0));

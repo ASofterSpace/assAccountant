@@ -58,6 +58,7 @@ public class Database {
 	private static final String CURRENT_BACKUP_KEY = "currentBackup";
 	private static final String INCOME_TAXES_KEY = "incomeTaxes";
 	private static final String LOANS_KEY = "loans";
+	private static final String FORMAT_KEY = "format";
 
 	private static int BACKUP_MAX = 64;
 
@@ -92,6 +93,8 @@ public class Database {
 	private String userLegalName;
 
 	private String location;
+
+	private String formatStr;
 
 	private List<Loan> loans;
 
@@ -206,6 +209,11 @@ public class Database {
 		loans = new ArrayList<>();
 		for (Record loanRec : loanRecs) {
 			loans.add(new Loan(loanRec));
+		}
+
+		formatStr = root.getString(FORMAT_KEY);
+		if (formatStr == null) {
+			formatStr = "EN";
 		}
 
 		return root;
@@ -1406,6 +1414,8 @@ public class Database {
 
 		root.set(LOANS_KEY, loans);
 
+		root.getString(FORMAT_KEY, formatStr);
+
 		taskCtrl.saveIntoRecord(root);
 
 		dbFile.setAllContents(root);
@@ -1474,6 +1484,33 @@ public class Database {
 
 	public void setLoans(List<Loan> loans) {
 		this.loans = loans;
+	}
+
+	public String getFormatStr() {
+		return formatStr;
+	}
+
+	public void setFormatStr(String formatStr) {
+		this.formatStr = formatStr;
+		// no need to save here - we could, but this is not important enough, honestly...
+		// and it is better to have the advantage of sometimes not having saved yet (e.g. for editing details
+		// of recurring entries which have not "really" been released yet ^^)
+	}
+
+	public String formatMoney(Integer amount) {
+		if ("DE".equals(formatStr)) {
+			return FinanceUtils.formatMoneyDE(amount);
+		} else {
+			return FinanceUtils.formatMoney(amount);
+		}
+	}
+
+	public String formatMoney(Integer amount, Currency currency) {
+		if ("DE".equals(formatStr)) {
+			return FinanceUtils.formatMoneyDE(amount, currency);
+		} else {
+			return FinanceUtils.formatMoney(amount, currency);
+		}
 	}
 
 }

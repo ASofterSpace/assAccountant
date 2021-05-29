@@ -182,7 +182,7 @@ public abstract class Entry {
 	}
 
 	public String getPreTaxAmountAsText() {
-		return FinanceUtils.formatMoney(getPreTaxAmount(), currency);
+		return AccountingUtils.getDatabase().formatMoney(getPreTaxAmount(), currency);
 	}
 
 	public void setPreTaxAmount(Integer preTaxAmount) {
@@ -205,7 +205,7 @@ public abstract class Entry {
 	}
 
 	public String getPostTaxAmountAsText() {
-		return FinanceUtils.formatMoney(getPostTaxAmount(), currency);
+		return AccountingUtils.getDatabase().formatMoney(getPostTaxAmount(), currency);
 	}
 
 	public void setPostTaxAmount(Integer postTaxAmount) {

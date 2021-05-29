@@ -8,7 +8,6 @@ import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Year;
-import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 
 import java.awt.Color;
@@ -61,14 +60,14 @@ public class TaxTab extends Tab {
 		for (Year year : database.getYears()) {
 			html += "<div class='line'>";
 			html += "<div style='width: " + cw + "%; display: inline-block; text-align: right;'>" + year + "</div>";
-			html += "<div style='width: " + cw + "%; display: inline-block; text-align: right;'>" + FinanceUtils.formatMoney(year.getInTotalTax()) + " €</div>";
-			html += "<div style='width: " + cw2 + "%; display: inline-block; text-align: right;'>" + FinanceUtils.formatMoney((int) year.getExpectedIncomeTax()) + " €</div>";
+			html += "<div style='width: " + cw + "%; display: inline-block; text-align: right;'>" + database.formatMoney(year.getInTotalTax()) + " €</div>";
+			html += "<div style='width: " + cw2 + "%; display: inline-block; text-align: right;'>" + database.formatMoney((int) year.getExpectedIncomeTax()) + " €</div>";
 			html += "<div style='width: " + cw2 + "%; display: inline-block; text-align: right;'>";
 			Integer actualIncomeTax = incomeTaxes.get(year.getNum());
 			if (actualIncomeTax == null) {
 				html += "(unknown)";
 			} else {
-				html += FinanceUtils.formatMoney(actualIncomeTax) + " €";
+				html += database.formatMoney(actualIncomeTax) + " €";
 			}
 			html += "</div>";
 			html += "</div>";

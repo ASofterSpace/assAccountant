@@ -8,7 +8,6 @@ import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.toolbox.accounting.Currency;
-import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.utils.DateUtils;
@@ -74,7 +73,7 @@ public class FinanceLogEntry {
 
 		html += "<div class='line'>";
 		html += AccountingUtils.createLabelHtml("Total: ", textColor, "", "text-align: right; width: 50%;");
-		html += AccountingUtils.createLabelHtml(FinanceUtils.formatMoney(totalAmount, Currency.EUR), textColor, "", "text-align: right; width: 10%;");
+		html += AccountingUtils.createLabelHtml(database.formatMoney(totalAmount, Currency.EUR), textColor, "", "text-align: right; width: 10%;");
 		html += "</div>";
 
 		return html;
@@ -112,7 +111,7 @@ public class FinanceLogEntry {
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curCurPanel.add(curLabel, new Arrangement(0, 0, 0.5, 1.0));
 
-		curLabel = AccountingUtils.createLabel(FinanceUtils.formatMoney(totalAmount, Currency.EUR), textColor, "");
+		curLabel = AccountingUtils.createLabel(database.formatMoney(totalAmount, Currency.EUR), textColor, "");
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curCurPanel.add(curLabel, new Arrangement(1, 0, 0.1, 1.0));
 

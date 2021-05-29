@@ -750,6 +750,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				System.out.println("Answering " + tabKind + " request...");
 
+				for (String arg : arguments) {
+					if (arg.startsWith("format=")) {
+						database.setFormatStr(arg.substring(arg.indexOf("=") + 1));
+					}
+				}
+
 				TaskCtrl taskCtrl = database.getTaskCtrl();
 				taskCtrl.generateNewInstances(DateUtils.now());
 
@@ -780,6 +786,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				}
 
 				tabsHtml += "</div>";
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[FORMAT]]", database.getFormatStr());
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TABS]]", tabsHtml);
 

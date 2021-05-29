@@ -8,12 +8,11 @@ import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.AddEntryGUI;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
-import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.entries.Incoming;
+import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.toolbox.accounting.Currency;
-import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.utils.DateUtils;
@@ -117,7 +116,7 @@ public class BankTransaction {
 
 		html += AccountingUtils.createLabelHtml(DateUtils.serializeDate(getDate()), textColor, "", "text-align: left; width: 10%;");
 		html += AccountingUtils.createLabelHtml(StrUtils.replaceAll(getTitle(), "\n", "<br>"), textColor, "", "text-align: left; width: 70%;");
-		html += AccountingUtils.createLabelHtml(FinanceUtils.formatMoney(getAmount(), Currency.EUR), textColor, "", "text-align: right; width: 10%;");
+		html += AccountingUtils.createLabelHtml(database.formatMoney(getAmount(), Currency.EUR), textColor, "", "text-align: right; width: 10%;");
 
 		// TODO - add working buttons
 		/*
@@ -174,7 +173,7 @@ public class BankTransaction {
 		curLabel.addMouseListener(rowHighlighter);
 		curCurPanel.add(curLabel, new Arrangement(1, 0, 0.7, 0.0));
 
-		curLabel = AccountingUtils.createLabel(FinanceUtils.formatMoney(getAmount(), Currency.EUR), textColor, "");
+		curLabel = AccountingUtils.createLabel(database.formatMoney(getAmount(), Currency.EUR), textColor, "");
 		curLabel.addMouseListener(rowHighlighter);
 		curLabel.setHorizontalAlignment(JLabel.RIGHT);
 		curCurPanel.add(curLabel, new Arrangement(2, 0, 0.1, 0.0));

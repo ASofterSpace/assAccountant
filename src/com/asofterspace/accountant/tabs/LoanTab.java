@@ -9,7 +9,6 @@ import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.loans.Loan;
 import com.asofterspace.accountant.loans.Payment;
-import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.utils.DateUtils;
 
@@ -44,7 +43,7 @@ public class LoanTab extends Tab {
 
 		for (Loan loan : loans) {
 			html.append("<div class='line' style='margin-top: 15pt; font-weight: bold;'>");
-			html.append(loan.getName() + " (" + FinanceUtils.formatMoney(loan.getAmount()) + " €)");
+			html.append(loan.getName() + " (" + database.formatMoney(loan.getAmount()) + " €)");
 			html.append("</div>");
 			if (loan.getDetails() != null) {
 				html.append("<div class='line' style='font-style: italic;'>");
@@ -58,7 +57,7 @@ public class LoanTab extends Tab {
 				html.append("<div class='line' style='padding-left: 9pt;'>");
 				html.append(DateUtils.serializeDate(payment.getDate()));
 				html.append(" ");
-				html.append(FinanceUtils.formatMoney(payment.getAmount()) + " €");
+				html.append(database.formatMoney(payment.getAmount()) + " €");
 				html.append("</div>");
 
 				amountPaid += payment.getAmount();
@@ -66,7 +65,7 @@ public class LoanTab extends Tab {
 
 			html.append("<div class='line'>");
 			html.append("Total paid so far: ");
-			html.append(FinanceUtils.formatMoney(amountPaid) + " €");
+			html.append(database.formatMoney(amountPaid) + " €");
 			html.append("</div>");
 		}
 
