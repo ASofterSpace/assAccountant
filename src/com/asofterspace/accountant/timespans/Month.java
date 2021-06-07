@@ -22,6 +22,7 @@ import com.asofterspace.toolbox.Utils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -203,7 +204,8 @@ public class Month extends TimeSpan {
 	}
 
 	public boolean addEntry(Date date, String title, Object catOrCustomerObj, String amountStr,
-		Currency currency, String taxationPercentStr, String postTaxAmountStr, String originator, boolean isOutgoing) {
+		Currency currency, String taxationPercentStr, String postTaxAmountStr, String originator,
+		boolean isOutgoing, Database database) {
 
 		Integer amountObj = FinanceUtils.parseMoney(amountStr);
 		Integer postTaxAmountObj = FinanceUtils.parseMoney(postTaxAmountStr);
@@ -242,6 +244,27 @@ public class Month extends TimeSpan {
 
 			if ((customer == null) || "".equals(customer)) {
 				return GuiUtils.complain("The text " + catOrCustomer + " should contain a customer!");
+			}
+
+			// when a new customer is added...
+			Set<String> existingCustomers = database.getCustomers();
+			if (!existingCustomers.contains(customer)) {
+				// ... automatically create a new task outlining what has to be done about this customer!
+				String entryTitle = "Tell Mari about our new customer, " + customer;
+				String entryDetails = "* Add repeating tasks to create and log new invoices, " +
+					"if this customer gets invoices regularly now\n" +
+					"* add to the repeating task 'fill out the yearly Umsatzsteuererklärung and send it via ELSTER!' " +
+					"to the VAT_TOTAL_INCOMING_PREV_YEAR_TAX_0%_(...) placeholder this new customer if it is located " +
+					"outside of the EU\n" +
+					"* add to the repeating task 'USt-Voranmeldung abschicken' " +
+					"to the VAT_TOTAL_INCOMING_PREV_MONTH_TAX_0%_(...) placeholder this new customer if it is located " +
+					"outside of the EU\n" +
+					"* add to the repeating task 'USt-Voranmeldung abschicken' " +
+					"to the VAT IDs list for the Zusammenfassende Meldung towards the end this new customer if it " +
+					"is located outside of Germany but inside of the EU";
+				String entryDate = DateUtils.serializeDate(DateUtils.now());
+
+				database.getTaskCtrl().addAdHocTask(entryTitle, entryDetails, entryDate);
 			}
 
 			Incoming newOut = new Incoming(amountObj, currency, taxationPercent, postTaxAmountObj,

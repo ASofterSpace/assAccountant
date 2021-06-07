@@ -394,7 +394,7 @@ public class Database {
 		}
 
 		if (curMonth.addEntry(date, title, catOrCustomer, amount, currency, taxationPercent,
-			postTaxAmount, originator, isOutgoing)) {
+			postTaxAmount, originator, isOutgoing, this)) {
 
 			save();
 
