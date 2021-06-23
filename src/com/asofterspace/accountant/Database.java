@@ -908,6 +908,9 @@ public class Database {
 
 	private void bulkImportBankStatementsFromPdfForSparda(PdfFile pdf, String pdfText) {
 
+		// until March 2o21, bracketMode was false - now it is true, which will be detected based on the IBAN
+		boolean bracketMode = false;
+
 		String bank = "Sparda";
 		String iban = null;
 		String bic = null;
@@ -915,20 +918,40 @@ public class Database {
 		if (pdfText.contains("[(IBAN: ")) {
 			iban = pdfText.substring(pdfText.indexOf("[(IBAN: ") + 8);
 			bic = iban.substring(iban.indexOf("BIC:") + 4);
-			bic = bic.substring(0, bic.indexOf(")"));
-			bic = bic.replaceAll(" ", "");
 			iban = iban.substring(0, iban.indexOf("BIC:"));
+			if (iban.startsWith(")")) {
+				iban = "(" + iban + ")";
+				bracketMode = true;
+				iban = getContentFromBrackets(iban);
+			}
 			iban = iban.replaceAll(" ", "");
+
+			if (bracketMode) {
+				bic = "(" + bic.substring(0, bic.indexOf("]TJ"));
+				bic = getContentFromBrackets(bic);
+			} else {
+				bic = bic.substring(0, bic.indexOf(")"));
+			}
+			bic = bic.replaceAll(" ", "");
 		}
 		if (pdfText.contains("-29.8181 -1.2424 Td")) {
 			owner = pdfText.substring(pdfText.indexOf("-29.8181 -1.2424 Td"));
 			owner = owner.substring(owner.indexOf("[(") + 2);
 			owner = owner.substring(0, owner.indexOf(")]"));
+			if (bracketMode) {
+				owner = "(" + owner + ")";
+				owner = getContentFromBrackets(owner);
+			}
 		}
 		BankAccount curAccount = getOrAddBankAccount(bank, iban, bic, owner);
 
-		if (pdfText.contains("[(Vorgang)]TJ")) {
-			String transStr = pdfText.substring(pdfText.indexOf("[(Vorgang)]TJ") + 13);
+		String VORGANG = "[(Vorgang)]TJ";
+		if (bracketMode) {
+			VORGANG = "[(Vorgan)-2.30769(g)]TJ";
+		}
+
+		if (pdfText.contains(VORGANG)) {
+			String transStr = pdfText.substring(pdfText.indexOf(VORGANG) + VORGANG.length());
 			String curEntryStr = null;
 			String curDateStr = null;
 			Date curDate = null;
@@ -951,17 +974,26 @@ public class Database {
 						curAccount.addTransaction(new BankTransaction(amount, curEntryStr, curDate, curAccount));
 					}
 					curEntryStr = transStr.substring(0, transStr.indexOf(")]"));
+					if (bracketMode) {
+						curEntryStr = "(" + curEntryStr + ")";
+						curEntryStr = getContentFromBrackets(curEntryStr);
+					}
 					curDateStr = curEntryStr.substring(0, 6) + curYear;
 					curDate = DateUtils.parseDate(curDateStr);
 					curEntryStr = curEntryStr.substring(14);
-					String amountStr = curEntryStr.substring(curEntryStr.lastIndexOf("  ") + 2);
+
+					// search for the second-last " "
+					int amountIndex = curEntryStr.lastIndexOf(" ");
+					amountIndex = curEntryStr.lastIndexOf(" ", amountIndex - 1) + 1;
+					String amountStr = curEntryStr.substring(amountIndex);
+
 					// H: positive, S: negative
 					if (amountStr.endsWith("S")) {
 						amountStr = "-" + amountStr;
 					}
 					amountStr = amountStr.substring(0, amountStr.length() - 1);
 					amount = FinanceUtils.parseMoney(amountStr);
-					curEntryStr = curEntryStr.substring(0, curEntryStr.lastIndexOf("  "));
+					curEntryStr = curEntryStr.substring(0, amountIndex);
 					curEntryStr = curEntryStr.trim();
 					continue;
 				}
@@ -970,27 +1002,46 @@ public class Database {
 				}
 				// regularly, we expect to end here by using the break
 				if ((transStr.startsWith("                                            Übertrag")) ||
-					(transStr.startsWith("                                    neuer Kontostand vom"))) {
+					(transStr.startsWith(" )-26060.66666(Übertrag )")) ||
+					(transStr.startsWith("                                    neuer Kontostand vom")) ||
+					(transStr.startsWith(" )-21212.18181(neuer )-0.36363(Kontostand )-0.66666(vom )"))) {
 					// finalize previous entry
 					if (curEntryStr != null) {
 						curAccount.addTransaction(new BankTransaction(amount, curEntryStr, curDate, curAccount));
 					}
 
-					if (transStr.contains("[(Vorgang)]TJ")) {
-						transStr = transStr.substring(transStr.indexOf("[(Vorgang)]TJ") + 13);
+					if (transStr.contains(VORGANG)) {
+						transStr = transStr.substring(transStr.indexOf(VORGANG) + VORGANG.length());
 						curEntryStr = null;
 					} else {
 						properExit = true;
 						break;
 					}
 				} else {
-					curEntryStr += "\n" + transStr.substring(0, transStr.indexOf(")]")).trim();
+					if (bracketMode) {
+						curEntryStr += "\n" + getContentFromBrackets("(" + transStr.substring(0, transStr.indexOf(")]")).trim() + ")");
+					} else {
+						curEntryStr += "\n" + transStr.substring(0, transStr.indexOf(")]")).trim();
+					}
 				}
 			}
 			if (!properExit) {
 				GuiUtils.complain("We did not exit the parsing of the PDF as expected, some entries may have been missed!");
 			}
 		}
+	}
+
+	// takes in "bla (foo ) blubb (bar)" and returns "foo bar"
+	private String getContentFromBrackets(String str) {
+		StringBuilder result = new StringBuilder();
+		while (str.contains("(")) {
+			str = str.substring(str.indexOf("(") + 1);
+			if (str.contains(")")) {
+				result.append(str.substring(0, str.indexOf(")")));
+				str = str.substring(str.indexOf(")") + 1);
+			}
+		}
+		return result.toString();
 	}
 
 	private void bulkImportBankStatementsFromPdfForDKB(PdfFile pdf, String pdfText) {
