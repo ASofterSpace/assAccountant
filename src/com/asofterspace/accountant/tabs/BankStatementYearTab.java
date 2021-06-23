@@ -69,8 +69,19 @@ public class BankStatementYearTab extends Tab {
 
 		List<BankAccount> accounts = database.getBankAccounts();
 
+		html += "<select id='bankStatementSelect' onchange='accountant.updateBankStatementView();'>";
+		html += "<option value='all' selected>All Bank Accounts</option>";
+		int bankAccountNum = 0;
 		for (BankAccount account : accounts) {
-			html += "<div>";
+			bankAccountNum++;
+			html += "<option value='" + bankAccountNum + "'>" + account.getBank() + " (" + account.getIban() + ")</option>";
+		}
+		html += "</select>";
+
+		bankAccountNum = 0;
+		for (BankAccount account : accounts) {
+			bankAccountNum++;
+			html += "<div class='bankStatementContainer' id='bankStatementNum" + bankAccountNum + "'>";
 			html += "<div class='secondaryTitle'>" + account.getBank() + ", IBAN: " + account.getIban() + ", BIC: " + account.getBic() + "</div>";
 
 			List<BankTransaction> transactions = account.getTransactions();

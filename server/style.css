@@ -6,6 +6,16 @@ body {
 	padding-right: 60pt;
 }
 
+input, textarea, select {
+	color: #AACCFF;
+	background: rgb(24, 0, 27);
+	border: 1px solid rgb(80, 60, 160);
+	border-radius: 4pt;
+	padding: 0pt 4pt 1pt 4pt;
+	font-family: "Calibri";
+	font-size: 1em;
+}
+
 body > div {
 	padding-bottom: 10pt;
 	color: #88AAFF;

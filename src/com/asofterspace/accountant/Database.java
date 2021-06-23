@@ -181,7 +181,19 @@ public class Database {
 		bankAccounts = new ArrayList<>();
 		List<Record> recs = root.getArray(BANK_ACCOUNTS_KEY);
 		for (Record rec : recs) {
-			bankAccounts.add(BankAccount.fromRecord(rec));
+			BankAccount cur = BankAccount.fromRecord(rec);
+			BankAccount existing = null;
+			for (BankAccount prev : bankAccounts) {
+				if (prev.equals(cur)) {
+					existing = prev;
+				}
+			}
+			if (existing == null) {
+				bankAccounts.add(cur);
+			} else {
+				existing.addAllTransactions(cur.getTransactions());
+				existing.addInfoOptionally(cur);
+			}
 		}
 
 		// only used during bulk import of legacy data

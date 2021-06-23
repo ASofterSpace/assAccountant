@@ -117,6 +117,28 @@ window.accountant = {
 		}
 	},
 
+	updateBankStatementView: function() {
+
+		// set all to invisible
+		var elems = document.getElementsByClassName("bankStatementContainer");
+		for (var i = 0; i < elems.length; i++) {
+			elems[i].style.display = 'none';
+		}
+
+		// if one is selected...
+		var which = document.getElementById("bankStatementSelect").value;
+		var elem = document.getElementById("bankStatementNum" + which);
+		if (elem) {
+			// ... set it to visible ...
+			elem.style.display = 'block';
+		} else {
+			// ... otherwise, set all to visible
+			for (var i = 0; i < elems.length; i++) {
+				elems[i].style.display = 'block';
+			}
+		}
+	},
+
 }
 
 

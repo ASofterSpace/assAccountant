@@ -9,9 +9,7 @@ import com.asofterspace.toolbox.utils.Record;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -33,8 +31,7 @@ public class BankAccount {
 
 	private String accountHolder;
 
-	// we use a set here, such that we automatically only get each transaction once
-	private Set<BankTransaction> transactions;
+	private List<BankTransaction> transactions;
 
 
 	private BankAccount() {
@@ -45,7 +42,7 @@ public class BankAccount {
 		this.iban = iban;
 		this.bic = bic;
 		this.accountHolder = accountHolder;
-		this.transactions = new HashSet<>();
+		this.transactions = new ArrayList<>();
 	}
 
 	public static BankAccount fromRecord(Record rec) {
@@ -60,7 +57,7 @@ public class BankAccount {
 
 		result.accountHolder = rec.getString(OWNER_KEY);
 
-		result.transactions = new HashSet<>();
+		result.transactions = new ArrayList<>();
 
 		List<Record> recs = rec.getArray(TRANSACTIONS_KEY);
 		for (Record trans : recs) {
@@ -134,12 +131,41 @@ public class BankAccount {
 		}
 	}
 
+	public void addInfoOptionally(BankAccount other) {
+		setAccountHolderOptionally(other.accountHolder);
+		setIbanOptionally(other.iban);
+		setBicOptionally(other.bic);
+	}
+
 	public List<BankTransaction> getTransactions() {
 
 		List<BankTransaction> result = new ArrayList<>();
 		result.addAll(transactions);
 
-		Collections.sort(result, new Comparator<BankTransaction>() {
+		sortTransactions(result);
+
+		return result;
+	}
+
+	public void addTransaction(BankTransaction newTrans) {
+		if (!transactions.contains(newTrans)) {
+			transactions.add(newTrans);
+		}
+		sortTransactions(transactions);
+	}
+
+	public void addAllTransactions(List<BankTransaction> newTransactions) {
+		for (BankTransaction newTrans : newTransactions) {
+			if (!transactions.contains(newTrans)) {
+				transactions.add(newTrans);
+			}
+		}
+		sortTransactions(transactions);
+	}
+
+	private void sortTransactions(List<BankTransaction> transactionList) {
+
+		Collections.sort(transactionList, new Comparator<BankTransaction>() {
 			public int compare(BankTransaction a, BankTransaction b) {
 				// break ties using the title (such that a higher number in a title gets sorted to the top)
 				if (a.getDate().equals(b.getDate())) {
@@ -149,12 +175,6 @@ public class BankAccount {
 				return b.getDate().compareTo(a.getDate());
 			}
 		});
-
-		return result;
-	}
-
-	public void addTransaction(BankTransaction newTrans) {
-		transactions.add(newTrans);
 	}
 
 	@Override
@@ -176,12 +196,6 @@ public class BankAccount {
 			// match null to any, or else require exact match
 			if ((this.bic != null) && (otherBankAccount.bic != null)) {
 				if (!this.bic.equals(otherBankAccount.bic)) {
-					return false;
-				}
-			}
-			// match null to any, or else require exact match
-			if ((this.accountHolder != null) && (otherBankAccount.accountHolder != null)) {
-				if (!this.accountHolder.equals(otherBankAccount.accountHolder)) {
 					return false;
 				}
 			}
