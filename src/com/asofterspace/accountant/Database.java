@@ -8,6 +8,7 @@ import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.loans.Loan;
+import com.asofterspace.accountant.rent.RentData;
 import com.asofterspace.accountant.tasks.TaskCtrl;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
@@ -57,6 +58,7 @@ public class Database {
 	private static final String BACKUP_FILE_NAME = "database_backup_";
 	private static final String CURRENT_BACKUP_KEY = "currentBackup";
 	private static final String INCOME_TAXES_KEY = "incomeTaxes";
+	private static final String RENT_KEY = "rent";
 	private static final String LOANS_KEY = "loans";
 	private static final String FORMAT_KEY = "format";
 
@@ -97,6 +99,8 @@ public class Database {
 	private String formatStr;
 
 	private List<Loan> loans;
+
+	private RentData rentData;
 
 	private Record root;
 
@@ -216,6 +220,8 @@ public class Database {
 
 		monthlyIncoming = root.getArray(MONTHLY_INCOMING);
 		monthlyOutgoing = root.getArray(MONTHLY_OUTGOING);
+
+		rentData = new RentData(root.get(RENT_KEY));
 
 		List<Record> loanRecs = root.getArray(LOANS_KEY);
 		loans = new ArrayList<>();
@@ -1475,6 +1481,8 @@ public class Database {
 		root.set(MONTHLY_INCOMING, monthlyIncoming);
 		root.set(MONTHLY_OUTGOING, monthlyOutgoing);
 
+		root.set(RENT_KEY, rentData);
+
 		root.set(LOANS_KEY, loans);
 
 		root.getString(FORMAT_KEY, formatStr);
@@ -1539,6 +1547,14 @@ public class Database {
 			result.put(StrUtils.strToInt(key), rec.asInteger());
 		}
 		return result;
+	}
+
+	public RentData getRentData() {
+		return rentData;
+	}
+
+	public void setRentData(RentData rentData) {
+		this.rentData = rentData;
 	}
 
 	public List<Loan> getLoans() {
