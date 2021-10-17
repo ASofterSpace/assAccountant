@@ -5,7 +5,6 @@
 package com.asofterspace.accountant.entries;
 
 import com.asofterspace.accountant.AccountingUtils;
-import com.asofterspace.accountant.AddPaidGUI;
 import com.asofterspace.accountant.ConsistencyProblem;
 import com.asofterspace.accountant.ConsistencyWarning;
 import com.asofterspace.accountant.Database;
@@ -24,8 +23,6 @@ import com.asofterspace.toolbox.Utils;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
@@ -33,7 +30,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.swing.JButton;
 import javax.swing.JPanel;
 
 
@@ -510,46 +506,6 @@ public abstract class Entry {
 		curLabel = AccountingUtils.createLabel("", textColor, tooltip);
 		curLabel.addMouseListener(rowHighlighter);
 		curPanel.add(curLabel, new Arrangement(7, 0, 0.0, 1.0));
-
-		JButton curButton = new JButton("Paid");
-		curButton.addMouseListener(rowHighlighter);
-		curButton.setPreferredSize(defaultDimension);
-		curPanel.add(curButton, new Arrangement(8, 0, 0.05, 1.0));
-		curButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				AddPaidGUI addPaidGUI = new AddPaidGUI(database.getGUI(), database, Entry.this);
-				addPaidGUI.show();
-			}
-		});
-
-		// no need to edit, as it can be done through the web interface
-		/*
-		curButton = new JButton("Edit");
-		curButton.addMouseListener(rowHighlighter);
-		curButton.setPreferredSize(defaultDimension);
-		curPanel.add(curButton, new Arrangement(9, 0, 0.05, 1.0));
-		curButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				AddEntryGUI editEntryGUI = new AddEntryGUI(database.getGUI(), database, Entry.this);
-				editEntryGUI.show();
-			}
-		});
-
-		curButton = new JButton("Delete");
-		curButton.addMouseListener(rowHighlighter);
-		curButton.setPreferredSize(defaultDimension);
-		curPanel.add(curButton, new Arrangement(10, 0, 0.06, 1.0));
-		curButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (GuiUtils.confirmDelete("entry '" + getTitle() + "'")) {
-					Entry.this.deleteFrom(database);
-				}
-			}
-		});
-		*/
 
 		curLabel = AccountingUtils.createLabel("", textColor, tooltip);
 		curLabel.addMouseListener(rowHighlighter);

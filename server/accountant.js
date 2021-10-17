@@ -2,10 +2,11 @@ window.accountant = {
 
 	// id of the entry we are currently editing
 	currentlyEditing: null,
-
+	currentlyPaid: null,
 	currentlyDeleting: null,
 
 	lastTaxChangeWasPreTax: true,
+
 
 	exportCsvs: function(tab) {
 		var request = new XMLHttpRequest();
@@ -189,6 +190,94 @@ window.accountant = {
 		}
 
 		request.send();
+	},
+
+	paidEntry: function(id) {
+
+		var request = new XMLHttpRequest();
+		request.open("GET", "entry?id=" + id, true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		var outer = this;
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				if (result.success) {
+					outer.showPaidModal();
+
+					document.getElementById("paidEntryContainer").innerHTML = result.date + " " + result.title + " " +
+						result.amount + " " + result.taxationPercent + "% " + result.postTaxAmount;
+
+					if (result.kind == "in") {
+						document.getElementById("paidToFromLabel").innerHTML = "in to";
+					} else {
+						document.getElementById("paidToFromLabel").innerHTML = "out from";
+					}
+
+					if (result.received) {
+						outer.paidSelectYepp();
+					} else {
+						outer.paidSelectNope();
+					}
+
+					document.getElementById("paidDate").value = result.receivedOnDate;
+					outer.trySelect(outer.accToId(result.receivedOnAccount));
+
+					outer.currentlyPaid = id;
+				}
+			}
+		}
+
+		request.send();
+	},
+
+	savePaidModal: function() {
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "paidEntry", true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				if (result.success) {
+					window.location.reload(false);
+				}
+			}
+		}
+
+		var data = {
+			"receivedOnDate": document.getElementById("paidDate").value,
+			"receivedOnAccount": document.getElementById("paidAccount").value,
+			"id": this.currentlyPaid,
+		};
+
+		if (document.getElementById("paidYepp").className == "button checked") {
+			data.received = true;
+		} else {
+			data.received = false;
+		}
+
+		request.send(JSON.stringify(data));
+	},
+
+	showPaidModal: function() {
+		var modal = document.getElementById("paidModal");
+		if (modal) {
+			modal.style.display = "block";
+
+			document.getElementById("modalBackground").style.display = "block";
+		}
+	},
+
+	closePaidModal: function() {
+		var modal = document.getElementById("paidModal");
+		if (modal) {
+			modal.style.display = "none";
+		}
+
+		document.getElementById("modalBackground").style.display = "none";
 	},
 
 	deleteEntry: function(id) {
@@ -391,6 +480,24 @@ window.accountant = {
 		document.getElementById("aeCatCust").innerHTML = custs;
 	},
 
+	paidSelectYepp: function() {
+		var paidYepp = document.getElementById("paidYepp");
+		var paidNope = document.getElementById("paidNope");
+		if (paidYepp && paidNope) {
+			paidYepp.className = "button checked";
+			paidNope.className = "button unchecked";
+		}
+	},
+
+	paidSelectNope: function() {
+		var paidYepp = document.getElementById("paidYepp");
+		var paidNope = document.getElementById("paidNope");
+		if (paidYepp && paidNope) {
+			paidYepp.className = "button unchecked";
+			paidNope.className = "button checked";
+		}
+	},
+
 	catToId: function(cat) {
 		return this.somethingToId("aeCatOption", cat);
 	},
@@ -403,7 +510,14 @@ window.accountant = {
 		return this.somethingToId("aeOrgOption", org);
 	},
 
+	accToId: function(acc) {
+		return this.somethingToId("paidAccOption", acc);
+	},
+
 	somethingToId: function(prefix, cat) {
+		if (cat == null) {
+			return null;
+		}
 		cat = cat.toUpperCase();
 		var index = cat.indexOf(" ");
 		if (index < 0) {
@@ -413,6 +527,9 @@ window.accountant = {
 	},
 
 	trySelect: function(id) {
+		if (id == null) {
+			return;
+		}
 		var el = document.getElementById(id);
 		if (el) {
 			el.selected = true;
@@ -496,5 +613,13 @@ for (var i = 0; i < window.aeOriginators.length; i++) {
 		window.aeOriginators[i] + "</option>";
 }
 document.getElementById("aeOriginator").innerHTML = orgs;
+
+var accs = "";
+for (var i = 0; i < window.paidAccounts.length; i++) {
+	accs += "<option id='" + window.accountant.accToId(window.paidAccounts[i]) + "' " +
+		"value='" + window.paidAccounts[i] + "'>" +
+		window.paidAccounts[i] + "</option>";
+}
+document.getElementById("paidAccount").innerHTML = accs;
 
 window.accountant.resetAddEntryModal();

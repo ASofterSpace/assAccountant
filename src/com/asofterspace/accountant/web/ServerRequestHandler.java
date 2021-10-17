@@ -174,6 +174,27 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 					break;
 
+				case "/paidEntry":
+					editingId = json.getString("id");
+					editingEntry = database.getEntry(editingId);
+					if (editingEntry != null) {
+						if (editingEntry.setPaidInfo(json.getBoolean("received"),
+							json.getString("receivedOnDate"), json.getString("receivedOnAccount"))) {
+							database.save();
+						} else {
+							answer = new WebServerAnswerInJson("{\"success\": false, \"error\": \"" +
+								"There was some unspecified error!\"}");
+							respond(403, answer);
+							return;
+						}
+					} else {
+						answer = new WebServerAnswerInJson("{\"success\": false, \"error\": \"" +
+							"The entry could not be found - and therefore, its paid info could not be updated!\"}");
+						respond(403, answer);
+						return;
+					}
+					break;
+
 				case "/addEntry":
 
 					String catOrCustomer = json.getString("customer");
@@ -906,6 +927,14 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				}
 				orgs.append("]");
 				indexContent = StrUtils.replaceAll(indexContent, "[[AE_ORIGINATORS]]", orgs.toString());
+
+				StringBuilder accs = new StringBuilder();
+				accs.append("[");
+				for (String curAccount : database.getAccounts()) {
+					accs.append("\"" + curAccount + "\",");
+				}
+				accs.append("]");
+				indexContent = StrUtils.replaceAll(indexContent, "[[PAID_ACCOUNTS]]", accs.toString());
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TABS]]", tabsHtml);
 

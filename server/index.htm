@@ -32,6 +32,7 @@
 			window.aeCategories = [[AE_CATEGORIES]];
 			window.aeCustomers = [[AE_CUSTOMERS]];
 			window.aeOriginators = [[AE_ORIGINATORS]];
+			window.paidAccounts = [[PAID_ACCOUNTS]];
 		</script>
 
 		<div id="buttonBackground" style="position: absolute; z-index: 200; height: 30pt; right: 78pt;left: 210pt;bottom: 0;background: linear-gradient(0deg, rgb(20, 0, 30), rgba(10, 0, 20, 0.8), rgba(40, 0, 80, 0));">
@@ -112,7 +113,39 @@
 			</div>
 		</div>
 
-		<div class="modal wobbling_center_0" id="deleteModal" style="z-index: 1500; top: 240pt; background: linear-gradient(-5deg, rgb(60, 20, 50), rgb(40, 0, 80), rgba(40, 0, 80, 0.5), rgba(40, 0, 80, 0.8), rgb(60, 20, 50), rgb(60, 20, 50));">
+		<div class="modal wobbling_center_0" id="paidModal" style="z-index: 1500; top: 200pt; background: linear-gradient(-5deg, rgb(60, 20, 50), rgb(40, 0, 80), rgba(40, 0, 80, 0.5), rgba(40, 0, 80, 0.8), rgb(60, 20, 50), rgb(60, 20, 50));">
+			<div style="position: relative; padding-bottom: 4pt;">
+				You are adding a paid by date to this entry:
+			</div>
+			<div id="paidEntryContainer" style="position: relative; padding-bottom: 8pt;">
+			</div>
+
+			<div style="position: relative; padding-bottom: 8pt;">
+				<span>The entry...</span>
+				<div style="width: 90%; position: absolute; right: 0pt; top: 0; text-align: center;">
+					<span id="paidYepp" class="button checked" onclick="accountant.paidSelectYepp()">Has been paid</span>
+					<span id="paidNope" class="button unchecked" onclick="accountant.paidSelectNope()">Has not yet been paid</span>
+				</div>
+			</div>
+
+			<div style="position: relative; padding-bottom: 8pt;">
+				<span>Paid by Date:</span>
+				<input id="paidDate" type="text" style="width: 80%; position: absolute; right: 0pt; top: 0;" value="[[CURDATE]]" />
+			</div>
+
+			<div style="position: relative; padding-bottom: 8pt;">
+				<span>Paid <span id="paidToFromLabel">to</span> Account:</span>
+				<select id="paidAccount" style="width: 80%; position: absolute; right: 0pt; top: 0;">
+				</select>
+			</div>
+
+			<div class="buttonBar modal wobbling_center_5" style="position: absolute;left: 406pt;right: 247pt;display: block;top: unset;bottom: -55pt;">
+				<span class="button bigger" onclick="accountant.savePaidModal()">Save Changes</span>
+				<span class="button bigger" onclick="accountant.closePaidModal()">Cancel</span>
+			</div>
+		</div>
+
+		<div class="modal wobbling_center_0" id="deleteModal" style="z-index: 2000; top: 240pt; background: linear-gradient(-5deg, rgb(60, 20, 50), rgb(40, 0, 80), rgba(40, 0, 80, 0.5), rgba(40, 0, 80, 0.8), rgb(60, 20, 50), rgb(60, 20, 50));">
 			<div style="position: relative; padding-bottom: 8pt;">
 				Do you really want to delete the entry '<span id="delTitle"></span>'?
 			</div>
