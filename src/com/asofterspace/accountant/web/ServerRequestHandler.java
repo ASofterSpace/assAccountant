@@ -25,6 +25,7 @@ import com.asofterspace.accountant.tasks.TaskCtrl;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.TimeSpan;
 import com.asofterspace.accountant.timespans.Year;
+import com.asofterspace.accountant.world.Category;
 import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.gui.GuiUtils;
@@ -807,6 +808,30 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				indexContent = StrUtils.replaceAll(indexContent, "[[FORMAT]]", database.getFormatStr());
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
+
+				StringBuilder cats = new StringBuilder();
+				cats.append("[");
+				for (Category cat : Category.values()) {
+					cats.append("\"" + cat.getText() + "\",");
+				}
+				cats.append("]");
+				indexContent = StrUtils.replaceAll(indexContent, "[[AE_CATEGORIES]]", cats.toString());
+
+				StringBuilder custs = new StringBuilder();
+				custs.append("[");
+				for (String cust : database.getCustomers()) {
+					custs.append("\"" + cust + "\",");
+				}
+				custs.append("]");
+				indexContent = StrUtils.replaceAll(indexContent, "[[AE_CUSTOMERS]]", custs.toString());
+
+				StringBuilder orgs = new StringBuilder();
+				orgs.append("[");
+				for (String org : database.getOriginators()) {
+					orgs.append("\"" + org + "\",");
+				}
+				orgs.append("]");
+				indexContent = StrUtils.replaceAll(indexContent, "[[AE_ORIGINATORS]]", orgs.toString());
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TABS]]", tabsHtml);
 

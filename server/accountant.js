@@ -159,14 +159,14 @@ window.accountant = {
 
 					if (result.kind == "in") {
 						outer.aeSelectIncoming();
-						document.getElementById("aeCatCust").innerHTML = "<option>" + result.customer  + "</option>";
+						outer.trySelect(outer.custToId(result.customer));
 					} else {
 						outer.aeSelectOutgoing();
-						document.getElementById("aeCatCust").innerHTML = "<option>" + result.category + "</option>";
+						outer.trySelect(outer.catToId(result.category));
 					}
 					document.getElementById("aeDate").value = result.date;
 					document.getElementById("aeTitle").value = result.title;
-					document.getElementById("aeOriginator").innerHTML = "<option>" + result.originator + "</option>";
+					outer.trySelect(outer.orgToId(result.originator));
 					document.getElementById("aeBeforeTax").value = result.amount;
 					document.getElementById("aeTax").value = result.taxationPercent;
 					document.getElementById("aeAfterTax").value = result.postTaxAmount;
@@ -195,11 +195,10 @@ window.accountant = {
 		this.aeSelectOutgoing();
 		document.getElementById("aeDate").value = DateUtils.serializeDate(DateUtils.now());
 		document.getElementById("aeTitle").value = "";
-		document.getElementById("aeCatCust").innerHTML = "";
-		document.getElementById("aeOriginator").innerHTML = "";
 		document.getElementById("aeBeforeTax").value = "";
 		document.getElementById("aeTax").value = "";
 		document.getElementById("aeAfterTax").value = "";
+		this.trySelect(this.orgToId("Moya"));
 	},
 
 	closeAddEntryModal: function() {
@@ -232,6 +231,12 @@ window.accountant = {
 		if (label) {
 			label.innerHTML = "Category:";
 		}
+		var cats = "";
+		for (var i = 0; i < window.aeCategories.length; i++) {
+			cats += "<option id='" + this.catToId(window.aeCategories[i]) + "'>" +
+				window.aeCategories[i] + "</option>";
+		}
+		document.getElementById("aeCatCust").innerHTML = cats;
 	},
 
 	aeSelectIncoming: function() {
@@ -245,6 +250,40 @@ window.accountant = {
 		if (label) {
 			label.innerHTML = "Customer:";
 		}
+		var custs = "";
+		for (var i = 0; i < window.aeCustomers.length; i++) {
+			custs += "<option id='" + this.custToId(window.aeCustomers[i]) + "'>" +
+				window.aeCustomers[i] + "</option>";
+		}
+		document.getElementById("aeCatCust").innerHTML = custs;
+	},
+
+	catToId: function(cat) {
+		return this.somethingToId("aeCatOption", cat);
+	},
+
+	custToId: function(cust) {
+		return this.somethingToId("aeCustOption", cust);
+	},
+
+	orgToId: function(org) {
+		return this.somethingToId("aeOrgOption", org);
+	},
+
+	somethingToId: function(prefix, cat) {
+		cat = cat.toUpperCase();
+		var index = cat.indexOf(" ");
+		if (index < 0) {
+			return prefix + cat;
+		}
+		return prefix + cat.substring(0, index);
+	},
+
+	trySelect: function(id) {
+		var el = document.getElementById(id);
+		if (el) {
+			el.selected = true;
+		}
 	},
 
 }
@@ -254,3 +293,12 @@ window.addEventListener("resize", window.accountant.onResize);
 
 
 window.accountant.onResize();
+
+var orgs = "";
+for (var i = 0; i < window.aeOriginators.length; i++) {
+	orgs += "<option id='" + window.accountant.orgToId(window.aeOriginators[i]) + "'>" +
+		window.aeOriginators[i] + "</option>";
+}
+document.getElementById("aeOriginator").innerHTML = orgs;
+
+window.accountant.resetAddEntryModal();
