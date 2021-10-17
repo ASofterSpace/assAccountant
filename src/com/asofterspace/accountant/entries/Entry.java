@@ -5,7 +5,6 @@
 package com.asofterspace.accountant.entries;
 
 import com.asofterspace.accountant.AccountingUtils;
-import com.asofterspace.accountant.AddEntryGUI;
 import com.asofterspace.accountant.AddPaidGUI;
 import com.asofterspace.accountant.ConsistencyProblem;
 import com.asofterspace.accountant.ConsistencyWarning;
@@ -516,6 +515,8 @@ public abstract class Entry {
 			}
 		});
 
+		// no need to edit, as it can be done through the web interface
+		/*
 		curButton = new JButton("Edit");
 		curButton.addMouseListener(rowHighlighter);
 		curButton.setPreferredSize(defaultDimension);
@@ -527,6 +528,7 @@ public abstract class Entry {
 				editEntryGUI.show();
 			}
 		});
+		*/
 
 		curButton = new JButton("Delete");
 		curButton.addMouseListener(rowHighlighter);
