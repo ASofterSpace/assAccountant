@@ -19,6 +19,7 @@ import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.images.ColorRGB;
 import com.asofterspace.toolbox.io.CsvFileGerman;
 import com.asofterspace.toolbox.io.Directory;
+import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 
@@ -31,6 +32,7 @@ import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import javax.swing.JLabel;
@@ -54,9 +56,9 @@ public class AccountingUtils {
 		html += "<span style='width: 51%'>&nbsp;</span>";
 
 		html += AccountingUtils.createLabelHtml("Total:", textColor, tooltip, "text-align: right; width: 5%;");
-		html += AccountingUtils.createLabelHtml(database.formatMoney(totalBeforeTax, Currency.EUR), textColor, tooltip, "text-align: right; width: 10%;");
-		html += AccountingUtils.createLabelHtml(database.formatMoney(totalTax, Currency.EUR), textColor, tooltip, "text-align: right; width: 10%;");
-		html += AccountingUtils.createLabelHtml(database.formatMoney(totalAfterTax, Currency.EUR), textColor, tooltip, "text-align: right; width: 10%;");
+		html += AccountingUtils.createLabelHtml(database.formatMoney(totalBeforeTax, Currency.EUR), textColor, tooltip, "text-align: right; width: 8.5%;");
+		html += AccountingUtils.createLabelHtml(database.formatMoney(totalTax, Currency.EUR), textColor, tooltip, "text-align: right; width: 7%;");
+		html += AccountingUtils.createLabelHtml(database.formatMoney(totalAfterTax, Currency.EUR), textColor, tooltip, "text-align: right; width: 8.5%;");
 
 		html += "</div>";
 
@@ -694,7 +696,9 @@ public class AccountingUtils {
 
 		String altStr = "";
 		if ((tooltip != null) && !"".equals(tooltip)) {
-			altStr = " alt='" + tooltip + "'";
+			tooltip = StrUtils.replaceAll(tooltip, "\"", "");
+			tooltip = StrUtils.replaceAll(tooltip, "'", "");
+			altStr = " title='" + tooltip + "'";
 		}
 
 		return "<span style='color: " + colStr + "; " + style + "'" + altStr + ">" + text + "</span>";
@@ -898,4 +902,12 @@ public class AccountingUtils {
 		return database;
 	}
 
+	public static String getMonthLink(Date date) {
+		if (date == null) {
+			return "/overview";
+		}
+
+		return "/month_" + DateUtils.getYear(date) + "_" +
+				DateUtils.getMonthNameEN(date).toLowerCase();
+	}
 }

@@ -177,8 +177,18 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						postTaxAmountStr = json.getString("postTaxAmount");
 					}
 
+					String dateStr = json.getString("date");
+					Date date = DateUtils.parseDate(dateStr);
+					if (date == null) {
+						answer = new WebServerAnswerInJson("{\"success\": false, \"error\": \"" +
+							"The text " + dateStr + " could not be parsed as date! " +
+							"Please use YYYY-MM-DD or DD. MM. YYYY as date format.\"}");
+						respond(403, answer);
+						return;
+					}
+
 					// we add the new entry (no matter if we are editing a new one or editing an existing one)...
-					if (database.addEntry(json.getString("date"), json.getString("title"), catOrCustomer,
+					if (database.addEntry(date, json.getString("title"), catOrCustomer,
 						preTaxAmountStr, Currency.EUR, json.getString("taxationPercent"), postTaxAmountStr,
 						json.getString("originator"), "out".equals(json.getString("kind")))) {
 
@@ -189,6 +199,9 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						if (editingEntry != null) {
 							editingEntry.deleteFrom(database);
 						}
+
+						answer = new WebServerAnswerInJson("{\"success\": true, \"link\": \"" +
+							AccountingUtils.getMonthLink(date) + "\"}");
 					}
 					break;
 

@@ -18,7 +18,6 @@ import com.asofterspace.toolbox.configuration.ConfigFile;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.gui.MainWindow;
-import com.asofterspace.toolbox.gui.MenuItemForMainMenu;
 import com.asofterspace.toolbox.io.File;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.StrUtils;
@@ -33,7 +32,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.GridBagLayout;
@@ -298,6 +296,7 @@ public class GUI extends MainWindow {
 		});
 		edit.add(showSearch);
 
+		/*
 		MenuItemForMainMenu addEntry = new MenuItemForMainMenu("Add Entry");
 		addEntry.addMouseListener(new MouseAdapter() {
 			@Override
@@ -310,6 +309,7 @@ public class GUI extends MainWindow {
 			}
 		});
 		menu.add(addEntry);
+		*/
 
 		JMenu tasksMenu = new JMenu("Tasks");
 

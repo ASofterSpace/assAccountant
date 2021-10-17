@@ -97,7 +97,7 @@ public class OverviewTab extends Tab {
 			html += "<br>";
 			html += "<div class='line'>";
 
-			html += AccountingUtils.createLabelHtml(curProblem.getProblem(), curProblem.getColor(), "", "text-align: left; width: 80%;");
+			html += AccountingUtils.createLabelHtml(curProblem.getProblem(), curProblem.getColor(), curProblem.getProblem(), "text-align: left; width: 80%;");
 
 			// TODO :: add working buttons
 			/*
@@ -111,7 +111,11 @@ public class OverviewTab extends Tab {
 					addPaidGUI.show();
 				}
 			});
+			*/
 
+			html += "<span class='button' style='width:8%; float:right;' onclick='window.location = \"" + curProblem.getEntry().getMonthLink() + "\"'>Show</span>";
+
+			/*
 			curButton = new JButton("Show");
 			curButton.setPreferredSize(defaultDimension);
 			curPanel.add(curButton, new Arrangement(2, 0, 0.1, 1.0));
@@ -133,7 +137,7 @@ public class OverviewTab extends Tab {
 			html += "<br>";
 			html += "<div class='line'>";
 
-			html += AccountingUtils.createLabelHtml(curProblem.getProblem(), curProblem.getColor(), "", "text-align: left; width: 80%;");
+			html += AccountingUtils.createLabelHtml(curProblem.getProblem(), curProblem.getColor(), curProblem.getProblem(), "text-align: left; width: 80%;");
 
 			// TODO - add working buttons
 			/*
@@ -148,7 +152,11 @@ public class OverviewTab extends Tab {
 					addEntryGUI.show();
 				}
 			});
+			*/
 
+			html += "<span class='button' style='width:8%; float:right;' onclick='window.location = \"" + curProblem.getEntry().getMonthLink() + "\"'>Show</span>";
+
+			/*
 			curButton = new JButton("Show");
 			curButton.addMouseListener(rowHighlighter);
 			curButton.setPreferredSize(defaultDimension);

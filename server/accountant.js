@@ -169,8 +169,16 @@ window.accountant = {
 					document.getElementById("aeDate").value = result.date;
 					document.getElementById("aeTitle").value = result.title;
 					outer.trySelect(outer.orgToId(result.originator));
+
+					if (result.amount.indexOf(" ") >= 0) {
+						result.amount = result.amount.substring(0, result.amount.indexOf(" "));
+					}
 					document.getElementById("aeBeforeTax").value = result.amount;
 					document.getElementById("aeTax").value = result.taxationPercent;
+
+					if (result.postTaxAmount.indexOf(" ") >= 0) {
+						result.postTaxAmount = result.postTaxAmount.substring(0, result.postTaxAmount.indexOf(" "));
+					}
 					document.getElementById("aeAfterTax").value = result.postTaxAmount;
 
 					outer.currentlyEditing = id;
@@ -187,6 +195,7 @@ window.accountant = {
 			modal.style.display = "block";
 
 			this.currentlyEditing = null;
+			this.last_link = null;
 
 			document.getElementById("modalBackground").style.display = "block";
 		}
@@ -211,8 +220,14 @@ window.accountant = {
 			modal.style.display = "none";
 		}
 
-		// reload, as data might have changed while the modal was open...
-		window.location.reload(false);
+		if (this.last_link == null) {
+			// reload, as data might have changed while the modal was open...
+			window.location.reload(false);
+		} else {
+			// ... or go to the correct page automagically if we actually made a change while
+			// the modal was open!
+			window.location = this.last_link;
+		}
 	},
 
 	submitAddEntryModal: function(closeOnSubmit) {
@@ -233,7 +248,10 @@ window.accountant = {
 							entrySavedLabel.style.display = "none";
 						}, 3000);
 					}
+					window.accountant.last_link = result.link;
+					// if we want to close on submit...
 					if (closeOnSubmit) {
+						// ... go to the correct page automagically!
 						window.accountant.closeAddEntryModal();
 					}
 				}

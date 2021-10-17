@@ -396,14 +396,8 @@ public class Database {
 		}
 	}
 
-	public boolean addEntry(String dateStr, String title, Object catOrCustomer, String amount,
+	public boolean addEntry(Date date, String title, Object catOrCustomer, String amount,
 		Currency currency, String taxationPercent, String postTaxAmount, String originator, boolean isOutgoing) {
-
-		Date date = DateUtils.parseDate(dateStr);
-		if (date == null) {
-			return GuiUtils.complain("The text " + dateStr + " could not be parsed as date!\n" +
-				"Please use YYYY-MM-DD or DD. MM. YYYY as date format.");
-		}
 
 		Month curMonth = getMonthFromEntryDate(date);
 
@@ -551,7 +545,14 @@ public class Database {
 
 				Category category = mapTitleToCategory(titleStr);
 
-				if (!addEntry(dateStr, titleStr, category.getText(), amountStr, Currency.EUR, taxationPercentStr, null, "", true)) {
+				Date date = DateUtils.parseDate(dateStr);
+				if (date == null) {
+					System.out.println("The text " + dateStr + " could not be parsed as date! " +
+						"Please use YYYY-MM-DD or DD. MM. YYYY as date format.");
+					break;
+				}
+
+				if (!addEntry(date, titleStr, category.getText(), amountStr, Currency.EUR, taxationPercentStr, null, "", true)) {
 					// stop upon the first failure instead of showing a million error messages
 					break;
 				}
@@ -611,7 +612,14 @@ public class Database {
 					}
 				}
 
-				if (!addEntry(dateStr, titleStr, customer, amountStr, Currency.EUR, taxationPercentStr, null, "", false)) {
+				Date date = DateUtils.parseDate(dateStr);
+				if (date == null) {
+					System.out.println("The text " + dateStr + " could not be parsed as date! " +
+						"Please use YYYY-MM-DD or DD. MM. YYYY as date format.");
+					break;
+				}
+
+				if (!addEntry(date, titleStr, customer, amountStr, Currency.EUR, taxationPercentStr, null, "", false)) {
 					// stop upon the first failure instead of showing a million error messages
 					break;
 				}

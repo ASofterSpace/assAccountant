@@ -423,8 +423,15 @@ public class AddEntryGUI {
 			postTaxAmountStr = amountPostTax.getText();
 		}
 
+		Date date = DateUtils.parseDate(dateText.getText());
+		if (date == null) {
+			System.out.println("The text " + dateText.getText() + " could not be parsed as date! " +
+				"Please use YYYY-MM-DD or DD. MM. YYYY as date format.");
+			return;
+		}
+
 		// we add the new entry (no matter if we are editing a new one or editing an existing one)...
-		if (database.addEntry(dateText.getText(), titleText.getText(), catOrCustomer,
+		if (database.addEntry(date, titleText.getText(), catOrCustomer,
 			preTaxAmountStr, Currency.EUR, taxPerc.getText(), postTaxAmountStr,
 			(String) originator.getSelectedItem(), isOutgoing.isSelected())) {
 
@@ -434,7 +441,6 @@ public class AddEntryGUI {
 				editingEntry.deleteFrom(database);
 			}
 
-			Date date = DateUtils.parseDate(dateText.getText());
 			if (date != null) {
 				Month month = database.getMonthFromEntryDate(date);
 				TimeSpanTab curTab = mainGUI.getTabForTimeSpan(month);

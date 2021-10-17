@@ -375,16 +375,20 @@ public abstract class Entry {
 		if (getReceived()) {
 			tooltip = "Paid on " + DateUtils.serializeDate(getReceivedOnDate()) + " to " + getReceivedOnAccount();
 		}
+		String titletooltip = getTitle() + " | " + tooltip;
 
 		html += "<div class='line'>";
 
 		html += AccountingUtils.createLabelHtml(getDateAsText(), textColor, tooltip, "text-align: center; width: 10%;");
-		html += AccountingUtils.createLabelHtml(getTitle(), textColor, tooltip, "text-align: left; width: 30%;");
+		html += AccountingUtils.createLabelHtml(getTitle(), textColor, titletooltip, "text-align: left; width: 30%;");
 		html += AccountingUtils.createLabelHtml("[" + getCategoryOrCustomer() + "]", textColor, tooltip, "text-align: left; width: 11%;");
 		html += AccountingUtils.createLabelHtml(getOriginator(), textColor, tooltip, "text-align: right; width: 5%;");
-		html += AccountingUtils.createLabelHtml(getPreTaxAmountAsText(), textColor, tooltip, "text-align: right; width: 10%;");
-		html += AccountingUtils.createLabelHtml(getTaxPercentAsText(), textColor, tooltip, "text-align: right; width: 10%;");
-		html += AccountingUtils.createLabelHtml(getPostTaxAmountAsText(), textColor, tooltip, "text-align: right; width: 10%;");
+		html += AccountingUtils.createLabelHtml(getPreTaxAmountAsText(), textColor, tooltip, "text-align: right; width: 8.5%;");
+		html += AccountingUtils.createLabelHtml(getTaxPercentAsText(), textColor, tooltip, "text-align: right; width: 7%;");
+		html += AccountingUtils.createLabelHtml(getPostTaxAmountAsText(), textColor, tooltip, "text-align: right; width: 8.5%; padding-right: 1%;");
+
+		html += "<span class='button' style='width:5%; margin-right:0.3%;' ";
+		html += "onclick='accountant.paidEntry(\"" + getId() + "\")'>Paid</span>";
 
 		/*
 		JButton curButton = new JButton("Paid");
@@ -400,7 +404,7 @@ public abstract class Entry {
 		});
 		*/
 
-		html += "<span class='button' style='width:8%; float:right;' ";
+		html += "<span class='button' style='width:5%; margin-right:0.3%;' ";
 		html += "onclick='accountant.editEntry(\"" + getId() + "\")'>Edit</span>";
 
 		/*
@@ -415,7 +419,12 @@ public abstract class Entry {
 				editEntryGUI.show();
 			}
 		});
+		*/
 
+		html += "<span class='button' style='width:5%;' ";
+		html += "onclick='accountant.deleteEntry(\"" + getId() + "\")'>Delete</span>";
+
+		/*
 		curButton = new JButton("Delete");
 		curButton.addMouseListener(rowHighlighter);
 		curButton.setPreferredSize(defaultDimension);
@@ -671,6 +680,10 @@ public abstract class Entry {
 			return false;
 		}
 		return id.equals(otherId);
+	}
+
+	public String getMonthLink() {
+		return AccountingUtils.getMonthLink(date);
 	}
 
 	@Override
