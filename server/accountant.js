@@ -3,6 +3,8 @@ window.accountant = {
 	// id of the entry we are currently editing
 	currentlyEditing: null,
 
+	lastTaxChangeWasPreTax: true,
+
 	exportCsvs: function(tab) {
 		var request = new XMLHttpRequest();
 		request.open("POST", "exportCSVs", true);
@@ -170,6 +172,8 @@ window.accountant = {
 					document.getElementById("aeBeforeTax").value = result.amount;
 					document.getElementById("aeTax").value = result.taxationPercent;
 					document.getElementById("aeAfterTax").value = result.postTaxAmount;
+
+					outer.currentlyEditing = id;
 				}
 			}
 		}
@@ -211,13 +215,56 @@ window.accountant = {
 		window.location.reload(false);
 	},
 
-	submitAddEntryModal: function() {
+	submitAddEntryModal: function(closeOnSubmit) {
 
+		var request = new XMLHttpRequest();
+		request.open("POST", "addEntry", true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				// show some sort of confirmation
+				if (result.success) {
+					var entrySavedLabel = document.getElementById("entrySavedLabel");
+					if (entrySavedLabel) {
+						entrySavedLabel.style.display = "block";
+						window.setTimeout(function () {
+							entrySavedLabel.style.display = "none";
+						}, 3000);
+					}
+					if (closeOnSubmit) {
+						window.accountant.closeAddEntryModal();
+					}
+				}
+			}
+		}
+
+		var data = {
+			"date": document.getElementById("aeDate").value,
+			"title": document.getElementById("aeTitle").value,
+			"originator": document.getElementById("aeOriginator").value,
+			"amount": document.getElementById("aeBeforeTax").value,
+			"taxationPercent": document.getElementById("aeTax").value,
+			"postTaxAmount": document.getElementById("aeAfterTax").value,
+			"lastTaxChangeWasPreTax": this.lastTaxChangeWasPreTax,
+			"id": this.currentlyEditing,
+		};
+
+		var outgoing = document.getElementById("aeOutgoing");
+		if (outgoing && (outgoing.className == "button checked")) {
+			data.kind = "out";
+			data.category = document.getElementById("aeCatCust").value;
+		} else {
+			data.kind = "in";
+			data.customer = document.getElementById("aeCatCust").value;
+		}
+
+		request.send(JSON.stringify(data));
 	},
 
 	submitAndCloseAddEntryModal: function() {
-		this.submitAddEntryModal();
-		this.closeAddEntryModal();
+		this.submitAddEntryModal(true);
 	},
 
 	aeSelectOutgoing: function() {
@@ -233,7 +280,8 @@ window.accountant = {
 		}
 		var cats = "";
 		for (var i = 0; i < window.aeCategories.length; i++) {
-			cats += "<option id='" + this.catToId(window.aeCategories[i]) + "'>" +
+			cats += "<option id='" + this.catToId(window.aeCategories[i]) + "' " +
+				"value='" + window.aeCategories[i] + "'>" +
 				window.aeCategories[i] + "</option>";
 		}
 		document.getElementById("aeCatCust").innerHTML = cats;
@@ -252,7 +300,8 @@ window.accountant = {
 		}
 		var custs = "";
 		for (var i = 0; i < window.aeCustomers.length; i++) {
-			custs += "<option id='" + this.custToId(window.aeCustomers[i]) + "'>" +
+			custs += "<option id='" + this.custToId(window.aeCustomers[i]) + "' " +
+				"value='" + window.aeCustomers[i] + "'>" +
 				window.aeCustomers[i] + "</option>";
 		}
 		document.getElementById("aeCatCust").innerHTML = custs;
@@ -286,6 +335,68 @@ window.accountant = {
 		}
 	},
 
+	aeCalcTax: function() {
+		if (this.lastTaxChangeWasPreTax) {
+			this.aeCalcPostTax();
+		} else {
+			this.aeCalcPreTax();
+		}
+	},
+
+	aeCalcPostTax: function() {
+		this.lastTaxChangeWasPreTax = true;
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "calcPostTax", true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				if (result.success) {
+					if (result.postTax == null) {
+						result.postTax = "";
+					}
+					document.getElementById("aeAfterTax").value = result.postTax;
+				}
+			}
+		}
+
+		var data = {
+			"preTax": document.getElementById("aeBeforeTax").value,
+			"tax": document.getElementById("aeTax").value,
+		};
+
+		request.send(JSON.stringify(data));
+	},
+
+	aeCalcPreTax: function() {
+		this.lastTaxChangeWasPreTax = false;
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "calcPreTax", true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				if (result.success) {
+					if (result.preTax == null) {
+						result.preTax = "";
+					}
+					document.getElementById("aeBeforeTax").value = result.preTax;
+				}
+			}
+		}
+
+		var data = {
+			"postTax": document.getElementById("aeAfterTax").value,
+			"tax": document.getElementById("aeTax").value,
+		};
+
+		request.send(JSON.stringify(data));
+	},
+
 }
 
 
@@ -296,7 +407,8 @@ window.accountant.onResize();
 
 var orgs = "";
 for (var i = 0; i < window.aeOriginators.length; i++) {
-	orgs += "<option id='" + window.accountant.orgToId(window.aeOriginators[i]) + "'>" +
+	orgs += "<option id='" + window.accountant.orgToId(window.aeOriginators[i]) + "' " +
+		"value='" + window.aeOriginators[i] + "'>" +
 		window.aeOriginators[i] + "</option>";
 }
 document.getElementById("aeOriginator").innerHTML = orgs;

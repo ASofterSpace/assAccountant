@@ -41,7 +41,7 @@ public class MonthTab extends TimeSpanTab {
 		html += "<div class='relContainer'>";
 
 		if (ConfigCtrl.invoiceLocationIsSet()) {
-			html += "<span class='topleftAction button' ";
+			html += "<span class='topleftAction button' style='left:4pt;' ";
 			html += "onclick='window.accountant.openInOS(" + getYear().getNum() + ", " + getMonth().getNum() + ")'>";
 			html += "Open in OS</span>";
 			String invoiceLocation = ConfigCtrl.getInvoiceLocation(getYear().getNum(), getMonth().getNum());

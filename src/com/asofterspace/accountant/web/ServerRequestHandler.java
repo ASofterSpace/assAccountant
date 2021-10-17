@@ -26,6 +26,7 @@ import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.TimeSpan;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.world.Category;
+import com.asofterspace.toolbox.accounting.Currency;
 import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.gui.GuiUtils;
@@ -140,6 +141,57 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 					break;
 
+				case "/calcPostTax":
+					Integer amountPreTaxInt = FinanceUtils.parseMoney(json.getString("preTax"));
+					Integer amountTaxInt = AccountingUtils.parseTaxes(json.getString("tax"));
+					Integer amountPostTaxInt = FinanceUtils.calcPostTax(amountPreTaxInt, amountTaxInt);
+					if (amountPostTaxInt != null) {
+						answer = new WebServerAnswerInJson("{\"success\": true, \"postTax\": \"" +
+							database.formatMoney(amountPostTaxInt) + "\"}");
+					}
+					break;
+
+				case "/calcPreTax":
+					amountPostTaxInt = FinanceUtils.parseMoney(json.getString("postTax"));
+					amountTaxInt = AccountingUtils.parseTaxes(json.getString("tax"));
+					amountPreTaxInt = FinanceUtils.calcPreTax(amountPostTaxInt, amountTaxInt);
+					if (amountPreTaxInt != null) {
+						answer = new WebServerAnswerInJson("{\"success\": true, \"preTax\": \"" +
+							database.formatMoney(amountPreTaxInt) + "\"}");
+					}
+					break;
+
+				case "/addEntry":
+
+					String catOrCustomer = json.getString("customer");
+					if ("out".equals(json.getString("kind"))) {
+						catOrCustomer = json.getString("category");
+					}
+
+					String preTaxAmountStr = null;
+					String postTaxAmountStr = null;
+
+					if (json.getBoolean("lastTaxChangeWasPreTax")) {
+						preTaxAmountStr = json.getString("amount");
+					} else {
+						postTaxAmountStr = json.getString("postTaxAmount");
+					}
+
+					// we add the new entry (no matter if we are editing a new one or editing an existing one)...
+					if (database.addEntry(json.getString("date"), json.getString("title"), catOrCustomer,
+						preTaxAmountStr, Currency.EUR, json.getString("taxationPercent"), postTaxAmountStr,
+						json.getString("originator"), "out".equals(json.getString("kind")))) {
+
+						// ... and if we are editing an existing one, we delete the existing one
+						// (think about this as the scifi transporter approach to editing ^^)
+						String editingId = json.getString("id");
+						Entry editingEntry = database.getEntry(editingId);
+						if (editingEntry != null) {
+							editingEntry.deleteFrom(database);
+						}
+					}
+					break;
+
 				default:
 					respond(404);
 					return;
@@ -218,18 +270,14 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		}
 
 		if ("/entry".equals(location)) {
-
 			String id = arguments.get("id");
-
-			List<Entry> entries = database.getEntries();
-			for (Entry entry : entries) {
-				if (entry.hasId(id)) {
-					boolean forDisplay = true;
-					JSON json = new JSON(entry.toRecord(forDisplay));
-					json.set("success", true);
-					WebServerAnswerInJson answer = new WebServerAnswerInJson(json);
-					return answer;
-				}
+			Entry entry = database.getEntry(id);
+			if (entry != null) {
+				boolean forDisplay = true;
+				JSON json = new JSON(entry.toRecord(forDisplay));
+				json.set("success", true);
+				WebServerAnswerInJson answer = new WebServerAnswerInJson(json);
+				return answer;
 			}
 		}
 

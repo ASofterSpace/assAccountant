@@ -1338,6 +1338,17 @@ public class Database {
 		return result;
 	}
 
+	public synchronized Entry getEntry(String id) {
+		for (Year year : getYears()) {
+			for (Entry entry : year.getEntries()) {
+				if (entry.hasId(id)) {
+					return entry;
+				}
+			}
+		}
+		return null;
+	}
+
 	public synchronized List<Entry> getEntriesOrdered() {
 		List<Entry> result = new ArrayList<>();
 		for (Year year : getYears()) {

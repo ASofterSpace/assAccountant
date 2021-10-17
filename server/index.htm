@@ -88,24 +88,24 @@
 
 			<div style="position: relative; padding-bottom: 8pt;">
 				<span>Amount before tax: </span>
-				<input id="aeBeforeTax" type="text" style="width: 80%; position: absolute; right: 20pt; top: 0;" value="" />
+				<input id="aeBeforeTax" type="text" style="width: 80%; position: absolute; right: 20pt; top: 0;" value="" oninput="accountant.aeCalcPostTax()" />
 				<span style="position: absolute;right: 0;top: 0;">€</span>
 			</div>
 
 			<div style="position: relative; padding-bottom: 8pt;">
 				<span>Tax percentage: </span>
-				<input id="aeTax" type="text" style="width: 80%; position: absolute; right: 20pt; top: 0;" value="" />
+				<input id="aeTax" type="text" style="width: 80%; position: absolute; right: 20pt; top: 0;" value="" oninput="accountant.aeCalcTax()" />
 				<span style="position: absolute;right: 0;top: 0;">%</span>
 			</div>
 
 			<div style="position: relative; padding-bottom: 8pt;">
 				<span>Amount after tax: </span>
-				<input id="aeAfterTax" type="text" style="width: 80%; position: absolute; right: 20pt; top: 0;" value="" />
+				<input id="aeAfterTax" type="text" style="width: 80%; position: absolute; right: 20pt; top: 0;" value="" oninput="accountant.aeCalcPreTax()" />
 				<span style="position: absolute;right: 0;top: 0;">€</span>
 			</div>
 
 			<div class="buttonBar modal wobbling_center_5" style="position: absolute;left: 362pt;right: 180pt;display: block;top: unset;bottom: -55pt;">
-				<span class="button bigger" onclick="accountant.submitAddEntryModal()">Save</span>
+				<span class="button bigger" onclick="accountant.submitAddEntryModal(false)">Save</span>
 				<span class="button bigger" onclick="accountant.submitAndCloseAddEntryModal()">Save &amp; Exit</span>
 				<span class="button bigger" onclick="accountant.resetAddEntryModal()">Reset</span>
 				<span class="button bigger" onclick="accountant.closeAddEntryModal()">Exit</span>
