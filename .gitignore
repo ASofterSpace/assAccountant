@@ -45,3 +45,6 @@ import
 
 # pictures
 /server/pics
+
+# toolbox-js
+/server/toolbox

@@ -119,11 +119,13 @@ public class Month extends TimeSpan {
 		Record outgoingRec = Record.emptyArray();
 		result.set(OUTGOING_KEY, outgoingRec);
 
+		boolean forDisplay = false;
+
 		for (Incoming entry : incomings) {
-			incomingRec.append(entry.toRecord());
+			incomingRec.append(entry.toRecord(forDisplay));
 		}
 		for (Outgoing entry : outgoings) {
-			outgoingRec.append(entry.toRecord());
+			outgoingRec.append(entry.toRecord(forDisplay));
 		}
 
 		result.set(VAT_PREPAID_KEY, vatPrepaymentsPaidTotal);

@@ -10,7 +10,7 @@
 
 		<meta name="description" content="Our accountant, who helps us with invoices, payments and legal forms.">
 
-		<link href="style.css?v=@version" media="all" rel="stylesheet" type="text/css">
+		@include(inc_dependencies.htm)
 	</head>
 
 	<body id="body">
@@ -31,9 +31,83 @@
 			window.currentFormat = "[[FORMAT]]";
 		</script>
 
-		<span class="bottomrightAction button" onclick="window.accountant.changeFormat();">
+		<div id="buttonBackground" style="position: absolute; z-index: 200; height: 30pt; right: 78pt;left: 210pt;bottom: 0;background: linear-gradient(0deg, rgb(20, 0, 30), rgba(10, 0, 20, 0.8), rgba(40, 0, 80, 0));">
+			&nbsp;
+		</div>
+
+		<span class="bottomleftAction button" style="z-index: 300;" onclick="window.accountant.showAddEntryModal();">
+			Add Entry
+		</span>
+
+		<span class="bottomrightAction button" style="z-index: 300;" onclick="window.accountant.changeFormat();">
 			Format: [[FORMAT]]
 		</span>
+
+		<div id="modalBackground" style="position: absolute; display: none; z-index: 500;top: 0;right: 0;left: 0;bottom: 0;background: black;opacity: 0.65;">
+			&nbsp;
+		</div>
+
+		<div class="modal wobbling_center_0" id="addEntryModal" style="z-index: 1000; top: 140pt; background: linear-gradient(-5deg, rgb(60, 20, 50), rgb(40, 0, 80), rgba(40, 0, 80, 0.5), rgba(40, 0, 80, 0.8), rgb(60, 20, 50), rgb(60, 20, 50));">
+			<div id="entrySavedLabel" class="modal wobbling_center_4" style="display: none;text-align: center;font-weight: bold;font-style: italic;color: #F00;padding-bottom: 10pt; top:-50pt;">
+				Saved!
+			</div>
+
+			<div style="position: relative; padding-bottom: 8pt;">
+				<span>Kind:</span>
+				<div style="width: 90%; position: absolute; right: 0pt; top: 0; text-align: center;">
+					<span id="aeOutgoing" class="button checked" onclick="accountant.aeSelectOutgoing()">Outgoing Money (we have to pay)</span>
+					<span id="aeIncoming" class="button unchecked" onclick="accountant.aeSelectIncoming()">Incoming Money (we get paid)</span>
+				</div>
+				<span class="button" onclick="accountant.closeAddEntryModal()" style="position: absolute;right: 0;top: 0;">X</span>
+			</div>
+
+			<div style="position: relative; padding-bottom: 8pt;">
+				<span>Date in YYYY-MM-DD or DD. MM. YYYY:</span>
+				<input id="aeDate" type="text" style="width: 70%; position: absolute; right: 0pt; top: 0;" value="[[CURDATE]]" />
+			</div>
+
+			<div style="position: relative; padding-bottom: 8pt;">
+				<span>Title:</span>
+				<input id="aeTitle" type="text" style="width: 90%; position: absolute; right: 0pt; top: 0;" value="" />
+			</div>
+
+			<div style="position: relative; padding-bottom: 8pt;">
+				<span id="aeCatCustLabel">Category:</span>
+				<select id="aeCatCust" style="width: 85%; position: absolute; right: 0pt; top: 0;">
+				</select>
+			</div>
+
+			<div style="position: relative; padding-bottom: 8pt;">
+				<span>Originator:</span>
+				<select id="aeOriginator" style="width: 85%; position: absolute; right: 0pt; top: 0;">
+				</select>
+			</div>
+
+			<div style="position: relative; padding-bottom: 8pt;">
+				<span>Amount before tax: </span>
+				<input id="aeBeforeTax" type="text" style="width: 80%; position: absolute; right: 20pt; top: 0;" value="" />
+				<span style="position: absolute;right: 0;top: 0;">€</span>
+			</div>
+
+			<div style="position: relative; padding-bottom: 8pt;">
+				<span>Tax percentage: </span>
+				<input id="aeTax" type="text" style="width: 80%; position: absolute; right: 20pt; top: 0;" value="" />
+				<span style="position: absolute;right: 0;top: 0;">%</span>
+			</div>
+
+			<div style="position: relative; padding-bottom: 8pt;">
+				<span>Amount after tax: </span>
+				<input id="aeAfterTax" type="text" style="width: 80%; position: absolute; right: 20pt; top: 0;" value="" />
+				<span style="position: absolute;right: 0;top: 0;">€</span>
+			</div>
+
+			<div class="buttonBar modal wobbling_center_5" style="position: absolute;left: 362pt;right: 180pt;display: block;top: unset;bottom: -55pt;">
+				<span class="button bigger" onclick="accountant.submitAddEntryModal()">Save</span>
+				<span class="button bigger" onclick="accountant.submitAndCloseAddEntryModal()">Save &amp; Exit</span>
+				<span class="button bigger" onclick="accountant.resetAddEntryModal()">Reset</span>
+				<span class="button bigger" onclick="accountant.closeAddEntryModal()">Exit</span>
+			</div>
+		</div>
 
 		<input type="text" id="copyInputField" style="position: fixed; top: -25pt;" />
 

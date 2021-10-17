@@ -43,9 +43,11 @@ public class Incoming extends Entry {
 	}
 
 	@Override
-	public Record toRecord() {
+	public Record toRecord(boolean forDisplay) {
 
-		Record result = super.toRecord();
+		Record result = super.toRecord(forDisplay);
+
+		result.set(KIND_KEY, "in");
 
 		result.set(CUSTOMER_KEY, customer);
 

@@ -10,6 +10,7 @@ import com.asofterspace.accountant.AssAccountant;
 import com.asofterspace.accountant.ConfigCtrl;
 import com.asofterspace.accountant.data.OutgoingOverviewData;
 import com.asofterspace.accountant.Database;
+import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.entries.Incoming;
 import com.asofterspace.accountant.Problem;
 import com.asofterspace.accountant.TabCtrl;
@@ -211,6 +212,22 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						WebServerAnswerInJson answer = new WebServerAnswerInJson(json);
 						return answer;
 					}
+				}
+			}
+		}
+
+		if ("/entry".equals(location)) {
+
+			String id = arguments.get("id");
+
+			List<Entry> entries = database.getEntries();
+			for (Entry entry : entries) {
+				if (entry.hasId(id)) {
+					boolean forDisplay = true;
+					JSON json = new JSON(entry.toRecord(forDisplay));
+					json.set("success", true);
+					WebServerAnswerInJson answer = new WebServerAnswerInJson(json);
+					return answer;
 				}
 			}
 		}
@@ -788,6 +805,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				tabsHtml += "</div>";
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[FORMAT]]", database.getFormatStr());
+
+				indexContent = StrUtils.replaceAll(indexContent, "[[CURDATE]]", DateUtils.serializeDate(DateUtils.now()));
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TABS]]", tabsHtml);
 

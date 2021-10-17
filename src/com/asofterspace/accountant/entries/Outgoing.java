@@ -44,9 +44,11 @@ public class Outgoing extends Entry {
 	}
 
 	@Override
-	public Record toRecord() {
+	public Record toRecord(boolean forDisplay) {
 
-		Record result = super.toRecord();
+		Record result = super.toRecord(forDisplay);
+
+		result.set(KIND_KEY, "out");
 
 		result.set(CATEGORY_KEY, category);
 

@@ -33,6 +33,7 @@ import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -40,6 +41,7 @@ import javax.swing.JPanel;
 
 public abstract class Entry {
 
+	public static final String KIND_KEY = "kind";
 	private static final String PRE_TAX_AMOUNT_KEY = "amount";
 	private static final String POST_TAX_AMOUNT_KEY = "postTaxAmount";
 	private static final String CURRENCY_KEY = "currency";
@@ -70,6 +72,9 @@ public abstract class Entry {
 	private Date receivedOnDate;
 
 	private String receivedOnAccount;
+
+	// not stored across sessions, only used to identify to the backend an entry that is shown on the frontend
+	private String id = null;
 
 	protected Month parent;
 
@@ -131,13 +136,17 @@ public abstract class Entry {
 		this.parent = parent;
 	}
 
-	public Record toRecord() {
+	public Record toRecord(boolean forDisplay) {
 
 		Record result = new Record();
 
-		result.set(PRE_TAX_AMOUNT_KEY, preTaxAmount);
-
-		result.set(POST_TAX_AMOUNT_KEY, postTaxAmount);
+		if (forDisplay) {
+			result.set(PRE_TAX_AMOUNT_KEY, getPreTaxAmountAsText());
+			result.set(POST_TAX_AMOUNT_KEY, getPostTaxAmountAsText());
+		} else {
+			result.set(PRE_TAX_AMOUNT_KEY, preTaxAmount);
+			result.set(POST_TAX_AMOUNT_KEY, postTaxAmount);
+		}
 
 		result.set(CURRENCY_KEY, currency);
 
@@ -390,7 +399,12 @@ public abstract class Entry {
 				addPaidGUI.show();
 			}
 		});
+		*/
 
+		html += "<span class='button' style='width:8%; float:right;' ";
+		html += "onclick='accountant.editEntry(\"" + getId() + "\")'>Edit</span>";
+
+		/*
 		curButton = new JButton("Edit");
 		curButton.addMouseListener(rowHighlighter);
 		curButton.setPreferredSize(defaultDimension);
@@ -641,6 +655,20 @@ public abstract class Entry {
 			return true;
 		}
 		return false;
+	}
+
+	public String getId() {
+		if (id == null) {
+			id = "" + UUID.randomUUID();
+		}
+		return id;
+	}
+
+	public boolean hasId(String otherId) {
+		if (id == null) {
+			return false;
+		}
+		return id.equals(otherId);
 	}
 
 	@Override

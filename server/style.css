@@ -73,7 +73,7 @@ span.bottomrightAction, a.bottomrightAction {
 }
 
 span.topleftAction, a.topleftAction, span.bottomleftAction, a.bottomleftAction {
-	left: 10pt;
+	left: 220pt;
 }
 
 span.toprightAction, a.toprightAction, span.topleftAction, a.topleftAction {
@@ -126,6 +126,28 @@ span.button.unchecked {
 
 span.button.checked {
 	background: rgba(150, 200, 250, 0.6);
+}
+
+div.modal {
+	display: none;
+	position: absolute;
+	top: 100pt;
+	left: 100pt;
+	right: 100pt;
+	border-radius: 16pt;
+	background: linear-gradient(15deg, rgb(60, 20, 50), rgb(40, 0, 80), rgb(60, 20, 50));
+	padding: 15pt;
+	opacity: 0.95;
+}
+
+div.modal textarea {
+	width: 100%;
+	box-sizing: border-box;
+}
+
+div.modal > div.column {
+	width: 18%;
+	display: inline-block;
 }
 
 div.line:hover {

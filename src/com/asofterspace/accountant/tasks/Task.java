@@ -180,6 +180,9 @@ public class Task extends GenericTask {
 		for (String detailLine : detailsAfterReplacement) {
 			html.append("<div class='line' onclick='accountant.copyText(\"");
 			html.append(StrUtils.replaceAll(detailLine, "\"", "\" + '\"' + \"") + "\")'>");
+			if (detailLine.equals("")) {
+				detailLine = "&nbsp;";
+			}
 			html.append(detailLine);
 			html.append("</div>");
 		}

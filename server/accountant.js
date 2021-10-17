@@ -1,5 +1,8 @@
 window.accountant = {
 
+	// id of the entry we are currently editing
+	currentlyEditing: null,
+
 	exportCsvs: function(tab) {
 		var request = new XMLHttpRequest();
 		request.open("POST", "exportCSVs", true);
@@ -136,6 +139,111 @@ window.accountant = {
 			for (var i = 0; i < elems.length; i++) {
 				elems[i].style.display = 'block';
 			}
+		}
+	},
+
+	editEntry: function(id) {
+
+		var request = new XMLHttpRequest();
+		request.open("GET", "entry?id=" + id, true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		var outer = this;
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				if (result.success) {
+					outer.showAddEntryModal();
+					outer.resetAddEntryModal();
+
+					if (result.kind == "in") {
+						outer.aeSelectIncoming();
+						document.getElementById("aeCatCust").innerHTML = "<option>" + result.customer  + "</option>";
+					} else {
+						outer.aeSelectOutgoing();
+						document.getElementById("aeCatCust").innerHTML = "<option>" + result.category + "</option>";
+					}
+					document.getElementById("aeDate").value = result.date;
+					document.getElementById("aeTitle").value = result.title;
+					document.getElementById("aeOriginator").innerHTML = "<option>" + result.originator + "</option>";
+					document.getElementById("aeBeforeTax").value = result.amount;
+					document.getElementById("aeTax").value = result.taxationPercent;
+					document.getElementById("aeAfterTax").value = result.postTaxAmount;
+				}
+			}
+		}
+
+		request.send();
+	},
+
+	showAddEntryModal: function() {
+		var modal = document.getElementById("addEntryModal");
+		if (modal) {
+			modal.style.display = "block";
+
+			this.currentlyEditing = null;
+
+			document.getElementById("modalBackground").style.display = "block";
+		}
+	},
+
+	resetAddEntryModal: function() {
+
+		var DateUtils = toolbox.utils.DateUtils;
+
+		this.aeSelectOutgoing();
+		document.getElementById("aeDate").value = DateUtils.serializeDate(DateUtils.now());
+		document.getElementById("aeTitle").value = "";
+		document.getElementById("aeCatCust").innerHTML = "";
+		document.getElementById("aeOriginator").innerHTML = "";
+		document.getElementById("aeBeforeTax").value = "";
+		document.getElementById("aeTax").value = "";
+		document.getElementById("aeAfterTax").value = "";
+	},
+
+	closeAddEntryModal: function() {
+		var modal = document.getElementById("addEntryModal");
+		if (modal) {
+			modal.style.display = "none";
+		}
+
+		// reload, as data might have changed while the modal was open...
+		window.location.reload(false);
+	},
+
+	submitAddEntryModal: function() {
+
+	},
+
+	submitAndCloseAddEntryModal: function() {
+		this.submitAddEntryModal();
+		this.closeAddEntryModal();
+	},
+
+	aeSelectOutgoing: function() {
+		var outgoing = document.getElementById("aeOutgoing");
+		var incoming = document.getElementById("aeIncoming");
+		var label = document.getElementById("aeCatCustLabel");
+		if (outgoing && incoming) {
+			outgoing.className = "button checked";
+			incoming.className = "button unchecked";
+		}
+		if (label) {
+			label.innerHTML = "Category:";
+		}
+	},
+
+	aeSelectIncoming: function() {
+		var outgoing = document.getElementById("aeOutgoing");
+		var incoming = document.getElementById("aeIncoming");
+		var label = document.getElementById("aeCatCustLabel");
+		if (outgoing && incoming) {
+			outgoing.className = "button unchecked";
+			incoming.className = "button checked";
+		}
+		if (label) {
+			label.innerHTML = "Customer:";
 		}
 	},
 

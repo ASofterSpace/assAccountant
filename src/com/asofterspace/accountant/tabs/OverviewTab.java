@@ -79,6 +79,7 @@ public class OverviewTab extends Tab {
 		for (GenericTask task : tasks) {
 			if ((!task.hasBeenDone()) && task.matches(searchFor)) {
 				if (task instanceof Task) {
+					html += "<br>";
 					html += ((Task) task).createPanelInHtml(database);
 				} else {
 					// TODO notify this in the HTML somehow
@@ -93,6 +94,7 @@ public class OverviewTab extends Tab {
 		List<PaymentProblem> paymentProblems = database.getPaymentProblems();
 		for (final PaymentProblem curProblem : paymentProblems) {
 
+			html += "<br>";
 			html += "<div class='line'>";
 
 			html += AccountingUtils.createLabelHtml(curProblem.getProblem(), curProblem.getColor(), "", "text-align: left; width: 80%;");
@@ -128,6 +130,7 @@ public class OverviewTab extends Tab {
 		List<ConsistencyProblem> consistencyProblems = database.getUnacknowledgedConsistencyProblems();
 		for (final ConsistencyProblem curProblem : consistencyProblems) {
 
+			html += "<br>";
 			html += "<div class='line'>";
 
 			html += AccountingUtils.createLabelHtml(curProblem.getProblem(), curProblem.getColor(), "", "text-align: left; width: 80%;");

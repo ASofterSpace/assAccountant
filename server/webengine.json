@@ -7,7 +7,9 @@
 		"style.css",
 		"accountant.js",
 		"pics/mari.jpg",
-		"pics/signature.png"
+		"pics/signature.png",
+		"toolbox/utils/DateUtils-0.0.1.js",
+		"toolbox/utils/StrUtils-0.0.1.js"
 	],
-	"version": 1009
+	"version": 1034
 }
