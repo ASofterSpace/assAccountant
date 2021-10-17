@@ -17,7 +17,6 @@ import com.asofterspace.toolbox.accounting.Currency;
 import com.asofterspace.toolbox.accounting.FinanceUtils;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
-import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.io.CsvFileGerman;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
@@ -537,7 +536,6 @@ public abstract class Entry {
 				editEntryGUI.show();
 			}
 		});
-		*/
 
 		curButton = new JButton("Delete");
 		curButton.addMouseListener(rowHighlighter);
@@ -551,6 +549,7 @@ public abstract class Entry {
 				}
 			}
 		});
+		*/
 
 		curLabel = AccountingUtils.createLabel("", textColor, tooltip);
 		curLabel.addMouseListener(rowHighlighter);

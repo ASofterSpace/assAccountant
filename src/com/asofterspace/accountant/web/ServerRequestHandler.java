@@ -161,6 +161,19 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 					break;
 
+				case "/deleteEntry":
+					String editingId = json.getString("id");
+					Entry editingEntry = database.getEntry(editingId);
+					if (editingEntry != null) {
+						editingEntry.deleteFrom(database);
+					} else {
+						answer = new WebServerAnswerInJson("{\"success\": false, \"error\": \"" +
+							"The entry could not be found - and therefore, could not be deleted!\"}");
+						respond(403, answer);
+						return;
+					}
+					break;
+
 				case "/addEntry":
 
 					String catOrCustomer = json.getString("customer");
@@ -194,8 +207,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 						// ... and if we are editing an existing one, we delete the existing one
 						// (think about this as the scifi transporter approach to editing ^^)
-						String editingId = json.getString("id");
-						Entry editingEntry = database.getEntry(editingId);
+						editingId = json.getString("id");
+						editingEntry = database.getEntry(editingId);
 						if (editingEntry != null) {
 							editingEntry.deleteFrom(database);
 						}

@@ -3,6 +3,8 @@ window.accountant = {
 	// id of the entry we are currently editing
 	currentlyEditing: null,
 
+	currentlyDeleting: null,
+
 	lastTaxChangeWasPreTax: true,
 
 	exportCsvs: function(tab) {
@@ -187,6 +189,70 @@ window.accountant = {
 		}
 
 		request.send();
+	},
+
+	deleteEntry: function(id) {
+
+		var request = new XMLHttpRequest();
+		request.open("GET", "entry?id=" + id, true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		var outer = this;
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				if (result.success) {
+					outer.showDeleteModal();
+
+					document.getElementById("delTitle").innerHTML = result.title;
+
+					outer.currentlyDeleting = id;
+				}
+			}
+		}
+
+		request.send();
+	},
+
+	yesDeleteModal: function() {
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "deleteEntry", true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				if (result.success) {
+					window.location.reload(false);
+				}
+			}
+		}
+
+		var data = {
+			"id": this.currentlyDeleting,
+		};
+
+		request.send(JSON.stringify(data));
+	},
+
+	showDeleteModal: function() {
+		var modal = document.getElementById("deleteModal");
+		if (modal) {
+			modal.style.display = "block";
+
+			document.getElementById("modalBackground").style.display = "block";
+		}
+	},
+
+	closeDeleteModal: function() {
+		var modal = document.getElementById("deleteModal");
+		if (modal) {
+			modal.style.display = "none";
+		}
+
+		document.getElementById("modalBackground").style.display = "none";
 	},
 
 	showAddEntryModal: function() {
