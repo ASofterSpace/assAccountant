@@ -385,54 +385,11 @@ public abstract class Entry {
 		html += "<span class='button' style='width:5%; margin-right:0.3%;' ";
 		html += "onclick='accountant.paidEntry(\"" + getId() + "\")'>Paid</span>";
 
-		/*
-		JButton curButton = new JButton("Paid");
-		curButton.addMouseListener(rowHighlighter);
-		curButton.setPreferredSize(defaultDimension);
-		curPanel.add(curButton, new Arrangement(8, 0, 0.05, 1.0));
-		curButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				AddPaidGUI addPaidGUI = new AddPaidGUI(database.getGUI(), database, Entry.this);
-				addPaidGUI.show();
-			}
-		});
-		*/
-
 		html += "<span class='button' style='width:5%; margin-right:0.3%;' ";
 		html += "onclick='accountant.editEntry(\"" + getId() + "\")'>Edit</span>";
 
-		/*
-		curButton = new JButton("Edit");
-		curButton.addMouseListener(rowHighlighter);
-		curButton.setPreferredSize(defaultDimension);
-		curPanel.add(curButton, new Arrangement(9, 0, 0.05, 1.0));
-		curButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				AddEntryGUI editEntryGUI = new AddEntryGUI(database.getGUI(), database, Entry.this);
-				editEntryGUI.show();
-			}
-		});
-		*/
-
 		html += "<span class='button' style='width:5%;' ";
 		html += "onclick='accountant.deleteEntry(\"" + getId() + "\")'>Delete</span>";
-
-		/*
-		curButton = new JButton("Delete");
-		curButton.addMouseListener(rowHighlighter);
-		curButton.setPreferredSize(defaultDimension);
-		curPanel.add(curButton, new Arrangement(10, 0, 0.06, 1.0));
-		curButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (GuiUtils.confirmDelete("entry '" + getTitle() + "'")) {
-					Entry.this.deleteFrom(database);
-				}
-			}
-		});
-		*/
 
 		html += "</div>";
 

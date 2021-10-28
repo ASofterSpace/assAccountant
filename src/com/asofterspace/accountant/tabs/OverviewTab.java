@@ -99,33 +99,9 @@ public class OverviewTab extends Tab {
 
 			html += AccountingUtils.createLabelHtml(curProblem.getProblem(), curProblem.getColor(), curProblem.getProblem(), "text-align: left; width: 80%;");
 
-			// TODO :: add working buttons
-			/*
-			JButton curButton = new JButton("Paid");
-			curButton.setPreferredSize(defaultDimension);
-			curPanel.add(curButton, new Arrangement(1, 0, 0.1, 1.0));
-			curButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					AddPaidGUI addPaidGUI = new AddPaidGUI(database.getGUI(), database, curProblem.getEntry());
-					addPaidGUI.show();
-				}
-			});
-			*/
+			html += "<span class='button' style='width:8%; float:right; margin-left:0.3%;' onclick='accountant.paidEntry(\"" + curProblem.getEntry().getId() + "\")'>Paid</span>";
 
-			html += "<span class='button' style='width:8%; float:right;' onclick='window.location = \"" + curProblem.getEntry().getMonthLink() + "\"'>Show</span>";
-
-			/*
-			curButton = new JButton("Show");
-			curButton.setPreferredSize(defaultDimension);
-			curPanel.add(curButton, new Arrangement(2, 0, 0.1, 1.0));
-			curButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					database.getGUI().showMonthTabForEntry(curProblem.getEntry());
-				}
-			});
-			*/
+			html += "<span class='button' style='width:8%; float:right; margin-left:0.3%;' onclick='window.location = \"" + curProblem.getEntry().getMonthLink() + "\"'>Show</span>";
 
 			html += "</div>";
 		}
@@ -139,35 +115,12 @@ public class OverviewTab extends Tab {
 
 			html += AccountingUtils.createLabelHtml(curProblem.getProblem(), curProblem.getColor(), curProblem.getProblem(), "text-align: left; width: 80%;");
 
-			// TODO - add working buttons
+			html += "<span class='button' style='width:8%; float:right; margin-left:0.3%;' onclick='accountant.editEntry(\"" + curProblem.getEntry().getId() + "\")'>Edit</span>";
+
+			html += "<span class='button' style='width:8%; float:right; margin-left:0.3%;' onclick='window.location = \"" + curProblem.getEntry().getMonthLink() + "\"'>Show</span>";
+
+			// TODO - add working button
 			/*
-			JButton curButton = new JButton("Edit");
-			curButton.addMouseListener(rowHighlighter);
-			curButton.setPreferredSize(defaultDimension);
-			curPanel.add(curButton, new Arrangement(1, 0, 0.08, 1.0));
-			curButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					AddEntryGUI addEntryGUI = new AddEntryGUI(database.getGUI(), database, curProblem.getEntry());
-					addEntryGUI.show();
-				}
-			});
-			*/
-
-			html += "<span class='button' style='width:8%; float:right;' onclick='window.location = \"" + curProblem.getEntry().getMonthLink() + "\"'>Show</span>";
-
-			/*
-			curButton = new JButton("Show");
-			curButton.addMouseListener(rowHighlighter);
-			curButton.setPreferredSize(defaultDimension);
-			curPanel.add(curButton, new Arrangement(2, 0, 0.08, 1.0));
-			curButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					database.getGUI().showMonthTabForEntry(curProblem.getEntry());
-				}
-			});
-
 			curButton = new JButton("Acknowledge");
 			curButton.addMouseListener(rowHighlighter);
 			curButton.setPreferredSize(defaultDimension);

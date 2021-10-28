@@ -287,6 +287,7 @@ public class Database {
 
 	public Set<String> getCustomers() {
 		Set<String> result = new HashSet<>();
+		result.add("Other");
 		for (Year year : years) {
 			for (Month month : year.getMonths()) {
 				for (Incoming incoming : month.getIncomings()) {

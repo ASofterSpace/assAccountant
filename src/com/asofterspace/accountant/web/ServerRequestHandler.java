@@ -113,6 +113,14 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 			switch (fileLocation) {
 
+				case "/calcCategoryBasedOnTitle":
+					Category cat = database.mapTitleToCategory(json.getString("title"));
+					if (cat != null) {
+						answer = new WebServerAnswerInJson("{\"success\": true, \"category\": \"" +
+							cat.getText() + "\"}");
+					}
+					break;
+
 				case "/exportCSVs":
 					Directory exportDir = new Directory(AssAccountant.getWebRoot().getParentDirectory(), "export");
 					String tabStr = json.getString("tab");

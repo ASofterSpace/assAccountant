@@ -440,6 +440,37 @@ window.accountant = {
 		this.submitAddEntryModal(true);
 	},
 
+	aeCalcCategoryBasedOnTitle: function() {
+		var title = document.getElementById("aeTitle");
+		var outgoing = document.getElementById("aeOutgoing");
+		if (title && outgoing) {
+			if (outgoing.className == "button checked") {
+				var titleStr = title.value;
+
+				var request = new XMLHttpRequest();
+				request.open("POST", "calcCategoryBasedOnTitle", true);
+				request.setRequestHeader("Content-Type", "application/json");
+
+				var outer = this;
+
+				request.onreadystatechange = function() {
+					if (request.readyState == 4 && request.status == 200) {
+						var result = JSON.parse(request.response);
+						if (result.success) {
+							outer.trySelect(outer.catToId(result.category));
+						}
+					}
+				}
+
+				var data = {
+					"title": titleStr
+				};
+
+				request.send(JSON.stringify(data));
+			}
+		}
+	},
+
 	aeSelectOutgoing: function() {
 		var outgoing = document.getElementById("aeOutgoing");
 		var incoming = document.getElementById("aeIncoming");
