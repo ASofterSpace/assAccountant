@@ -946,6 +946,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				indexContent = StrUtils.replaceAll(indexContent, "[[TABS]]", tabsHtml);
 
+				indexContent = StrUtils.replaceAll(indexContent, "[[AVATAR_DESCRIPTION]]", SideBarCtrl.getAvatarDescription(new SideBarEntryForEmployee("Mari")));
+
 				// TODO - enable actually searching for things
 				String searchFor = "";
 
