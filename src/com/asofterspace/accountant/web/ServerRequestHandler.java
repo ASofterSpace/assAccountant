@@ -894,9 +894,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 				for (Tab tab : tabs) {
 					tabsHtml += "<a href='";
-					tabsHtml += tabToLink(tab);
+					String link = tabToLink(tab);
+					tabsHtml += link;
 					tabsHtml += "'";
-					if (tabKind.equals(tabToLink(tab))) {
+					if (tabKind.equals(link)) {
 						currentlySelectedTab = tab;
 						tabsHtml += " class='selectedTab'";
 					}
@@ -972,7 +973,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		return null;
 	}
 
-	private static String locationToTabKind(String locEquiv) {
+	private String locationToTabKind(String locEquiv) {
 
 		if (locEquiv.startsWith("/")) {
 			locEquiv = locEquiv.substring(1);
@@ -982,17 +983,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			return "overview";
 		}
 
-		if ("task_log".equals(locEquiv) ||
-			"finance_log".equals(locEquiv) ||
-			"income_log".equals(locEquiv) ||
-			"bank_statements".equals(locEquiv) ||
-			"calculator".equals(locEquiv) ||
-			"taxes".equals(locEquiv) ||
-			"rent".equals(locEquiv) ||
-			"loans".equals(locEquiv) ||
-			locEquiv.startsWith("year_") ||
-			locEquiv.startsWith("month_") ||
-			locEquiv.startsWith("bs_year_")) {
+		if (linkToTab(locEquiv) != null) {
 			return locEquiv;
 		}
 
