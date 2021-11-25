@@ -12,9 +12,11 @@ import javax.swing.JPanel;
 
 public abstract class Tab {
 
-	public abstract void createTabOnGUI(JPanel parentPanel, Database database, String searchFor);
+	public void createTabOnGUI(JPanel parentPanel, Database database, String searchFor) {
+	}
 
-	public abstract void destroyTabOnGUI(JPanel parentPanel);
+	public void destroyTabOnGUI(JPanel parentPanel) {
+	}
 
 	public abstract String getHtmlGUI(Database database, String searchFor);
 

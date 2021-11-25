@@ -65,6 +65,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 	private Server accServer;
 
+	private List<String> links = null;
+
 
 	public ServerRequestHandler(Server server, Socket request, Directory webRoot, Directory serverDir,
 		Database db, TabCtrl tabCtrl) {
@@ -983,7 +985,15 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			return "overview";
 		}
 
-		if (linkToTab(locEquiv) != null) {
+		if (links == null) {
+			links = new ArrayList<>();
+			List<Tab> tabs = tabCtrl.getTabs();
+			for (Tab tab : tabs) {
+				links.add(tabToLink(tab));
+			}
+		}
+
+		if (links.contains(locEquiv)) {
 			return locEquiv;
 		}
 

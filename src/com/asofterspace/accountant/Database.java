@@ -61,6 +61,7 @@ public class Database {
 	private static final String RENT_KEY = "rent";
 	private static final String LOANS_KEY = "loans";
 	private static final String FORMAT_KEY = "format";
+	private static final String INFO_KEY = "info";
 
 	private static int BACKUP_MAX = 64;
 
@@ -97,6 +98,8 @@ public class Database {
 	private String location;
 
 	private String formatStr;
+
+	private String info;
 
 	private List<Loan> loans;
 
@@ -232,6 +235,11 @@ public class Database {
 		formatStr = root.getString(FORMAT_KEY);
 		if (formatStr == null) {
 			formatStr = "EN";
+		}
+
+		info = root.getString(INFO_KEY);
+		if (info == null) {
+			info = "N/A";
 		}
 
 		return root;
@@ -1505,7 +1513,9 @@ public class Database {
 
 		root.set(LOANS_KEY, loans);
 
-		root.getString(FORMAT_KEY, formatStr);
+		root.set(FORMAT_KEY, formatStr);
+
+		root.set(INFO_KEY, info);
 
 		taskCtrl.saveIntoRecord(root);
 
@@ -1610,6 +1620,10 @@ public class Database {
 		} else {
 			return FinanceUtils.formatMoney(amount, currency);
 		}
+	}
+
+	public String getInfo() {
+		return info;
 	}
 
 }

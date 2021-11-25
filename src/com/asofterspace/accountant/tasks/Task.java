@@ -79,6 +79,9 @@ public class Task extends GenericTask {
 	// for Mari, ids are completely ephemeral - that is, when Mari is restarted, ids are re-assigned
 	private String id;
 
+	// just an id that is counted up for identifying checkboxes etc.
+	private static int count_up_id = 0;
+
 
 	public Task(String title, Integer scheduledOnDay, List<String> scheduledOnDaysOfWeek, List<Integer> scheduledInMonths,
 		List<Integer> scheduledInYears, List<String> details, List<String> onDone) {
@@ -178,8 +181,25 @@ public class Task extends GenericTask {
 		String[] detailsAfterReplacement = detail.split("\n");
 
 		for (String detailLine : detailsAfterReplacement) {
-			html.append("<div class='line' onclick='accountant.copyText(\"");
-			html.append(StrUtils.replaceAll(detailLine, "\"", "\" + '\"' + \"") + "\")'>");
+
+			boolean copyLineOnClick = true;
+
+			if (detailLine.contains("%[CHECK]")) {
+				detailLine = StrUtils.replaceFirst(detailLine, "%[CHECK]", "<input type='checkbox' id='check_" + count_up_id + "'>");
+				detailLine = "<label for='check_" + count_up_id + "'>" + detailLine + "</label>";
+				count_up_id++;
+				copyLineOnClick = false;
+			}
+
+			html.append("<div class='line'");
+
+			if (copyLineOnClick) {
+				html.append(" onclick='accountant.copyText(\"");
+				html.append(StrUtils.replaceAll(detailLine, "\"", "\" + '\"' + \"") + "\")'");
+			}
+
+			html.append(">");
+
 			if (detailLine.equals("")) {
 				detailLine = "&nbsp;";
 			}
