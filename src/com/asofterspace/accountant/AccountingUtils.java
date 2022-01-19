@@ -16,7 +16,7 @@ import com.asofterspace.toolbox.accounting.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.gui.GuiUtils;
-import com.asofterspace.toolbox.images.ColorRGB;
+import com.asofterspace.toolbox.images.ColorRGBA;
 import com.asofterspace.toolbox.io.CsvFileGerman;
 import com.asofterspace.toolbox.io.Directory;
 import com.asofterspace.toolbox.utils.DateUtils;
@@ -676,7 +676,7 @@ public class AccountingUtils {
 		// default color
 		String colStr = "#88AAFF";
 		if (color != null) {
-			ColorRGB col = new ColorRGB(color);
+			ColorRGBA col = new ColorRGBA(color);
 			if (!"#000000".equals(col.toHexString())) {
 				colStr = col.toHexString();
 			}

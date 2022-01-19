@@ -14,7 +14,7 @@ import com.asofterspace.accountant.web.ServerRequestHandler;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.guiImages.ImagePanel;
-import com.asofterspace.toolbox.images.ColorRGB;
+import com.asofterspace.toolbox.images.ColorRGBA;
 import com.asofterspace.toolbox.images.DefaultImageFile;
 import com.asofterspace.toolbox.images.GraphImage;
 import com.asofterspace.toolbox.images.GraphTimeDataPoint;
@@ -61,9 +61,9 @@ public class FinanceLogTab extends Tab {
 		List<GraphTimeDataPoint> timeData = new ArrayList<>();
 
 		GraphImage graph = new GraphImage(1000, 600);
-		graph.setForegroundColor(new ColorRGB(136, 170, 255));
-		graph.setBackgroundColor(new ColorRGB(0, 0, 0, 0));
-		graph.setDataColor(new ColorRGB(136, 170, 255));
+		graph.setForegroundColor(new ColorRGBA(136, 170, 255));
+		graph.setBackgroundColor(new ColorRGBA(0, 0, 0, 0));
+		graph.setDataColor(new ColorRGBA(136, 170, 255));
 		graph.setBaseYmin(0.0);
 
 
@@ -143,8 +143,8 @@ public class FinanceLogTab extends Tab {
 		List<GraphTimeDataPoint> timeData = new ArrayList<>();
 
 		GraphImage graph = new GraphImage();
-		graph.setBackgroundColor(new ColorRGB(GUI.getBackgroundColor()));
-		graph.setDataColor(new ColorRGB(80, 0, 160));
+		graph.setBackgroundColor(new ColorRGBA(GUI.getBackgroundColor()));
+		graph.setDataColor(new ColorRGBA(80, 0, 160));
 		graph.setBaseYmin(0.0);
 		ImagePanel graphPanel = new ImagePanel(graph);
 		graphPanel.setMinimumHeight(500);

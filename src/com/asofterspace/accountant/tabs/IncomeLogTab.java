@@ -14,7 +14,7 @@ import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.web.ServerRequestHandler;
 import com.asofterspace.toolbox.accounting.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
-import com.asofterspace.toolbox.images.ColorRGB;
+import com.asofterspace.toolbox.images.ColorRGBA;
 import com.asofterspace.toolbox.images.DefaultImageFile;
 import com.asofterspace.toolbox.images.GraphImage;
 import com.asofterspace.toolbox.images.GraphTimeDataPoint;
@@ -61,15 +61,15 @@ public class IncomeLogTab extends Tab {
 		List<GraphTimeDataPoint> timeData = new ArrayList<>();
 
 		GraphImage smoothGraph = new GraphImage(1000, 400);
-		smoothGraph.setForegroundColor(new ColorRGB(136, 170, 255));
-		smoothGraph.setBackgroundColor(new ColorRGB(0, 0, 0, 0));
-		smoothGraph.setDataColor(new ColorRGB(136, 170, 255));
+		smoothGraph.setForegroundColor(new ColorRGBA(136, 170, 255));
+		smoothGraph.setBackgroundColor(new ColorRGBA(0, 0, 0, 0));
+		smoothGraph.setDataColor(new ColorRGBA(136, 170, 255));
 		smoothGraph.setBaseYmin(0.0);
 
 		GraphImage graph = new GraphImage(1000, 400);
-		graph.setForegroundColor(new ColorRGB(136, 170, 255));
-		graph.setBackgroundColor(new ColorRGB(0, 0, 0, 0));
-		graph.setDataColor(new ColorRGB(136, 170, 255));
+		graph.setForegroundColor(new ColorRGBA(136, 170, 255));
+		graph.setBackgroundColor(new ColorRGBA(0, 0, 0, 0));
+		graph.setDataColor(new ColorRGBA(136, 170, 255));
 		graph.setBaseYmin(0.0);
 
 		List<Year> years = database.getYears();
