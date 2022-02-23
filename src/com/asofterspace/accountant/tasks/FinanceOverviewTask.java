@@ -15,9 +15,10 @@ import java.util.List;
 public class FinanceOverviewTask extends Task {
 
 	public FinanceOverviewTask(String title, Integer scheduledOnDay, List<String> scheduledOnDaysOfWeek, List<Integer> scheduledInMonths,
-		List<Integer> scheduledInYears, List<String> details, List<String> onDone) {
+		List<Integer> scheduledInYears, List<String> details, List<String> onDone, Boolean biweeklyEven, Boolean biweeklyOdd) {
 
-		super(title, scheduledOnDay, scheduledOnDaysOfWeek, scheduledInMonths, scheduledInYears, details, onDone);
+		super(title, scheduledOnDay, scheduledOnDaysOfWeek, scheduledInMonths, scheduledInYears, details, onDone,
+			biweeklyEven, biweeklyOdd);
 	}
 
 	public FinanceOverviewTask(GenericTask other) {

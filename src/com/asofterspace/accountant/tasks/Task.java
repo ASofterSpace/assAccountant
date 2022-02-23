@@ -84,9 +84,10 @@ public class Task extends GenericTask {
 
 
 	public Task(String title, Integer scheduledOnDay, List<String> scheduledOnDaysOfWeek, List<Integer> scheduledInMonths,
-		List<Integer> scheduledInYears, List<String> details, List<String> onDone) {
+		List<Integer> scheduledInYears, List<String> details, List<String> onDone, Boolean biweeklyEven, Boolean biweeklyOdd) {
 
-		super(title, scheduledOnDay, scheduledOnDaysOfWeek, scheduledInMonths, scheduledInYears, details, onDone);
+		super(title, scheduledOnDay, scheduledOnDaysOfWeek, scheduledInMonths, scheduledInYears, details, onDone,
+			biweeklyEven, biweeklyOdd);
 
 		this.taskCtrl = AssAccountant.getTaskCtrl();
 	}
