@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JPanel;
 
@@ -58,6 +59,9 @@ public class IncomeLogTab extends Tab {
 		html += "An upwards slope is good, a sideways slope is okay.</div>";
 
 
+		Map<Integer, Integer> incomeTaxes = database.getIncomeTaxes();
+
+
 		List<GraphTimeDataPoint> timeData = new ArrayList<>();
 
 		GraphImage smoothGraph = new GraphImage(1000, 400);
@@ -75,6 +79,7 @@ public class IncomeLogTab extends Tab {
 		List<Year> years = database.getYears();
 		boolean foundEntry = false;
 		String afterHtml = "";
+		String yearlyHtml = "";
 
 		Date today = DateUtils.now();
 		int curYear = DateUtils.getYear(today);
@@ -143,26 +148,84 @@ public class IncomeLogTab extends Tab {
 			}
 
 			// monthly average for the year
-			afterHtml += "<div class='line'>";
-			afterHtml += "<span style='width: 38%; display: inline-block; text-align: right;'>";
-			afterHtml += "Average over " + averageMonths + " months in " + year + ":&nbsp;&nbsp;&nbsp;";
-			afterHtml += "</span>";
-			afterHtml += "<span style='width: 20%; display: inline-block;'>";
+			String curHtml = "<div class='line'>";
+			curHtml += "<span style='width: 38%; display: inline-block; text-align: right;'>";
+			curHtml += "Average gross income over " + averageMonths + " months in " + year + ":&nbsp;&nbsp;&nbsp;";
+			curHtml += "</span>";
+			curHtml += "<span style='width: 20%; display: inline-block;'>";
 			int average = 0;
 			if (averageMonths > 0) {
 				average = averageSum / averageMonths;
 			}
-			afterHtml += database.formatMoney(average, Currency.EUR);
-			afterHtml += "</span>";
-			afterHtml += "<span>(";
+			curHtml += database.formatMoney(average, Currency.EUR);
+			curHtml += "</span>";
+			curHtml += "<span>(";
 			String sep = "";
 			for (String key : keysThisYear) {
-				afterHtml += sep;
+				curHtml += sep;
 				sep = ", ";
-				afterHtml += key;
+				curHtml += key;
 			}
-			afterHtml += ")</span>";
+			curHtml += ")</span>";
+			curHtml += "</div>";
+
+			yearlyHtml += curHtml;
+			afterHtml += curHtml;
+
+			int ongoingAverage = average;
+
+			// monthly average taxe: USt
+			afterHtml += "<div class='line'>";
+			afterHtml += "<span style='width: 38%; display: inline-block; text-align: right;'>";
+			afterHtml += "Average USt tax over " + averageMonths + " months in " + year + ":&nbsp;&nbsp;&nbsp;";
+			afterHtml += "</span>";
+			afterHtml += "<span style='width: 20%; display: inline-block;'>- ";
+			average = 0;
+			if (averageMonths > 0) {
+				average = year.getInTotalTax() / averageMonths;
+			}
+			afterHtml += database.formatMoney(average, Currency.EUR);
+			afterHtml += "</span>";
 			afterHtml += "</div>";
+
+			ongoingAverage -= average;
+
+			// monthly average taxe: ESt
+			afterHtml += "<div class='line'>";
+			afterHtml += "<span style='width: 38%; display: inline-block; text-align: right;'>";
+			afterHtml += "Average ";
+			Integer incomeTaxAmount = incomeTaxes.get(year.getNum());
+			if (incomeTaxAmount == null) {
+				incomeTaxAmount = (int) year.getExpectedIncomeTax();
+				afterHtml += "expected";
+			} else {
+				afterHtml += "actual";
+			}
+			afterHtml += " ESt tax over " + averageMonths + " months in " + year + ":&nbsp;&nbsp;&nbsp;";
+			afterHtml += "</span>";
+			afterHtml += "<span style='width: 20%; display: inline-block;'>- ";
+			average = 0;
+			if (averageMonths > 0) {
+				average = incomeTaxAmount / averageMonths;
+			}
+			afterHtml += database.formatMoney(average, Currency.EUR);
+			afterHtml += "</span>";
+			afterHtml += "</div>";
+
+			ongoingAverage -= average;
+
+			// monthly average net
+			curHtml = "<div class='line'>";
+			curHtml += "<span style='width: 38%; display: inline-block; text-align: right;'>";
+			curHtml += "Average net income over " + averageMonths + " months in " + year + ":&nbsp;&nbsp;&nbsp;";
+			curHtml += "</span>";
+			curHtml += "<span style='width: 20%; display: inline-block;'>";
+			curHtml += database.formatMoney(ongoingAverage, Currency.EUR);
+			curHtml += "</span>";
+			curHtml += "</div>";
+
+			yearlyHtml += curHtml;
+			afterHtml += curHtml;
 
 			afterHtml += "<div>";
 			afterHtml += "&nbsp;";
@@ -178,6 +241,11 @@ public class IncomeLogTab extends Tab {
 			html += "<div>Here is the same data with only minor smoothening:</div>";
 
 			html += "<div><img src='income_log_graph.png' /></div>";
+
+			html += "<div>Here is the overview for the different years:</div>";
+			html += "<div>&nbsp;</div>";
+			html += yearlyHtml;
+			html += "<div>&nbsp;</div>";
 
 			html += "<div>And finally, there is the original raw data:</div>";
 			html += "<div>&nbsp;</div>";

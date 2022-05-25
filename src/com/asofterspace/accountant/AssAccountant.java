@@ -23,8 +23,8 @@ import javax.swing.SwingUtilities;
 public class AssAccountant {
 
 	public final static String PROGRAM_TITLE = "assAccountant (Mari)";
-	public final static String VERSION_NUMBER = "0.0.2.9(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "5. April 2020 - 25. November 2021";
+	public final static String VERSION_NUMBER = "0.0.3.0(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "5. April 2020 - 25. May 2022";
 
 	public final static String DATA_DIR = "config";
 	public final static String SERVER_DIR = "server";
