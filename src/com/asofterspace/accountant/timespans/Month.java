@@ -205,7 +205,8 @@ public class Month extends TimeSpan {
 		outgoings.remove(remEntry);
 	}
 
-	public boolean addEntry(Date date, String title, Object catOrCustomerObj, String amountStr,
+	// adds an entry and returns the id of the new entry
+	public String addEntry(Date date, String title, Object catOrCustomerObj, String amountStr,
 		Currency currency, String taxationPercentStr, String postTaxAmountStr, String originator,
 		boolean isOutgoing, Database database) {
 
@@ -213,17 +214,17 @@ public class Month extends TimeSpan {
 		Integer postTaxAmountObj = FinanceUtils.parseMoney(postTaxAmountStr);
 
 		if ((amountObj == null) && (postTaxAmountObj == null)) {
-			return GuiUtils.complain("The texts " + amountStr + " and " + postTaxAmountStr +
+			return GuiUtils.complainstr("The texts " + amountStr + " and " + postTaxAmountStr +
 				" could both not be parsed as amounts of money!");
 		}
 
 		Integer taxationPercent = AccountingUtils.parseTaxes(taxationPercentStr);
 		if (taxationPercent == null) {
-			return GuiUtils.complain("The text " + taxationPercentStr + " could not be parsed as integer!");
+			return GuiUtils.complainstr("The text " + taxationPercentStr + " could not be parsed as integer!");
 		}
 
 		if (catOrCustomerObj == null) {
-			return GuiUtils.complain("The no category or customer entered!");
+			return GuiUtils.complainstr("The no category or customer entered!");
 		}
 
 		String catOrCustomer = catOrCustomerObj.toString();
@@ -233,48 +234,46 @@ public class Month extends TimeSpan {
 			Category category = Category.fromString(catOrCustomer);
 
 			if (category == null) {
-				return GuiUtils.complain("The text " + catOrCustomer + " could not be parsed as category!");
+				return GuiUtils.complainstr("The text " + catOrCustomer + " could not be parsed as category!");
 			}
 
-			Outgoing newIn = new Outgoing(amountObj, currency, taxationPercent, postTaxAmountObj,
+			Outgoing newOut = new Outgoing(amountObj, currency, taxationPercent, postTaxAmountObj,
 				date, title, originator, category, this);
-			outgoings.add(newIn);
-
-		} else {
-
-			String customer = catOrCustomer;
-
-			if ((customer == null) || "".equals(customer)) {
-				return GuiUtils.complain("The text " + catOrCustomer + " should contain a customer!");
-			}
-
-			// when a new customer is added...
-			Set<String> existingCustomers = database.getCustomers();
-			if (!existingCustomers.contains(customer)) {
-				// ... automatically create a new task outlining what has to be done about this customer!
-				String entryTitle = "Tell Mari about our new customer, " + customer;
-				String entryDetails = "* Add repeating tasks to create and log new invoices, " +
-					"if this customer gets invoices regularly now\n" +
-					"* add to the repeating task 'fill out the yearly Umsatzsteuererklärung and send it via ELSTER!' " +
-					"to the VAT_TOTAL_INCOMING_PREV_YEAR_TAX_0%_(...) placeholder this new customer if it is located " +
-					"outside of the EU\n" +
-					"* add to the repeating task 'USt-Voranmeldung abschicken' " +
-					"to the VAT_TOTAL_INCOMING_PREV_MONTH_TAX_0%_(...) placeholder this new customer if it is located " +
-					"outside of the EU\n" +
-					"* add to the repeating task 'USt-Voranmeldung abschicken' " +
-					"to the VAT IDs list for the Zusammenfassende Meldung towards the end this new customer if it " +
-					"is located outside of Germany but inside of the EU";
-				String entryDate = DateUtils.serializeDate(DateUtils.now());
-
-				database.getTaskCtrl().addAdHocTask(entryTitle, entryDetails, entryDate);
-			}
-
-			Incoming newOut = new Incoming(amountObj, currency, taxationPercent, postTaxAmountObj,
-				date, title, originator, customer, this);
-			incomings.add(newOut);
+			outgoings.add(newOut);
+			return newOut.getId();
 		}
 
-		return true;
+		String customer = catOrCustomer;
+
+		if ((customer == null) || "".equals(customer)) {
+			return GuiUtils.complainstr("The text " + catOrCustomer + " should contain a customer!");
+		}
+
+		// when a new customer is added...
+		Set<String> existingCustomers = database.getCustomers();
+		if (!existingCustomers.contains(customer)) {
+			// ... automatically create a new task outlining what has to be done about this customer!
+			String entryTitle = "Tell Mari about our new customer, " + customer;
+			String entryDetails = "* Add repeating tasks to create and log new invoices, " +
+				"if this customer gets invoices regularly now\n" +
+				"* add to the repeating task 'fill out the yearly Umsatzsteuererklärung and send it via ELSTER!' " +
+				"to the VAT_TOTAL_INCOMING_PREV_YEAR_TAX_0%_(...) placeholder this new customer if it is located " +
+				"outside of the EU\n" +
+				"* add to the repeating task 'USt-Voranmeldung abschicken' " +
+				"to the VAT_TOTAL_INCOMING_PREV_MONTH_TAX_0%_(...) placeholder this new customer if it is located " +
+				"outside of the EU\n" +
+				"* add to the repeating task 'USt-Voranmeldung abschicken' " +
+				"to the VAT IDs list for the Zusammenfassende Meldung towards the end this new customer if it " +
+				"is located outside of Germany but inside of the EU";
+			String entryDate = DateUtils.serializeDate(DateUtils.now());
+
+			database.getTaskCtrl().addAdHocTask(entryTitle, entryDetails, entryDate);
+		}
+
+		Incoming newIn = new Incoming(amountObj, currency, taxationPercent, postTaxAmountObj,
+			date, title, originator, customer, this);
+		incomings.add(newIn);
+		return newIn.getId();
 	}
 
 	public String getMonthName() {

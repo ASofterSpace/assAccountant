@@ -231,12 +231,16 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						return;
 					}
 
-					// we add the new entry (no matter if we are editing a new one or editing an existing one)...
-					if (database.addEntry(date, json.getString("title"), catOrCustomer,
+					// we add the new entry (no matter if we are editing a new one or editing an existing one)
+					String new_id = database.addEntry(date, json.getString("title"), catOrCustomer,
 						preTaxAmountStr, Currency.EUR, json.getString("taxationPercent"), postTaxAmountStr,
-						json.getString("originator"), "out".equals(json.getString("kind")))) {
+						json.getString("originator"), "out".equals(json.getString("kind")));
 
-						// ... and if we are editing an existing one, we delete the existing one
+					// did the adding succeed?
+					if (new_id != null) {
+						// yes, it succeeded! a new entry with a new id was created!
+
+						// now if we are editing an existing one, we delete the existing one
 						// (think about this as the scifi transporter approach to editing ^^)
 						editingId = json.getString("id");
 						editingEntry = database.getEntry(editingId);
@@ -245,7 +249,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						}
 
 						answer = new WebServerAnswerInJson("{\"success\": true, \"link\": \"" +
-							AccountingUtils.getMonthLink(date) + "\"}");
+							AccountingUtils.getMonthLink(date) + "\", \"id\": \"" + new_id + "\"}");
 					}
 					break;
 

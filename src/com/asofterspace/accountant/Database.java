@@ -405,24 +405,24 @@ public class Database {
 		}
 	}
 
-	public boolean addEntry(Date date, String title, Object catOrCustomer, String amount,
+	// adds an entry and returns the id of the new entry
+	public String addEntry(Date date, String title, Object catOrCustomer, String amount,
 		Currency currency, String taxationPercent, String postTaxAmount, String originator, boolean isOutgoing) {
 
 		Month curMonth = getMonthFromEntryDate(date);
 
 		if (curMonth == null) {
-			return false;
+			return null;
 		}
 
-		if (curMonth.addEntry(date, title, catOrCustomer, amount, currency, taxationPercent,
-			postTaxAmount, originator, isOutgoing, this)) {
+		String newId = curMonth.addEntry(date, title, catOrCustomer, amount, currency, taxationPercent,
+			postTaxAmount, originator, isOutgoing, this);
 
+		if (newId != null) {
 			save();
-
-			return true;
 		}
 
-		return false;
+		return newId;
 	}
 
 	public Year getYearFromEntryDate(Date date) {
@@ -561,7 +561,7 @@ public class Database {
 					break;
 				}
 
-				if (!addEntry(date, titleStr, category.getText(), amountStr, Currency.EUR, taxationPercentStr, null, "", true)) {
+				if (addEntry(date, titleStr, category.getText(), amountStr, Currency.EUR, taxationPercentStr, null, "", true) == null) {
 					// stop upon the first failure instead of showing a million error messages
 					break;
 				}
@@ -628,7 +628,7 @@ public class Database {
 					break;
 				}
 
-				if (!addEntry(date, titleStr, customer, amountStr, Currency.EUR, taxationPercentStr, null, "", false)) {
+				if (addEntry(date, titleStr, customer, amountStr, Currency.EUR, taxationPercentStr, null, "", false) == null) {
 					// stop upon the first failure instead of showing a million error messages
 					break;
 				}

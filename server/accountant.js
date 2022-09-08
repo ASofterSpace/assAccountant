@@ -404,6 +404,10 @@ window.accountant = {
 						}, 3000);
 					}
 					window.accountant.last_link = result.link;
+
+					// we are now editing the NEW entry, no longer the old one!
+					window.accountant.currentlyEditing = result.id;
+
 					// if we want to close on submit...
 					if (closeOnSubmit) {
 						// ... go to the correct page automagically!
@@ -564,6 +568,11 @@ window.accountant = {
 		var el = document.getElementById(id);
 		if (el) {
 			el.selected = true;
+		} else {
+			el = document.getElementById(id + "S");
+			if (el) {
+				el.selected = true;
+			}
 		}
 	},
 

@@ -433,7 +433,7 @@ public class AddEntryGUI {
 		// we add the new entry (no matter if we are editing a new one or editing an existing one)...
 		if (database.addEntry(date, titleText.getText(), catOrCustomer,
 			preTaxAmountStr, Currency.EUR, taxPerc.getText(), postTaxAmountStr,
-			(String) originator.getSelectedItem(), isOutgoing.isSelected())) {
+			(String) originator.getSelectedItem(), isOutgoing.isSelected()) != null) {
 
 			// ... and if we are editing an existing one, we delete the existing one
 			// (think about this as the scifi transporter approach to editing ^^)
