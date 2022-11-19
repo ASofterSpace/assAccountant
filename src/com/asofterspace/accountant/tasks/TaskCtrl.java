@@ -67,11 +67,11 @@ public class TaskCtrl extends TaskCtrlBase {
 	}
 
 	@Override
-	protected GenericTask createTask(String title, Integer scheduledOnDay, List<String> scheduledOnDaysOfWeek,
-		List<Integer> scheduledInMonths, List<Integer> scheduledInYears, List<String> details, List<String> onDone,
-		Boolean biweeklyEven, Boolean biweeklyOdd) {
+	protected GenericTask createTask(String title, Integer scheduledOnXDayOfMonth, Integer scheduledOnDay,
+		List<String> scheduledOnDaysOfWeek, List<Integer> scheduledInMonths, List<Integer> scheduledInYears,
+		List<String> details, List<String> onDone, Boolean biweeklyEven, Boolean biweeklyOdd) {
 
-		return new Task(title, scheduledOnDay, scheduledOnDaysOfWeek, scheduledInMonths,
+		return new Task(title, scheduledOnXDayOfMonth, scheduledOnDay, scheduledOnDaysOfWeek, scheduledInMonths,
 			scheduledInYears, details, onDone, biweeklyEven, biweeklyOdd);
 	}
 

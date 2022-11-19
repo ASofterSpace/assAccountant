@@ -83,11 +83,12 @@ public class Task extends GenericTask {
 	private static int count_up_id = 0;
 
 
-	public Task(String title, Integer scheduledOnDay, List<String> scheduledOnDaysOfWeek, List<Integer> scheduledInMonths,
-		List<Integer> scheduledInYears, List<String> details, List<String> onDone, Boolean biweeklyEven, Boolean biweeklyOdd) {
+	public Task(String title, Integer scheduledOnXDayOfMonth, Integer scheduledOnDay, List<String> scheduledOnDaysOfWeek,
+		List<Integer> scheduledInMonths, List<Integer> scheduledInYears,
+		List<String> details, List<String> onDone, Boolean biweeklyEven, Boolean biweeklyOdd) {
 
-		super(title, scheduledOnDay, scheduledOnDaysOfWeek, scheduledInMonths, scheduledInYears, details, onDone,
-			biweeklyEven, biweeklyOdd);
+		super(title, scheduledOnXDayOfMonth, scheduledOnDay, scheduledOnDaysOfWeek, scheduledInMonths, scheduledInYears,
+			details, onDone, biweeklyEven, biweeklyOdd);
 
 		this.taskCtrl = AssAccountant.getTaskCtrl();
 	}
