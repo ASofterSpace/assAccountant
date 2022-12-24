@@ -405,8 +405,13 @@ window.accountant = {
 					}
 					window.accountant.last_link = result.link;
 
-					// we are now editing the NEW entry, no longer the old one!
-					window.accountant.currentlyEditing = result.id;
+					// if we were editing before, then we continue editing - but now we are editing
+					// the newly saved task
+					// if we were NOT editing before, but just saving... then we are still not in
+					// editing mode!
+					if (window.accountant.currentlyEditing) {
+						window.accountant.currentlyEditing = result.id;
+					}
 
 					// if we want to close on submit...
 					if (closeOnSubmit) {
