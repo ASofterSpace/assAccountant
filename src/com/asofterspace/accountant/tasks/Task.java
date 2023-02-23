@@ -605,7 +605,7 @@ public class Task extends GenericTask {
 		html += AccountingUtils.createLabelHtml(getReleasedDateStr(), textColor, "", "text-align: left; width: 8%;");
 
 		int titleWidth = 50;
-		if (done && (doneDate != null)) {
+		if (done && (getDoneDate() != null)) {
 			html += AccountingUtils.createLabelHtml(DateUtils.serializeDate(getDoneDate()), textColor, "", "text-align: left; width: 8%;");
 			titleWidth = 42;
 		}
@@ -653,11 +653,11 @@ public class Task extends GenericTask {
 		finLog = new JTextPane();
 		if (Task.this instanceof FinanceOverviewTask) {
 			// if this was done before, load the finance log contents as filled in back then
-			if (done && (doneDate != null)) {
+			if (done && (getDoneDate() != null)) {
 				StringBuilder finLogText = new StringBuilder();
 				List<FinanceLogEntry> entries = taskCtrl.getFinanceLogs();
 				for (FinanceLogEntry entry : entries) {
-					if (DateUtils.isSameDay(entry.getDate(), doneDate)) {
+					if (DateUtils.isSameDay(entry.getDate(), getDoneDate())) {
 						for (FinanceLogEntryRow row : entry.getRows()) {
 							finLogText.append(row.getAccount());
 							finLogText.append(": ");
@@ -721,7 +721,7 @@ public class Task extends GenericTask {
 			public void actionPerformed(ActionEvent e) {
 				if (Task.this.done) {
 					if (Task.this instanceof FinanceOverviewTask) {
-						taskCtrl.removeFinanceLogForDate(doneDate);
+						taskCtrl.removeFinanceLogForDate(getDoneDate());
 					}
 					setDoneLog(taskLog.getText());
 				} else {
@@ -742,7 +742,7 @@ public class Task extends GenericTask {
 				}
 
 				if (Task.this instanceof FinanceOverviewTask) {
-					FinanceLogEntry entry = new FinanceLogEntry(doneDate);
+					FinanceLogEntry entry = new FinanceLogEntry(getDoneDate());
 					String[] finLogLines = finLog.getText().split("\n");
 					boolean wroteARow = false;
 					for (String line : finLogLines) {
@@ -851,7 +851,7 @@ public class Task extends GenericTask {
 		h++;
 
 		double titleWidth = 0.5;
-		if (done && (doneDate != null)) {
+		if (done && (getDoneDate() != null)) {
 			curLabel = AccountingUtils.createLabel(DateUtils.serializeDate(getDoneDate()), textColor, "");
 			curLabel.addMouseListener(rowHighlighter);
 			curPanel.add(curLabel, new Arrangement(h, 0, 0.08, 1.0));
@@ -905,11 +905,11 @@ public class Task extends GenericTask {
 		finLog = new JTextPane();
 		if (Task.this instanceof FinanceOverviewTask) {
 			// if this was done before, load the finance log contents as filled in back then
-			if (done && (doneDate != null)) {
+			if (done && (getDoneDate() != null)) {
 				StringBuilder finLogText = new StringBuilder();
 				List<FinanceLogEntry> entries = taskCtrl.getFinanceLogs();
 				for (FinanceLogEntry entry : entries) {
-					if (DateUtils.isSameDay(entry.getDate(), doneDate)) {
+					if (DateUtils.isSameDay(entry.getDate(), getDoneDate())) {
 						for (FinanceLogEntryRow row : entry.getRows()) {
 							finLogText.append(row.getAccount());
 							finLogText.append(": ");
@@ -973,7 +973,7 @@ public class Task extends GenericTask {
 			public void actionPerformed(ActionEvent e) {
 				if (Task.this.done) {
 					if (Task.this instanceof FinanceOverviewTask) {
-						taskCtrl.removeFinanceLogForDate(doneDate);
+						taskCtrl.removeFinanceLogForDate(getDoneDate());
 					}
 					setDoneLog(taskLog.getText());
 				} else {
@@ -996,7 +996,7 @@ public class Task extends GenericTask {
 				}
 
 				if (Task.this instanceof FinanceOverviewTask) {
-					FinanceLogEntry entry = new FinanceLogEntry(doneDate);
+					FinanceLogEntry entry = new FinanceLogEntry(getDoneDate());
 					String[] finLogLines = finLog.getText().split("\n");
 					boolean wroteARow = false;
 					for (String line : finLogLines) {
