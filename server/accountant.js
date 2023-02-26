@@ -115,7 +115,11 @@ window.accountant = {
 					if (request.readyState == 4 && request.status == 200) {
 						var result = JSON.parse(request.response);
 						if (result.success) {
-							taskDetailsHolder.innerHTML = result.detailsHtml;
+							taskDetailsHolder.innerHTML = result.detailsHtml +
+								"<div>&nbsp;</div>" +
+								"<div><span onclick='accountant.editDetails(\"" + id +
+								"\")' class='button'>Edit Details</span></div>" +
+								"<div>&nbsp;</div>";
 						}
 					}
 				}
@@ -123,6 +127,26 @@ window.accountant = {
 				request.send();
 			}
 		}
+	},
+
+	editDetails: function(id) {
+		// TODO
+		alert("Sorry, the editing details function has not yet been implemented!");
+	},
+
+	setTaskDone: function(id) {
+		// TODO
+		alert("Sorry, the setting tasks to done function (and modal) has not yet been implemented!");
+	},
+
+	deleteTask: function(id, taskTitle) {
+		this.showDeleteModal();
+
+		this.currentlyDeleting = id;
+		this.currentlyDeletingWhat = "task";
+
+		document.getElementById("delTitle").innerText = taskTitle;
+		document.getElementById("delWhat").innerText = this.currentlyDeletingWhat;
 	},
 
 	updateBankStatementView: function() {
@@ -294,9 +318,11 @@ window.accountant = {
 				if (result.success) {
 					outer.showDeleteModal();
 
-					document.getElementById("delTitle").innerHTML = result.title;
-
 					outer.currentlyDeleting = id;
+					outer.currentlyDeletingWhat = "entry";
+
+					document.getElementById("delTitle").innerHTML = result.title;
+					document.getElementById("delWhat").innerText = outer.currentlyDeletingWhat;
 				}
 			}
 		}
@@ -307,7 +333,11 @@ window.accountant = {
 	yesDeleteModal: function() {
 
 		var request = new XMLHttpRequest();
-		request.open("POST", "deleteEntry", true);
+		if (this.currentlyDeletingWhat == "entry") {
+			request.open("POST", "deleteEntry", true);
+		} else {
+			request.open("POST", "deleteTask", true);
+		}
 		request.setRequestHeader("Content-Type", "application/json");
 
 		request.onreadystatechange = function() {
@@ -344,7 +374,7 @@ window.accountant = {
 		document.getElementById("modalBackground").style.display = "none";
 	},
 
-	showAddEntryModal: function() {
+	showAddEntryModal: function(optionalPrefillData) {
 		var modal = document.getElementById("addEntryModal");
 		if (modal) {
 			modal.style.display = "block";
@@ -353,6 +383,22 @@ window.accountant = {
 			this.last_link = null;
 
 			document.getElementById("modalBackground").style.display = "block";
+
+			if (optionalPrefillData) {
+				document.getElementById("aeTitle").value = optionalPrefillData["title"];
+				if (optionalPrefillData["kind"] == "incoming") {
+					this.aeSelectIncoming();
+					document.getElementById("aeCatCust").value = optionalPrefillData["customer"];
+				} else {
+					this.aeSelectOutgoing();
+					document.getElementById("aeCatCust").value = optionalPrefillData["category"];
+				}
+				document.getElementById("aeDate").value = optionalPrefillData["date"];
+				document.getElementById("aeBeforeTax").value = ""+(optionalPrefillData["amount"]/100);
+				document.getElementById("aeTax").value = optionalPrefillData["taxationPercent"];
+				this.trySelect(this.orgToId(optionalPrefillData["originator"]));
+				this.aeCalcPostTax();
+			}
 		}
 	},
 

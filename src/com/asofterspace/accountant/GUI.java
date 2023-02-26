@@ -19,7 +19,6 @@ import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.GuiUtils;
 import com.asofterspace.toolbox.gui.MainWindow;
 import com.asofterspace.toolbox.io.File;
-import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.StrUtils;
 import com.asofterspace.toolbox.Utils;
 
@@ -209,29 +208,6 @@ public class GUI extends MainWindow {
 		});
 		file.add(dropBankStatements);
 
-		JMenuItem dropEntireDatabase = new JMenuItem("Drop Entire Database");
-		dropEntireDatabase.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (GuiUtils.confirmDelete("entire database")) {
-					database.drop();
-				}
-			}
-		});
-		file.add(dropEntireDatabase);
-
-		file.addSeparator();
-
-		JMenuItem save = new JMenuItem("Save (done automatically anyway!)");
-		save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, ActionEvent.CTRL_MASK));
-		save.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				database.save();
-			}
-		});
-		file.add(save);
-
 		file.addSeparator();
 
 		JMenuItem close = new JMenuItem("Exit");
@@ -295,90 +271,7 @@ public class GUI extends MainWindow {
 		});
 		tasksMenu.add(addTask);
 
-		// add tasks a week into the future button
-		JMenuItem addFutureTasksBtn = new JMenuItem("Materialize Tasks Scheduled for One More Week into the Future");
-		addFutureTasksBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				Date until = DateUtils.addDays(database.getTaskCtrl().getLastTaskGeneration(), 7);
-				database.getTaskCtrl().generateNewInstances(until);
-				GuiUtils.notify("Added tasks until " + DateUtils.serializeDate(until));
-
-				// we explicitly do NOT save yet - we only save once one of the tasks is actually worked on
-
-				// refresh selected tab - which might be the overview tab...
-				refreshCurrentTab();
-			}
-		});
-		tasksMenu.add(addFutureTasksBtn);
-
 		menu.add(tasksMenu);
-
-/*
-		// open the invoice file location on disk
-		MenuItemForMainMenu openOnDisk = new MenuItemForMainMenu("Open on Disk");
-		openOnDisk.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				String diskLocation = configuration.getValue(ConfigCtrl.CONFIG_KEY_INVOICE_LOCATION_ON_DISK);
-				if (diskLocation == null) {
-					GuiUtils.complain("Sorry, the key " +
-						ConfigCtrl.CONFIG_KEY_INVOICE_LOCATION_ON_DISK + " in the configuration file " +
-						configuration.getAbsoluteFilename() + " has not been set!");
-					return;
-				}
-				if (currentlyOpenedTab != null) {
-					// go directly to the current year
-					if (currentlyOpenedTab instanceof TimeSpanTab) {
-						diskLocation += "/" + ((TimeSpanTab) currentlyOpenedTab).getYear().getNum();
-					}
-					// go directly to the current month
-					if (currentlyOpenedTab instanceof MonthTab) {
-						Month curMonth = ((MonthTab) currentlyOpenedTab).getMonth();
-						diskLocation += "/" + StrUtils.leftPad0(curMonth.getNum() + 1, 2) + " " +
-							curMonth.getMonthName().toLowerCase();
-					}
-				}
-				Directory diskLocationFile = new Directory(diskLocation);
-				try {
-					Desktop.getDesktop().open(diskLocationFile.getJavaFile());
-				} catch (IOException ex) {
-					GuiUtils.complain("Sorry, the folder " +
-						diskLocationFile.getAbsoluteDirname() + " could not be opened!");
-				}
-			}
-		});
-		menu.add(openOnDisk);
-
-		JMenu huh = new JMenu("?");
-
-		JMenuItem openConfigPath = new JMenuItem("Open Config Path");
-		openConfigPath.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					Desktop.getDesktop().open(configuration.getParentDirectory().getJavaFile());
-				} catch (IOException ex) {
-					GuiUtils.complain("Sorry, the folder " +
-						configuration.getParentDirectory().getAbsoluteDirname() + " could not be opened!");
-				}
-			}
-		});
-		huh.add(openConfigPath);
-
-		JMenuItem about = new JMenuItem("About");
-		about.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				String aboutMessage = "This is the " + AssAccountant.PROGRAM_TITLE + ".\n" +
-					"Version: " + AssAccountant.VERSION_NUMBER + " (" + AssAccountant.VERSION_DATE + ")\n" +
-					"Brought to you by: A Softer Space";
-				JOptionPane.showMessageDialog(mainFrame, aboutMessage, "About", JOptionPane.INFORMATION_MESSAGE);
-			}
-		});
-		huh.add(about);
-		menu.add(huh);
-*/
 
 		parent.setJMenuBar(menu);
 

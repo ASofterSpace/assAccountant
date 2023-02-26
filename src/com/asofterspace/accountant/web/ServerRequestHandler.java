@@ -186,6 +186,12 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 					break;
 
+				case "/deleteTask":
+					TaskCtrl taskCtrl = database.getTaskCtrl();
+					taskCtrl.deleteTaskInstanceById(json.getString("id"));
+					taskCtrl.save();
+					break;
+
 				case "/deleteEntry":
 					String editingId = json.getString("id");
 					Entry editingEntry = database.getEntry(editingId);

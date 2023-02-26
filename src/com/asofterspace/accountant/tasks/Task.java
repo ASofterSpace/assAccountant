@@ -9,7 +9,6 @@ import com.asofterspace.accountant.AssAccountant;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.entries.Incoming;
-import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.TimeSpan;
@@ -113,9 +112,23 @@ public class Task extends GenericTask {
 		return new Task(this);
 	}
 
+	public boolean doDetailsExist() {
+		if ((details == null) || (details.size() < 1)) {
+			return false;
+		}
+
+		for (String detail : details) {
+			if ((detail != null) && !detail.trim().equals("")) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public String getDetailsToShowToUser(Database database) {
 
-		if ((details == null) || (details.size() < 1)) {
+		if (!doDetailsExist()) {
 			return null;
 		}
 
@@ -206,6 +219,24 @@ public class Task extends GenericTask {
 				continue;
 			}
 
+			String keyBefore = "%[ADD_ENTRY_BTN(";
+			String keyAfter = ")]";
+			int indexBefore = detailLine.indexOf(keyBefore) + keyBefore.length();
+			int indexAfter = detailLine.lastIndexOf(keyAfter);
+			if ((indexBefore >= 0) && (indexAfter >= 0) && (indexBefore <= indexAfter)) {
+				detailLine = detailLine.substring(0, indexAfter);
+				detailLine = detailLine.substring(indexBefore);
+				try {
+					JSON entryData = new JSON(detailLine);
+					detailLine = "<span class='button' onclick='var d = " + StrUtils.replaceAll(detailLine, "'", "\\'") +
+						"; accountant.showAddEntryModal(d);'>" +
+						entryData.getString("buttonText") + "</span>";
+					copyLineOnClick = false;
+				} catch (JsonParseException e) {
+					detailLine = "(Here should be a button, but the data could not be parsed: " + detailLine + ")";
+				}
+			}
+
 			html.append("<div class='line'");
 
 			if (copyLineOnClick) {
@@ -248,38 +279,6 @@ public class Task extends GenericTask {
 			curPanel.setLayout(new GridBagLayout());
 
 			boolean specialRow = false;
-
-			String keyBefore = "%[ADD_ENTRY_BTN(";
-			String keyAfter = ")]";
-			int indexBefore = detailLine.indexOf(keyBefore) + keyBefore.length();
-			int indexAfter = detailLine.lastIndexOf(keyAfter);
-			if ((indexBefore >= 0) && (indexAfter >= 0) && (indexBefore <= indexAfter)) {
-				detailLine = detailLine.substring(0, indexAfter);
-				detailLine = detailLine.substring(indexBefore);
-				try {
-					final JSON entryData = new JSON(detailLine);
-					JButton curAddEntryBtn = new JButton(entryData.getString("buttonText"));
-					curPanel.add(curAddEntryBtn, new Arrangement(0, 0, 1.0, 0.0));
-					curAddEntryBtn.addActionListener(new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							Entry fakeEntry = null;
-							if ("incoming".equals(entryData.getString("kind").toLowerCase())) {
-								fakeEntry = new Incoming(entryData, null);
-							} else {
-								fakeEntry = new Outgoing(entryData, null);
-							}
-							// AddEntryGUI addEntryGUI = new AddEntryGUI(database.getGUI(), database, fakeEntry);
-							// addEntryGUI.show();
-						}
-					});
-				} catch (JsonParseException e) {
-					CopyByClickLabel curLabel = AccountingUtils.createLabel(
-						"Here should be a button, but I could not parse the json: " + detailLine, new Color(0, 0, 0), "");
-					curPanel.add(curLabel, new Arrangement(0, 0, 1.0, 0.0));
-				}
-				specialRow = true;
-			}
 
 			if (!specialRow) {
 				CopyByClickLabel curLabel = AccountingUtils.createLabel(detailLine, new Color(0, 0, 0), "");
@@ -421,26 +420,29 @@ public class Task extends GenericTask {
 
 		html += AccountingUtils.createLabelHtml(title, textColor, "", "text-align: left; width: " + titleWidth + "%;");
 
-		html += "<span class='button' style='width:8%; float:right;' ";
-		html += "onclick='accountant.showDetails(\"" + getId() + "\")'>Details</span>";
+		html += "<span class='button' style='width:7%; float:right;' ";
+		html += "onclick='accountant.deleteTask(\"" + getId() + "\", \"" +
+			StrUtils.replaceAll(title, "\"", "\\\"") + "\")'>";
+		html += "Delete";
+		html += "</span>";
+
+		html += "<span class='button' style='width:6%; float:right; margin-right: 4pt;' ";
+		html += "onclick='accountant.setTaskDone(\"" + getId() + "\")'>";
+		html += "Done";
+		html += "</span>";
+
+		html += "<span class='button' style='width:10%; float:right; margin-right: 4pt;' ";
+		if (doDetailsExist()) {
+			html += "onclick='accountant.showDetails(\"" + getId() + "\")'>";
+			html += "Show Details";
+		} else {
+			html += "onclick='accountant.editDetails(\"" + getId() + "\")'>";
+			html += "Add Details";
+		}
+		html += "</span>";
 
 		// TODO add working buttons
 		/*
-		addedLines = new ArrayList<>();
-		detailsButton = new JButton("Show Details");
-		detailsButton.addMouseListener(rowHighlighter);
-		if ((details == null) || (details.size() < 1)) {
-			detailsButton.setText("Add Details");
-			// actually keep the details button enabled in case the user wants to add a log
-			// detailsButton.setEnabled(false);
-		}
-		if (done) {
-			detailsButton.setText("Show Details");
-		}
-		detailsButton.setPreferredSize(defaultDimension);
-		curPanel.add(detailsButton, new Arrangement(h, 0, 0.1, 1.0));
-		h++;
-
 		taskLog = new JTextPane();
 		// if the task is already done...
 		if (doneLog != null) {
@@ -505,17 +507,6 @@ public class Task extends GenericTask {
 			newHeight = 128;
 		}
 		finLog.setPreferredSize(new Dimension(128, newHeight));
-
-		detailsButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (!detailsButton.getText().startsWith("Hide")) {
-					showDetails();
-				} else {
-					hideDetails();
-				}
-			}
-		});
 
 		JButton curButton = new JButton("Done");
 		curButton.addMouseListener(rowHighlighter);
@@ -601,21 +592,6 @@ public class Task extends GenericTask {
 				}
 
 				taskCtrl.save();
-			}
-		});
-
-		curButton = new JButton("Delete");
-		curButton.addMouseListener(rowHighlighter);
-		curButton.setPreferredSize(defaultDimension);
-		curPanel.add(curButton, new Arrangement(h, 0, 0.06, 1.0));
-		h++;
-		curButton.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (GuiUtils.confirmDelete("task '" + getTitle() + "'")) {
-					taskCtrl.deleteTaskInstance(Task.this);
-					taskCtrl.save();
-				}
 			}
 		});
 		*/
