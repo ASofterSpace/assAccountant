@@ -24,8 +24,6 @@ public class YearTab extends TimeSpanTab {
 
 	private Year year;
 
-	private JPanel tab;
-
 
 	public YearTab(Year year) {
 		this.year = year;
@@ -115,18 +113,6 @@ public class YearTab extends TimeSpanTab {
 	@Override
 	public Directory exportCsvTo(Directory exportDir, Database database) {
 		return AccountingUtils.exportTimeSpanCsvTo(exportDir, database, year, this);
-	}
-
-	@Override
-	public void destroyTabOnGUI(JPanel parentPanel) {
-		if (tab != null) {
-			parentPanel.remove(tab);
-		}
-	}
-
-	@Override
-	public int getComparisonOrder() {
-		return (getYear().getNum() * 100) + 50;
 	}
 
 	@Override

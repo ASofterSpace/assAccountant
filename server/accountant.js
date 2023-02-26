@@ -385,6 +385,39 @@ window.accountant = {
 		}
 	},
 
+	showGUI: function() {
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "showGUI", true);
+		request.setRequestHeader("Content-Type", "application/json");
+		var data = {};
+		request.send(JSON.stringify(data));
+	},
+
+	gulpBankStatements: function() {
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "gulpBankStatements", true);
+		request.setRequestHeader("Content-Type", "application/json");
+		document.getElementById('temporary_overlay').style.display = 'block';
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4) {
+				document.getElementById('temporary_overlay').style.display = 'none';
+				if (request.status == 200) {
+					var result = JSON.parse(request.response);
+					// show some sort of confirmation
+					alert(result.message);
+				} else {
+					alert("Gulp bank statement call failed!\nStatus: " + request.status);
+				}
+			}
+		}
+
+		var data = {};
+		request.send(JSON.stringify(data));
+	},
+
 	submitAddEntryModal: function(closeOnSubmit) {
 
 		var request = new XMLHttpRequest();

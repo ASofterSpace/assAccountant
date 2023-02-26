@@ -4,22 +4,13 @@
  */
 package com.asofterspace.accountant.tabs;
 
-import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
-import com.asofterspace.toolbox.gui.Arrangement;
-
-import java.awt.Color;
-import java.awt.GridBagLayout;
-
-import javax.swing.JPanel;
 
 
 public class CalculatorTab extends Tab {
 
 	private static final String TITLE = "Calculator";
-
-	private JPanel tab;
 
 
 	public CalculatorTab() {
@@ -55,34 +46,6 @@ public class CalculatorTab extends Tab {
 		html += "<div class='footer'>&nbsp;</div>";
 
 		return html;
-	}
-
-	@Override
-	public void createTabOnGUI(final JPanel parentPanel, final Database database, String searchFor) {
-
-		tab = new JPanel();
-		tab.setBackground(GUI.getBackgroundColor());
-		tab.setLayout(new GridBagLayout());
-
-		JPanel footer = new JPanel();
-		footer.setBackground(GUI.getBackgroundColor());
-		tab.add(footer, new Arrangement(0, 1, 1.0, 1.0));
-
-		AccountingUtils.resetTabSize(tab, parentPanel);
-
-		parentPanel.add(tab);
-	}
-
-	@Override
-	public void destroyTabOnGUI(JPanel parentPanel) {
-		if (tab != null) {
-			parentPanel.remove(tab);
-		}
-	}
-
-	@Override
-	public int getComparisonOrder() {
-		return (10000 * 100) + 2000;
 	}
 
 	@Override

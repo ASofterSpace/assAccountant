@@ -5,7 +5,6 @@
 package com.asofterspace.accountant.tasks;
 
 import com.asofterspace.accountant.AccountingUtils;
-import com.asofterspace.accountant.AddEntryGUI;
 import com.asofterspace.accountant.AssAccountant;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
@@ -21,9 +20,6 @@ import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
 import com.asofterspace.toolbox.gui.GuiUtils;
-import com.asofterspace.toolbox.io.Directory;
-import com.asofterspace.toolbox.io.File;
-import com.asofterspace.toolbox.io.IoUtils;
 import com.asofterspace.toolbox.io.JSON;
 import com.asofterspace.toolbox.io.JsonParseException;
 import com.asofterspace.toolbox.utils.DateUtils;
@@ -42,7 +38,6 @@ import java.util.UUID;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
@@ -193,6 +188,24 @@ public class Task extends GenericTask {
 				copyLineOnClick = false;
 			}
 
+			if (detailLine.trim().startsWith("%[ADD_GULP_BANK_STATEMENTS_BTN]")) {
+				detailLine = StrUtils.replaceAll(detailLine,
+					"%[ADD_GULP_BANK_STATEMENTS_BTN]",
+					"<span class='button' onclick='accountant.gulpBankStatements();'>" +
+					"Gulp Bank Statements</span>");
+				copyLineOnClick = false;
+			}
+
+			if (detailLine.contains("%[LIST_INCOMING_UNPAID]")) {
+				List<Incoming> incomings = database.getIncomings();
+				for (Incoming incoming : incomings) {
+					if (!incoming.getReceived()) {
+						html.append(incoming.createPanelHtml(database));
+					}
+				}
+				continue;
+			}
+
 			html.append("<div class='line'");
 
 			if (copyLineOnClick) {
@@ -236,19 +249,6 @@ public class Task extends GenericTask {
 
 			boolean specialRow = false;
 
-			if (detailLine.contains("%[LIST_INCOMING_UNPAID]")) {
-				List<Incoming> incomings = database.getIncomings();
-				int i = 0;
-				for (Incoming incoming : incomings) {
-					if (!incoming.getReceived()) {
-						JPanel curCurPanel = incoming.createPanelOnGUI(database);
-						curPanel.add(curCurPanel, new Arrangement(0, i, 1.0, 0.0));
-						i++;
-					}
-				}
-				specialRow = true;
-			}
-
 			String keyBefore = "%[ADD_ENTRY_BTN(";
 			String keyAfter = ")]";
 			int indexBefore = detailLine.indexOf(keyBefore) + keyBefore.length();
@@ -269,8 +269,8 @@ public class Task extends GenericTask {
 							} else {
 								fakeEntry = new Outgoing(entryData, null);
 							}
-							AddEntryGUI addEntryGUI = new AddEntryGUI(database.getGUI(), database, fakeEntry);
-							addEntryGUI.show();
+							// AddEntryGUI addEntryGUI = new AddEntryGUI(database.getGUI(), database, fakeEntry);
+							// addEntryGUI.show();
 						}
 					});
 				} catch (JsonParseException e) {
@@ -278,197 +278,6 @@ public class Task extends GenericTask {
 						"Here should be a button, but I could not parse the json: " + detailLine, new Color(0, 0, 0), "");
 					curPanel.add(curLabel, new Arrangement(0, 0, 1.0, 0.0));
 				}
-				specialRow = true;
-			}
-
-			if (detailLine.trim().startsWith("%[ADD_GULP_BANK_STATEMENTS_BTN]")) {
-				JButton gulpBankStatementsBtn = new JButton("Gulp Bank Statements");
-				curPanel.add(gulpBankStatementsBtn, new Arrangement(0, 0, 1.0, 0.0));
-				gulpBankStatementsBtn.addActionListener(new ActionListener() {
-					@Override
-					public void actionPerformed(ActionEvent e) {
-
-						StringBuilder importStr = new StringBuilder();
-
-						Directory downloadsDir = new Directory("C:\\Users\\Moyaccercchi\\Downloads");
-						boolean recursive = false;
-
-
-						// SPARDA
-
-						// find all Sparda bank statements in the Downloads folder
-						List<File> downloadFiles = downloadsDir.getAllFiles(recursive);
-						List<File> anyBankFiles = new ArrayList<>();
-						List<File> bankStatements = new ArrayList<>();
-						for (File file : downloadFiles) {
-							String localName = file.getLocalFilename();
-							if (!localName.endsWith(".pdf")) {
-								continue;
-							}
-							if (!(localName.startsWith("1480748_") || localName.startsWith("5001480748_"))) {
-								continue;
-							}
-							anyBankFiles.add(file);
-							if (localName.contains("_Kontoauszug_")) {
-								bankStatements.add(file);
-								importStr.append("\n" + localName + " (Sparda bank statement)");
-							} else {
-								importStr.append("\n" + localName + " (Sparda generic file)");
-							}
-						}
-
-						// put them into the official folder
-						Directory spardaDir = new Directory("C:\\home\\official\\Sparda");
-						for (File file : anyBankFiles) {
-							file.moveTo(spardaDir);
-						}
-
-						// apply un-secure script
-						IoUtils.execute(spardaDir.getAbsoluteDirname() + "\\0 decrypt pdfs.bat");
-
-						// copy them into the assAccountant
-						Directory accImportDir = new Directory("C:\\home\\prog\\asofterspace\\assAccountant\\import");
-						Directory decryptDir = new Directory("C:\\home\\official\\Sparda\\decrypted");
-
-						List<File> importFiles = new ArrayList<>();
-
-						for (File file : bankStatements) {
-
-							File decryptedFile = new File(decryptDir, file.getLocalFilename());
-
-							decryptedFile.copyToDisk(accImportDir);
-
-							importFiles.add(new File(accImportDir, file.getLocalFilename()));
-						}
-
-						// import them into the assAccountant
-						database.bulkImportBankStatements(importFiles);
-
-
-						// DKB
-
-						// find all DKB bank statements in the Downloads folder
-						downloadFiles = downloadsDir.getAllFiles(recursive);
-						anyBankFiles = new ArrayList<>();
-						bankStatements = new ArrayList<>();
-						for (File file : downloadFiles) {
-							String localName = file.getLocalFilename();
-							if (!localName.endsWith(".pdf")) {
-								continue;
-							}
-							if (!(localName.startsWith("Kontoauszug_1011709415_") ||
-								  localName.startsWith("Kreditkartenabrechnung_4748xxxxxxxx7849_") ||
-								  localName.startsWith("Depotauszug_vom_"))) {
-								continue;
-							}
-							anyBankFiles.add(file);
-							// currently, we can only import Kontoauszug_, but we should in future also be able to import the credit card stuff
-							if (localName.contains("Kontoauszug_")) {
-							// if (localName.contains("Kontoauszug_") || localName.contains("Kreditkartenabrechnung_")) {
-								bankStatements.add(file);
-								importStr.append("\n" + localName + " (DKB bank statement)");
-							} else {
-								importStr.append("\n" + localName + " (DKB generic file)");
-							}
-						}
-
-						// put them into the official folder
-						Directory dkbDir = new Directory("C:\\home\\official\\DKB");
-						for (File file : anyBankFiles) {
-							file.moveTo(dkbDir);
-						}
-
-						// copy them into the assAccountant
-						importFiles = new ArrayList<>();
-
-						for (File file : bankStatements) {
-
-							file.copyToDisk(accImportDir);
-
-							importFiles.add(new File(accImportDir, file.getLocalFilename()));
-						}
-
-						// import them into the assAccountant
-						database.bulkImportBankStatements(importFiles);
-
-
-						// n26
-
-						// find all N26 bank statements in the Downloads folder
-						downloadFiles = downloadsDir.getAllFiles(recursive);
-						anyBankFiles = new ArrayList<>();
-						bankStatements = new ArrayList<>();
-						for (File file : downloadFiles) {
-							String localName = file.getLocalFilename();
-							if (!localName.endsWith(".pdf")) {
-								continue;
-							}
-							if (!localName.startsWith("statement-")) {
-								continue;
-							}
-							anyBankFiles.add(file);
-							bankStatements.add(file);
-							importStr.append("\n" + localName + " (n26 bank statement)");
-						}
-
-						// put them into the official folder
-						Directory n26Dir = new Directory("C:\\home\\official\\n26");
-						for (File file : anyBankFiles) {
-							file.moveTo(n26Dir);
-						}
-
-						// find all N26 bank statement CSV in the Downloads folder
-						downloadFiles = downloadsDir.getAllFiles(recursive);
-						anyBankFiles = new ArrayList<>();
-						bankStatements = new ArrayList<>();
-						for (File file : downloadFiles) {
-							String localName = file.getLocalFilename();
-							if (!localName.endsWith(".csv")) {
-								continue;
-							}
-							if (!localName.startsWith("n26-csv-transactions-")) {
-								continue;
-							}
-							anyBankFiles.add(file);
-							bankStatements.add(file);
-							importStr.append("\n" + localName + " (n26 bank statement)");
-						}
-
-						// put them into the official folder
-						for (File file : anyBankFiles) {
-							file.moveTo(n26Dir);
-						}
-
-						// copy them into the assAccountant
-						importFiles = new ArrayList<>();
-
-						for (File file : bankStatements) {
-
-							file.copyToDisk(accImportDir);
-
-							importFiles.add(new File(accImportDir, file.getLocalFilename()));
-						}
-
-						// import them into the assAccountant
-						database.bulkImportBankStatements(importFiles);
-
-
-						if (importStr.length() < 1) {
-							importStr.append("\nNo files at all - sorry!");
-						}
-						GuiUtils.complain("Imported:\n" + importStr.toString());
-					}
-				});
-				specialRow = true;
-			}
-
-			if (detailLine.trim().startsWith("%[CHECK]")) {
-				JCheckBox checkBox = new JCheckBox();
-				checkBox.setBackground(GUI.getBackgroundColor());
-				curPanel.add(checkBox, new Arrangement(0, 0, 0.0, 0.0));
-				CopyByClickLabel curLabel = AccountingUtils.createLabel(detailLine.replaceAll("%\\[CHECK\\]", ""),
-					new Color(0, 0, 0), "");
-				curPanel.add(curLabel, new Arrangement(1, 0, 1.0, 0.0));
 				specialRow = true;
 			}
 

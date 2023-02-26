@@ -17,14 +17,12 @@ import com.asofterspace.toolbox.web.WebTemplateEngine;
 
 import java.util.List;
 
-import javax.swing.SwingUtilities;
-
 
 public class AssAccountant {
 
 	public final static String PROGRAM_TITLE = "assAccountant (Mari)";
-	public final static String VERSION_NUMBER = "0.0.3.0(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "5. April 2020 - 25. May 2022";
+	public final static String VERSION_NUMBER = "0.0.3.1(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "5. April 2020 - 24. February 2023";
 
 	public final static String DATA_DIR = "config";
 	public final static String SERVER_DIR = "server";
@@ -177,10 +175,7 @@ public class AssAccountant {
 			return;
 		}
 
-		SwingUtilities.invokeLater(new GUI(database, tabCtrl, config));
 
-
-		Directory dataDir = new Directory(System.getProperty("java.class.path") + "/../" + DATA_DIR);
 		Directory serverDir = new Directory(System.getProperty("java.class.path") + "/../" + SERVER_DIR);
 		webRoot = new Directory(System.getProperty("java.class.path") + "/../" + WEB_ROOT_DIR);
 

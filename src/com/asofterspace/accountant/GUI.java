@@ -83,8 +83,6 @@ public class GUI extends MainWindow {
 	private String[] strTabs;
 	private JScrollPane tabListScroller;
 
-	private NewYearGUI newYearGUI;
-	private AddEntryGUI addEntryGUI;
 	private AddTaskGUI addTaskGUI;
 
 
@@ -168,20 +166,6 @@ public class GUI extends MainWindow {
 
 		JMenu file = new JMenu("File");
 		menu.add(file);
-
-		JMenuItem addYear = new JMenuItem("Add Year");
-		addYear.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, ActionEvent.CTRL_MASK));
-		addYear.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				// show the new year GUI
-				if (newYearGUI == null) {
-					newYearGUI = new NewYearGUI(GUI.this, database);
-				}
-				newYearGUI.show();
-			}
-		});
-		file.add(addYear);
 
 		file.addSeparator();
 
@@ -295,21 +279,6 @@ public class GUI extends MainWindow {
 			}
 		});
 		edit.add(showSearch);
-
-		/*
-		MenuItemForMainMenu addEntry = new MenuItemForMainMenu("Add Entry");
-		addEntry.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				// show the add entry GUI
-				if (addEntryGUI == null) {
-					addEntryGUI = new AddEntryGUI(GUI.this, database, null);
-				}
-				addEntryGUI.show();
-			}
-		});
-		menu.add(addEntry);
-		*/
 
 		JMenu tasksMenu = new JMenu("Tasks");
 

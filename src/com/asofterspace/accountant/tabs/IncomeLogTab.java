@@ -37,8 +37,6 @@ public class IncomeLogTab extends Tab {
 
 	private static final String TITLE = "Income Log";
 
-	private JPanel tab;
-
 
 	public IncomeLogTab() {
 	}
@@ -321,18 +319,6 @@ public class IncomeLogTab extends Tab {
 		csvFile.save();
 
 		return resultDir;
-	}
-
-	@Override
-	public void destroyTabOnGUI(JPanel parentPanel) {
-		if (tab != null) {
-			parentPanel.remove(tab);
-		}
-	}
-
-	@Override
-	public int getComparisonOrder() {
-		return (10000 * 100) + 3000;
 	}
 
 	@Override

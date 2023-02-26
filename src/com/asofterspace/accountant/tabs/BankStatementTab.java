@@ -11,9 +11,4 @@ public class BankStatementTab extends BankStatementYearTab {
 		super(null);
 	}
 
-	@Override
-	public int getComparisonOrder() {
-		return (10000 * 100) + 1000;
-	}
-
 }

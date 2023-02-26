@@ -22,8 +22,6 @@ import com.asofterspace.accountant.timespans.Month;
 import com.asofterspace.accountant.timespans.Year;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 
@@ -42,6 +40,8 @@ public class TabCtrl {
 	private BankStatementTab bankStatementTab;
 	private InfoTab infoTab;
 
+	private List<Tab> tabList;
+
 
 	public TabCtrl(Database database) {
 		this.database = database;
@@ -55,9 +55,11 @@ public class TabCtrl {
 		this.calculatorTab = new CalculatorTab();
 		this.bankStatementTab = new BankStatementTab();
 		this.infoTab = new InfoTab();
+
+		this.tabList = createTabList();
 	}
 
-	public List<Tab> getTabs() {
+	private List<Tab> createTabList() {
 
 		List<Tab> result = new ArrayList<>();
 
@@ -69,8 +71,8 @@ public class TabCtrl {
 		result.add(loanTab);
 		result.add(taxTab);
 		result.add(calculatorTab);
-		result.add(bankStatementTab);
 		result.add(infoTab);
+		result.add(bankStatementTab);
 
 		List<Year> years = database.getYears();
 		for (Year year : years) {
@@ -85,13 +87,11 @@ public class TabCtrl {
 			result.add(new BankStatementYearTab(new Year(year, database)));
 		}
 
-		Collections.sort(result, new Comparator<Tab>() {
-			public int compare(Tab a, Tab b) {
-				return a.compareTo(b);
-			}
-		});
-
 		return result;
+	}
+
+	public List<Tab> getTabs() {
+		return tabList;
 	}
 
 	public OverviewTab getOverviewTab() {

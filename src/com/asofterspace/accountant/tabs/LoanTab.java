@@ -23,8 +23,6 @@ public class LoanTab extends Tab {
 
 	private static final String TITLE = "Loans";
 
-	private JPanel tab;
-
 
 	public LoanTab() {
 	}
@@ -88,18 +86,6 @@ public class LoanTab extends Tab {
 		AccountingUtils.resetTabSize(tab, parentPanel);
 
 		parentPanel.add(tab);
-	}
-
-	@Override
-	public void destroyTabOnGUI(JPanel parentPanel) {
-		if (tab != null) {
-			parentPanel.remove(tab);
-		}
-	}
-
-	@Override
-	public int getComparisonOrder() {
-		return (10000 * 100) + 2750;
 	}
 
 	@Override

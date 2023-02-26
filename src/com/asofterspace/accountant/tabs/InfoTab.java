@@ -31,11 +31,6 @@ public class InfoTab extends Tab {
 	}
 
 	@Override
-	public int getComparisonOrder() {
-		return (10000 * 100) + 1500;
-	}
-
-	@Override
 	public String toString() {
 		return TITLE;
 	}

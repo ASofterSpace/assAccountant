@@ -12,6 +12,7 @@ import com.asofterspace.accountant.data.OutgoingOverviewData;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
 import com.asofterspace.accountant.entries.Incoming;
+import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.Problem;
 import com.asofterspace.accountant.TabCtrl;
 import com.asofterspace.accountant.tabs.BankStatementTab;
@@ -53,6 +54,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import javax.swing.SwingUtilities;
 
 
 public class ServerRequestHandler extends WebServerRequestHandler {
@@ -114,6 +117,18 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 		try {
 
 			switch (fileLocation) {
+
+				case "/showGUI":
+					SwingUtilities.invokeLater(new GUI(database, tabCtrl, AssAccountant.getConfig()));
+					break;
+
+				case "/gulpBankStatements":
+					String resultStr = database.getTaskCtrl().gulpBankStatements();
+					Record answerRec = Record.emptyObject();
+					answerRec.set("success", true);
+					answerRec.set("message", resultStr);
+					answer = new WebServerAnswerInJson(answerRec);
+					break;
 
 				case "/calcCategoryBasedOnTitle":
 					Category cat = database.mapTitleToCategory(json.getString("title"));

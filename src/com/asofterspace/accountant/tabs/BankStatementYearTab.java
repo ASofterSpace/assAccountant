@@ -32,8 +32,6 @@ import javax.swing.JPanel;
 
 public class BankStatementYearTab extends Tab {
 
-	private JPanel tab;
-
 	private Year year;
 
 	private String title;
@@ -265,18 +263,6 @@ public class BankStatementYearTab extends Tab {
 		AccountingUtils.resetTabSize(tab, parentPanel);
 
 		parentPanel.add(tab);
-	}
-
-	@Override
-	public void destroyTabOnGUI(JPanel parentPanel) {
-		if (tab != null) {
-			parentPanel.remove(tab);
-		}
-	}
-
-	@Override
-	public int getComparisonOrder() {
-		return getYear().getNum() * 100;
 	}
 
 	public Year getYear() {

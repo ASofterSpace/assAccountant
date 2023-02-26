@@ -36,8 +36,6 @@ public class FinanceLogTab extends Tab {
 
 	private static final String TITLE = "Finance Log";
 
-	private JPanel tab;
-
 
 	public FinanceLogTab() {
 	}
@@ -218,18 +216,6 @@ public class FinanceLogTab extends Tab {
 		csvFile.save();
 
 		return resultDir;
-	}
-
-	@Override
-	public void destroyTabOnGUI(JPanel parentPanel) {
-		if (tab != null) {
-			parentPanel.remove(tab);
-		}
-	}
-
-	@Override
-	public int getComparisonOrder() {
-		return (10000 * 100) + 4000;
 	}
 
 	@Override

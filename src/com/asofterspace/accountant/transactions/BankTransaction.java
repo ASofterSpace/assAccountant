@@ -5,11 +5,7 @@
 package com.asofterspace.accountant.transactions;
 
 import com.asofterspace.accountant.AccountingUtils;
-import com.asofterspace.accountant.AddEntryGUI;
 import com.asofterspace.accountant.Database;
-import com.asofterspace.accountant.entries.Entry;
-import com.asofterspace.accountant.entries.Incoming;
-import com.asofterspace.accountant.entries.Outgoing;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.toolbox.accounting.Currency;
@@ -21,13 +17,10 @@ import com.asofterspace.toolbox.utils.StrUtils;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.GridBagLayout;
 import java.util.Date;
 
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -183,6 +176,7 @@ public class BankTransaction {
 		curLabel.setPreferredSize(defaultDimension);
 		curCurPanel.add(curLabel, new Arrangement(3, 0, 0.0, 0.0));
 
+		/*
 		JButton curButton = new JButton("Prepare Entry");
 		curButton.addMouseListener(rowHighlighter);
 		curButton.setMinimumSize(defaultDimension);
@@ -201,6 +195,7 @@ public class BankTransaction {
 				addEntryGUI.show();
 			}
 		});
+		*/
 
 		curLabel = new CopyByClickLabel("");
 		curLabel.addMouseListener(rowHighlighter);

@@ -4,28 +4,20 @@
  */
 package com.asofterspace.accountant.tabs;
 
-import com.asofterspace.accountant.AccountingUtils;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.GUI;
 import com.asofterspace.accountant.loans.Payment;
 import com.asofterspace.accountant.rent.RentData;
 import com.asofterspace.accountant.rent.RentMonth;
 import com.asofterspace.accountant.rent.RentPayment;
-import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.utils.DateUtils;
 
-import java.awt.Color;
-import java.awt.GridBagLayout;
 import java.util.List;
-
-import javax.swing.JPanel;
 
 
 public class RentTab extends Tab {
 
 	private static final String TITLE = "Rent";
-
-	private JPanel tab;
 
 
 	public RentTab() {
@@ -76,34 +68,6 @@ public class RentTab extends Tab {
 		html.append("<div class='footer'>&nbsp;</div>");
 
 		return html.toString();
-	}
-
-	@Override
-	public void createTabOnGUI(final JPanel parentPanel, final Database database, String searchFor) {
-
-		tab = new JPanel();
-		tab.setBackground(GUI.getBackgroundColor());
-		tab.setLayout(new GridBagLayout());
-
-		JPanel footer = new JPanel();
-		footer.setBackground(GUI.getBackgroundColor());
-		tab.add(footer, new Arrangement(0, 1, 1.0, 1.0));
-
-		AccountingUtils.resetTabSize(tab, parentPanel);
-
-		parentPanel.add(tab);
-	}
-
-	@Override
-	public void destroyTabOnGUI(JPanel parentPanel) {
-		if (tab != null) {
-			parentPanel.remove(tab);
-		}
-	}
-
-	@Override
-	public int getComparisonOrder() {
-		return (10000 * 100) + 2890;
 	}
 
 	@Override

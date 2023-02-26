@@ -26,8 +26,6 @@ public class MonthTab extends TimeSpanTab {
 
 	private Month month;
 
-	private JPanel tab;
-
 
 	public MonthTab(Month month) {
 		this.month = month;
@@ -126,11 +124,6 @@ public class MonthTab extends TimeSpanTab {
 		if (tab != null) {
 			parentPanel.remove(tab);
 		}
-	}
-
-	@Override
-	public int getComparisonOrder() {
-		return (getYear().getNum() * 100) + 10 + month.getNum();
 	}
 
 	public Month getMonth() {

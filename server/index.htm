@@ -43,6 +43,10 @@
 			Add Entry
 		</span>
 
+		<span class="bottomleftAction button" style="z-index: 300; left: 280pt; opacity: 0.75;" onclick="window.accountant.showGUI();">
+			Show Legacy GUI
+		</span>
+
 		<span class="bottomrightAction button" style="z-index: 300;" onclick="window.accountant.changeFormat();">
 			Format: [[FORMAT]]
 		</span>
@@ -157,6 +161,9 @@
 		</div>
 
 		<input type="text" id="copyInputField" style="position: fixed; top: -25pt;" />
+
+		<div id="temporary_overlay">
+		</div>
 
 		<script src="accountant.js?v=@version"></script>
 	</body>

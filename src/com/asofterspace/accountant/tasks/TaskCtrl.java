@@ -8,6 +8,9 @@ import com.asofterspace.accountant.Database;
 import com.asofterspace.toolbox.calendar.GenericTask;
 import com.asofterspace.toolbox.calendar.TaskCtrlBase;
 import com.asofterspace.toolbox.gui.GuiUtils;
+import com.asofterspace.toolbox.io.Directory;
+import com.asofterspace.toolbox.io.File;
+import com.asofterspace.toolbox.io.IoUtils;
 import com.asofterspace.toolbox.utils.DateUtils;
 import com.asofterspace.toolbox.utils.Record;
 
@@ -176,6 +179,180 @@ public class TaskCtrl extends TaskCtrlBase {
 
 	public void save() {
 		database.save();
+	}
+
+	public String gulpBankStatements() {
+
+		StringBuilder importStr = new StringBuilder();
+
+		Directory downloadsDir = new Directory("C:\\Users\\Moyaccercchi\\Downloads");
+		boolean recursive = false;
+
+
+		// SPARDA
+
+		// find all Sparda bank statements in the Downloads folder
+		List<File> downloadFiles = downloadsDir.getAllFiles(recursive);
+		List<File> anyBankFiles = new ArrayList<>();
+		List<File> bankStatements = new ArrayList<>();
+		for (File file : downloadFiles) {
+			String localName = file.getLocalFilename();
+			if (!localName.endsWith(".pdf")) {
+				continue;
+			}
+			if (!(localName.startsWith("1480748_") || localName.startsWith("5001480748_"))) {
+				continue;
+			}
+			anyBankFiles.add(file);
+			if (localName.contains("_Kontoauszug_")) {
+				bankStatements.add(file);
+				importStr.append("\n" + localName + " (Sparda bank statement)");
+			} else {
+				importStr.append("\n" + localName + " (Sparda generic file)");
+			}
+		}
+
+		// put them into the official folder
+		Directory spardaDir = new Directory("C:\\home\\official\\Sparda");
+		for (File file : anyBankFiles) {
+			file.moveTo(spardaDir);
+		}
+
+		// apply un-secure script
+		IoUtils.execute(spardaDir.getAbsoluteDirname() + "\\0 decrypt pdfs.bat");
+
+		// copy them into the assAccountant
+		Directory accImportDir = new Directory("C:\\home\\prog\\asofterspace\\assAccountant\\import");
+		Directory decryptDir = new Directory("C:\\home\\official\\Sparda\\decrypted");
+
+		List<File> importFiles = new ArrayList<>();
+
+		for (File file : bankStatements) {
+
+			File decryptedFile = new File(decryptDir, file.getLocalFilename());
+
+			decryptedFile.copyToDisk(accImportDir);
+
+			importFiles.add(new File(accImportDir, file.getLocalFilename()));
+		}
+
+		// import them into the assAccountant
+		database.bulkImportBankStatements(importFiles);
+
+
+		// DKB
+
+		// find all DKB bank statements in the Downloads folder
+		downloadFiles = downloadsDir.getAllFiles(recursive);
+		anyBankFiles = new ArrayList<>();
+		bankStatements = new ArrayList<>();
+		for (File file : downloadFiles) {
+			String localName = file.getLocalFilename();
+			if (!localName.endsWith(".pdf")) {
+				continue;
+			}
+			if (!(localName.startsWith("Kontoauszug_1011709415_") ||
+				  localName.startsWith("Kreditkartenabrechnung_4748xxxxxxxx7849_") ||
+				  localName.startsWith("Depotauszug_vom_"))) {
+				continue;
+			}
+			anyBankFiles.add(file);
+			// currently, we can only import Kontoauszug_, but we should in future also be able to import the credit card stuff
+			if (localName.contains("Kontoauszug_")) {
+			// if (localName.contains("Kontoauszug_") || localName.contains("Kreditkartenabrechnung_")) {
+				bankStatements.add(file);
+				importStr.append("\n" + localName + " (DKB bank statement)");
+			} else {
+				importStr.append("\n" + localName + " (DKB generic file)");
+			}
+		}
+
+		// put them into the official folder
+		Directory dkbDir = new Directory("C:\\home\\official\\DKB");
+		for (File file : anyBankFiles) {
+			file.moveTo(dkbDir);
+		}
+
+		// copy them into the assAccountant
+		importFiles = new ArrayList<>();
+
+		for (File file : bankStatements) {
+
+			file.copyToDisk(accImportDir);
+
+			importFiles.add(new File(accImportDir, file.getLocalFilename()));
+		}
+
+		// import them into the assAccountant
+		database.bulkImportBankStatements(importFiles);
+
+
+		// n26
+
+		// find all N26 bank statements in the Downloads folder
+		downloadFiles = downloadsDir.getAllFiles(recursive);
+		anyBankFiles = new ArrayList<>();
+		bankStatements = new ArrayList<>();
+		for (File file : downloadFiles) {
+			String localName = file.getLocalFilename();
+			if (!localName.endsWith(".pdf")) {
+				continue;
+			}
+			if (!localName.startsWith("statement-")) {
+				continue;
+			}
+			anyBankFiles.add(file);
+			bankStatements.add(file);
+			importStr.append("\n" + localName + " (n26 bank statement)");
+		}
+
+		// put them into the official folder
+		Directory n26Dir = new Directory("C:\\home\\official\\n26");
+		for (File file : anyBankFiles) {
+			file.moveTo(n26Dir);
+		}
+
+		// find all N26 bank statement CSV in the Downloads folder
+		downloadFiles = downloadsDir.getAllFiles(recursive);
+		anyBankFiles = new ArrayList<>();
+		bankStatements = new ArrayList<>();
+		for (File file : downloadFiles) {
+			String localName = file.getLocalFilename();
+			if (!localName.endsWith(".csv")) {
+				continue;
+			}
+			if (!localName.startsWith("n26-csv-transactions-")) {
+				continue;
+			}
+			anyBankFiles.add(file);
+			bankStatements.add(file);
+			importStr.append("\n" + localName + " (n26 bank statement)");
+		}
+
+		// put them into the official folder
+		for (File file : anyBankFiles) {
+			file.moveTo(n26Dir);
+		}
+
+		// copy them into the assAccountant
+		importFiles = new ArrayList<>();
+
+		for (File file : bankStatements) {
+
+			file.copyToDisk(accImportDir);
+
+			importFiles.add(new File(accImportDir, file.getLocalFilename()));
+		}
+
+		// import them into the assAccountant
+		database.bulkImportBankStatements(importFiles);
+
+
+		if (importStr.length() < 1) {
+			importStr.append("\nNo files at all - sorry!");
+		}
+
+		return "Imported:\n" + importStr.toString();
 	}
 
 }

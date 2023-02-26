@@ -232,3 +232,16 @@ div.projectbar > a > img {
 	max-width: 80%;
 	vertical-align: middle;
 }
+
+div#temporary_overlay {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: rgba(0,0,0,0.5);
+	margin: 0;
+	padding: 0;
+	z-index: 20000;
+}

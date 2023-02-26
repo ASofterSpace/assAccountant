@@ -12,25 +12,19 @@ import javax.swing.JPanel;
 
 public abstract class Tab {
 
+	JPanel tab = null;
+
+
 	public void createTabOnGUI(JPanel parentPanel, Database database, String searchFor) {
 	}
 
 	public void destroyTabOnGUI(JPanel parentPanel) {
+		if (tab != null) {
+			parentPanel.remove(tab);
+		}
 	}
 
 	public abstract String getHtmlGUI(Database database, String searchFor);
-
-	/**
-	 * Get the comparison order; higher numbers are sorted further towards the top!
-	 */
-	public abstract int getComparisonOrder();
-
-	public int compareTo(Tab tab) {
-		if (tab == null) {
-			return 1;
-		}
-		return tab.getComparisonOrder() - getComparisonOrder();
-	}
 
 	/**
 	 * Export this tab in one or more CSV files into a folder inside exportDir and return the

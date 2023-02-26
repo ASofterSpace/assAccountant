@@ -5,8 +5,6 @@
 package com.asofterspace.accountant.tabs;
 
 import com.asofterspace.accountant.AccountingUtils;
-import com.asofterspace.accountant.AddEntryGUI;
-import com.asofterspace.accountant.AddPaidGUI;
 import com.asofterspace.accountant.ConsistencyProblem;
 import com.asofterspace.accountant.Database;
 import com.asofterspace.accountant.entries.Entry;
@@ -33,8 +31,6 @@ import javax.swing.JPanel;
 public class OverviewTab extends Tab {
 
 	private static final String TITLE = "Overview";
-
-	private JPanel tab;
 
 
 	public OverviewTab() {
@@ -309,18 +305,7 @@ public class OverviewTab extends Tab {
 			curLabel.setPreferredSize(defaultDimension);
 			curPanel.add(curLabel, new Arrangement(0, 0, 0.8, 1.0));
 
-			JButton curButton = new JButton("Paid");
-			curButton.setPreferredSize(defaultDimension);
-			curPanel.add(curButton, new Arrangement(1, 0, 0.1, 1.0));
-			curButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					AddPaidGUI addPaidGUI = new AddPaidGUI(database.getGUI(), database, curProblem.getEntry());
-					addPaidGUI.show();
-				}
-			});
-
-			curButton = new JButton("Show");
+			JButton curButton = new JButton("Show");
 			curButton.setPreferredSize(defaultDimension);
 			curPanel.add(curButton, new Arrangement(2, 0, 0.1, 1.0));
 			curButton.addActionListener(new ActionListener() {
@@ -367,19 +352,7 @@ public class OverviewTab extends Tab {
 			curLabel.setPreferredSize(defaultDimension);
 			curPanel.add(curLabel, new Arrangement(0, 0, 0.8, 1.0));
 
-			JButton curButton = new JButton("Edit");
-			curButton.addMouseListener(rowHighlighter);
-			curButton.setPreferredSize(defaultDimension);
-			curPanel.add(curButton, new Arrangement(1, 0, 0.08, 1.0));
-			curButton.addActionListener(new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					AddEntryGUI addEntryGUI = new AddEntryGUI(database.getGUI(), database, curProblem.getEntry());
-					addEntryGUI.show();
-				}
-			});
-
-			curButton = new JButton("Show");
+			JButton curButton = new JButton("Show");
 			curButton.addMouseListener(rowHighlighter);
 			curButton.setPreferredSize(defaultDimension);
 			curPanel.add(curButton, new Arrangement(2, 0, 0.08, 1.0));
@@ -425,18 +398,6 @@ public class OverviewTab extends Tab {
 		AccountingUtils.resetTabSize(tab, parentPanel);
 
 		parentPanel.add(tab);
-	}
-
-	@Override
-	public void destroyTabOnGUI(JPanel parentPanel) {
-		if (tab != null) {
-			parentPanel.remove(tab);
-		}
-	}
-
-	@Override
-	public int getComparisonOrder() {
-		return (10000 * 100) + 10000;
 	}
 
 	@Override

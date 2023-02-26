@@ -361,8 +361,6 @@ public abstract class Entry {
 
 	public String createPanelHtml(Database database) {
 
-		// TODO - get buttons to actually work
-
 		String html = "";
 
 		Color textColor = getTextColor();
