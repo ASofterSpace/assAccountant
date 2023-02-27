@@ -24,6 +24,11 @@ public class RentTab extends Tab {
 	}
 
 	@Override
+	public boolean isShownInMenu() {
+		return false;
+	}
+
+	@Override
 	public String getHtmlGUI(Database database, String searchFor) {
 
 		StringBuilder html = new StringBuilder();

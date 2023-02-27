@@ -218,6 +218,10 @@ public class AssAccountant {
 		return taskCtrl;
 	}
 
+	public static TabCtrl getTabCtrl() {
+		return tabCtrl;
+	}
+
 	public static Directory getWebRoot() {
 		return webRoot;
 	}

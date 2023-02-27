@@ -124,6 +124,14 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					SwingUtilities.invokeLater(new GUI(database, tabCtrl, AssAccountant.getConfig()));
 					break;
 
+				case "/generalUndo":
+					database.undo();
+					break;
+
+				case "/generalRedo":
+					database.redo();
+					break;
+
 				case "/gulpBankStatements":
 					String resultStr = database.getTaskCtrl().gulpBankStatements();
 					Record answerRec = Record.emptyObject();
@@ -930,12 +938,17 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 				Tab currentlySelectedTab = tabCtrl.getOverviewTab();
 
 				for (Tab tab : tabs) {
-					tabsHtml += "<a href='";
 					String link = tabToLink(tab);
+					if (tabKind.equals(link)) {
+						currentlySelectedTab = tab;
+					}
+					if (!tab.isShownInMenu()) {
+						continue;
+					}
+					tabsHtml += "<a href='";
 					tabsHtml += link;
 					tabsHtml += "'";
 					if (tabKind.equals(link)) {
-						currentlySelectedTab = tab;
 						tabsHtml += " class='selectedTab'";
 					}
 					tabsHtml += ">&nbsp;" + tab.toString() + "</a>";

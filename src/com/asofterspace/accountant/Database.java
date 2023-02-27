@@ -638,7 +638,9 @@ public class Database {
 		save();
 	}
 
-	public void bulkImportBankStatements(List<File> bulkFiles) {
+	public String bulkImportBankStatements(List<File> bulkFiles) {
+
+		StringBuilder result = new StringBuilder();
 
 		for (File bulkFile : bulkFiles) {
 
@@ -647,30 +649,39 @@ public class Database {
 			switch (filetype) {
 
 				case "csv":
-					bulkImportBankStatementsFromCsv(new CsvFile(bulkFile));
+					result.append(bulkImportBankStatementsFromCsv(new CsvFile(bulkFile)));
 					break;
 
 				case "pdf":
-					bulkImportBankStatementsFromPdf(new PdfFile(bulkFile));
+					result.append(bulkImportBankStatementsFromPdf(new PdfFile(bulkFile)));
 					break;
 
 				default:
-					GuiUtils.complain("The file " + bulkFile.getFilename() + " has type " +
+					result.append("\nThe file " + bulkFile.getFilename() + " has type " +
 						filetype.toUpperCase() + ", which cannot be imported!");
 					break;
 			}
 		}
 
 		save();
+
+		return result.toString();
 	}
 
-	public void bulkImportBankStatementsFromCsv(CsvFile csv) {
+	@SuppressWarnings("fallthrough")
+	public String bulkImportBankStatementsFromCsv(CsvFile csv) {
 
 		String headLine = csv.getHeadLine();
+		int offsetForOldCategory = 0;
 
 		switch (headLine) {
 
+			// old kind of CSV with Category
 			case "\"Date\",\"Payee\",\"Account number\",\"Transaction type\",\"Payment reference\",\"Category\",\"Amount (EUR)\",\"Amount (Foreign Currency)\",\"Type Foreign Currency\",\"Exchange Rate\"":
+				offsetForOldCategory = 1;
+
+			// new kind of CSV without Category
+			case "\"Date\",\"Payee\",\"Account number\",\"Transaction type\",\"Payment reference\",\"Amount (EUR)\",\"Amount (Foreign Currency)\",\"Type Foreign Currency\",\"Exchange Rate\"":
 				String bank = "n26";
 				String iban = null;
 				String bic = "NTSBDEB1XXX";
@@ -688,19 +699,19 @@ public class Database {
 					if (!"".equals(line.get(4).trim())) {
 						content += "\n" + line.get(4);
 					}
-					int amount = FinanceUtils.parseMoney(line.get(6));
+					int amount = FinanceUtils.parseMoney(line.get(5+offsetForOldCategory));
 					curAccount.addTransaction(new BankTransaction(amount, content, date, curAccount));
 					line = csv.getContentLineInColumns();
 				}
 				break;
 
 			default:
-				GuiUtils.complain("The input file " + csv.getFilename() + " does not belong to a known bank!");
-				break;
+				return "\nThe input file " + csv.getFilename() + " does not belong to a known bank!";
 		}
+		return "";
 	}
 
-	public void bulkImportBankStatementsFromPdf(PdfFile pdf) {
+	public String bulkImportBankStatementsFromPdf(PdfFile pdf) {
 
 		List<PdfObject> objs = pdf.getObjects();
 
@@ -737,22 +748,18 @@ public class Database {
 
 		if (pdfText.contains("(Sparda-) Tj\n21.35 0.00 Td (Bank ) Tj\n15.34 0.00 Td (Berlin ) Tj\n17.01 0.00 Td (eG) Tj") ||
 			pdfText.contains("(Sparda-) Tj\n21.35 0.00 Td (Bank ) Tj\n15.35 0.00 Td (Berlin ) Tj\n17.01 0.00 Td (eG) Tj")) {
-			bulkImportBankStatementsFromPdfForSpardaUntil2018(pdf, pdfText);
-			return;
+			return bulkImportBankStatementsFromPdfForSpardaUntil2018(pdf, pdfText);
 		}
 		if (pdfText.contains("\n[(Sparda-Bank Berlin eG)]TJ")) {
-			bulkImportBankStatementsFromPdfForSparda(pdf, pdfText);
-			return;
+			return bulkImportBankStatementsFromPdfForSparda(pdf, pdfText);
 		}
 		if (pdfText.contains("\n(DEUTSCHE KREDITBANK AG)Tj")) {
-			bulkImportBankStatementsFromPdfForDKB(pdf, pdfText);
-			return;
+			return bulkImportBankStatementsFromPdfForDKB(pdf, pdfText);
 		}
 		if (pdfText.contains("\n[(GLS Gemeinschaftsbank eG)]TJ")) {
-			bulkImportBankStatementsFromPdfForGLS(pdf, pdfText);
-			return;
+			return bulkImportBankStatementsFromPdfForGLS(pdf, pdfText);
 		}
-		GuiUtils.complain("The input file " + pdf.getFilename() + " does not belong to a known bank!");
+		return "The input file " + pdf.getFilename() + " does not belong to a known bank!";
 	}
 
 	/**
@@ -787,7 +794,7 @@ public class Database {
 		return result;
 	}
 
-	private void bulkImportBankStatementsFromPdfForSpardaUntil2018(PdfFile pdf, String pdfText) {
+	private String bulkImportBankStatementsFromPdfForSpardaUntil2018(PdfFile pdf, String pdfText) {
 
 		String bank = "Sparda";
 		String iban = null;
@@ -927,9 +934,10 @@ public class Database {
 				GuiUtils.complain("We did not exit the parsing of " + pdf.getFilename() + " as expected, some entries may have been missed!");
 			}
 		}
+		return "";
 	}
 
-	private void bulkImportBankStatementsFromPdfForSparda(PdfFile pdf, String pdfText) {
+	private String bulkImportBankStatementsFromPdfForSparda(PdfFile pdf, String pdfText) {
 
 		// until March 2o21, bracketMode was false - now it is true, which will be detected based on the IBAN
 		boolean bracketMode = false;
@@ -1052,6 +1060,7 @@ public class Database {
 				GuiUtils.complain("We did not exit the parsing of the PDF as expected, some entries may have been missed!");
 			}
 		}
+		return "";
 	}
 
 	// takes in "bla (foo ) blubb (bar)" and returns "foo bar"
@@ -1067,7 +1076,7 @@ public class Database {
 		return result.toString();
 	}
 
-	private void bulkImportBankStatementsFromPdfForDKB(PdfFile pdf, String pdfText) {
+	private String bulkImportBankStatementsFromPdfForDKB(PdfFile pdf, String pdfText) {
 
 		String bank = "DKB";
 		String iban = null;
@@ -1207,9 +1216,10 @@ public class Database {
 				GuiUtils.complain("We did not exit the parsing of " + pdf.getFilename() + " as expected, some entries may have been missed!");
 			}
 		}
+		return "";
 	}
 
-	private void bulkImportBankStatementsFromPdfForGLS(PdfFile pdf, String pdfText) {
+	private String bulkImportBankStatementsFromPdfForGLS(PdfFile pdf, String pdfText) {
 
 		String bank = "GLS";
 		String iban = null;
@@ -1304,6 +1314,7 @@ public class Database {
 				GuiUtils.complain("We did not exit the parsing of " + pdf.getFilename() + " as expected, some entries may have been missed!");
 			}
 		}
+		return "";
 	}
 
 	private BankAccount getOrAddBankAccount(String bank, String iban, String bic, String owner) {

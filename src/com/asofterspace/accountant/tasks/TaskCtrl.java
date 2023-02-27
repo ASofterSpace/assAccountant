@@ -208,6 +208,7 @@ public class TaskCtrl extends TaskCtrlBase {
 	public String gulpBankStatements() {
 
 		StringBuilder importStr = new StringBuilder();
+		StringBuilder errorStrs = new StringBuilder();
 
 		Directory downloadsDir = new Directory("C:\\Users\\Moyaccercchi\\Downloads");
 		boolean recursive = false;
@@ -261,7 +262,7 @@ public class TaskCtrl extends TaskCtrlBase {
 		}
 
 		// import them into the assAccountant
-		database.bulkImportBankStatements(importFiles);
+		errorStrs.append(database.bulkImportBankStatements(importFiles));
 
 
 		// DKB
@@ -308,7 +309,7 @@ public class TaskCtrl extends TaskCtrlBase {
 		}
 
 		// import them into the assAccountant
-		database.bulkImportBankStatements(importFiles);
+		errorStrs.append(database.bulkImportBankStatements(importFiles));
 
 
 		// n26
@@ -369,14 +370,19 @@ public class TaskCtrl extends TaskCtrlBase {
 		}
 
 		// import them into the assAccountant
-		database.bulkImportBankStatements(importFiles);
+		errorStrs.append(database.bulkImportBankStatements(importFiles));
 
 
 		if (importStr.length() < 1) {
 			importStr.append("\nNo files at all - sorry!");
 		}
 
-		return "Imported:\n" + importStr.toString();
+		String result = "Imported:\n" + importStr.toString();
+		String errorStr = errorStrs.toString();
+		if (!"".equals(errorStrs)) {
+			result += "\n\nErrors:" + errorStr;
+		}
+		return result;
 	}
 
 }

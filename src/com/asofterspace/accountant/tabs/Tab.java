@@ -15,6 +15,14 @@ public abstract class Tab {
 	JPanel tab = null;
 
 
+	/**
+	 * Is this tab shown in the menu on the left (true) or is it hidden and
+	 * only accessible through the operations tab (false)?
+	 */
+	public boolean isShownInMenu() {
+		return true;
+	}
+
 	public void createTabOnGUI(JPanel parentPanel, Database database, String searchFor) {
 	}
 

@@ -208,43 +208,8 @@ public class GUI extends MainWindow {
 		});
 		file.add(dropBankStatements);
 
-		file.addSeparator();
-
-		JMenuItem close = new JMenuItem("Exit");
-		close.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, ActionEvent.ALT_MASK));
-		close.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("Accountant out. Have a fun day! :)");
-				System.exit(0);
-			}
-		});
-		file.add(close);
-
 		JMenu edit = new JMenu("Edit");
 		menu.add(edit);
-
-		JMenuItem undo = new JMenuItem("Undo");
-		undo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Z, ActionEvent.CTRL_MASK));
-		undo.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				database.undo();
-			}
-		});
-		edit.add(undo);
-
-		JMenuItem redo = new JMenuItem("Redo");
-		redo.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Y, ActionEvent.CTRL_MASK));
-		redo.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				database.redo();
-			}
-		});
-		edit.add(redo);
-
-		edit.addSeparator();
 
 		JMenuItem showSearch = new JMenuItem("Search");
 		showSearch.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, ActionEvent.CTRL_MASK));

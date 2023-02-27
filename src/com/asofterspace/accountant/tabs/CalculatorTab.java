@@ -17,6 +17,11 @@ public class CalculatorTab extends Tab {
 	}
 
 	@Override
+	public boolean isShownInMenu() {
+		return false;
+	}
+
+	@Override
 	public String getHtmlGUI(Database database, String searchFor) {
 
 		String html = "";

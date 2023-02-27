@@ -12,6 +12,7 @@ import com.asofterspace.accountant.tabs.IncomeLogTab;
 import com.asofterspace.accountant.tabs.InfoTab;
 import com.asofterspace.accountant.tabs.LoanTab;
 import com.asofterspace.accountant.tabs.MonthTab;
+import com.asofterspace.accountant.tabs.OperationsTab;
 import com.asofterspace.accountant.tabs.OverviewTab;
 import com.asofterspace.accountant.tabs.RentTab;
 import com.asofterspace.accountant.tabs.Tab;
@@ -39,6 +40,7 @@ public class TabCtrl {
 	private CalculatorTab calculatorTab;
 	private BankStatementTab bankStatementTab;
 	private InfoTab infoTab;
+	private OperationsTab operationsTab;
 
 	private List<Tab> tabList;
 
@@ -55,6 +57,7 @@ public class TabCtrl {
 		this.calculatorTab = new CalculatorTab();
 		this.bankStatementTab = new BankStatementTab();
 		this.infoTab = new InfoTab();
+		this.operationsTab = new OperationsTab();
 
 		this.tabList = createTabList();
 	}
@@ -72,6 +75,7 @@ public class TabCtrl {
 		result.add(taxTab);
 		result.add(calculatorTab);
 		result.add(infoTab);
+		result.add(operationsTab);
 		result.add(bankStatementTab);
 
 		List<Year> years = database.getYears();

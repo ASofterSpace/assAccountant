@@ -457,6 +457,36 @@ window.accountant = {
 		}
 	},
 
+	generalUndo: function() {
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "generalUndo", true);
+		request.setRequestHeader("Content-Type", "application/json");
+		document.getElementById('temporary_overlay').style.display = 'block';
+		request.onreadystatechange = function() {
+			if (request.readyState == 4) {
+				document.getElementById('temporary_overlay').style.display = 'none';
+			}
+		};
+		var data = {};
+		request.send(JSON.stringify(data));
+	},
+
+	generalRedo: function() {
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "generalRedo", true);
+		request.setRequestHeader("Content-Type", "application/json");
+		document.getElementById('temporary_overlay').style.display = 'block';
+		request.onreadystatechange = function() {
+			if (request.readyState == 4) {
+				document.getElementById('temporary_overlay').style.display = 'none';
+			}
+		};
+		var data = {};
+		request.send(JSON.stringify(data));
+	},
+
 	showGUI: function() {
 
 		var request = new XMLHttpRequest();
