@@ -167,6 +167,18 @@ public class TaskCtrl extends TaskCtrlBase {
 		}
 	}
 
+	public void setTaskInstanceToDoneById(String id, String taskLogText, String finLogText) {
+		for (int i = taskInstances.size() - 1; i >= 0; i--) {
+			GenericTask genTask = taskInstances.get(i);
+			if (genTask instanceof Task) {
+				Task task = (Task) genTask;
+				if (task.getId().equals(id)) {
+					task.setToDone(taskLogText, finLogText);
+				}
+			}
+		}
+	}
+
 	/**
 	 * Returns true if it worked and an ad hoc task was created, and false otherwise
 	 */

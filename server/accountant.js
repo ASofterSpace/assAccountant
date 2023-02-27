@@ -18,7 +18,7 @@ window.accountant = {
 				var result = JSON.parse(request.response);
 				alert("Exported to: " + result.exportPath);
 			}
-		}
+		};
 
 		var data = {
 			tab: tab,
@@ -115,14 +115,10 @@ window.accountant = {
 					if (request.readyState == 4 && request.status == 200) {
 						var result = JSON.parse(request.response);
 						if (result.success) {
-							taskDetailsHolder.innerHTML = result.detailsHtml +
-								"<div>&nbsp;</div>" +
-								"<div><span onclick='accountant.editDetails(\"" + id +
-								"\")' class='button'>Edit Details</span></div>" +
-								"<div>&nbsp;</div>";
+							taskDetailsHolder.innerHTML = result.detailsHtml;
 						}
 					}
-				}
+				};
 
 				request.send();
 			}
@@ -134,9 +130,39 @@ window.accountant = {
 		alert("Sorry, the editing details function has not yet been implemented!");
 	},
 
-	setTaskDone: function(id) {
-		// TODO
-		alert("Sorry, the setting tasks to done function (and modal) has not yet been implemented!");
+	setTaskDone: function(taskId) {
+		var request = new XMLHttpRequest();
+		request.open("POST", "setTaskDone", true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				if (result.success) {
+					window.location.reload(false);
+				}
+			}
+		};
+
+		var taskLogTextarea = document.getElementById("task-log-" + taskId);
+		var taskLogStr = "";
+		if (taskLogTextarea) {
+			taskLogStr = taskLogTextarea.value;
+		}
+
+		var finLogTextarea = document.getElementById("task-finance-log-" + taskId);
+		var finLogStr = "";
+		if (finLogTextarea) {
+			finLogStr = finLogTextarea.value;
+		}
+
+		var data = {
+			id: taskId,
+			taskLog: taskLogStr,
+			finLog: finLogStr
+		};
+
+		request.send(JSON.stringify(data));
 	},
 
 	deleteTask: function(id, taskTitle) {
@@ -211,7 +237,7 @@ window.accountant = {
 					outer.currentlyEditing = id;
 				}
 			}
-		}
+		};
 
 		request.send();
 	},
@@ -251,7 +277,7 @@ window.accountant = {
 					outer.currentlyPaid = id;
 				}
 			}
-		}
+		};
 
 		request.send();
 	},
@@ -269,7 +295,7 @@ window.accountant = {
 					window.location.reload(false);
 				}
 			}
-		}
+		};
 
 		var data = {
 			"receivedOnDate": document.getElementById("paidDate").value,
@@ -325,7 +351,7 @@ window.accountant = {
 					document.getElementById("delWhat").innerText = outer.currentlyDeletingWhat;
 				}
 			}
-		}
+		};
 
 		request.send();
 	},
@@ -347,7 +373,7 @@ window.accountant = {
 					window.location.reload(false);
 				}
 			}
-		}
+		};
 
 		var data = {
 			"id": this.currentlyDeleting,
@@ -458,7 +484,7 @@ window.accountant = {
 					alert("Gulp bank statement call failed!\nStatus: " + request.status);
 				}
 			}
-		}
+		};
 
 		var data = {};
 		request.send(JSON.stringify(data));
@@ -499,7 +525,7 @@ window.accountant = {
 					}
 				}
 			}
-		}
+		};
 
 		var data = {
 			"date": document.getElementById("aeDate").value,
@@ -548,7 +574,7 @@ window.accountant = {
 							outer.trySelect(outer.catToId(result.category));
 						}
 					}
-				}
+				};
 
 				var data = {
 					"title": titleStr
@@ -685,7 +711,7 @@ window.accountant = {
 					document.getElementById("aeAfterTax").value = result.postTax;
 				}
 			}
-		}
+		};
 
 		var data = {
 			"preTax": document.getElementById("aeBeforeTax").value,
@@ -712,7 +738,7 @@ window.accountant = {
 					document.getElementById("aeBeforeTax").value = result.preTax;
 				}
 			}
-		}
+		};
 
 		var data = {
 			"postTax": document.getElementById("aeAfterTax").value,

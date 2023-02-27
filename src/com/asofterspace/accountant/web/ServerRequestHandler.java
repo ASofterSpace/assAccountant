@@ -114,6 +114,8 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 		WebServerAnswer answer = new WebServerAnswerInJson("{\"success\": true}");
 
+		TaskCtrl taskCtrl = database.getTaskCtrl();
+
 		try {
 
 			switch (fileLocation) {
@@ -186,8 +188,16 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					}
 					break;
 
+				case "/setTaskDone":
+					taskCtrl.setTaskInstanceToDoneById(
+						json.getString("id"),
+						json.getString("taskLog"),
+						json.getString("finLog")
+					);
+					taskCtrl.save();
+					break;
+
 				case "/deleteTask":
-					TaskCtrl taskCtrl = database.getTaskCtrl();
 					taskCtrl.deleteTaskInstanceById(json.getString("id"));
 					taskCtrl.save();
 					break;

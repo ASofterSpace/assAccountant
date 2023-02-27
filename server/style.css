@@ -245,3 +245,18 @@ div#temporary_overlay {
 	padding: 0;
 	z-index: 20000;
 }
+
+div.taskDetails {
+	display: block;
+	border: 1px solid #50A;
+	border-radius: 10pt;
+	margin-top: 4pt;
+	margin-bottom: 8pt;
+	margin-right: 2pt;
+	padding: 6pt;
+}
+
+div.taskDetails > textarea {
+	width: 99%;
+	height: 80pt;
+}
