@@ -179,7 +179,7 @@ public class Task extends GenericTask {
 		String detail = getDetailsToShowToUser(database);
 
 		if (detail == null) {
-			return "";
+			detail = "<i>This task has no details.</i>";
 		}
 
 		detail = detail.trim();
