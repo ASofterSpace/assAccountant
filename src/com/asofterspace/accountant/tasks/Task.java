@@ -460,13 +460,13 @@ public class Task extends GenericTask {
 			if (this instanceof FinanceOverviewTask) {
 				taskCtrl.removeFinanceLogForDate(getDoneDate());
 			}
-			setDoneLog(taskLog.getText());
+			setDoneLog(taskLogText);
 		} else {
 			this.done = true;
 			setDoneDate(new Date());
 			String detailsForUser = getDetailsToShowToUser(database);
 			if (detailsForUser == null) {
-				setDoneLog(taskLog.getText());
+				setDoneLog(taskLogText);
 			} else {
 				StringBuilder originalDetails = new StringBuilder();
 				originalDetails.append(taskLogText);
