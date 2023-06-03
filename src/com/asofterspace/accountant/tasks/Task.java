@@ -250,7 +250,9 @@ public class Task extends GenericTask {
 
 				if (copyLineOnClick) {
 					html.append(" onclick='accountant.copyText(\"");
-					html.append(StrUtils.replaceAll(detailLine.trim(), "\"", "\" + '\"' + \"") + "\")'");
+					html.append(StrUtils.replaceAll(
+						StrUtils.replaceAll(detailLine.trim(), "\\", "\\\\"),
+					"\"", "\" + '\"' + \"") + "\")'");
 				}
 
 				html.append(">");
