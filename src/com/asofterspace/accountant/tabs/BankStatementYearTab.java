@@ -49,7 +49,15 @@ public class BankStatementYearTab extends Tab {
 	@Override
 	public String getHtmlGUI(Database database, String searchFor) {
 
-		String html = "<div class='mainTitle'>" + title + "</div>";
+		String html = "";
+
+		html += "<div class='relContainer'>";
+		html += "<span class='toprightAction button' onclick='accountant.gulpBankStatements()'>";
+		html += "Gulp Bank Statements";
+		html += "</span>";
+		html += "</div>";
+
+		html += "<div class='mainTitle'>" + title + "</div>";
 
 		Color textColor = new Color(0, 0, 0);
 
