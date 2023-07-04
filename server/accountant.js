@@ -662,6 +662,13 @@ window.accountant = {
 			paidYepp.className = "button checked";
 			paidNope.className = "button unchecked";
 		}
+		var paidDate = document.getElementById("paidDate");
+		if (paidDate) {
+			if (paidDate.value == '') {
+				var DateUtils = toolbox.utils.DateUtils;
+				paidDate.value = DateUtils.serializeDate(DateUtils.now());
+			}
+		}
 	},
 
 	paidSelectNope: function() {
