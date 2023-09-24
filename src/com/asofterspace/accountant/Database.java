@@ -1621,7 +1621,7 @@ public class Database {
 		if ("DE".equals(formatStr)) {
 			return FinanceUtils.formatMoneyDE(amount);
 		} else {
-			return FinanceUtils.formatMoney(amount);
+			return FinanceUtils.formatMoneyEN(amount);
 		}
 	}
 
@@ -1629,7 +1629,7 @@ public class Database {
 		if ("DE".equals(formatStr)) {
 			return FinanceUtils.formatMoneyDE(amount, currency);
 		} else {
-			return FinanceUtils.formatMoney(amount, currency);
+			return FinanceUtils.formatMoneyEN(amount, currency);
 		}
 	}
 
