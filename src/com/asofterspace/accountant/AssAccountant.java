@@ -21,8 +21,8 @@ import java.util.List;
 public class AssAccountant {
 
 	public final static String PROGRAM_TITLE = "assAccountant (Mari)";
-	public final static String VERSION_NUMBER = "0.0.3.1(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
-	public final static String VERSION_DATE = "5. April 2020 - 24. February 2023";
+	public final static String VERSION_NUMBER = "0.0.3.2(" + Utils.TOOLBOX_VERSION_NUMBER + ")";
+	public final static String VERSION_DATE = "5. April 2020 - 20. January 2024";
 
 	public final static String DATA_DIR = "config";
 	public final static String SERVER_DIR = "server";

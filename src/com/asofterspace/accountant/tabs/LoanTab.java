@@ -29,7 +29,7 @@ public class LoanTab extends Tab {
 
 	@Override
 	public boolean isShownInMenu() {
-		return false;
+		return true;
 	}
 
 	@Override
@@ -41,15 +41,32 @@ public class LoanTab extends Tab {
 
 		List<Loan> loans = database.getLoans();
 
-		int loanAmount = loans.size();
-		html.append("<div>We have " + loanAmount + " loan" + (loanAmount == 1 ? "" : "s") + (loanAmount == 0 ? "." : ":") + "</div>");
+		int loanAmountActive = 0;
+		int loanAmountInactive = 0;
+		for (Loan loan : loans) {
+			if (loan.getActive()) {
+				loanAmountActive++;
+			} else {
+				loanAmountInactive++;
+			}
+		}
+		int loanAmountSum = loanAmountActive + loanAmountInactive;
+		html.append("<div>We have " + loanAmountSum + " loan" + (loanAmountSum == 1 ? "" : "s") +
+			" in total (" + loanAmountActive + " active loan" + (loanAmountActive == 1 ? "" : "s") + ", " +
+			loanAmountInactive + " inactive loan" + (loanAmountInactive == 1 ? "" : "s") + ")" +
+			(loanAmountSum == 0 ? "." : ":") + "</div>");
 
 		for (Loan loan : loans) {
-			html.append("<div class='line' style='margin-top: 15pt; font-weight: bold;'>");
-			html.append(loan.getName() + " (" + database.formatMoney(loan.getAmount()) + " €)");
+			String extraStyle = "";
+			if (!loan.getActive()) {
+				extraStyle = " text-decoration: line-through; opacity: 0.6;";
+			}
+			html.append("<div class='line' style='margin-top: 15pt; font-weight: bold;" + extraStyle + "'>");
+			html.append("<i>" + loan.getKindDisplayStr() + "</i> " + loan.getName());
+			html.append(" (" + database.formatMoney(loan.getAmount()) + " €)");
 			html.append("</div>");
 			if (loan.getDetails() != null) {
-				html.append("<div class='line' style='font-style: italic;'>");
+				html.append("<div class='line' style='font-style: italic;" + extraStyle + "'>");
 				html.append(loan.getDetails());
 				html.append("</div>");
 			}
@@ -57,7 +74,7 @@ public class LoanTab extends Tab {
 			int amountPaid = 0;
 
 			for (Payment payment : loan.getPayments()) {
-				html.append("<div class='line' style='padding-left: 9pt;'>");
+				html.append("<div class='line' style='padding-left: 9pt;" + extraStyle + "'>");
 				html.append(DateUtils.serializeDate(payment.getDate()));
 				html.append(" ");
 				html.append(database.formatMoney(payment.getAmount()) + " €");
@@ -66,7 +83,7 @@ public class LoanTab extends Tab {
 				amountPaid += payment.getAmount();
 			}
 
-			html.append("<div class='line'>");
+			html.append("<div class='line' style='" + extraStyle + "'>");
 			html.append("Total paid so far: ");
 			html.append(database.formatMoney(amountPaid) + " €");
 			html.append("</div>");

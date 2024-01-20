@@ -14,6 +14,12 @@ import java.util.List;
 
 public class Loan implements Recordable {
 
+	private final static String ACTIVE = "active";
+
+	private final static String KIND = "kind";
+	private final static String THEY_OWE = "THEY_OWE";
+	private final static String WE_OWE = "WE_OWE";
+
 	private final static String PAYMENTS = "payments";
 
 	private final static String CREATED_ON = "createdOn";
@@ -23,6 +29,11 @@ public class Loan implements Recordable {
 	private final static String DETAILS = "details";
 
 	private final static String NAME = "name";
+
+
+	private boolean active;
+
+	private String kind;
 
 	private String name;
 
@@ -40,6 +51,14 @@ public class Loan implements Recordable {
 	}
 
 	public Loan(Record rec) {
+
+		this.active = rec.getBoolean(ACTIVE, true);
+
+		this.kind = rec.getString(KIND);
+		if (!THEY_OWE.equals(this.kind)) {
+			this.kind = WE_OWE;
+		}
+
 		this.name = rec.getString(NAME);
 		this.details = rec.getString(DETAILS);
 		this.amount = rec.getInteger(AMOUNT, 0);
@@ -91,9 +110,34 @@ public class Loan implements Recordable {
 		this.payments = payments;
 	}
 
+	public boolean getActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
+	public String getKind() {
+		return kind;
+	}
+
+	public String getKindDisplayStr() {
+		if (THEY_OWE.equals(kind)) {
+			return "[WE ARE OWED - they need to pay]";
+		}
+		return "[WE OWE THIS - we need to pay]";
+	}
+
+	public void setKind(String kind) {
+		this.kind = kind;
+	}
+
 	@Override
 	public Record toRecord() {
 		Record rec = Record.emptyObject();
+		rec.set(ACTIVE, active);
+		rec.set(KIND, kind);
 		rec.set(NAME, name);
 		rec.set(DETAILS, details);
 		rec.set(AMOUNT, amount);
