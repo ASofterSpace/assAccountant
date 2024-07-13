@@ -322,9 +322,10 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 			List<GenericTask> taskInstances = taskCtrl.getTaskInstances();
 			Date fromDate = DateUtils.parseDate(arguments.get("from"));
 			Date toDate = DateUtils.parseDate(arguments.get("to"));
+			Date today = DateUtils.now();
 
 			for (GenericTask taskInstance : taskInstances) {
-				if (taskInstance.appliesTo(fromDate, toDate)) {
+				if (taskInstance.appliesToRange(fromDate, toDate, today)) {
 					json.append(taskCtrl.taskToRecord(taskInstance));
 				}
 			}
