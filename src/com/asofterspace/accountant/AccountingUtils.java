@@ -12,6 +12,7 @@ import com.asofterspace.accountant.tabs.Tab;
 import com.asofterspace.accountant.timespans.TimeSpan;
 import com.asofterspace.accountant.timespans.Year;
 import com.asofterspace.accountant.web.ServerRequestHandler;
+import com.asofterspace.accountant.world.Category;
 import com.asofterspace.toolbox.accounting.Currency;
 import com.asofterspace.toolbox.gui.Arrangement;
 import com.asofterspace.toolbox.gui.CopyByClickLabel;
@@ -44,18 +45,26 @@ public class AccountingUtils {
 	private static Database database;
 
 
-	public static String createTotalPanelHtml(int totalBeforeTax, int totalTax, int totalAfterTax) {
+	public static String createTotalPanelHtml(int totalBeforeTax, int totalTax, int totalAfterTax, String extraLabel) {
 
 		String html = "";
 
-		html += "<div class='line'>";
+		html += "<div class='line'";
+		if (extraLabel != null) {
+			html += " style='font-style: italic;'";
+		}
+		html += ">";
 
 		Color textColor = null;
 		String tooltip = null;
 
-		html += "<span style='width: 51%'>&nbsp;</span>";
+		html += "<span style='width: 51%;'>&nbsp;</span>";
 
-		html += AccountingUtils.createLabelHtml("Total:", textColor, tooltip, "text-align: right; width: 5%;");
+		String labelText = "Total:";
+		if (extraLabel != null) {
+			labelText = extraLabel + " " + labelText;
+		}
+		html += AccountingUtils.createLabelHtml(labelText, textColor, tooltip, "text-align: right; width: 5%;");
 		html += AccountingUtils.createLabelHtml(database.formatMoney(totalBeforeTax, Currency.EUR), textColor, tooltip, "text-align: right; width: 8.5%;");
 		html += AccountingUtils.createLabelHtml(database.formatMoney(totalTax, Currency.EUR), textColor, tooltip, "text-align: right; width: 7%;");
 		html += AccountingUtils.createLabelHtml(database.formatMoney(totalAfterTax, Currency.EUR), textColor, tooltip, "text-align: right; width: 8.5%;");
@@ -244,7 +253,7 @@ public class AccountingUtils {
 			}
 		}
 
-		html += AccountingUtils.createTotalPanelHtml(totalBeforeTax, totalTax, totalAfterTax);
+		html += createTotalPanelHtml(totalBeforeTax, totalTax, totalAfterTax, null);
 
 
 		html += "<div class='secondaryTitle'>Outgoing Payments - Received Invoices:</div>";
@@ -252,15 +261,23 @@ public class AccountingUtils {
 		totalBeforeTax = 0;
 		totalTax = 0;
 		totalAfterTax = 0;
+		int totalTravelBeforeTax = 0;
+		int totalTravelTax = 0;
+		int totalTravelAfterTax = 0;
 		List<Outgoing> outgoings = timeSpan.getOutgoings();
 		for (Outgoing cur : outgoings) {
 			if (cur.matches(searchFor)) {
 				html += cur.createPanelHtml(database);
 				totalBeforeTax += cur.getPreTaxAmount();
 				totalAfterTax += cur.getPostTaxAmount();
+				if (cur.getCategory() == Category.TRAVEL) {
+					totalTravelBeforeTax += cur.getPreTaxAmount();
+					totalTravelAfterTax += cur.getPostTaxAmount();
+				}
 			}
 		}
 		totalTax = totalAfterTax - totalBeforeTax;
+		totalTravelTax = totalTravelAfterTax - totalTravelBeforeTax;
 
 		if ("".equals(searchFor)) {
 			if ((totalBeforeTax != timeSpan.getOutTotalBeforeTax()) ||
@@ -270,7 +287,8 @@ public class AccountingUtils {
 			}
 		}
 
-		html += AccountingUtils.createTotalPanelHtml(totalBeforeTax, totalTax, totalAfterTax);
+		html += createTotalPanelHtml(totalBeforeTax, totalTax, totalAfterTax, null);
+		html += createTotalPanelHtml(totalTravelBeforeTax, totalTravelTax, totalTravelAfterTax, "Travel");
 
 
 		html += "<div class='secondaryTitle'>Outgoing Donations - Received Donation Invoices:</div>";
@@ -296,7 +314,7 @@ public class AccountingUtils {
 			}
 		}
 
-		html += AccountingUtils.createTotalPanelHtml(totalBeforeTax, totalTax, totalAfterTax);
+		html += createTotalPanelHtml(totalBeforeTax, totalTax, totalAfterTax, null);
 
 
 		html += "<div class='secondaryTitle'>Outgoing Personal Expenses:</div>";
@@ -322,7 +340,7 @@ public class AccountingUtils {
 			}
 		}
 
-		html += AccountingUtils.createTotalPanelHtml(totalBeforeTax, totalTax, totalAfterTax);
+		html += createTotalPanelHtml(totalBeforeTax, totalTax, totalAfterTax, null);
 
 
 		return html;
