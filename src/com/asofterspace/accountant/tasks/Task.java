@@ -285,16 +285,18 @@ public class Task extends GenericTask {
 			html.append("<textarea id='task-finance-log-" + getId() + "'>");
 			StringBuilder finLogText = new StringBuilder();
 			List<FinanceLogEntry> entries = taskCtrl.getFinanceLogs();
-			// if this was done before, load the finance log contents as filled in back then
-			if (done && (getDoneDate() != null)) {
+			// if this was done before, load the finance log contents as filled in back then;
+			Date doneDate = getDoneDate();
+			if (done && (doneDate != null)) {
 				for (FinanceLogEntry entry : entries) {
-					if (DateUtils.isSameDay(entry.getDate(), getDoneDate())) {
+					if (DateUtils.isSameDay(entry.getDate(), doneDate)) {
 						for (FinanceLogEntryRow row : entry.getRows()) {
 							finLogText.append(row.getAccount());
 							finLogText.append(": ");
 							finLogText.append(database.formatMoney(row.getAmount(), Currency.EUR));
 							finLogText.append("\n");
 						}
+						break;
 					}
 				}
 			} else {
@@ -306,12 +308,17 @@ public class Task extends GenericTask {
 						finLogText.append(": ");
 						finLogText.append("\n");
 					}
+					finLogText.append("\nTo compare - previously:\n");
+					for (FinanceLogEntryRow row : entry.getRows()) {
+						finLogText.append(row.getAccount());
+						finLogText.append(": ");
+						finLogText.append(database.formatMoney(row.getAmount(), Currency.EUR));
+						finLogText.append("\n");
+					}
 				}
 			}
 			html.append(finLogText);
 			html.append("</textarea>");
-			html.append("<div>Copy this to an external editor, modify it there, and copy it back in here " +
-				"just before you click on [Done]!</div>");
 		}
 
 
