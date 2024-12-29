@@ -12,6 +12,7 @@ rm -rf toolbox
 mkdir toolbox
 cd toolbox
 
+mkdir accounting
 mkdir calendar
 mkdir coders
 mkdir configuration
