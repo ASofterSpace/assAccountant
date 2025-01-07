@@ -47,7 +47,6 @@ import com.asofterspace.toolbox.web.WebServerAnswerInJson;
 import com.asofterspace.toolbox.web.WebServerAnswerWithText;
 import com.asofterspace.toolbox.web.WebServerRequestHandler;
 
-import java.awt.Desktop;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -167,13 +166,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 						json.getInteger("year"),
 						json.getInteger("month")
 					);
-					Directory diskLocationFile = new Directory(diskLocation);
-					try {
-						Desktop.getDesktop().open(diskLocationFile.getJavaFile());
-					} catch (IOException ex) {
-						System.out.println("Sorry, the folder " +
-							diskLocationFile.getAbsoluteDirname() + " could not be opened!");
-					}
+					GuiUtils.openFolder(diskLocation);
 					break;
 
 				case "/calcPostTax":
