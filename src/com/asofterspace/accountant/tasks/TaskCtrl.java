@@ -211,7 +211,9 @@ public class TaskCtrl extends TaskCtrlBase {
 		StringBuilder importStr = new StringBuilder();
 		StringBuilder errorStrs = new StringBuilder();
 
-		Directory downloadsDir = new Directory("C:\\Users\\Moyaccercchi\\Downloads");
+		Directory downloadsDir = new Directory("/home/moya/Downloads");
+		Directory officialDir = new Directory("/cyber/official");
+		Directory accountantDir = new Directory("/cyber/prog/asofterspace/assAccountant");
 		boolean recursive = false;
 
 
@@ -239,17 +241,17 @@ public class TaskCtrl extends TaskCtrlBase {
 		}
 
 		// put them into the official folder
-		Directory spardaDir = new Directory("C:\\home\\official\\Sparda");
+		Directory spardaDir = new Directory(officialDir, "Sparda");
 		for (File file : anyBankFiles) {
 			file.moveTo(spardaDir);
 		}
 
 		// apply un-secure script
-		IoUtils.execute(spardaDir.getAbsoluteDirname() + "\\0 decrypt pdfs.bat");
+		IoUtils.execute(spardaDir.getAbsoluteDirname() + "/0_decrypt_pdfs.sh");
 
 		// copy them into the assAccountant
-		Directory accImportDir = new Directory("C:\\home\\prog\\asofterspace\\assAccountant\\import");
-		Directory decryptDir = new Directory("C:\\home\\official\\Sparda\\decrypted");
+		Directory accImportDir = new Directory(accountantDir, "import");
+		Directory decryptDir = new Directory(spardaDir, "decrypted");
 
 		List<File> importFiles = new ArrayList<>();
 
@@ -294,7 +296,7 @@ public class TaskCtrl extends TaskCtrlBase {
 		}
 
 		// put them into the official folder
-		Directory dkbDir = new Directory("C:\\home\\official\\DKB");
+		Directory dkbDir = new Directory(officialDir, "DKB");
 		for (File file : anyBankFiles) {
 			file.moveTo(dkbDir);
 		}
@@ -333,7 +335,7 @@ public class TaskCtrl extends TaskCtrlBase {
 		}
 
 		// put them into the official folder
-		Directory n26Dir = new Directory("C:\\home\\official\\n26");
+		Directory n26Dir = new Directory(officialDir, "n26");
 		for (File file : anyBankFiles) {
 			file.moveTo(n26Dir);
 		}
