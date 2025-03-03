@@ -215,6 +215,15 @@ window.accountant = {
 					if (result.kind == "in") {
 						outer.aeSelectIncoming();
 						outer.trySelect(outer.custToId(result.customer));
+						document.getElementById("aeIncoKind").value = window.aeIncoKinds[0];
+						if (result.incoKind) {
+							if (result.incoKind.toLowerCase().startsWith("e")) {
+								document.getElementById("aeIncoKind").value = window.aeIncoKinds[1];
+							}
+							if (result.incoKind.toLowerCase().startsWith("u") || result.incoKind.toLowerCase().startsWith("ü")) {
+								document.getElementById("aeIncoKind").value = window.aeIncoKinds[2];
+							}
+						}
 					} else {
 						outer.aeSelectOutgoing();
 						outer.trySelect(outer.catToId(result.category));
@@ -415,9 +424,21 @@ window.accountant = {
 				if (optionalPrefillData["kind"] == "incoming") {
 					this.aeSelectIncoming();
 					document.getElementById("aeCatCust").value = optionalPrefillData["customer"];
+					// default to... the default
+					document.getElementById("aeIncoKind").value = window.aeIncoKinds[0];
+					if (optionalPrefillData["incoKind"]) {
+						if (optionalPrefillData["incoKind"].toLowerCase().startsWith("e")) {
+							document.getElementById("aeIncoKind").value = window.aeIncoKinds[1];
+						}
+						if (optionalPrefillData["incoKind"].toLowerCase().startsWith("u") || optionalPrefillData["incoKind"].toLowerCase().startsWith("ü")) {
+							document.getElementById("aeIncoKind").value = window.aeIncoKinds[2];
+						}
+					}
+					document.getElementById("aeIncoKindContainer").style.display = 'block';
 				} else {
 					this.aeSelectOutgoing();
 					document.getElementById("aeCatCust").value = optionalPrefillData["category"];
+					document.getElementById("aeIncoKindContainer").style.display = 'none';
 				}
 				document.getElementById("aeDate").value = optionalPrefillData["date"];
 				document.getElementById("aeBeforeTax").value = ""+(optionalPrefillData["amount"]/100);
@@ -438,6 +459,7 @@ window.accountant = {
 		document.getElementById("aeBeforeTax").value = "";
 		document.getElementById("aeTax").value = "";
 		document.getElementById("aeAfterTax").value = "";
+		document.getElementById("aeIncoKind").value = window.aeIncoKinds[0];
 		this.trySelect(this.orgToId("Moya"));
 	},
 
@@ -575,6 +597,7 @@ window.accountant = {
 		} else {
 			data.kind = "in";
 			data.customer = document.getElementById("aeCatCust").value;
+			data.incoKind = document.getElementById("aeIncoKind").value;
 		}
 
 		request.send(JSON.stringify(data));
@@ -633,6 +656,7 @@ window.accountant = {
 				window.aeCategories[i] + "</option>";
 		}
 		document.getElementById("aeCatCust").innerHTML = cats;
+		document.getElementById("aeIncoKindContainer").style.display = 'none';
 	},
 
 	aeSelectIncoming: function() {
@@ -653,6 +677,14 @@ window.accountant = {
 				window.aeCustomers[i] + "</option>";
 		}
 		document.getElementById("aeCatCust").innerHTML = custs;
+		var incoKinds = "";
+		for (var i = 0; i < window.aeIncoKinds.length; i++) {
+			incoKinds += "<option id='" + this.incoKindToId(window.aeIncoKinds[i]) + "' " +
+				"value='" + window.aeIncoKinds[i] + "'>" +
+				window.aeIncoKinds[i] + "</option>";
+		}
+		document.getElementById("aeIncoKind").innerHTML = incoKinds;
+		document.getElementById("aeIncoKindContainer").style.display = 'block';
 	},
 
 	paidSelectYepp: function() {
@@ -686,6 +718,10 @@ window.accountant = {
 
 	custToId: function(cust) {
 		return this.somethingToId("aeCustOption", cust);
+	},
+
+	incoKindToId: function(cust) {
+		return this.somethingToId("aeIncoKindOption", cust);
 	},
 
 	orgToId: function(org) {

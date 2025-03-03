@@ -496,6 +496,13 @@ public abstract class Entry {
 						this));
 				}
 			}
+			Incoming thisInco = (Incoming) this;
+			if (thisInco.isSomeKindOfPauschale() && (thisInco.getTaxPercent() != 0)) {
+				result.add(new ConsistencyProblem(
+					"For " + AccountingUtils.getEntryForLog(this) + ", it is a Pauschale - but there is a non-zero tax percent of " +
+					thisInco.getTaxPercent() + " on it, when just zero tax would have been expected.",
+					this));
+			}
 		}
 
 		if (getDate() == null) {

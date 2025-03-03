@@ -208,7 +208,7 @@ public class Month extends TimeSpan {
 	// adds an entry and returns the id of the new entry
 	public String addEntry(Date date, String title, Object catOrCustomerObj, String amountStr,
 		Currency currency, String taxationPercentStr, String postTaxAmountStr, String originator,
-		boolean isOutgoing, Database database) {
+		String incoKind, boolean isOutgoing, Database database) {
 
 		Integer amountObj = FinanceUtils.parseMoney(amountStr);
 		Integer postTaxAmountObj = FinanceUtils.parseMoney(postTaxAmountStr);
@@ -271,7 +271,7 @@ public class Month extends TimeSpan {
 		}
 
 		Incoming newIn = new Incoming(amountObj, currency, taxationPercent, postTaxAmountObj,
-			date, title, originator, customer, this);
+			date, title, originator, customer, incoKind, this);
 		incomings.add(newIn);
 		return newIn.getId();
 	}
@@ -298,6 +298,39 @@ public class Month extends TimeSpan {
 		int result = 0;
 		for (Incoming cur : incomings) {
 			result += cur.getPostTaxAmount();
+		}
+		return result;
+	}
+
+	@Override
+	public int getInTotalNoPauschalenAfterTax() {
+		int result = 0;
+		for (Incoming cur : incomings) {
+			if (!cur.isSomeKindOfPauschale()) {
+				result += cur.getPostTaxAmount();
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public int getInTotalEhrenamtspauschalen() {
+		int result = 0;
+		for (Incoming cur : incomings) {
+			if (cur.isEhrenamtspauschale()) {
+				result += cur.getPostTaxAmount();
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public int getInTotalUebungsleiterinnenpauschalen() {
+		int result = 0;
+		for (Incoming cur : incomings) {
+			if (cur.isUebungsleiterinnenpauschale()) {
+				result += cur.getPostTaxAmount();
+			}
 		}
 		return result;
 	}

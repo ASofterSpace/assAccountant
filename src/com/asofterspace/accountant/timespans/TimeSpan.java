@@ -46,6 +46,9 @@ public abstract class TimeSpan {
 
 	// after tax means after applying VAT (USt)
 	public abstract int getInTotalAfterTax();
+	public abstract int getInTotalNoPauschalenAfterTax();
+	public abstract int getInTotalEhrenamtspauschalen();
+	public abstract int getInTotalUebungsleiterinnenpauschalen();
 
 	public abstract int getOutTotalBeforeTax();
 

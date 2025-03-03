@@ -31,6 +31,7 @@
 			window.currentFormat = "[[FORMAT]]";
 			window.aeCategories = [[AE_CATEGORIES]];
 			window.aeCustomers = [[AE_CUSTOMERS]];
+			window.aeIncoKinds = ["Rechnung (default)", "Ehrenamtspauschale", "Übungsleiterinnenpauschale"];
 			window.aeOriginators = [[AE_ORIGINATORS]];
 			window.paidAccounts = [[PAID_ACCOUNTS]];
 		</script>
@@ -78,6 +79,12 @@
 			<div style="position: relative; padding-bottom: 8pt;">
 				<span id="aeCatCustLabel">Category:</span>
 				<select id="aeCatCust" style="width: 85%; position: absolute; right: 0pt; top: 0;">
+				</select>
+			</div>
+
+			<div id="aeIncoKindContainer" style="position: relative; padding-bottom: 8pt; display:none:">
+				<span>Income Kind:</span>
+				<select id="aeIncoKind" style="width: 85%; position: absolute; right: 0pt; top: 0;">
 				</select>
 			</div>
 

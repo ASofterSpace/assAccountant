@@ -18,6 +18,10 @@ import java.util.Date;
 public class Incoming extends Entry {
 
 	private static final String CUSTOMER_KEY = "customer";
+	private static final String INCO_KIND_KEY = "incoKind";
+
+	private boolean isEhrenamtspauschale = false;
+	private boolean isUebungsleiterinnenpauschale = false;
 
 	private String customer;
 
@@ -26,11 +30,13 @@ public class Incoming extends Entry {
 	 * Create an incoming payment (sent invoice) at runtime
 	 */
 	public Incoming(Integer amount, Currency currency, Integer taxationPercent, Integer postTaxAmount,
-		Date date, String title, String originator, String customer, Month parent) {
+		Date date, String title, String originator, String customer, String incoKind, Month parent) {
 
 		super(amount, currency, taxationPercent, postTaxAmount, date, title, originator, parent);
 
 		this.customer = customer;
+
+		setPauschalenBasedOnIncoKind(incoKind);
 	}
 
 	/**
@@ -40,6 +46,17 @@ public class Incoming extends Entry {
 		super(entryRecord, parent);
 
 		customer = entryRecord.getString(CUSTOMER_KEY);
+
+		setPauschalenBasedOnIncoKind(entryRecord.getString(INCO_KIND_KEY));
+	}
+
+	private void setPauschalenBasedOnIncoKind(String incoKind) {
+		isEhrenamtspauschale = false;
+		isUebungsleiterinnenpauschale = false;
+		if (incoKind != null) {
+			isEhrenamtspauschale = incoKind.toLowerCase().startsWith("e");
+			isUebungsleiterinnenpauschale = incoKind.toLowerCase().startsWith("u") || incoKind.toLowerCase().startsWith("ü");
+		}
 	}
 
 	@Override
@@ -50,6 +67,13 @@ public class Incoming extends Entry {
 		result.set(KIND_KEY, "in");
 
 		result.set(CUSTOMER_KEY, customer);
+
+		if (isEhrenamtspauschale) {
+			result.set(INCO_KIND_KEY, "ehrenamtspauschale");
+		}
+		if (isUebungsleiterinnenpauschale) {
+			result.set(INCO_KIND_KEY, "uebungsleiterinnenpauschale");
+		}
 
 		return result;
 	}
@@ -73,6 +97,18 @@ public class Incoming extends Entry {
 	@Override
 	public String getCategoryOrCustomer() {
 		return getCustomer();
+	}
+
+	public boolean isSomeKindOfPauschale() {
+		return isEhrenamtspauschale || isUebungsleiterinnenpauschale;
+	}
+
+	public boolean isEhrenamtspauschale() {
+		return isEhrenamtspauschale;
+	}
+
+	public boolean isUebungsleiterinnenpauschale() {
+		return isUebungsleiterinnenpauschale;
 	}
 
 }

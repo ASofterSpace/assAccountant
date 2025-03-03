@@ -160,6 +160,33 @@ public class Year extends TimeSpan {
 	}
 
 	@Override
+	public int getInTotalNoPauschalenAfterTax() {
+		int result = 0;
+		for (Month month : months) {
+			result += month.getInTotalNoPauschalenAfterTax();
+		}
+		return result;
+	}
+
+	@Override
+	public int getInTotalEhrenamtspauschalen() {
+		int result = 0;
+		for (Month month : months) {
+			result += month.getInTotalEhrenamtspauschalen();
+		}
+		return result;
+	}
+
+	@Override
+	public int getInTotalUebungsleiterinnenpauschalen() {
+		int result = 0;
+		for (Month month : months) {
+			result += month.getInTotalUebungsleiterinnenpauschalen();
+		}
+		return result;
+	}
+
+	@Override
 	public int getOutTotalBeforeTax() {
 		int result = 0;
 		for (Month month : months) {

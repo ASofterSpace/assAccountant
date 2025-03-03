@@ -407,7 +407,7 @@ public class Database {
 
 	// adds an entry and returns the id of the new entry
 	public String addEntry(Date date, String title, Object catOrCustomer, String amount,
-		Currency currency, String taxationPercent, String postTaxAmount, String originator, boolean isOutgoing) {
+		Currency currency, String taxationPercent, String postTaxAmount, String originator, String incoKind, boolean isOutgoing) {
 
 		Month curMonth = getMonthFromEntryDate(date);
 
@@ -416,7 +416,7 @@ public class Database {
 		}
 
 		String newId = curMonth.addEntry(date, title, catOrCustomer, amount, currency, taxationPercent,
-			postTaxAmount, originator, isOutgoing, this);
+			postTaxAmount, originator, incoKind, isOutgoing, this);
 
 		if (newId != null) {
 			save();
@@ -561,7 +561,7 @@ public class Database {
 					break;
 				}
 
-				if (addEntry(date, titleStr, category.getText(), amountStr, Currency.EUR, taxationPercentStr, null, "", true) == null) {
+				if (addEntry(date, titleStr, category.getText(), amountStr, Currency.EUR, taxationPercentStr, null, "", null, true) == null) {
 					// stop upon the first failure instead of showing a million error messages
 					break;
 				}
@@ -628,7 +628,7 @@ public class Database {
 					break;
 				}
 
-				if (addEntry(date, titleStr, customer, amountStr, Currency.EUR, taxationPercentStr, null, "", false) == null) {
+				if (addEntry(date, titleStr, customer, amountStr, Currency.EUR, taxationPercentStr, null, "", null, false) == null) {
 					// stop upon the first failure instead of showing a million error messages
 					break;
 				}

@@ -140,22 +140,6 @@ public class AccountingUtils {
 		return curPanel;
 	}
 
-	private static List<String> createList(String text, int amount) {
-		List<String> result = new ArrayList<>();
-		result.add(CsvFileGerman.sanitizeForCsv(text));
-		result.add(CsvFileGerman.sanitizeForCsv(amount / 100.0));
-		return result;
-	}
-
-	public static String createOverviewPanelInHtml(String text, int amount) {
-
-		String html = "<div class='line'>";
-		html += AccountingUtils.createLabelHtml(text, null, "", "text-align: right; width: 50%;");
-		html += AccountingUtils.createLabelHtml(database.formatMoney(amount, Currency.EUR), null, "", "text-align: left; width: 50%;");
-		html += "</div>";
-		return html;
-	}
-
 	public static JPanel createOverviewPanelOnGUI(String text, int amount) {
 
 		Dimension defaultDimension = GUI.getDefaultDimensionForInvoiceLine();
@@ -176,24 +160,56 @@ public class AccountingUtils {
 		return curPanel;
 	}
 
-	private static List<String> createList(String text1, int amount1, String text2, int amount2) {
+	private static List<String> createCsvDataList(List<Object> textList) {
+
 		List<String> result = new ArrayList<>();
-		result.add(CsvFileGerman.sanitizeForCsv(text1));
-		result.add(CsvFileGerman.sanitizeForCsv(amount1 / 100.0));
-		result.add(CsvFileGerman.sanitizeForCsv(text2));
-		result.add(CsvFileGerman.sanitizeForCsv(amount2 / 100.0));
+
+		result.add(CsvFileGerman.sanitizeForCsv((String) textList.get(0)));
+
+		if (textList.size() > 1) {
+			result.add(CsvFileGerman.sanitizeForCsv(((Integer) textList.get(1)) / 100.0));
+		}
+
+		if (textList.size() > 3) {
+			result.add(CsvFileGerman.sanitizeForCsv((String) textList.get(2)));
+			result.add(CsvFileGerman.sanitizeForCsv(((Integer) textList.get(3)) / 100.0));
+		}
+
 		return result;
 	}
 
-	public static String createOverviewPanelInHtml(String text1, int amount1, String text2, int amount2) {
+	private static String createOverviewPanelInHtml(List<Object> textList) {
 
-		String html = "<div class='line'>";
-		html += AccountingUtils.createLabelHtml(text1, null, "", "text-align: right; width: 50%;");
-		html += AccountingUtils.createLabelHtml(database.formatMoney(amount1, Currency.EUR), null, "", "text-align: left; width: 10%;");
-		html += AccountingUtils.createLabelHtml(text2, null, "", "text-align: right; width: 10%;");
-		html += AccountingUtils.createLabelHtml(database.formatMoney(amount2, Currency.EUR), null, "", "text-align: left; width: 30%;");
-		html += "</div>";
-		return html;
+		if (textList.size() == 1) {
+			String text = (String) textList.get(0);
+			if ("".equals(text)) {
+				return text;
+			}
+			String html = "<div style='text-align: center; padding-top: 5pt;'>";
+			html += text;
+			html += "</div>";
+			return html;
+		}
+
+		if (textList.size() == 2) {
+			String html = "<div class='line'>";
+			html += AccountingUtils.createLabelHtml((String) textList.get(0), null, "", "text-align: right; width: 50%;");
+			html += AccountingUtils.createLabelHtml(database.formatMoney((Integer) textList.get(1), Currency.EUR), null, "", "text-align: left; width: 50%;");
+			html += "</div>";
+			return html;
+		}
+
+		if (textList.size() == 4) {
+			String html = "<div class='line'>";
+			html += AccountingUtils.createLabelHtml((String) textList.get(0), null, "", "text-align: right; width: 50%;");
+			html += AccountingUtils.createLabelHtml(database.formatMoney((Integer) textList.get(1), Currency.EUR), null, "", "text-align: left; width: 10%;");
+			html += AccountingUtils.createLabelHtml((String) textList.get(2), null, "", "text-align: right; width: 10%;");
+			html += AccountingUtils.createLabelHtml(database.formatMoney((Integer) textList.get(3), Currency.EUR), null, "", "text-align: left; width: 30%;");
+			html += "</div>";
+			return html;
+		}
+
+		return "error - textList.size() == " + textList.size() + " not supported!";
 	}
 
 	public static JPanel createOverviewPanelOnGUI(String text1, int amount1, String text2, int amount2) {
@@ -482,97 +498,99 @@ public class AccountingUtils {
 
 	public static List<List<String>> createOverviewAndTaxInfoCsvData(TimeSpan timeSpan) {
 
+		List<List<Object>> resList = createOverviewAndTaxInfoBase(timeSpan);
+
 		List<List<String>> result = new ArrayList<>();
-
-		result.add(createList("Total amount earned: ", timeSpan.getInTotalAfterTax(), "Of that VAT: ", timeSpan.getInTotalTax()));
-		result.add(createList("Total amount spent: ", timeSpan.getOutTotalAfterTax(), "Of that VAT: ", timeSpan.getOutTotalTax()));
-		result.add(createList("Total amount donated: ", timeSpan.getDonTotalAfterTax(), "Of that VAT: ", timeSpan.getDonTotalTax()));
-		result.add(createList("Total amount of personal expenses: ", timeSpan.getPersTotalAfterTax(), "Of that VAT: ", timeSpan.getPersTotalTax()));
-
-		if (timeSpan instanceof Year) {
-			Year curYear = (Year) timeSpan;
-			result.add(createList("ROUGHLY expected income tax payment: ", (int) curYear.getExpectedIncomeTax()));
-			result.add(createList("Total amount earned in " + curYear.getNum() + ": ", (int) (timeSpan.getInTotalBeforeTax() - (timeSpan.getOutTotalBeforeTax() + timeSpan.getDonTotalBeforeTax() + timeSpan.getPersTotalBeforeTax() + curYear.getExpectedIncomeTax()))));
+		for (List<Object> curList : resList) {
+			result.add(createCsvDataList(curList));
 		}
-
-		List<String> subList = new ArrayList<>();
-		subList.add("");
-		result.add(subList);
-		subList = new ArrayList<>();
-		subList.add("-------------- VAT / USt --------------");
-		result.add(subList);
-
-		result.add(createList("Total deductible already paid VAT / Gesamte abziehbare Vorsteuerbeträge: ", timeSpan.getDiscountablePreTax()));
-		result.add(createList("Remaining VAT advance payment / Verbleibende Umsatzsteuer-Vorauszahlung: ", timeSpan.getRemainingVatPayments()));
-		result.add(createList("Actual VAT advance payments made / An das Finanzamt abgeführte Umsatzsteuer: ", timeSpan.getVatPrepaymentsPaidTotal()));
-
-		subList = new ArrayList<>();
-		subList.add("");
-		result.add(subList);
-		subList = new ArrayList<>();
-		subList.add("-------------- Income Tax / ESt --------------");
-		result.add(subList);
-
-		OutgoingOverviewData ood = new OutgoingOverviewData(timeSpan);
-
-		result.add(createList("Total amount spent on items, raw materials etc.: ", ood.getWareCosts() + ood.getOtherCosts()));
-		result.add(createList("Total external personnel and subcontractor costs: ", ood.getExternalSalary()));
-		result.add(createList("Total internal personnel costs: ", ood.getInternalSalary()));
-		result.add(createList("Total insurance costs: ", ood.getInsuranceCosts()));
-		result.add(createList("Total vehicle costs: ", ood.getVehicleCosts()));
-		result.add(createList("Total travel costs: ", ood.getTravelCosts()));
-		result.add(createList("Total location / building costs: ", ood.getLocationCosts()));
-		result.add(createList("Total education and conference costs: ", ood.getEducationCosts()));
-		result.add(createList("Total amount spent on IT infrastructure: ", ood.getInfrastructureCosts()));
-		result.add(createList("Total advertisement and branded item costs: ", ood.getAdvertisementCosts()));
-		result.add(createList("Total entertainment (e.g. restaurant) costs: ", ood.getEntertainmentCosts()));
-
 		return result;
 	}
 
 	public static String createOverviewAndTaxInfoHtml(TimeSpan timeSpan) {
 
-		String html = "";
+		List<List<Object>> resList = createOverviewAndTaxInfoBase(timeSpan);
 
-		html += "<div class='secondaryTitle'>Overview and Tax Information:</div>";
+		StringBuilder html = new StringBuilder();
+		html.append("<div class='secondaryTitle'>Overview and Tax Information:</div>");
+		for (List<Object> curList : resList) {
+			html.append(createOverviewPanelInHtml(curList));
+		}
+		return html.toString();
+	}
 
-		html += AccountingUtils.createOverviewPanelInHtml("Total amount earned: ", timeSpan.getInTotalAfterTax(), "Of that VAT: ", timeSpan.getInTotalTax());
-		html += AccountingUtils.createOverviewPanelInHtml("Total amount spent: ", timeSpan.getOutTotalAfterTax(), "Of that VAT: ", timeSpan.getOutTotalTax());
-		html += AccountingUtils.createOverviewPanelInHtml("Total amount donated: ", timeSpan.getDonTotalAfterTax(), "Of that VAT: ", timeSpan.getDonTotalTax());
-		html += AccountingUtils.createOverviewPanelInHtml("Total amount of personal expenses: ", timeSpan.getPersTotalAfterTax(), "Of that VAT: ", timeSpan.getPersTotalTax());
+	public static List<List<Object>> createOverviewAndTaxInfoBase(TimeSpan timeSpan) {
+
+		List<List<Object>> result = new ArrayList<>();
+
+		addToObjList(result, "Total amount earned: ", timeSpan.getInTotalAfterTax(), "Of that VAT: ", timeSpan.getInTotalTax());
+		addToObjList(result, "Total amount spent: ", timeSpan.getOutTotalAfterTax(), "Of that VAT: ", timeSpan.getOutTotalTax());
+		addToObjList(result, "Total amount donated: ", timeSpan.getDonTotalAfterTax(), "Of that VAT: ", timeSpan.getDonTotalTax());
+		addToObjList(result, "Total amount of personal expenses: ", timeSpan.getPersTotalAfterTax(), "Of that VAT: ", timeSpan.getPersTotalTax());
 
 		if (timeSpan instanceof Year) {
 			Year curYear = (Year) timeSpan;
-			html += AccountingUtils.createOverviewPanelInHtml("ROUGHLY expected income tax payment: ", (int) curYear.getExpectedIncomeTax());
-			html += AccountingUtils.createOverviewPanelInHtml("Total amount earned in " + curYear.getNum() + ": ", (int) (timeSpan.getInTotalBeforeTax() - (timeSpan.getOutTotalBeforeTax() + timeSpan.getDonTotalBeforeTax() + timeSpan.getPersTotalBeforeTax() + curYear.getExpectedIncomeTax())));
+			addToObjList(result, "ROUGHLY expected income tax payment: ", (int) curYear.getExpectedIncomeTax());
+			addToObjList(result, "Total amount earned in " + curYear.getNum() + ": ", (int) (timeSpan.getInTotalBeforeTax() - (timeSpan.getOutTotalBeforeTax() + timeSpan.getDonTotalBeforeTax() + timeSpan.getPersTotalBeforeTax() + curYear.getExpectedIncomeTax())));
 		}
 
-		html += "<div style='text-align: center; padding-top: 5pt;'>-------------- VAT / USt --------------</div>";
+		addToObjList(result, "");
+		addToObjList(result, "-------------- VAT / USt --------------");
 
-		html += AccountingUtils.createOverviewPanelInHtml("Total deductible already paid VAT / Gesamte abziehbare Vorsteuerbeträge: ", timeSpan.getDiscountablePreTax());
-		html += AccountingUtils.createOverviewPanelInHtml("Remaining VAT advance payment / Verbleibende Umsatzsteuer-Vorauszahlung: ", timeSpan.getRemainingVatPayments());
-		html += AccountingUtils.createOverviewPanelInHtml("Actual VAT advance payments made / An das Finanzamt abgeführte Umsatzsteuer: ", timeSpan.getVatPrepaymentsPaidTotal());
+		addToObjList(result, "Total deductible already paid VAT / Gesamte abziehbare Vorsteuerbeträge: ", timeSpan.getDiscountablePreTax());
+		addToObjList(result, "Remaining VAT advance payment / Verbleibende Umsatzsteuer-Vorauszahlung: ", timeSpan.getRemainingVatPayments());
+		addToObjList(result, "Actual VAT advance payments made / An das Finanzamt abgeführte Umsatzsteuer: ", timeSpan.getVatPrepaymentsPaidTotal());
 
-		html += "<div style='text-align: center; padding-top: 5pt;'>-------------- Income Tax / ESt --------------</div>";
+		addToObjList(result, "");
+		addToObjList(result, "-------------- Income Tax / ESt --------------");
 
 		OutgoingOverviewData ood = new OutgoingOverviewData(timeSpan);
 
-		html += AccountingUtils.createOverviewPanelInHtml("Total amount spent on items, raw materials etc.: ", ood.getWareCosts() + ood.getOtherCosts());
-		html += AccountingUtils.createOverviewPanelInHtml("Total external personnel and subcontractor costs: ", ood.getExternalSalary());
-		html += AccountingUtils.createOverviewPanelInHtml("Total internal personnel costs: ", ood.getInternalSalary());
-		html += AccountingUtils.createOverviewPanelInHtml("Total insurance costs: ", ood.getInsuranceCosts());
-		html += AccountingUtils.createOverviewPanelInHtml("Total vehicle costs: ", ood.getVehicleCosts());
-		html += AccountingUtils.createOverviewPanelInHtml("Total travel costs: ", ood.getTravelCosts());
-		html += AccountingUtils.createOverviewPanelInHtml("Total location / building costs: ", ood.getLocationCosts());
-		html += AccountingUtils.createOverviewPanelInHtml("Total education and conference costs: ", ood.getEducationCosts());
-		html += AccountingUtils.createOverviewPanelInHtml("Total amount spent on IT infrastructure: ", ood.getInfrastructureCosts());
-		html += AccountingUtils.createOverviewPanelInHtml("Total advertisement and branded item costs: ", ood.getAdvertisementCosts());
-		html += AccountingUtils.createOverviewPanelInHtml("Total entertainment (e.g. restaurant) costs: ", ood.getEntertainmentCosts());
+		addToObjList(result, "Total amount earned as invoices: ", timeSpan.getInTotalNoPauschalenAfterTax());
+		addToObjList(result, "Total amount earned as Ehrenamtspauschalen: ", timeSpan.getInTotalEhrenamtspauschalen());
+		addToObjList(result, "Total amount earned as Übungsleiterinnenpauschalen: ", timeSpan.getInTotalUebungsleiterinnenpauschalen());
+		addToObjList(result, "");
+		addToObjList(result, "Total amount spent on items, raw materials etc.: ", ood.getWareCosts() + ood.getOtherCosts());
+		addToObjList(result, "Total external personnel and subcontractor costs: ", ood.getExternalSalary());
+		addToObjList(result, "Total internal personnel costs: ", ood.getInternalSalary());
+		addToObjList(result, "Total insurance costs: ", ood.getInsuranceCosts());
+		addToObjList(result, "Total vehicle costs: ", ood.getVehicleCosts());
+		addToObjList(result, "Total travel costs: ", ood.getTravelCosts());
+		addToObjList(result, "Total location / building costs: ", ood.getLocationCosts());
+		addToObjList(result, "Total education and conference costs: ", ood.getEducationCosts());
+		addToObjList(result, "Total amount spent on IT infrastructure: ", ood.getInfrastructureCosts());
+		addToObjList(result, "Total advertisement and branded item costs: ", ood.getAdvertisementCosts());
+		addToObjList(result, "Total entertainment (e.g. restaurant) costs: ", ood.getEntertainmentCosts());
 
-		return html;
+		return result;
+	}
+
+	private static void addToObjList(List<List<Object>> result, String text1) {
+		List<Object> newList = new ArrayList<>();
+		newList.add(text1);
+		result.add(newList);
+	}
+
+	private static void addToObjList(List<List<Object>> result, String text1, int num1) {
+		List<Object> newList = new ArrayList<>();
+		newList.add(text1);
+		newList.add((Integer) num1);
+		result.add(newList);
+	}
+
+
+	private static void addToObjList(List<List<Object>> result, String text1, int num1, String text2, int num2) {
+		List<Object> newList = new ArrayList<>();
+		newList.add(text1);
+		newList.add((Integer) num1);
+		newList.add(text2);
+		newList.add((Integer) num2);
+		result.add(newList);
 	}
 
 	public static int createOverviewAndTaxInfo(TimeSpan timeSpan, JPanel tab, int i) {
+
+		// DEPRECATED FUNCTION, NOT UPDATED SINCE BEFORE ADDING incoKind!
 
 		CopyByClickLabel taxInfoLabel = AccountingUtils.createSubHeadLabel("Overview and Tax Information:");
 		tab.add(taxInfoLabel, new Arrangement(0, i, 1.0, 0.0));

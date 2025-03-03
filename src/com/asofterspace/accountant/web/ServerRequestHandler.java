@@ -266,7 +266,7 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					// we add the new entry (no matter if we are editing a new one or editing an existing one)
 					String new_id = database.addEntry(date, json.getString("title"), catOrCustomer,
 						preTaxAmountStr, Currency.EUR, json.getString("taxationPercent"), postTaxAmountStr,
-						json.getString("originator"), "out".equals(json.getString("kind")));
+						json.getString("originator"), json.getString("incoKind"), "out".equals(json.getString("kind")));
 
 					// did the adding succeed?
 					if (new_id != null) {
@@ -682,23 +682,25 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 					int inOtherTaxTax = 0;
 					int inTotal = 0;
 					for (Incoming incoming : incomings) {
-						inTotal += incoming.getPostTaxAmount();
-						switch (incoming.getTaxPercent()) {
-							case 0:
-								in0percTax += incoming.getPreTaxAmount();
-								break;
-							case 16:
-								in16percTax += incoming.getPreTaxAmount();
-								in16percTaxTax += incoming.getTaxAmount();
-								break;
-							case 19:
-								in19percTax += incoming.getPreTaxAmount();
-								in19percTaxTax += incoming.getTaxAmount();
-								break;
-							default:
-								inOtherTax += incoming.getPreTaxAmount();
-								inOtherTaxTax += incoming.getTaxAmount();
-								break;
+						if (!incoming.isSomeKindOfPauschale()) {
+							inTotal += incoming.getPostTaxAmount();
+							switch (incoming.getTaxPercent()) {
+								case 0:
+									in0percTax += incoming.getPreTaxAmount();
+									break;
+								case 16:
+									in16percTax += incoming.getPreTaxAmount();
+									in16percTaxTax += incoming.getTaxAmount();
+									break;
+								case 19:
+									in19percTax += incoming.getPreTaxAmount();
+									in19percTaxTax += incoming.getTaxAmount();
+									break;
+								default:
+									inOtherTax += incoming.getPreTaxAmount();
+									inOtherTaxTax += incoming.getTaxAmount();
+									break;
+							}
 						}
 					}
 
