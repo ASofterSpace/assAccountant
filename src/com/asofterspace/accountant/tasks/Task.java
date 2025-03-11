@@ -439,18 +439,20 @@ public class Task extends GenericTask {
 				int curInc = 0;
 				int curRest = 0;
 				for (Incoming entry : timeSpan.getIncomings()) {
-					if (0 == entry.getTaxPercent()) {
-						String curCustomer = entry.getCategoryOrCustomer().toLowerCase().trim();
-						boolean includeThisOne = false;
-						for (String incCustomer : included) {
-							if (curCustomer.equals(incCustomer)) {
-								includeThisOne = true;
+					if (!entry.isSomeKindOfPauschale()) {
+						if (0 == entry.getTaxPercent()) {
+							String curCustomer = entry.getCategoryOrCustomer().toLowerCase().trim();
+							boolean includeThisOne = false;
+							for (String incCustomer : included) {
+								if (curCustomer.equals(incCustomer)) {
+									includeThisOne = true;
+								}
 							}
-						}
-						if (includeThisOne) {
-							curInc += entry.getPreTaxAmount();
-						} else {
-							curRest += entry.getPreTaxAmount();
+							if (includeThisOne) {
+								curInc += entry.getPreTaxAmount();
+							} else {
+								curRest += entry.getPreTaxAmount();
+							}
 						}
 					}
 				}
