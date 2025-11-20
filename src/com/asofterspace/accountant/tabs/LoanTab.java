@@ -85,7 +85,10 @@ public class LoanTab extends Tab {
 
 			html.append("<div class='line' style='" + extraStyle + "'>");
 			html.append("Total paid so far: ");
-			html.append(database.formatMoney(amountPaid) + " €");
+			html.append(database.formatMoney(amountPaid));
+			html.append(" € (");
+			html.append(database.formatMoney(loan.getAmount() - amountPaid));
+			html.append(" € left)");
 			html.append("</div>");
 		}
 

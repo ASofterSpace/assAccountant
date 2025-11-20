@@ -175,7 +175,8 @@ public class BankStatementYearTab extends Tab {
 		graph.setBackgroundColor(new ColorRGBA(GUI.getBackgroundColor()));
 		graph.setDataColor(new ColorRGBA(80, 0, 160));
 		graph.setBaseYmin(0.0);
-		ImagePanel graphPanel = new ImagePanel(graph);
+		ImagePanel graphPanel = new ImagePanel();
+		graphPanel.setImage(graph);
 		graphPanel.setMinimumHeight(500);
 		tab.add(graphPanel, new Arrangement(0, i, 1.0, 0.0));
 		i++;
