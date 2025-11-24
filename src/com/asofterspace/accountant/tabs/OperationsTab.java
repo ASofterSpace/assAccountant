@@ -53,6 +53,10 @@ public class OperationsTab extends Tab {
 		html += "</div>";
 
 		html += "<div style='margin-bottom: 6pt;'>";
+		html += "<span class='button' onclick='accountant.save()'>";
+		html += "Save";
+		html += "</span>";
+		html += "&nbsp;&nbsp;&nbsp;";
 		html += "<span class='button' onclick='accountant.generalUndo()'>";
 		html += "General Undo";
 		html += "</span>";

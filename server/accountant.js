@@ -8,6 +8,27 @@ window.accountant = {
 	lastTaxChangeWasPreTax: true,
 
 
+	save: function() {
+
+		var request = new XMLHttpRequest();
+		request.open("POST", "save", true);
+		request.setRequestHeader("Content-Type", "application/json");
+
+		request.onreadystatechange = function() {
+			if (request.readyState == 4 && request.status == 200) {
+				var result = JSON.parse(request.response);
+				if (result.success) {
+					window.location.reload(false);
+				}
+			}
+		};
+
+		var data = {
+		};
+
+		request.send(JSON.stringify(data));
+	},
+
 	exportCsvs: function(tab) {
 		var request = new XMLHttpRequest();
 		request.open("POST", "exportCSVs", true);

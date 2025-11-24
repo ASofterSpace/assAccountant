@@ -16,19 +16,25 @@ public class Payment implements Recordable {
 
 	private final static String AMOUNT = "amount";
 
+	private final static String COMMENT = "comment";
+
 	private Date date;
 
 	private int amount;
 
+	private String comment;
 
-	public Payment(Date date, int amount) {
+
+	public Payment(Date date, int amount, String comment) {
 		this.date = date;
 		this.amount = amount;
+		this.comment = comment;
 	}
 
 	public Payment(Record rec) {
 		this.date = rec.getDate(DATE);
 		this.amount = rec.getInteger(AMOUNT, 0);
+		this.comment = rec.getString(COMMENT);
 	}
 
 	public Date getDate() {
@@ -47,11 +53,24 @@ public class Payment implements Recordable {
 		this.amount = amount;
 	}
 
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
+	}
+
 	@Override
 	public Record toRecord() {
 		Record rec = Record.emptyObject();
 		rec.set(DATE, date);
 		rec.set(AMOUNT, amount);
+		if (comment != null) {
+			if (!"".equals(comment)) {
+				rec.set(COMMENT, comment);
+			}
+		}
 		return rec;
 	}
 

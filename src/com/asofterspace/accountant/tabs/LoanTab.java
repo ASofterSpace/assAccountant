@@ -78,6 +78,10 @@ public class LoanTab extends Tab {
 				html.append(DateUtils.serializeDate(payment.getDate()));
 				html.append(" ");
 				html.append(database.formatMoney(payment.getAmount()) + " €");
+				String comment = payment.getComment();
+				if (comment != null) {
+					html.append(" <i>" + comment + "</i>");
+				}
 				html.append("</div>");
 
 				amountPaid += payment.getAmount();

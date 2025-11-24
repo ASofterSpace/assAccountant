@@ -119,6 +119,11 @@ public class ServerRequestHandler extends WebServerRequestHandler {
 
 			switch (fileLocation) {
 
+				case "/save":
+					taskCtrl.save();
+					database.save();
+					break;
+
 				case "/showGUI":
 					SwingUtilities.invokeLater(new GUI(database, tabCtrl, AssAccountant.getConfig()));
 					break;
