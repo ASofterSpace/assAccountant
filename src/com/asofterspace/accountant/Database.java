@@ -1445,7 +1445,15 @@ public class Database {
 
 		for (Problem problem : getProblems()) {
 			if (problem instanceof ConsistencyProblem) {
-				if (!acknowledgedProblems.contains(problem.getProblem())) {
+				String problemStr = StrUtils.removeWhitespace(problem.getProblem());
+				boolean alreadyAcknowledged = false;
+				for (String cur : acknowledgedProblems) {
+					if (problemStr.equals(StrUtils.removeWhitespace(cur))) {
+						alreadyAcknowledged = true;
+						break;
+					}
+				}
+				if (!alreadyAcknowledged) {
 					result.add((ConsistencyProblem) problem);
 				}
 			}
