@@ -41,15 +41,15 @@ public class YearTab extends TimeSpanTab {
 			html += "onclick='window.accountant.openInOS(" + getYear().getNum() + ", null)'>";
 			html += "Open in OS</span>";
 			String invoiceLocation = ConfigCtrl.getInvoiceLocation(getYear().getNum(), null);
-			html += "<a class='topleftAction button' style='left:76pt;' target='_blank' ";
+			html += "<a class='topleftAction button' style='left:82pt;' target='_blank' ";
 			html += "href='http://localhost:3013/?link=" + invoiceLocation + "'>Open in Browser</span>";
 			html += "</a>";
 		}
 
-		html += "<a class='toprightAction button' style='right:150pt;' target='_blank' href='print_pdf_bwa_" +
+		html += "<a class='toprightAction button' style='right:178pt;' target='_blank' href='print_pdf_bwa_" +
 			ServerRequestHandler.tabToLink(this) + "'>Print BWA</span>";
 		html += "</a>";
-		html += "<a class='toprightAction button' style='right:92pt;' target='_blank' href='print_pdf_euer_" +
+		html += "<a class='toprightAction button' style='right:110pt;' target='_blank' href='print_pdf_euer_" +
 			ServerRequestHandler.tabToLink(this) + "'>Print EÜR</span>";
 		html += "</a>";
 		html += "<span class='toprightAction button' onclick='window.accountant.exportCsvs(\"" + ServerRequestHandler.tabToLink(this) + "\")'>" +
