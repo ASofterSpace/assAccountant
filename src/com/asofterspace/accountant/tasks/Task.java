@@ -73,7 +73,7 @@ public class Task extends GenericTask {
 	private static int count_up_id = 0;
 
 
-	public Task(String title, Integer scheduledOnXDayOfMonth, Integer scheduledOnDay, List<String> scheduledOnDaysOfWeek,
+	public Task(String title, List<Integer> scheduledOnXDayOfMonth, Integer scheduledOnDay, List<String> scheduledOnDaysOfWeek,
 		List<Integer> scheduledInMonths, List<Integer> scheduledInYears,
 		List<String> details, List<String> onDone, Boolean biweeklyEven, Boolean biweeklyOdd) {
 

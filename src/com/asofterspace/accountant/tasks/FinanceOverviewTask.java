@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class FinanceOverviewTask extends Task {
 
-	public FinanceOverviewTask(String title, Integer scheduledOnXDayOfMonth, Integer scheduledOnDay,
+	public FinanceOverviewTask(String title, List<Integer> scheduledOnXDayOfMonth, Integer scheduledOnDay,
 		List<String> scheduledOnDaysOfWeek, List<Integer> scheduledInMonths, List<Integer> scheduledInYears,
 		List<String> details, List<String> onDone, Boolean biweeklyEven, Boolean biweeklyOdd) {
 
