@@ -44,7 +44,7 @@ public class MonthTab extends TimeSpanTab {
 			html += "Open in OS</span>";
 			String invoiceLocation = ConfigCtrl.getInvoiceLocation(getYear().getNum(), getMonth().getNum());
 			html += "<a class='topleftAction button' style='left:82pt;' target='_blank' ";
-			html += "href='http://localhost:3013/?link=" + invoiceLocation + "'>Open in Browser</span>";
+			html += "href='http://127.0.0.1:3013/?link=" + invoiceLocation + "'>Open in Browser</span>";
 			html += "</a>";
 		}
 
